@@ -65,6 +65,7 @@
 <header class="topbar"><div><div class="top-title" id="pageTitle">Centro de Control de Tráfico Terrestre</div><div class="top-sub" id="pageSub">Panel operativo integrado</div></div><div class="profile-mini"><div><div style="font-size:12px;font-weight:850" id="miniName">Operador CCTT</div><div class="muted" id="miniRole">Control operativo</div></div><div class="avatar" id="miniAvatar">CC</div></div></header>
 <div class="content">
 <section class="page active" id="page-inicio">
+ <div class="hero"><h1>Centro de Control de Tráfico Terrestre</h1><p>Panel unificado para las funciones de los ocho libros con macros: procesamiento de bitácoras, accidentes, citas, comunicados y operación de cesionarios. Los datos se conservan localmente en este navegador.</p></div>
  <div class="grid g4" id="homeKpis"></div>
  <div class="section-title"><h2>Módulos operativos</h2><span class="module-tag">8 archivos integrados</span></div>
  <div class="grid g3" id="moduleCards"></div>
@@ -910,4 +911,84 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   if(copTemplateIndex>=0)renderCopTemplateFinal();
 })();
 </script>
+
+<style id="reportMacroFidelityV5">
+/* Reporte cesionarios: replica del espaciado/escala de la macro Word */
+.report-overlay .report-bulletin-shell.in-template{font-family:"Noto Sans",Arial,sans-serif!important;padding:0!important;max-width:none!important;color:#111!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-top{margin:0 0 18px!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-headings{font-family:"Noto Sans",Arial,sans-serif!important;font-size:12px!important;line-height:1.18!important;text-align:right!important;margin-top:0!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-date{font-family:"Noto Sans",Arial,sans-serif!important;font-size:12px!important;line-height:1.18!important;text-align:right!important;margin:18px 0 24px!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-meta p{font-family:"Noto Sans",Arial,sans-serif!important;font-size:12px!important;line-height:17.33px!important;margin:0 0 13px!important;font-weight:700!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-paragraphs p{font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:12px!important;line-height:17.33px!important;text-align:justify!important;margin:0 0 13px!important}
+.report-overlay .report-bulletin-shell.in-template .rep-bulletin-table{font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:11px!important;line-height:15px!important;margin-top:13px!important;width:100%!important;border-collapse:collapse!important}
+.report-overlay .report-bulletin-shell.in-template .rep-bulletin-table th,.report-overlay .report-bulletin-shell.in-template .rep-bulletin-table td{padding:2px 5px!important;height:18px!important;vertical-align:middle!important}
+.report-overlay .report-bulletin-shell.in-template .rep-bulletin-table .zone-cell{text-align:center!important;vertical-align:middle!important;font-weight:700!important}
+</style>
+<script id="reportMacroFidelityV5Js">
+(function(){
+  const DEFAULT_REPORT_ROWS=[
+    ['ZONA NORTE','CONTECON'],['ZONA NORTE','HAZESA'],
+    ['ZONA SUR','SSA'],['ZONA SUR','TIMSA'],['ZONA SUR','OCUPA'],['ZONA SUR','MULTIMODAL'],['ZONA SUR','CEMEX'],['ZONA SUR','FRIMAN'],['ZONA SUR','LA JUNTA'],['ZONA SUR','CTM']
+  ];
+  function ensureMacroRows(){
+    ensureReport();
+    const keys=new Set((state.report.rows||[]).map(r=>norm((r.zone||'')+'|'+(r.name||''))));
+    let changed=false;
+    for(const [zone,name] of DEFAULT_REPORT_ROWS){
+      const k=norm(zone+'|'+name);
+      if(!keys.has(k)){state.report.rows.push({zone,name,status:'Pendiente',comments:'Sin novedades'});changed=true;}
+    }
+    if(changed) save();
+  }
+  function macroReportPlacement(){
+    const d=state.report.templatePlacement||{};
+    return {
+      top:Number.isFinite(+d.topV5)?+d.topV5:8.8,
+      left:Number.isFinite(+d.leftV5)?+d.leftV5:13.6,
+      width:Number.isFinite(+d.widthV5)?+d.widthV5:72.4,
+      height:Number.isFinite(+d.heightV5)?+d.heightV5:72.5,
+      font:Number.isFinite(+d.fontV5)?+d.fontV5:12
+    };
+  }
+  reportPlacement=function(){return macroReportPlacement()};
+  saveReportPlacement=function(k,v){
+    const map={top:'topV5',left:'leftV5',width:'widthV5',height:'heightV5',font:'fontV5'};
+    state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{}, {[map[k]||k]:+v});
+    save();updateReportPreview();
+  };
+  fitOverlayText=function(overlay){
+    if(!overlay)return;
+    const d=macroReportPlacement();
+    overlay.style.fontSize=d.font+'px';
+    overlay.style.lineHeight='17.33px';
+    let scale=1,guard=40;
+    while(guard--&&(overlay.scrollHeight>overlay.clientHeight+2||overlay.scrollWidth>overlay.clientWidth+2)&&scale>.76){
+      scale-=.02;
+      overlay.style.transformOrigin='top left';
+      overlay.style.transform=`scale(${scale})`;
+      overlay.style.width=(100/scale)+'%';
+      overlay.style.height=(100/scale)+'%';
+    }
+    return d.font*scale;
+  };
+  createReportOverlay=function(page){
+    const d=macroReportPlacement(),ov=document.createElement('div');
+    ov.className='report-overlay report-overlay-macro';
+    Object.assign(ov.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.font+'px',position:'absolute',overflow:'hidden',boxSizing:'border-box'});
+    ov.innerHTML=canonicalReportBulletinHtml({inTemplate:true});
+    page.appendChild(ov);
+    requestAnimationFrame(()=>fitOverlayText(ov));
+    return ov;
+  };
+  function resetPlacementToMacro(){
+    state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{}, {topV5:8.8,leftV5:13.6,widthV5:72.4,heightV5:72.5,fontV5:12});
+    save();
+  }
+  ensureMacroRows();
+  const p=state.report.templatePlacement||{};
+  if(!('topV5' in p)) resetPlacementToMacro();
+  try{renderReport();updateReportPreview();}catch(e){console.warn(e)}
+})();
+</script>
+
 </body></html>
