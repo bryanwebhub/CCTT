@@ -149,7 +149,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 
 <section class="page" id="page-inc35copoma">
  <div class="section-title"><h2>COPOMA · comunicados</h2><span class="module-tag">Hoja COPOMA</span></div>
- <div class="grid g2"><div class="card"><h3>Contenido y formato</h3><div class="grid g2"><div class="field"><label>Fecha</label><input type="date" id="copDate"></div><div class="field"><label>Hora</label><input type="time" id="copTime"></div></div><div class="field" style="margin-top:10px"><label>Encabezado</label><input id="copHeader" value="COMUNIDAD PORTUARIA DE MANZANILLO INFORMA:"></div><div class="field"><label>Mensaje</label><textarea id="copText" style="min-height:150px">Por medio del presente, el Centro de Control de Tráfico Terrestre informa al gremio la solicitud de abstenerse de enviar unidades hacia la zona norte. Esta medida se deriva de la alta afluencia vehicular registrada en las vialidades de dicha área y tiene como finalidad prevenir la acumulación de vehículos, así como evitar la saturación en los accesos exteriores.</textarea></div><div class="field"><label>Cierre</label><input id="copFooter" value="POR UNA COMUNIDAD PORTUARIA FORTALECIDA"></div><div class="row"><button class="btn primary" id="copGenerate">Generar contenido</button><button class="btn" id="copCopy">Copiar</button><button class="btn bad" id="copClear">Restablecer</button></div><h3 style="margin-top:18px">Editor de estilo</h3><div class="editor-toolbar" id="copToolbar"><button type="button" data-cmd="bold">B</button><button type="button" data-cmd="italic"><i>I</i></button><button type="button" data-cmd="underline"><u>U</u></button><button type="button" data-cmd="justifyLeft">L</button><button type="button" data-cmd="justifyCenter">C</button><button type="button" data-cmd="justifyRight">R</button><select id="copFontSize" aria-label="Tamaño de letra"><option value="3">Normal</option><option value="4">Mediana</option><option value="5">Grande</option><option value="6">Muy grande</option></select></div><div id="copRichEditor" class="rich-editor" contenteditable="true"></div></div><div class="card"><h3>Formatos base</h3><p class="muted">Puedes adjuntar hasta tres plantillas de imagen. La opción seleccionada se usa como fondo real del comunicado y queda guardada en este navegador.</p><input id="copTemplates" type="file" multiple accept="image/*"><div id="copTemplateList" class="template-list"></div><h3 style="margin-top:18px">Vista previa</h3><div id="copTemplatePreview" class="format-preview"><div class="overlay-content" id="copPreview"></div></div></div></div>
+ <div class="grid g2"><div class="card"><h3>Contenido y formato</h3><div class="grid g2"><div class="field"><label>Fecha</label><input type="date" id="copDate"></div><div class="field"><label>Hora</label><input type="time" id="copTime"></div></div><div class="field" style="margin-top:10px"><label>Encabezado</label><input id="copHeader" value="COMUNIDAD PORTUARIA DE MANZANILLO INFORMA:"></div><div class="field"><label>Mensaje</label><textarea id="copText" style="min-height:150px">Por medio del presente, el Centro de Control de Tráfico Terrestre informa al gremio la solicitud de abstenerse de enviar unidades hacia la zona norte. Esta medida se deriva de la alta afluencia vehicular registrada en las vialidades de dicha área y tiene como finalidad prevenir la acumulación de vehículos, así como evitar la saturación en los accesos exteriores.</textarea></div><div class="field"><label>Cierre</label><input id="copFooter" value="POR UNA COMUNIDAD PORTUARIA FORTALECIDA"></div><div class="row"><button class="btn primary" id="copGenerate">Generar contenido</button><button class="btn" id="copCopy">Copiar</button><button class="btn bad" id="copClear">Restablecer</button></div><h3 style="margin-top:18px">Editor de estilo</h3><div class="editor-toolbar" id="copToolbar"><button type="button" data-cmd="bold">B</button><button type="button" data-cmd="italic"><i>I</i></button><button type="button" data-cmd="underline"><u>U</u></button><button type="button" data-cmd="justifyLeft">L</button><button type="button" data-cmd="justifyCenter">C</button><button type="button" data-cmd="justifyRight">R</button><select id="copFontSize" aria-label="Tamaño de letra"><option value="3">Normal</option><option value="4">Mediana</option><option value="5">Grande</option><option value="6">Muy grande</option></select></div><div id="copRichEditor" class="rich-editor" contenteditable="true"></div></div><div class="card"><h3>Formatos base</h3><p class="muted">Puedes adjuntar hasta tres plantillas de imagen o PDF. La opción seleccionada se usa como fondo real del comunicado y queda guardada en este navegador.</p><input id="copTemplates" type="file" multiple accept="image/*,.pdf,application/pdf"><div id="copTemplateList" class="template-list"></div><h3 style="margin-top:18px">Vista previa</h3><div id="copTemplatePreview" class="format-preview"><div class="overlay-content" id="copPreview"></div></div></div></div>
 </section>
 
 <section class="page" id="page-inc35vial">
@@ -487,9 +487,9 @@ const FIXED_PAGE_CSS=`
 if(!document.getElementById('fixedPageCss'))document.head.insertAdjacentHTML('beforeend',FIXED_PAGE_CSS);
 
 function cleanLegendText(v){return String(v??'').replace(/\\n/g,'\n').replace(/\r\n/g,'\n')}
-function reportPlacement(){const d=state.report.templatePlacement||{};return {top:Number.isFinite(+d.top)?+d.top:27,left:Number.isFinite(+d.left)?+d.left:8,width:Number.isFinite(+d.width)?+d.width:84,height:Number.isFinite(+d.height)?+d.height:58,font:Number.isFinite(+d.font)?+d.font:11}}
+function reportPlacement(){const d=state.report.templatePlacement||{};return {top:Number.isFinite(+d.top)?+d.top:24,left:Number.isFinite(+d.left)?+d.left:7.5,width:Number.isFinite(+d.width)?+d.width:85.5,height:Number.isFinite(+d.height)?+d.height:66.5,font:Number.isFinite(+d.font)?+d.font:13}}
 function saveReportPlacement(k,v){state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{}, {[k]:+v});save();updateReportPreview()}
-function injectReportPlacementControls(){const host=document.getElementById('repPersistNote');if(!host||document.getElementById('reportPlacementControls'))return;const d=reportPlacement(),box=document.createElement('div');box.id='reportPlacementControls';box.innerHTML=`<div class="notice" style="margin-top:10px"><b>Ajuste de contenido sobre la plantilla</b><br>La plantilla conserva su tamaño y diseño. Ajuste únicamente el área donde se colocará el reporte; el sistema reducirá el texto automáticamente para evitar una segunda hoja.</div><div class="report-placement-grid"><div class="field"><label>Superior %</label><input id="rplTop" type="number" min="0" max="90" value="${d.top}"></div><div class="field"><label>Izquierda %</label><input id="rplLeft" type="number" min="0" max="90" value="${d.left}"></div><div class="field"><label>Ancho %</label><input id="rplWidth" type="number" min="10" max="100" value="${d.width}"></div><div class="field"><label>Alto %</label><input id="rplHeight" type="number" min="10" max="95" value="${d.height}"></div><div class="field"><label>Texto base px</label><input id="rplFont" type="number" min="7" max="24" value="${d.font}"></div></div>`;host.appendChild(box);[['rplTop','top'],['rplLeft','left'],['rplWidth','width'],['rplHeight','height'],['rplFont','font']].forEach(([id,k])=>document.getElementById(id).onchange=e=>saveReportPlacement(k,e.target.value))}
+function injectReportPlacementControls(){const host=document.getElementById('repPersistNote');if(!host||document.getElementById('reportPlacementControls'))return;const d=reportPlacement(),box=document.createElement('div');box.id='reportPlacementControls';box.innerHTML=`<div class="notice" style="margin-top:10px"><b>Ajuste de contenido sobre la plantilla</b><br>La plantilla conserva su tamaño y diseño. Ajuste únicamente el área donde se colocará el reporte; el sistema reducirá el texto automáticamente para evitar una segunda hoja y aprovechar mejor el espacio útil de la plantilla.</div><div class="report-placement-grid"><div class="field"><label>Superior %</label><input id="rplTop" type="number" min="0" max="90" value="${d.top}"></div><div class="field"><label>Izquierda %</label><input id="rplLeft" type="number" min="0" max="90" value="${d.left}"></div><div class="field"><label>Ancho %</label><input id="rplWidth" type="number" min="10" max="100" value="${d.width}"></div><div class="field"><label>Alto %</label><input id="rplHeight" type="number" min="10" max="95" value="${d.height}"></div><div class="field"><label>Texto base px</label><input id="rplFont" type="number" min="7" max="24" value="${d.font}"></div></div>`;host.appendChild(box);[['rplTop','top'],['rplLeft','left'],['rplWidth','width'],['rplHeight','height'],['rplFont','font']].forEach(([id,k])=>document.getElementById(id).onchange=e=>saveReportPlacement(k,e.target.value))}
 
 reportInsertHtml=function(full=true){const d=document.getElementById('repDate').value||today(),t=document.getElementById('repTime').value||timeNow(),legend=cleanLegendText(state.report.legend);return `<div class="report-insert">${full?`<h2>REPORTE OPERATIVO DE CESIONARIOS</h2><p>Fecha: <b>${esc(d)}</b> · Hora de emisión: <b>${esc(t)}</b></p><div style="white-space:pre-wrap;margin:.6em 0">${esc(legend)}</div>`:''}${reportTableHtml()}${full?`<p style="margin-top:.8em;font-size:.9em">Centro de Control de Tráfico Terrestre · ${esc(state.profile.name||'')}</p>`:''}</div>`};
 
@@ -637,10 +637,10 @@ ensureAssetModal();injectControlReview();injectTemplateTools();renderPdfHist();e
  renderCopTemplateFinal=async function(){
    const box=document.getElementById('copTemplatePreview'),f=copTemplateIndex>=0?copTemplates[copTemplateIndex]:null;box.className='format-preview';
    if(!f){box.innerHTML='<div class="empty">Adjunte una plantilla de imagen o PDF.</div>';copSavedStatus();return}
-   try{const ras=await templateRaster(f);if(!ras)throw new Error('COPOMA acepta imagen o PDF.');box.innerHTML='';const stage=document.createElement('div');stage.className='cop-exact-stage';stageSize(stage,ras.width,ras.height,760);stage.innerHTML=`<img class="template-bg" src="${ras.src}" alt="Plantilla COPOMA">`;box.appendChild(stage);buildCopLayers(stage);copSavedStatus()}catch(e){box.innerHTML='<div class="empty">No se pudo mostrar el formato: '+esc(e.message)+'</div>'}
+   try{const ras=await templateRaster(f);if(!ras)throw new Error('COPOMA acepta imagen o PDF.');box.innerHTML='';const stage=document.createElement('div');stage.className='cop-exact-stage';stageSize(stage,ras.width,ras.height,760);stage.innerHTML=`<img class="template-bg" src="${ras.src}" alt="Plantilla COPOMA">`;box.appendChild(stage);buildCopLayers(stage);applyCopDesign();copSavedStatus()}catch(e){box.innerHTML='<div class="empty">No se pudo mostrar el formato: '+esc(e.message)+'</div>'}
  };
 
- renderCop=function(){const st=document.querySelector('#copTemplatePreview .cop-exact-stage');if(st){buildCopLayers(st);return}renderCopTemplateFinal()};
+ renderCop=function(){const st=document.querySelector('#copTemplatePreview .cop-exact-stage');if(st){buildCopLayers(st);applyCopDesign();return}renderCopTemplateFinal()};
  syncCopEditor=function(){const ed=document.getElementById('copRichEditor');if(ed&&document.activeElement!==ed)ed.innerHTML=`<div>${esc(document.getElementById('copText').value.trim()).replace(/\n/g,'<br>')}</div>`;renderCop()};
  document.getElementById('copRichEditor').oninput=()=>renderCop();
  document.getElementById('copTemplates').onchange=async e=>{
@@ -661,7 +661,47 @@ ensureAssetModal();injectControlReview();injectTemplateTools();renderPdfHist();e
  // Make defaults resemble the supplied COPOMA example when the user has not customized them.
  if(!state.inc35.copomaDesign){state.inc35.copomaDesign={top:21.2,left:3.3,width:90.8,height:31.5,fontSize:24,color:'#111111',bg:'transparent',padding:0};save()}
 
- renderReportTemplates();renderCopTemplates();copSavedStatus();ensureCopDesignControls();syncCopEditor();
+ 
+function copAlignSettings(){const a=state.inc35.copomaAlign||{};return {body:a.body||'left',header:a.header||'left',footer:a.footer||'left'}}
+(function migrateReportPlacementDefaults(){
+ const d=state.report.templatePlacement||{};
+ const empty=!('top' in d)&&!('left' in d)&&!('width' in d)&&!('height' in d)&&!('font' in d);
+ const old=+d.top===27&&+d.left===8&&+d.width===84&&+d.height===58&&(!('font' in d)||+d.font===11);
+ if(empty||old){state.report.templatePlacement={top:24,left:7.5,width:85.5,height:66.5,font:13}; save();}
+})();
+const prevApplyCopDesign=applyCopDesign;
+applyCopDesign=function(){
+ prevApplyCopDesign();
+ const st=document.querySelector('#copTemplatePreview .cop-exact-stage');
+ if(!st) return;
+ const a=copAlignSettings();
+ const body=st.querySelector('.cop-layer-body');
+ const header=st.querySelector('.cop-layer-header');
+ const footer=st.querySelector('.cop-layer-footer');
+ if(body){body.style.textAlign=a.body; body.querySelectorAll('p,div').forEach(el=>el.style.textAlign=a.body);}
+ if(header) header.style.textAlign=a.header;
+ if(footer) footer.style.textAlign=a.footer;
+};
+const prevEnsureCopDesignControls=ensureCopDesignControls;
+ensureCopDesignControls=function(){
+ prevEnsureCopDesignControls();
+ const host=document.getElementById('copDesignControls');
+ if(!host||document.getElementById('copAlignControls')) return;
+ const a=copAlignSettings();
+ const row=document.createElement('div');
+ row.id='copAlignControls';
+ row.className='cop-design-grid';
+ row.style.marginTop='10px';
+ row.innerHTML=
+  '<div class="field"><label>Alineación mensaje</label><select id="copAlignBody"><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option><option value="justify">Justificado</option></select></div>'+
+  '<div class="field"><label>Alineación encabezado</label><select id="copAlignHeader"><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></div>'+
+  '<div class="field"><label>Alineación cierre</label><select id="copAlignFooter"><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></div>';
+ host.appendChild(row);
+ const bind=(id,key)=>{const el=document.getElementById(id); if(!el) return; el.value=a[key]; el.onchange=()=>{state.inc35.copomaAlign=Object.assign({},state.inc35.copomaAlign||{}, {[key]:el.value}); save(); applyCopDesign();}};
+ bind('copAlignBody','body'); bind('copAlignHeader','header'); bind('copAlignFooter','footer');
+};
+
+renderReportTemplates();renderCopTemplates();copSavedStatus();ensureCopDesignControls();syncCopEditor();
  if(copTemplateIndex>=0)renderCopTemplateFinal();
 })();
 </script>
