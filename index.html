@@ -464,7 +464,206 @@ function applyCopDesign(){const el=document.getElementById('copPreview');if(!el)
 function ensureCopDesignControls(){const inp=document.getElementById('copTemplates');if(!inp||document.getElementById('copDesignControls'))return;const box=document.createElement('div');box.id='copDesignControls';box.innerHTML=`<div class="notice" style="margin-top:10px">La imagen seleccionada se utiliza completa como plantilla. Ajusta el área donde se colocará el comunicado sin modificar la imagen original.</div><div class="cop-design-grid"><div class="field"><label>Superior %</label><input id="copDTop" type="number" min="0" max="95"></div><div class="field"><label>Izquierda %</label><input id="copDLeft" type="number" min="0" max="95"></div><div class="field"><label>Ancho %</label><input id="copDWidth" type="number" min="5" max="100"></div><div class="field"><label>Alto %</label><input id="copDHeight" type="number" min="5" max="100"></div><div class="field"><label>Tamaño texto</label><input id="copDFont" type="number" min="8" max="72"></div><div class="field"><label>Color texto</label><input id="copDColor" type="color"></div></div><div class="row" style="margin-top:10px"><button class="btn" id="copTransparentBg">Fondo transparente</button><button class="btn" id="copWhiteBg">Fondo claro</button><button class="btn dark" id="copPng">Descargar vista PNG</button></div>`;inp.insertAdjacentElement('afterend',box);const d=copDesign();[['copDTop','top'],['copDLeft','left'],['copDWidth','width'],['copDHeight','height'],['copDFont','fontSize']].forEach(([id,k])=>{const e=document.getElementById(id);e.value=d[k];e.oninput=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{}, {[k]:+e.value});save();applyCopDesign()}});const c=document.getElementById('copDColor');c.value=d.color;c.oninput=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{},{color:c.value});save();applyCopDesign()};document.getElementById('copTransparentBg').onclick=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{},{bg:'transparent'});save();applyCopDesign()};document.getElementById('copWhiteBg').onclick=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{},{bg:'rgba(255,255,255,0.72)'});save();applyCopDesign()};document.getElementById('copPng').onclick=async()=>{if(!window.html2canvas)return toast('No se cargó el generador de imagen.',true);const node=document.getElementById('copTemplatePreview');try{const canvas=await html2canvas(node,{scale:2,useCORS:true,backgroundColor:'#ffffff'});canvas.toBlob(b=>downloadBlob(b,'COPOMA_'+today()+'.png'),'image/png')}catch(e){toast('No se pudo generar la imagen: '+e.message,true)}}}
 async function restorePersistentAssets(){try{reportTemplates=await loadTemplateSet('report');reportTemplateIndex=reportTemplates.length?Math.min(Math.max(0,state.report.templateIndex??0),reportTemplates.length-1):-1;renderReportTemplates();if(reportTemplateIndex>=0)await chooseReportTemplate(reportTemplateIndex);copTemplates=await loadTemplateSet('copoma');copTemplateIndex=copTemplates.length?Math.min(Math.max(0,state.inc35.copomaTemplateIndex??0),copTemplates.length-1):-1;renderCopTemplates();if(copTemplateIndex>=0)await chooseCopTemplate(copTemplateIndex)}catch(e){console.warn('No fue posible restaurar formatos persistentes',e)}}
 
+
+/* === Fixed-page template engine v3: preserves page geometry and prevents accidental blank pages === */
+const FIXED_PAGE_CSS=`
+<style id="fixedPageCss">
+.report-fixed-page{position:relative!important;overflow:hidden!important;margin:0 auto!important;box-sizing:border-box!important;background:#fff!important}
+.report-fixed-page>.report-overlay{position:absolute;z-index:20;box-sizing:border-box;overflow:hidden;font-family:Arial,sans-serif;color:#111;background:transparent}
+.report-fixed-page>.report-overlay .report-insert{font-size:inherit;line-height:1.25}
+.report-fixed-page>.report-overlay h2{font-size:1.45em;margin:0 0 .55em;text-align:center}
+.report-fixed-page>.report-overlay p{margin:.35em 0}
+.report-fixed-page>.report-overlay table{width:100%;border-collapse:collapse;font-size:.78em;table-layout:fixed}
+.report-fixed-page>.report-overlay th,.report-fixed-page>.report-overlay td{border:1px solid #8e8e8e;padding:.32em .42em;vertical-align:top;word-break:break-word}
+.report-final-shell{display:flex;justify-content:center;overflow:auto;background:#edf2f8;padding:12px;border-radius:12px}
+.report-final-shell .docx-wrapper{padding:0!important;background:transparent!important}
+.report-final-shell section.docx{margin:0 auto!important;box-shadow:0 2px 12px #0013!important}
+.report-pdf-page{position:relative;margin:0 auto;background:#fff;overflow:hidden;box-shadow:0 2px 12px #0013}
+.report-pdf-page canvas{display:block;width:100%;height:100%}
+.report-placement-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:9px}
+.report-placement-grid input{width:100%;min-height:35px;padding:7px 8px;border:1px solid #cbd7e6;border-radius:8px}
+@media(max-width:800px){.report-placement-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>`;
+if(!document.getElementById('fixedPageCss'))document.head.insertAdjacentHTML('beforeend',FIXED_PAGE_CSS);
+
+function cleanLegendText(v){return String(v??'').replace(/\\n/g,'\n').replace(/\r\n/g,'\n')}
+function reportPlacement(){const d=state.report.templatePlacement||{};return {top:Number.isFinite(+d.top)?+d.top:27,left:Number.isFinite(+d.left)?+d.left:8,width:Number.isFinite(+d.width)?+d.width:84,height:Number.isFinite(+d.height)?+d.height:58,font:Number.isFinite(+d.font)?+d.font:11}}
+function saveReportPlacement(k,v){state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{}, {[k]:+v});save();updateReportPreview()}
+function injectReportPlacementControls(){const host=document.getElementById('repPersistNote');if(!host||document.getElementById('reportPlacementControls'))return;const d=reportPlacement(),box=document.createElement('div');box.id='reportPlacementControls';box.innerHTML=`<div class="notice" style="margin-top:10px"><b>Ajuste de contenido sobre la plantilla</b><br>La plantilla conserva su tamaño y diseño. Ajuste únicamente el área donde se colocará el reporte; el sistema reducirá el texto automáticamente para evitar una segunda hoja.</div><div class="report-placement-grid"><div class="field"><label>Superior %</label><input id="rplTop" type="number" min="0" max="90" value="${d.top}"></div><div class="field"><label>Izquierda %</label><input id="rplLeft" type="number" min="0" max="90" value="${d.left}"></div><div class="field"><label>Ancho %</label><input id="rplWidth" type="number" min="10" max="100" value="${d.width}"></div><div class="field"><label>Alto %</label><input id="rplHeight" type="number" min="10" max="95" value="${d.height}"></div><div class="field"><label>Texto base px</label><input id="rplFont" type="number" min="7" max="24" value="${d.font}"></div></div>`;host.appendChild(box);[['rplTop','top'],['rplLeft','left'],['rplWidth','width'],['rplHeight','height'],['rplFont','font']].forEach(([id,k])=>document.getElementById(id).onchange=e=>saveReportPlacement(k,e.target.value))}
+
+reportInsertHtml=function(full=true){const d=document.getElementById('repDate').value||today(),t=document.getElementById('repTime').value||timeNow(),legend=cleanLegendText(state.report.legend);return `<div class="report-insert">${full?`<h2>REPORTE OPERATIVO DE CESIONARIOS</h2><p>Fecha: <b>${esc(d)}</b> · Hora de emisión: <b>${esc(t)}</b></p><div style="white-space:pre-wrap;margin:.6em 0">${esc(legend)}</div>`:''}${reportTableHtml()}${full?`<p style="margin-top:.8em;font-size:.9em">Centro de Control de Tráfico Terrestre · ${esc(state.profile.name||'')}</p>`:''}</div>`};
+
+function fitOverlayText(overlay){if(!overlay)return;const d=reportPlacement();let px=d.font;overlay.style.fontSize=px+'px';overlay.style.lineHeight='1.25';let guard=30;while(guard--&&px>7&&(overlay.scrollHeight>overlay.clientHeight+2||overlay.scrollWidth>overlay.clientWidth+2)){px-=.35;overlay.style.fontSize=px+'px'}return px}
+function createReportOverlay(page){const d=reportPlacement(),ov=document.createElement('div');ov.className='report-overlay';Object.assign(ov.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.font+'px'});ov.innerHTML=reportInsertHtml(true);page.appendChild(ov);requestAnimationFrame(()=>fitOverlayText(ov));return ov}
+function normalizeDocxPage(page){page.classList.add('report-fixed-page');page.style.position='relative';page.style.overflow='hidden';const cs=getComputedStyle(page);if(!page.style.width&&cs.width)page.style.width=cs.width;if(!page.style.height&&cs.height)page.style.height=cs.height;return page}
+function firstRealDocxPage(box){const pages=[...box.querySelectorAll('section.docx')];if(!pages.length)return null;/* Keep the actual first template page only in generated report. This prevents flow-created/empty pages. */pages.slice(1).forEach(p=>p.style.display='none');return pages[0]}
+
+renderFinalReportWithTemplate=async function(f){const host=document.getElementById('reportPreview');host.innerHTML='<div class="empty">Preparando plantilla...</div>';state.report.legend=cleanLegendText(document.getElementById('repLegend').value);save();if(/\.docx$/i.test(f.name)){const shell=document.createElement('div');shell.className='template-final report-final-shell';const box=document.createElement('div');box.className='docx-render-host';shell.appendChild(box);host.innerHTML='';host.appendChild(shell);await renderDocxVisual(f,box);const page=firstRealDocxPage(box);if(!page)throw new Error('La plantilla DOCX no contiene una página renderizable.');normalizeDocxPage(page);createReportOverlay(page);return page}if(/\.pdf$/i.test(f.name)){host.innerHTML='';const shell=document.createElement('div');shell.className='template-final report-final-shell';const box=document.createElement('div');shell.appendChild(box);host.appendChild(shell);const wrap=await renderPdfFirstPage(f,box);if(!wrap)throw new Error('No fue posible renderizar el PDF.');wrap.classList.add('report-pdf-page','report-fixed-page');createReportOverlay(wrap);return wrap}oldUpdateReportPreview();return document.getElementById('printReport')};
+
+updateReportPreview=async function(){state.report.legend=cleanLegendText(document.getElementById('repLegend').value);document.getElementById('repLegend').value=state.report.legend;save();const f=reportTemplateIndex>=0?reportTemplates[reportTemplateIndex]:null;if(f){try{await renderFinalReportWithTemplate(f)}catch(e){console.warn(e);toast('No fue posible aplicar la plantilla; se mostrará el diseño institucional.',true);oldUpdateReportPreview()}}else oldUpdateReportPreview()};
+
+async function reportCaptureNode(){await updateReportPreview();return document.querySelector('#reportPreview .report-fixed-page')||document.getElementById('printReport')||document.getElementById('reportPreview')}
+exportReportImage=async function(){if(!window.html2canvas)return toast('No se pudo cargar el generador de imágenes.',true);const el=await reportCaptureNode(),cv=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,scrollX:0,scrollY:0});cv.toBlob(b=>downloadBlob(b,'Reporte_Cesionarios_'+today()+'.png'),'image/png')};
+exportReportPdf=async function(){if(!window.html2canvas||!window.jspdf)return toast('No se pudo cargar el generador de PDF.',true);const el=await reportCaptureNode(),cv=await html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,scrollX:0,scrollY:0}),{jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'}),pw=210,ph=297,m=5,maxW=pw-2*m,maxH=ph-2*m,scale=Math.min(maxW/cv.width,maxH/cv.height),w=cv.width*scale,h=cv.height*scale,x=(pw-w)/2,y=(ph-h)/2;pdf.addImage(cv.toDataURL('image/jpeg',.96),'JPEG',x,y,w,h);pdf.save('Reporte_Cesionarios_'+today()+'.pdf')};
+
+/* Fixed-aspect image templates for COPOMA and all canvas/image exports. */
+async function setCopStageAspect(){const box=document.getElementById('copTemplatePreview'),img=box?.querySelector('.template-bg');if(!box||!img)return;await new Promise(r=>{if(img.complete)r();else{img.onload=r;img.onerror=r}});if(img.naturalWidth&&img.naturalHeight){box.style.aspectRatio=`${img.naturalWidth}/${img.naturalHeight}`;box.style.minHeight='0';box.style.height='auto';img.style.objectFit='fill';img.style.width='100%';img.style.height='100%';box.style.position='relative';box.style.overflow='hidden'}}
+const previousRenderCopTemplateFinal=renderCopTemplateFinal;
+renderCopTemplateFinal=async function(){await previousRenderCopTemplateFinal();await setCopStageAspect();applyCopDesign()};
+const previousApplyCopDesign=applyCopDesign;
+applyCopDesign=function(){previousApplyCopDesign();const box=document.getElementById('copTemplatePreview');if(box){box.style.position='relative';box.style.overflow='hidden'}const el=document.getElementById('copPreview');if(el)el.style.overflow='hidden'};
+function bindCopPngExact(){const b=document.getElementById('copPng');if(!b)return;b.onclick=async()=>{if(!window.html2canvas)return toast('No se cargó el generador de imagen.',true);await setCopStageAspect();const node=document.getElementById('copTemplatePreview');try{const canvas=await html2canvas(node,{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0});canvas.toBlob(blob=>downloadBlob(blob,'COPOMA_'+today()+'.png'),'image/png')}catch(e){toast('No se pudo generar la imagen: '+e.message,true)}}}
+
+/* Keep preview/export areas isolated from scrollbars or layout containers in any module using html2canvas. */
+const _oldEnsureCopDesignControls=ensureCopDesignControls;
+ensureCopDesignControls=function(){_oldEnsureCopDesignControls();bindCopPngExact()};
+const _oldInjectTemplateTools=injectTemplateTools;
+injectTemplateTools=function(){_oldInjectTemplateTools();injectReportPlacementControls()};
+
 ensureAssetModal();injectControlReview();injectTemplateTools();renderPdfHist();ensureCopDesignControls();restorePersistentAssets();renderControl();
 
 </script>
+
+
+<style id="templateFidelityV4Css">
+.template-fidelity-note{margin-top:10px;padding:10px 12px;border-radius:10px;background:#fff8e7;border-left:4px solid #d49a20;font-size:12px;color:#5d4a20}
+.report-exact-stage,.cop-exact-stage{position:relative;margin:0 auto;background:#fff;overflow:hidden;box-shadow:0 2px 12px #0013;container-type:inline-size}
+.report-exact-stage>img,.cop-exact-stage>img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;z-index:0}
+.report-exact-stage .report-overlay{position:absolute;z-index:3;box-sizing:border-box;overflow:hidden;background:transparent;color:#111;font-family:Arial,sans-serif}
+.cop-layer{position:absolute;z-index:3;box-sizing:border-box;color:#101010;line-height:1.22;overflow:hidden}
+.cop-layer-date{top:5.1%;right:7.3%;width:31%;text-align:center;font-weight:900;line-height:1.05}
+.cop-layer-header{top:15.2%;left:4.1%;width:91.5%;font-weight:900;text-align:left}
+.cop-layer-body{top:21.2%;left:3.3%;width:90.8%;height:31.5%;text-align:left;white-space:normal}
+.cop-layer-footer{top:52.1%;left:3.3%;width:90%;font-weight:900;text-align:left}
+.cop-layer-body p{margin:0 0 .35em}.cop-layer-body div{margin:0}.cop-template-status{margin-top:7px;font-size:12px;color:#526a86}
+@media(max-width:700px){.cop-layer-date{width:35%;right:5%}.cop-layer-header{left:4%;width:92%}}
+</style>
+<script>
+/* === Template fidelity engine v4 === */
+(function(){
+ const repInput=document.getElementById('repTemplates');
+ if(repInput){
+   repInput.accept='.docx,.pdf,image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+   const p=repInput.previousElementSibling;
+   if(p&&p.classList.contains('muted')) p.innerHTML='Adjunta hasta tres plantillas <b>PDF, PNG/JPG o DOCX</b>. Para conservar exactamente encabezado, pie, logotipos y posiciones, usa PDF o imagen; DOCX se muestra en modo compatible del navegador.';
+   if(!document.getElementById('repFidelityNote')){
+     const n=document.createElement('div');n.id='repFidelityNote';n.className='template-fidelity-note';n.innerHTML='<b>Fidelidad del formato:</b> PDF/PNG/JPG se usan como fondo exacto. DOCX puede variar respecto a Microsoft Word cuando contiene encabezados, pies, formas flotantes o fuentes no disponibles.';repInput.insertAdjacentElement('afterend',n)
+   }
+ }
+ const copInput=document.getElementById('copTemplates');
+ if(copInput){
+   copInput.accept='image/*,.pdf,application/pdf';
+   const p=copInput.previousElementSibling;
+   if(p&&p.classList.contains('muted')) p.innerHTML='Puedes adjuntar hasta tres plantillas <b>de imagen o PDF</b>. La opción seleccionada se usa completa como fondo y queda guardada en este navegador.';
+   if(!document.getElementById('copUploadStatus')){const st=document.createElement('div');st.id='copUploadStatus';st.className='cop-template-status';copInput.insertAdjacentElement('afterend',st)}
+ }
+
+ async function pdfPageData(file,scale=2){
+   if(!window.pdfjsLib) throw new Error('No se cargó el visor PDF.');
+   pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+   const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+   const page=await pdf.getPage(1),vp=page.getViewport({scale});
+   const cv=document.createElement('canvas');cv.width=Math.ceil(vp.width);cv.height=Math.ceil(vp.height);
+   await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
+   return {src:cv.toDataURL('image/png'),width:cv.width,height:cv.height};
+ }
+ async function templateRaster(file){
+   if(!file) return null;
+   if(file.type&&file.type.startsWith('image/')){const src=await fileData(file),im=await imgFrom(src);return {src,width:im.naturalWidth||im.width,height:im.naturalHeight||im.height}}
+   if(/\.pdf$/i.test(file.name)||file.type==='application/pdf') return pdfPageData(file,2);
+   return null;
+ }
+ function stageSize(stage,w,h,max=840){const ratio=w/h;let width=Math.min(max, Math.max(320, stage.parentElement?.clientWidth-20||max));let height=width/ratio;stage.style.width=width+'px';stage.style.height=height+'px';stage.style.aspectRatio=`${w}/${h}`}
+
+ // Report templates: exact for PDF/image, compatible for DOCX.
+ const oldRenderReportTemplates=renderReportTemplates;
+ renderReportTemplates=function(){oldRenderReportTemplates(); const list=document.getElementById('repTemplateList'); if(!list)return; [...list.querySelectorAll('.template-option')].forEach((el,i)=>{const f=reportTemplates[i]; if(!f)return; const badge=document.createElement('span');badge.className='pill '+((/\.docx$/i.test(f.name))?'warn':'ok');badge.style.marginLeft='auto';badge.textContent=/\.docx$/i.test(f.name)?'DOCX compatible':'Fondo exacto'; const actions=el.querySelector('.template-actions'); if(actions)el.insertBefore(badge,actions);});};
+
+ chooseReportTemplate=async function(i){
+   reportTemplateIndex=i;state.report.templateIndex=i;save();renderReportTemplates();
+   const f=reportTemplates[i],target=document.getElementById('repTemplatePreview');target.classList.remove('docx-render-host');
+   if(!f){target.innerHTML='<div class="empty">Sin formato seleccionado.</div>';return}
+   try{
+     const ras=await templateRaster(f);
+     if(ras){target.innerHTML='';const st=document.createElement('div');st.className='report-exact-stage';stageSize(st,ras.width,ras.height,520);st.innerHTML=`<img src="${ras.src}" alt="Plantilla seleccionada">`;target.appendChild(st)}
+     else if(/\.docx$/i.test(f.name)){await renderDocxVisual(f,target);const warn=document.createElement('div');warn.className='template-fidelity-note';warn.textContent='Vista DOCX compatible: si el archivo usa encabezados/pies u objetos flotantes, Word puede verse diferente. Para salida idéntica, guarde ese formato como PDF y cárguelo aquí.';target.prepend(warn)}
+     else target.innerHTML='<div class="empty">Formato no compatible.</div>';
+     await updateReportPreview();
+   }catch(e){target.innerHTML='<div class="empty">No se pudo interpretar el formato: '+esc(e.message)+'</div>'}
+ };
+
+ const oldRenderFinalReportWithTemplate=renderFinalReportWithTemplate;
+ renderFinalReportWithTemplate=async function(f){
+   const ras=await templateRaster(f);
+   if(!ras) return oldRenderFinalReportWithTemplate(f);
+   const host=document.getElementById('reportPreview');host.innerHTML='';
+   const shell=document.createElement('div');shell.className='template-final report-final-shell';
+   const stage=document.createElement('div');stage.className='report-exact-stage report-fixed-page';stage.dataset.exactTemplate='1';stageSize(stage,ras.width,ras.height,920);stage.innerHTML=`<img src="${ras.src}" alt="Formato base">`;shell.appendChild(stage);host.appendChild(shell);createReportOverlay(stage);return stage;
+ };
+
+ // Save report image/PDF templates too.
+ document.getElementById('repTemplates').onchange=async e=>{
+   const fs=[...e.target.files].filter(f=>/\.(docx|pdf|png|jpe?g|webp)$/i.test(f.name)||f.type.startsWith('image/')).slice(0,3);
+   reportTemplates=fs;reportTemplateIndex=fs.length?0:-1;state.report.templateIndex=reportTemplateIndex;save();await saveTemplateSet('report',fs);renderReportTemplates();if(fs.length)await chooseReportTemplate(0);if(e.target.files.length>3)toast('Solo se guardaron los primeros tres formatos.',true);
+ };
+
+ // Replacement accepts the same formats.
+ const oldReplace=replacePersistedTemplate;
+ replacePersistedTemplate=async function(module,index){
+   if(module!=='report'&&module!=='copoma') return oldReplace(module,index);
+   const inp=document.createElement('input');inp.type='file';inp.accept=module==='report'?'.docx,.pdf,image/*':'image/*,.pdf,application/pdf';
+   inp.onchange=async()=>{const f=inp.files[0];if(!f)return;const arr=module==='report'?reportTemplates:copTemplates;arr[index]=f;await assetPut(`template:${module}:${index}`,f,f.name,f.type,{slot:index});if(module==='report'){renderReportTemplates();await chooseReportTemplate(index)}else{renderCopTemplates();await chooseCopTemplate(index)}toast('Formato reemplazado y guardado en este navegador.')};inp.click();
+ };
+
+ // COPOMA: image/PDF as exact base + independent content layers.
+ function copDateLabel(){const v=document.getElementById('copDate').value||today(),d=new Date(v+'T12:00:00');return d.toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}).replace(/\s+de\s+/gi,' DE ').toUpperCase()}
+ function copTimeLabel(){const t=document.getElementById('copTime').value||timeNow();return t.replace(':',':')+'HRS'}
+ function fitLayer(el,min=8){if(!el)return;const base=parseFloat(el.dataset.base||getComputedStyle(el).fontSize)||16;let px=base,guard=60;el.style.fontSize=px+'px';while(guard--&&px>min&&(el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1)){px-=.5;el.style.fontSize=px+'px'}}
+ function copBodyHtml(){const ed=document.getElementById('copRichEditor');return ed&&ed.innerHTML.trim()?ed.innerHTML:`<div>${esc(document.getElementById('copText').value).replace(/\n/g,'<br>')}</div>`}
+ function buildCopLayers(stage){
+   stage.querySelectorAll('.cop-layer').forEach(x=>x.remove());
+   const w=stage.clientWidth||720,bodyPx=Math.max(13,w*.034),headPx=Math.max(13,w*.029),datePx=Math.max(12,w*.027),footPx=Math.max(13,w*.027);
+   const d=document.createElement('div');d.className='cop-layer cop-layer-date';d.dataset.base=datePx;d.style.fontSize=datePx+'px';d.innerHTML=`${esc(copDateLabel())}<br>${esc(copTimeLabel())}`;
+   const h=document.createElement('div');h.className='cop-layer cop-layer-header';h.dataset.base=headPx;h.style.fontSize=headPx+'px';h.textContent=document.getElementById('copHeader').value.trim();
+   const b=document.createElement('div');b.className='cop-layer cop-layer-body';b.id='copPreview';b.dataset.base=bodyPx;b.style.fontSize=bodyPx+'px';b.innerHTML=copBodyHtml();
+   const ft=document.createElement('div');ft.className='cop-layer cop-layer-footer';ft.dataset.base=footPx;ft.style.fontSize=footPx+'px';ft.textContent=document.getElementById('copFooter').value.trim();
+   stage.append(d,h,b,ft);requestAnimationFrame(()=>[d,h,b,ft].forEach(x=>fitLayer(x,9)));
+ }
+ function copSavedStatus(){const st=document.getElementById('copUploadStatus');if(!st)return;const f=copTemplateIndex>=0?copTemplates[copTemplateIndex]:null;st.innerHTML=f?`Formato activo guardado: <b>${esc(f.name)}</b>. Puede cambiarlo o eliminarlo desde la lista.`:'No hay un formato base guardado.'}
+
+ renderCopTemplates=function(){const list=document.getElementById('copTemplateList');if(!list)return;list.innerHTML=copTemplates.length?copTemplates.map((f,i)=>`<div class="template-option ${i===copTemplateIndex?'active':''}"><input type="radio" name="copTemplateChoice" ${i===copTemplateIndex?'checked':''} onchange="chooseCopTemplate(${i})"><span><b>Plantilla ${i+1}</b><br><span class="mini-file">${esc(f.name)}</span></span><span class="pill ok" style="margin-left:auto">${/\.pdf$/i.test(f.name)?'PDF':'Imagen'}</span><span class="template-actions"><button type="button" onclick="replacePersistedTemplate('copoma',${i})">Cambiar</button><button type="button" onclick="removePersistedTemplate('copoma',${i})">Eliminar</button></span></div>`).join(''):'<div class="empty">No hay formatos guardados.</div>';copSavedStatus()};
+
+ chooseCopTemplate=async function(i){copTemplateIndex=i;state.inc35.copomaTemplateIndex=i;save();renderCopTemplates();await renderCopTemplateFinal()};
+ renderCopTemplateFinal=async function(){
+   const box=document.getElementById('copTemplatePreview'),f=copTemplateIndex>=0?copTemplates[copTemplateIndex]:null;box.className='format-preview';
+   if(!f){box.innerHTML='<div class="empty">Adjunte una plantilla de imagen o PDF.</div>';copSavedStatus();return}
+   try{const ras=await templateRaster(f);if(!ras)throw new Error('COPOMA acepta imagen o PDF.');box.innerHTML='';const stage=document.createElement('div');stage.className='cop-exact-stage';stageSize(stage,ras.width,ras.height,760);stage.innerHTML=`<img class="template-bg" src="${ras.src}" alt="Plantilla COPOMA">`;box.appendChild(stage);buildCopLayers(stage);copSavedStatus()}catch(e){box.innerHTML='<div class="empty">No se pudo mostrar el formato: '+esc(e.message)+'</div>'}
+ };
+
+ renderCop=function(){const st=document.querySelector('#copTemplatePreview .cop-exact-stage');if(st){buildCopLayers(st);return}renderCopTemplateFinal()};
+ syncCopEditor=function(){const ed=document.getElementById('copRichEditor');if(ed&&document.activeElement!==ed)ed.innerHTML=`<div>${esc(document.getElementById('copText').value.trim()).replace(/\n/g,'<br>')}</div>`;renderCop()};
+ document.getElementById('copRichEditor').oninput=()=>renderCop();
+ document.getElementById('copTemplates').onchange=async e=>{
+   const fs=[...e.target.files].filter(f=>f.type.startsWith('image/')||/\.pdf$/i.test(f.name)||f.type==='application/pdf').slice(0,3);
+   if(!fs.length){toast('Seleccione una imagen o PDF válido.',true);return}
+   copTemplates=fs;copTemplateIndex=0;state.inc35.copomaTemplateIndex=0;save();await saveTemplateSet('copoma',fs);renderCopTemplates();await chooseCopTemplate(0);if(e.target.files.length>3)toast('Solo se guardaron las primeras tres opciones.',true);
+ };
+
+ // Existing design controls now adjust only the body message area; date/header/footer remain visible.
+ applyCopDesign=function(){const st=document.querySelector('#copTemplatePreview .cop-exact-stage'),b=st?.querySelector('.cop-layer-body');if(!b)return;const d=copDesign();Object.assign(b.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',color:d.color,background:d.bg==='rgba(255,255,255,0.72)'?d.bg:'transparent',padding:d.padding+'px',borderRadius:d.bg==='transparent'?'0':'10px'});b.dataset.base=Math.max(10,(st.clientWidth||700)*(d.fontSize/700));fitLayer(b,9)};
+ const oldEnsure=ensureCopDesignControls;
+ ensureCopDesignControls=function(){oldEnsure();const n=document.querySelector('#copDesignControls .notice');if(n)n.innerHTML='<b>Ajuste del mensaje</b><br>Estos controles modifican solo el cuerpo del comunicado. La fecha/hora, encabezado y cierre se mantienen como capas independientes para que siempre sean visibles.';const png=document.getElementById('copPng');if(png)png.onclick=async()=>{const node=document.querySelector('#copTemplatePreview .cop-exact-stage');if(!node)return toast('Seleccione una plantilla.',true);if(!window.html2canvas)return toast('No se cargó el generador de imagen.',true);try{const cv=await html2canvas(node,{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0});cv.toBlob(b=>downloadBlob(b,'COPOMA_'+today()+'.png'),'image/png')}catch(e){toast('No se pudo generar la imagen: '+e.message,true)}}};
+
+ // Rebind generation and live fields.
+ document.getElementById('copGenerate').onclick=()=>{const text=copomaText();state.inc35.copoma.push({at:new Date().toISOString(),text,html:document.getElementById('copRichEditor').innerHTML});save();renderCop();toast('Comunicado generado.')};
+ ['copDate','copTime','copHeader','copText','copFooter'].forEach(id=>{const el=document.getElementById(id);el.oninput=()=>{if(id==='copText')syncCopEditor();else renderCop()}});
+
+ // Make defaults resemble the supplied COPOMA example when the user has not customized them.
+ if(!state.inc35.copomaDesign){state.inc35.copomaDesign={top:21.2,left:3.3,width:90.8,height:31.5,fontSize:24,color:'#111111',bg:'transparent',padding:0};save()}
+
+ renderReportTemplates();renderCopTemplates();copSavedStatus();ensureCopDesignControls();syncCopEditor();
+ if(copTemplateIndex>=0)renderCopTemplateFinal();
+})();
+</script>
+
 </body></html>
