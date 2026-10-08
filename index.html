@@ -65,6 +65,7 @@
 <header class="topbar"><div><div class="top-title" id="pageTitle">Centro de Control de Tráfico Terrestre</div><div class="top-sub" id="pageSub">Panel operativo integrado</div></div><div class="profile-mini"><div><div style="font-size:12px;font-weight:850" id="miniName">Operador CCTT</div><div class="muted" id="miniRole">Control operativo</div></div><div class="avatar" id="miniAvatar">CC</div></div></header>
 <div class="content">
 <section class="page active" id="page-inicio">
+ <div class="hero"><h1>Centro de Control de Tráfico Terrestre</h1><p>Panel unificado para las funciones de los ocho libros con macros: procesamiento de bitácoras, accidentes, citas, comunicados y operación de cesionarios. Los datos se conservan localmente en este navegador.</p></div>
  <div class="grid g4" id="homeKpis"></div>
  <div class="section-title"><h2>Módulos operativos</h2><span class="module-tag">8 archivos integrados</span></div>
  <div class="grid g3" id="moduleCards"></div>
@@ -105,7 +106,7 @@
  <div class="section-title"><h2>Reporte operativo de cesionarios</h2><span class="module-tag">Reporte_Operativo_Cesionarios_CCTT(1).xlsm</span></div>
  <div class="grid g2"><div class="card"><h3>Datos de emisión y formato</h3><div class="grid g3"><div class="field"><label>Fecha</label><input id="repDate" type="date"></div><div class="field"><label>Hora</label><input id="repTime" type="time"></div><div class="field"><label>Ciudad / plaza</label><input id="repPlace" placeholder="Manzanillo, Colima"></div></div><div class="field" style="margin-top:10px"><label>Encabezado institucional 1</label><input id="repHeader1" placeholder="Administración del Sistema Portuario Nacional de Manzanillo S.A. de C.V."></div><div class="field" style="margin-top:10px"><label>Encabezado institucional 2</label><input id="repHeader2" placeholder="Centro de Control de Tráfico Terrestre - Gerencia de Operaciones"></div><div class="grid g3" style="margin-top:10px"><div class="field"><label>Tipo de documento</label><input id="repDocType" value="Boletín Informativo"></div><div class="field"><label>Destinatario</label><input id="repRecipient1" value="ASIPONA MANZANILLO"></div><div class="field"><label>Línea final destinatario</label><input id="repRecipient2" value="PRESENTE"></div></div><div class="field" style="margin-top:10px"><label>Leyenda / cuerpo</label><textarea id="repLegend">Por medio del presente, se propone establecer un Reporte de Operaciones de Cesionarios por parte del Centro de Control de Tráfico Terrestre (CCTT), con la finalidad de contar con información actualizada y consolidada respecto al estado que mantienen las operaciones de los distintos Cesionarios que intervienen en el movimiento de carga dentro del recinto portuario.
 
-Lo anterior permitirá generar y emitir información operativa ante la presencia de eventos que puedan afectar de manera general o parcial la continuidad de las operaciones, tanto al interior del recinto portuario como en sus accesos y vialidades exteriores.
+Lo anterior permitirá generar y emitir información operativa ante la presencia de eventos que puedan afectar de manera general o parcial la continuidad de las operaciones, tanto al interior del recinto portuario como en sus accesos y vialidades exteriores, tales como fallas en el suministro eléctrico, eventos climatológicos, fallas o intermitencias en el sistema PIS, afectaciones en los sistemas operativos, restricciones de acceso, contingencias viales u otras situaciones que puedan modificar el flujo habitual de las operaciones.
 
 A continuación se anexa el estado de los cesionarios:</textarea></div><div class="row"><button class="btn primary" id="repUpdate">Actualizar vista</button><button class="btn" id="repResetStyle">Restablecer boletín</button><button class="btn" id="repAddRow">Agregar cesionario</button><button class="btn" id="repResetRows">Restablecer tabla</button><button class="btn" id="repImage">Generar imagen</button><button class="btn dark" id="repPdf">Generar PDF</button><button class="btn" id="repPrint">Imprimir</button></div></div><div class="card"><div class="row"><h3 style="margin:0">Estado operativo</h3><span class="pill">Filas editables</span></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Zona</th><th>Cesionario</th><th>Estatus</th><th>Comentarios</th><th></th></tr></thead><tbody id="repEditTable"></tbody></table></div></div></div>
  <div class="grid g2" style="margin-top:16px"><div class="card"><h3>Formatos base</h3><p class="muted">Adjunta hasta tres plantillas DOCX o PDF y elige cuál usar como referencia visual.</p><input id="repTemplates" type="file" multiple accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><div id="repTemplateList" class="template-list"></div></div><div class="card"><h3>Vista del formato seleccionado</h3><div id="repTemplatePreview" class="doc-preview"><div class="empty">Sin formato seleccionado.</div></div></div></div>
@@ -531,7 +532,7 @@ const FIXED_PAGE_CSS=`
 if(!document.getElementById('fixedPageCss'))document.head.insertAdjacentHTML('beforeend',FIXED_PAGE_CSS);
 
 function cleanLegendText(v){return String(v??'').replace(/\\n/g,'\n').replace(/\r\n/g,'\n')}
-function reportPlacement(){const d=state.report.templatePlacement||{};return {top:Number.isFinite(+d.top)?+d.top:24,left:Number.isFinite(+d.left)?+d.left:7.5,width:Number.isFinite(+d.width)?+d.width:85.5,height:Number.isFinite(+d.height)?+d.height:66.5,font:Number.isFinite(+d.font)?+d.font:13}}
+function reportPlacement(){const d=state.report.templatePlacement||{};return {top:Number.isFinite(+d.top)?+d.top:8.3,left:Number.isFinite(+d.left)?+d.left:9.2,width:Number.isFinite(+d.width)?+d.width:73.5,height:Number.isFinite(+d.height)?+d.height:84,font:Number.isFinite(+d.font)?+d.font:13.7}}
 function saveReportPlacement(k,v){state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{}, {[k]:+v});save();updateReportPreview()}
 function injectReportPlacementControls(){const host=document.getElementById('repPersistNote');if(!host||document.getElementById('reportPlacementControls'))return;const d=reportPlacement(),box=document.createElement('div');box.id='reportPlacementControls';box.innerHTML=`<div class="notice" style="margin-top:10px"><b>Ajuste de contenido sobre la plantilla</b><br>La plantilla conserva su tamaño y diseño. Ajuste únicamente el área donde se colocará el reporte; el sistema reducirá el texto automáticamente para evitar una segunda hoja y aprovechar mejor el espacio útil de la plantilla.</div><div class="report-placement-grid"><div class="field"><label>Superior %</label><input id="rplTop" type="number" min="0" max="90" value="${d.top}"></div><div class="field"><label>Izquierda %</label><input id="rplLeft" type="number" min="0" max="90" value="${d.left}"></div><div class="field"><label>Ancho %</label><input id="rplWidth" type="number" min="10" max="100" value="${d.width}"></div><div class="field"><label>Alto %</label><input id="rplHeight" type="number" min="10" max="95" value="${d.height}"></div><div class="field"><label>Texto base px</label><input id="rplFont" type="number" min="7" max="24" value="${d.font}"></div></div>`;host.appendChild(box);[['rplTop','top'],['rplLeft','left'],['rplWidth','width'],['rplHeight','height'],['rplFont','font']].forEach(([id,k])=>document.getElementById(id).onchange=e=>saveReportPlacement(k,e.target.value))}
 
@@ -778,7 +779,24 @@ function canonicalReportBulletinHtml(opts={}){const d=document.getElementById('r
 reportTableHtml=function(){return canonicalReportTableHtml()};
 reportInsertHtml=function(full=true){return full?canonicalReportBulletinHtml({inTemplate:true}):canonicalReportTableHtml()};
 applyReportTokens=function(root){const d=document.getElementById('repDate').value||today(),t=document.getElementById('repTime').value||timeNow(),m=canonicalReportMeta(),data={FECHA:d,HORA:t,LEYENDA:state.report.legend||'',OPERADOR:'',ENTIDAD:m.header2||'',LUGAR:m.place||'',ENCABEZADO1:m.header1||'',ENCABEZADO2:m.header2||'',DESTINATARIO1:m.recipient1||'',DESTINATARIO2:m.recipient2||'',TIPO_DOCUMENTO:m.docType||''};replaceSimpleTokens(root,data);const tableMarker=markerHost(root,'TABLA_CESIONARIOS')||markerHost(root,'CESIONARIOS');if(tableMarker){const box=document.createElement('div');box.innerHTML=canonicalReportTableHtml();tableMarker.replaceWith(box);return true}const contentMarker=markerHost(root,'CONTENIDO')||markerHost(root,'REPORTE');if(contentMarker){const box=document.createElement('div');box.innerHTML=canonicalReportBulletinHtml({inTemplate:true});contentMarker.replaceWith(box);return true}return false};
-(function migrateBulletinPlacement(){const d=state.report.templatePlacement||{};if(!d.top||+d.top>=20){state.report.templatePlacement={top:8.5,left:7.5,width:85,height:82,font:12.5};save()}})();
+(function migrateBulletinPlacement(){const d=state.report.templatePlacement||{};const legacy=(!d.top||+d.top>=20||+d.width>=82||+d.font<=12.5);if(legacy){state.report.templatePlacement={top:8.3,left:9.2,width:73.5,height:84,font:13.7};save()}})();
+(function migrateReportLegendMacro(){
+ const oldText=`Por medio del presente, se propone establecer un Reporte de Operaciones de Cesionarios por parte del Centro de Control de Tráfico Terrestre (CCTT), con la finalidad de contar con información actualizada y consolidada respecto al estado que mantienen las operaciones de los distintos Cesionarios que intervienen en el movimiento de carga dentro del recinto portuario.
+
+Lo anterior permitirá generar y emitir información operativa ante la presencia de eventos que puedan afectar de manera general o parcial la continuidad de las operaciones, tanto al interior del recinto portuario como en sus accesos y vialidades exteriores.
+
+A continuación se anexa el estado de los cesionarios:`;
+ const macroText=`Por medio del presente, se propone establecer un Reporte de Operaciones de Cesionarios por parte del Centro de Control de Tráfico Terrestre (CCTT), con la finalidad de contar con información actualizada y consolidada respecto al estado que mantienen las operaciones de los distintos Cesionarios que intervienen en el movimiento de carga dentro del recinto portuario.
+
+Lo anterior permitirá generar y emitir información operativa ante la presencia de eventos que puedan afectar de manera general o parcial la continuidad de las operaciones, tanto al interior del recinto portuario como en sus accesos y vialidades exteriores, tales como fallas en el suministro eléctrico, eventos climatológicos, fallas o intermitencias en el sistema PIS, afectaciones en los sistemas operativos, restricciones de acceso, contingencias viales u otras situaciones que puedan modificar el flujo habitual de las operaciones.
+
+A continuación se anexa el estado de los cesionarios:`;
+ if(!state.report.legend||cleanLegendText(state.report.legend).trim()===oldText.trim()){
+   state.report.legend=macroText;
+   const el=document.getElementById('repLegend'); if(el) el.value=macroText;
+   save();
+ }
+})();
 const canonicalOldUpdate=oldUpdateReportPreview;
 oldUpdateReportPreview=function(){syncReportMetaFromInputs();document.getElementById('reportPreview').innerHTML=`<div class="print-report printable report-bulletin" id="printReport">${canonicalReportBulletinHtml({inTemplate:false})}</div>`};
 
@@ -813,6 +831,15 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
 #copTemplatePreview{overflow:visible!important;height:auto!important;min-height:0!important;padding:8px;background:#eef3f8}
 #copTemplatePreview .cop-exact-stage{display:block;margin:0 auto!important;overflow:hidden!important;background:#fff;max-width:100%;box-shadow:0 2px 12px #0013}
 #copTemplatePreview .cop-exact-stage>img{object-fit:contain!important;background:#fff}
+
+/* Reporte cesionarios: proporción y aprovechamiento similares a la macro */
+.report-overlay .report-bulletin-shell.in-template{padding:0!important;max-width:none!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-headings{font-size:.98em!important;line-height:1.22!important;margin-top:.15em!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-date{font-size:.94em!important;line-height:1.32!important;margin:.95em 0 1.2em!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-meta p{margin:0 0 .78em!important;font-size:.96em!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-paragraphs p{font-size:.96em!important;line-height:1.32!important;text-align:justify!important;margin:0 0 .88em!important}
+.report-overlay .report-bulletin-shell.in-template .rep-bulletin-table{font-size:.78em!important;margin-top:.65em!important}
+.report-overlay .report-bulletin-shell.in-template .rep-bulletin-table th,.report-overlay .report-bulletin-shell.in-template .rep-bulletin-table td{padding:.22em .34em!important}
 </style>
 <script id="finalUxCorrectionsJs">
 (function(){
