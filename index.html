@@ -65,7 +65,6 @@
 <header class="topbar"><div><div class="top-title" id="pageTitle">Centro de Control de Tráfico Terrestre</div><div class="top-sub" id="pageSub">Panel operativo integrado</div></div><div class="profile-mini"><div><div style="font-size:12px;font-weight:850" id="miniName">Operador CCTT</div><div class="muted" id="miniRole">Control operativo</div></div><div class="avatar" id="miniAvatar">CC</div></div></header>
 <div class="content">
 <section class="page active" id="page-inicio">
- <div class="hero"><h1>Centro de Control de Tráfico Terrestre</h1><p>Panel unificado para las funciones de los ocho libros con macros: procesamiento de bitácoras, accidentes, citas, comunicados y operación de cesionarios. Los datos se conservan localmente en este navegador.</p></div>
  <div class="grid g4" id="homeKpis"></div>
  <div class="section-title"><h2>Módulos operativos</h2><span class="module-tag">8 archivos integrados</span></div>
  <div class="grid g3" id="moduleCards"></div>
@@ -793,4 +792,96 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
 
 <div id="orthographyNote" class="orthography-note">Corrección ortográfica <b>Español (México)</b> activada. Las palabras marcadas por el navegador muestran sugerencias con clic derecho; desde ese menú puedes corregir, omitir o agregar al diccionario.</div>
 <div id="locationManager" class="location-manager"><div class="location-panel"><div class="row"><h3 style="margin:0">Administrar ubicaciones</h3><button class="mini-btn right" id="locMgrClose">Cerrar</button></div><p class="muted">Estas ubicaciones estarán disponibles en todos los módulos con campo Ubicación. También puedes seguir escribiendo una ubicación libre.</p><div class="row"><input id="locMgrInput" spellcheck="true" lang="es-MX" style="flex:1;border:1px solid var(--line);border-radius:10px;padding:10px" placeholder="Nueva ubicación"><button class="btn primary" id="locMgrAdd">Añadir</button><button class="btn bad" id="locMgrClear">Eliminar todas</button></div><div id="locMgrList" style="margin-top:12px"></div></div></div>
+
+<style id="finalUxCorrections">
+/* PIS: vista tipo hoja de cálculo */
+.pis-sheet-panel .table-wrap{background:#fff;border:1px solid #c8d1dc;border-radius:0;overflow:auto;max-height:560px}
+.pis-sheet-panel table{border-collapse:collapse;min-width:1180px;font-family:Arial,sans-serif;font-size:13px}
+.pis-sheet-panel th,.pis-sheet-panel td{border:1px solid #d7dde5!important;border-radius:0!important;padding:6px 8px!important;background:#fff;white-space:nowrap}
+.pis-sheet-panel thead tr:first-child th{position:sticky;top:0;z-index:4;background:#eef1f5;color:#384454;text-align:center;font-weight:600;padding:4px!important}
+.pis-sheet-panel thead tr:nth-child(2) th{position:sticky;top:25px;z-index:3;background:#f7f8fa;color:#111;text-align:left;font-weight:700}
+.pis-sheet-panel .excel-corner,.pis-sheet-panel .excel-rownum{background:#eef1f5!important;color:#4b5563!important;text-align:center!important;font-weight:600!important;min-width:42px;width:42px}
+.pis-sheet-panel .excel-rownum{position:sticky;left:0;z-index:2}
+.pis-sheet-panel tbody tr:hover td{background:#f4f9ff}
+
+/* Reporte cesionarios */
+.rep-bulletin-table .zone-cell{vertical-align:middle!important;text-align:center!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-headings{margin-top:1.35em!important}
+.report-overlay .report-bulletin-shell.in-template .bulletin-date{margin-top:1.35em!important}
+
+/* COPOMA: plantilla completa */
+#copTemplatePreview{overflow:visible!important;height:auto!important;min-height:0!important;padding:8px;background:#eef3f8}
+#copTemplatePreview .cop-exact-stage{display:block;margin:0 auto!important;overflow:hidden!important;background:#fff;max-width:100%;box-shadow:0 2px 12px #0013}
+#copTemplatePreview .cop-exact-stage>img{object-fit:contain!important;background:#fff}
+</style>
+<script id="finalUxCorrectionsJs">
+(function(){
+  /* ---- PIS como hoja Excel ---- */
+  function excelizePisSheet(){
+    const tbody=document.getElementById('pisSheetTable');
+    if(!tbody) return;
+    const table=tbody.closest('table');
+    if(!table) return;
+    const thead=table.querySelector('thead');
+    if(thead){
+      const labels=['Origen','Tipo de documento','Número','Estatus','Motivo rechazo','Fecha','Acceso','Persona'];
+      thead.innerHTML=`<tr><th class="excel-corner"></th>${labels.map((_,i)=>`<th>${String.fromCharCode(65+i)}</th>`).join('')}</tr><tr><th class="excel-corner">#</th>${labels.map(x=>`<th>${x}</th>`).join('')}</tr>`;
+    }
+    [...tbody.querySelectorAll('tr')].forEach((tr,i)=>{
+      if(tr.querySelector('.excel-rownum')) return;
+      const c=document.createElement('th');c.className='excel-rownum';c.textContent=String(i+1);tr.prepend(c);
+      const empty=tr.querySelector('td.empty');if(empty) empty.colSpan=9;
+    });
+  }
+  const baseRenderPIS=window.renderPIS||renderPIS;
+  window.renderPIS=renderPIS=function(){baseRenderPIS();excelizePisSheet()};
+  excelizePisSheet();
+
+  /* ---- Balance: pegar directamente desde sitio web ---- */
+  function tableHtmlToTSV(html){
+    if(!html) return '';
+    try{
+      const doc=new DOMParser().parseFromString(html,'text/html');
+      const rows=[...doc.querySelectorAll('table tr')];
+      if(!rows.length) return '';
+      return rows.map(tr=>[...tr.querySelectorAll('th,td')].map(td=>td.innerText.replace(/\s*\n\s*/g,' ').trim()).join('\t')).join('\n');
+    }catch(e){return ''}
+  }
+  function bindWebPaste(id){
+    const el=document.getElementById(id);if(!el||el.dataset.webPasteBound) return;el.dataset.webPasteBound='1';
+    el.addEventListener('paste',e=>{
+      const html=e.clipboardData?.getData('text/html')||'';
+      const tsv=tableHtmlToTSV(html);
+      if(tsv){e.preventDefault();const start=el.selectionStart||0,end=el.selectionEnd||0;el.value=el.value.slice(0,start)+tsv+el.value.slice(end);el.selectionStart=el.selectionEnd=start+tsv.length;el.dispatchEvent(new Event('input',{bubbles:true}));toast('Tabla pegada desde el sitio conservando filas y columnas.');}
+    });
+  }
+  bindWebPaste('balPasteNorth');bindWebPaste('balPasteSouth');
+  ['balPasteNorth','balPasteSouth'].forEach(id=>{const el=document.getElementById(id);if(el){el.placeholder+=' · También puede pegar directamente desde una tabla del sitio web.';}});
+
+  /* ---- COPOMA: siempre mostrar plantilla completa ---- */
+  const oldCopFinal=renderCopTemplateFinal;
+  renderCopTemplateFinal=async function(){
+    const box=document.getElementById('copTemplatePreview'),f=copTemplateIndex>=0?copTemplates[copTemplateIndex]:null;
+    box.className='format-preview';box.style.overflow='visible';box.style.height='auto';box.style.minHeight='0';
+    if(!f){box.innerHTML='<div class="empty">Adjunte una plantilla de imagen o PDF.</div>';copSavedStatus();return}
+    try{
+      const ras=await templateRaster(f);if(!ras) throw new Error('COPOMA acepta imagen o PDF.');
+      box.innerHTML='';
+      const stage=document.createElement('div');stage.className='cop-exact-stage';
+      const avail=Math.max(320,Math.min(820,(box.clientWidth||820)-16));
+      const ratio=ras.width/ras.height;
+      stage.style.width=avail+'px';stage.style.height=(avail/ratio)+'px';stage.style.aspectRatio=`${ras.width}/${ras.height}`;
+      stage.innerHTML=`<img class="template-bg" src="${ras.src}" alt="Plantilla COPOMA">`;
+      box.appendChild(stage);
+      const bg=stage.querySelector('.template-bg');if(bg){bg.style.objectFit='contain';bg.style.width='100%';bg.style.height='100%'}
+      buildCopLayers(stage);applyCopDesign();copSavedStatus();
+      requestAnimationFrame(()=>stage.querySelectorAll('.cop-layer').forEach(x=>fitLayer(x,8)));
+    }catch(e){box.innerHTML='<div class="empty">No se pudo mostrar el formato: '+esc(e.message)+'</div>'}
+  };
+  const oldEnsureCop=ensureCopDesignControls;
+  ensureCopDesignControls=function(){oldEnsureCop();const b=document.getElementById('copPng');if(b)b.onclick=async()=>{const node=document.querySelector('#copTemplatePreview .cop-exact-stage');if(!node)return toast('Seleccione una plantilla.',true);if(!window.html2canvas)return toast('No se cargó el generador de imagen.',true);try{const cv=await html2canvas(node,{scale:3,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0,width:node.offsetWidth,height:node.offsetHeight});cv.toBlob(blob=>downloadBlob(blob,'COPOMA_'+today()+'.png'),'image/png')}catch(e){toast('No se pudo generar la imagen: '+e.message,true)}}};
+  ensureCopDesignControls();
+  if(copTemplateIndex>=0)renderCopTemplateFinal();
+})();
+</script>
 </body></html>
