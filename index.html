@@ -1487,4 +1487,141 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
 })();
 </script>
 
+
+<style id="reportTemplateBindFixV8Style">
+#reportPreview .report-fixed-page>.report-overlay-v8{position:absolute;z-index:40;box-sizing:border-box;overflow:hidden;background:transparent;color:#111;font-family:"Noto Sans",Arial,sans-serif}
+.report-overlay-v8 .report-bulletin-shell{padding:0!important;margin:0!important;max-width:none!important;background:transparent!important;color:#111!important}
+.report-overlay-v8 .bulletin-top{display:block!important;margin:0 0 14px!important}
+.report-overlay-v8 .bulletin-headings{font-size:10.9px!important;line-height:1.14!important;text-align:right!important;margin:0!important}
+.report-overlay-v8 .bulletin-date{font-size:10.9px!important;line-height:1.14!important;text-align:right!important;margin:14px 0 18px!important}
+.report-overlay-v8 .bulletin-meta p{font-size:10.7px!important;line-height:14.2px!important;margin:0 0 10px!important;font-weight:700!important}
+.report-overlay-v8 .bulletin-paragraphs p{font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:10.6px!important;line-height:14.4px!important;text-align:justify!important;margin:0 0 10px!important}
+.report-overlay-v8 .rep-bulletin-table{width:100%!important;border-collapse:collapse!important;table-layout:fixed!important;font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:9.6px!important;line-height:1.2!important;margin-top:10px!important}
+.report-overlay-v8 .rep-bulletin-table col.zone{width:17%!important}
+.report-overlay-v8 .rep-bulletin-table col.name{width:20%!important}
+.report-overlay-v8 .rep-bulletin-table col.status{width:22%!important}
+.report-overlay-v8 .rep-bulletin-table col.comments{width:41%!important}
+.report-overlay-v8 .rep-bulletin-table th,.report-overlay-v8 .rep-bulletin-table td{padding:3px 4px!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;height:auto!important}
+.report-overlay-v8 .rep-bulletin-table th{font-size:9.4px!important}
+.report-overlay-v8 .rep-bulletin-table .zone-cell{text-align:center!important;vertical-align:middle!important;font-weight:700!important}
+.report-overlay-v8 .bulletin-footer{display:none!important}
+</style>
+<script id="reportTemplateBindFixV8Js">
+(function(){
+  function repV8Placement(){
+    const d=state.report.templatePlacement||{};
+    return {
+      top:Number.isFinite(+d.topV8)?+d.topV8:10.4,
+      left:Number.isFinite(+d.leftV8)?+d.leftV8:7.1,
+      width:Number.isFinite(+d.widthV8)?+d.widthV8:86.3,
+      height:Number.isFinite(+d.heightV8)?+d.heightV8:71.5,
+      font:Number.isFinite(+d.fontV8)?+d.fontV8:10.7
+    };
+  }
+  function repEnsureV8Defaults(){
+    state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{});
+    let changed=false;
+    for(const [k,v] of Object.entries({topV8:10.4,leftV8:7.1,widthV8:86.3,heightV8:71.5,fontV8:10.7})){
+      if(!Number.isFinite(+state.report.templatePlacement[k])){state.report.templatePlacement[k]=v;changed=true;}
+    }
+    if(changed) save();
+  }
+  function repTemplatePreviewRaster(){
+    const root=document.getElementById('repTemplatePreview');
+    if(!root) return null;
+    const img=root.querySelector('img');
+    if(img&&img.src) return {src:img.src,width:img.naturalWidth||img.width||1240,height:img.naturalHeight||img.height||1754};
+    const cv=root.querySelector('canvas');
+    if(cv&&cv.width&&cv.height) return {src:cv.toDataURL('image/png'),width:cv.width,height:cv.height};
+    return null;
+  }
+  async function repTemplateRasterSafe(file){
+    try{ if(file && typeof templateRaster==='function'){ const r=await templateRaster(file); if(r&&r.src) return r; } }catch(e){ console.warn('templateRaster falló',e); }
+    let r=repTemplatePreviewRaster();
+    if(r) return r;
+    const root=document.getElementById('repTemplatePreview');
+    if(root && window.html2canvas){
+      try{const cv=await html2canvas(root,{scale:2,backgroundColor:'#ffffff',useCORS:true,scrollX:0,scrollY:0});return {src:cv.toDataURL('image/png'),width:cv.width,height:cv.height};}catch(e){console.warn('html2canvas sobre la plantilla falló',e)}
+    }
+    return null;
+  }
+  function repBulletinHtmlV8(){
+    const raw=canonicalReportBulletinHtml({inTemplate:true});
+    return raw.replace('<table class="rep-bulletin-table">','<table class="rep-bulletin-table"><colgroup><col class="zone"><col class="name"><col class="status"><col class="comments"></colgroup>');
+  }
+  function repOverlayV8(page){
+    page.querySelectorAll(':scope > .report-overlay,:scope > .report-overlay-v6,:scope > .report-overlay-v7,:scope > .report-overlay-v8').forEach(x=>x.remove());
+    const d=repV8Placement();
+    const ov=document.createElement('div');
+    ov.className='report-overlay-v8';
+    Object.assign(ov.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.font+'px'});
+    ov.innerHTML=repBulletinHtmlV8();
+    page.appendChild(ov);
+    const fit=()=>{
+      let scale=1,guard=120;
+      ov.style.transform=''; ov.style.width=d.width+'%'; ov.style.height=d.height+'%';
+      while(guard--&&(ov.scrollHeight>ov.clientHeight+2||ov.scrollWidth>ov.clientWidth+2)&&scale>.60){
+        scale-=0.01;
+        ov.style.transformOrigin='top left';
+        ov.style.transform='scale('+scale+')';
+        ov.style.width=(d.width/scale)+'%';
+        ov.style.height=(d.height/scale)+'%';
+      }
+    };
+    requestAnimationFrame(()=>{fit(); setTimeout(fit,60);});
+    return ov;
+  }
+  async function repStageV8(file,ras){
+    const host=document.getElementById('reportPreview');
+    host.innerHTML='';
+    const shell=document.createElement('div'); shell.className='template-final report-final-shell';
+    const stage=document.createElement('div'); stage.className='report-fixed-page report-exact-stage';
+    const max=Math.min(930,Math.max(420,(host.clientWidth||930)-28));
+    const ratio=(+ras.width||1240)/(+ras.height||1754);
+    stage.style.width=max+'px';
+    stage.style.height=(max/ratio)+'px';
+    stage.style.aspectRatio=`${ras.width}/${ras.height}`;
+    stage.style.position='relative';
+    stage.style.overflow='hidden';
+    const bg=document.createElement('img');
+    bg.src=ras.src; bg.alt=(file&&file.name)||'Formato base';
+    Object.assign(bg.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'fill',display:'block'});
+    stage.appendChild(bg);
+    shell.appendChild(stage);
+    host.appendChild(shell);
+    repOverlayV8(stage);
+    const chosen=document.getElementById('repChosenTemplate');
+    if(chosen&&file) chosen.textContent=(file.name||'Formato seleccionado')+' · vista aplicada';
+    return stage;
+  }
+  const renderFinalBaseV8 = renderFinalReportWithTemplate;
+  renderFinalReportWithTemplate = async function(file){
+    if(!file) throw new Error('No hay plantilla seleccionada.');
+    const isDocx=/\.docx$/i.test(String(file.name||''));
+    if(isDocx) return renderFinalBaseV8(file);
+    const ras=await repTemplateRasterSafe(file);
+    if(!ras) return renderFinalBaseV8(file);
+    return repStageV8(file,ras);
+  };
+  const updateBaseV8 = updateReportPreview;
+  updateReportPreview = async function(){
+    if(typeof syncReportMetaFromInputs==='function') syncReportMetaFromInputs();
+    const legendInput=document.getElementById('repLegend');
+    if(legendInput){ state.report.legend=cleanLegendText(legendInput.value); legendInput.value=state.report.legend; }
+    save();
+    const file=reportTemplateIndex>=0?reportTemplates[reportTemplateIndex]:null;
+    if(!file) return (typeof oldUpdateReportPreview==='function'?oldUpdateReportPreview():updateBaseV8());
+    try{return await renderFinalReportWithTemplate(file);}catch(err){
+      console.warn('V8 plantilla reporte falló, se usa vista compatible.',err);
+      const chosen=document.getElementById('repChosenTemplate');
+      if(chosen) chosen.textContent=(file.name||'Formato seleccionado')+' · vista compatible';
+      return typeof updateBaseV8==='function'?updateBaseV8():null;
+    }
+  };
+  reportCaptureNode = async function(){ await updateReportPreview(); return document.querySelector('#reportPreview .report-fixed-page')||document.getElementById('printReport')||document.getElementById('reportPreview'); };
+  repEnsureV8Defaults();
+  setTimeout(()=>{try{updateReportPreview()}catch(e){console.warn(e)}},160);
+})();
+</script>
+
 </body></html>
