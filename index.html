@@ -1958,11 +1958,13 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
     const rect=src.getBoundingClientRect();
     const ratio=(rect.width>0&&rect.height>0)?rect.width/rect.height:(8.5/11);
     const wrap=document.createElement('div');wrap.className='report-export-clone-wrap';
+    const scope=document.createElement('div');scope.id='reportPreview';
     const clone=src.cloneNode(true);
     const exportW=1200, exportH=Math.round(exportW/ratio);
     Object.assign(clone.style,{width:exportW+'px',height:exportH+'px',maxWidth:'none',maxHeight:'none',margin:'0',transform:'none'});
     clone.querySelectorAll('img').forEach(img=>{img.style.maxWidth='none'});
-    wrap.appendChild(clone);document.body.appendChild(wrap);
+    scope.appendChild(clone);
+    wrap.appendChild(scope);document.body.appendChild(wrap);
     await waitImages(clone);await waitFrame();forceFitOverlay(clone);await waitFrame();
     return {wrap,clone};
   }
@@ -1994,8 +1996,8 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
-  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
+  const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
+  const SUPABASE_ANON_KEY = 'TU_ANON_O_PUBLISHABLE_KEY';
   let sb=null,currentSession=null;
   function buildGate(){
     if(document.getElementById('ccttLoginGate'))return;
