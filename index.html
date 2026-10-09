@@ -178,7 +178,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 <section class="page" id="page-inc35bolet">
  <div class="section-title"><h2>Boletinados</h2></div>
  <div class="split"><div class="card"><h3>Captura de incidencia / conducta</h3><div class="field"><label>Motivo</label><select id="bolType"><option>CCTT Reporta, Maniobra indebida.</option><option>CCTT Reporta, Obstrucción.</option><option>CCTT Reporta, Falla mecánica.</option><option>CCTT Reporta, Choque.</option><option>CCTT Reporta, Caida de contenedor.</option><option>CCTT Reporta, Sin diesel.</option><option>CCTT Reporta, Derrame.</option><option selected>CCTT Reporta, Estacionado en zona prohibida.</option><option>CCTT Reporta, Hizo caso omiso a indicaciones.</option><option>CCTT Reporta, Agresión al personal de Movilidad.</option><option>CCTT Reporta, Agresión e Insultos al personal de Movilidad.</option><option>CCTT Reporta, Retorno en U.</option><option>CCTT Reporta, Aventar la unidad al personal de Movilidad.</option><option>CCTT Reporta, Daño de infraestructura.</option><option>CCTT Reporta, Atropellar a personal de Movilidad.</option><option value="__custom__">Escribir otro motivo…</option></select><div id="bolCustomWrap" class="field" style="display:none;margin-top:10px"><label>Escribir motivo personalizado</label><textarea id="bolCustomType" lang="es-MX" spellcheck="true" placeholder="Escribe aquí otro motivo, por ejemplo: CCTT reporta, obstrucción temporal de vialidad."></textarea><span class="muted">Se normalizarán mayúsculas y minúsculas en el boletín sin modificar tu texto original.</span></div></div><div class="grid g2"><div class="field"><label>Ubicación</label><input id="bolLocation"></div><div class="field"><label>Empresa</label><input id="bolCompany"></div><div class="field"><label>Placa</label><input id="bolPlate"></div><div class="field"><label>Operador</label><input id="bolOperator"></div></div><div class="field"><label>Antecedente</label><textarea id="bolBackground"></textarea></div><div class="row"><button class="btn primary" id="bolProcess">Procesar</button><button class="btn" id="bolCopy">Copiar</button><button class="btn bad" id="bolClear">Borrar</button></div></div><div class="card"><h3>Boletín</h3><div id="bolPreview" class="notice" style="white-space:pre-wrap;min-height:320px"></div></div></div>
- <div class="card" style="margin-top:16px"><h3>Registros guardados</h3><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Motivo</th><th>Ubicación</th><th>Empresa</th><th>Placa</th><th>Operador</th></tr></thead><tbody id="bolHistory"></tbody></table></div></div>
+ <div class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between;margin-bottom:12px"><h3 style="margin:0">Registros guardados</h3><button type="button" class="btn bad" id="bolClearHistory">Borrar historial</button></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Motivo</th><th>Ubicación</th><th>Empresa</th><th>Placa</th><th>Operador</th><th>Acciones</th></tr></thead><tbody id="bolHistory"></tbody></table></div></div>
 </section>
 
 <section class="page" id="page-inc35redes">
@@ -437,7 +437,11 @@ function vialText(){
 function renderVial(){document.getElementById('vialPreview').textContent=vialText()}
 document.getElementById('vialGenerate').onclick=()=>{VIAL35.forEach((n,i)=>state.inc35.roads[n]=document.getElementById('vf'+i).value);state.inc35.vialDate=document.getElementById('vialDate').value;state.inc35.vialTime=document.getElementById('vialTime').value;save();renderVial();toast('Reporte vial actualizado.')};document.getElementById('vialCopy').onclick=()=>copyPlain(vialText());document.getElementById('vialClear').onclick=()=>{VIAL35.forEach((n,i)=>{state.inc35.roads[n]='';document.getElementById('vf'+i).value=''});save();renderVial()};
 function bulletin35Text(){let f=[['Ubicación:',proper35(document.getElementById('bolLocation').value)],['Empresa:',company35(document.getElementById('bolCompany').value)],['Placa:',document.getElementById('bolPlate').value.trim().toUpperCase()],['Operador:',proper35(document.getElementById('bolOperator').value)],['Antecedente:',proper35(document.getElementById('bolBackground').value)]];return [ccttBolMotive(),...f.filter(x=>x[1]).map(x=>x[0]+' '+x[1])].join('\n')}
-function renderBol(){document.getElementById('bolPreview').textContent=bulletin35Text();document.getElementById('bolHistory').innerHTML=(state.inc35.bulletins||[]).slice().reverse().map(x=>`<tr><td>${esc(x.at)}</td><td>${esc(x.type)}</td><td>${esc(x.location)}</td><td>${esc(x.company)}</td><td>${esc(x.plate)}</td><td>${esc(x.operator)}</td></tr>`).join('')}
+function renderBol(){
+ document.getElementById('bolPreview').textContent=bulletin35Text();
+ const rows=(state.inc35.bulletins||[]).map((x,i)=>({...x,_index:i})).reverse();
+ document.getElementById('bolHistory').innerHTML=rows.map(x=>`<tr><td>${esc(x.at)}</td><td>${esc(x.type)}</td><td>${esc(x.location)}</td><td>${esc(x.company)}</td><td>${esc(x.plate)}</td><td>${esc(x.operator)}</td><td><button type="button" class="mini-btn cctt-bol-delete" data-bol-index="${x._index}">Eliminar</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted">Sin boletinados guardados.</td></tr>';
+}
 document.getElementById('bolProcess').onclick=()=>{let o={at:new Date().toLocaleString(),type:ccttBolMotive(),location:proper35(document.getElementById('bolLocation').value),company:company35(document.getElementById('bolCompany').value),plate:document.getElementById('bolPlate').value.trim().toUpperCase(),operator:proper35(document.getElementById('bolOperator').value),text:bulletin35Text()};state.inc35.bulletins.push(o);save();renderBol();toast('Boletinado procesado.')};document.getElementById('bolCopy').onclick=()=>copyPlain(bulletin35Text());document.getElementById('bolClear').onclick=()=>{['bolLocation','bolCompany','bolPlate','bolOperator','bolBackground','bolCustomType'].forEach(id=>document.getElementById(id).value='');renderBol()};['bolType','bolCustomType','bolLocation','bolCompany','bolPlate','bolOperator','bolBackground'].forEach(id=>document.getElementById(id).addEventListener('input',renderBol));document.getElementById('bolType').addEventListener('change',ccttToggleBolCustom);ccttToggleBolCustom();
 let socialImgs=[];function fileData(f){return new Promise((res,rej)=>{let r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)})}function imgFrom(src){return new Promise((res,rej)=>{let i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src})}function drawCover(ctx,img,x,y,w,h){let r=Math.max(w/img.width,h/img.height),sw=w/r,sh=h/r,sx=(img.width-sw)/2,sy=(img.height-sh)/2;ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h)}
 function wrapCanvasText(ctx,text,x,y,maxW,lineH,maxLines=8){const words=String(text||'').split(/\s+/).filter(Boolean);let line='',lines=[];for(const w of words){const t=(line+w+' ').trim();if(ctx.measureText(t).width>maxW&&line){lines.push(line.trim());line=w+' ';if(lines.length>=maxLines-1)break}else line=t+' '}if(line.trim()&&lines.length<maxLines)lines.push(line.trim());for(const ln of lines){ctx.fillText(ln,x,y);y+=lineH}return y}
@@ -2347,7 +2351,7 @@ function createAdminUI(){if($('page-adminUsuarios'))return;
  $('ccttAllModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=true);
  $('ccttNoModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=false);
  $('ccttFindUser').onclick=async()=>{try{const r=await invoke('get-user',{userId:$('ccttTargetUser').value.trim()},secret);$('ccttTargetName').value=r.name||'';document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=(r.modules||[]).includes(el.value));notify('Permisos cargados.')}catch(e){notify(e.message,true)}};
- $('ccttSaveUser').onclick=async()=>{try{const userId=$('ccttTargetUser').value.trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId))throw Error('Introduce un UUID válido.');const selected=[...document.querySelectorAll('#ccttPermGrid input:checked')].map(x=>x.value);await invoke('save-user',{userId,name:$('ccttTargetName').value.trim(),modules:selected},secret);notify('Permisos guardados en Supabase.');await loadAdminData()}catch(e){notify(e.message,true)}};
+ $('ccttSaveUser').onclick=async()=>{try{const userId=$('ccttTargetUser').value.trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId))throw Error('Introduce un UUID válido.');const selected=[...document.querySelectorAll('#ccttPermGrid input:checked')].map(x=>x.value);await invoke('save-user',{userId,name:$('ccttTargetName').value.trim(),modules:selected},secret);const check=await invoke('get-user',{userId},secret);const actual=(check.modules||[]).slice().sort();if(JSON.stringify(actual)!==JSON.stringify(selected.slice().sort()))throw Error('Supabase no confirmó todos los permisos. Actualiza la Edge Function cctt-admin a la versión 24 y vuelve a guardar.');notify('Permisos guardados y verificados en Supabase. El usuario debe recargar o volver a iniciar sesión para verlos.');await loadAdminData()}catch(e){notify(e.message,true)}};
  $('ccttTemplateFile').insertAdjacentHTML('afterend','<input id="ccttEditTemplateId" type="hidden"><p class="muted" id="ccttTemplateEditNote">Publicar nuevo formato, o seleccionar Editar en la tabla para reemplazarlo.</p>');
  $('ccttUploadTemplate').onclick=async()=>{try{const file=$('ccttTemplateFile').files[0];if(!file)throw Error('Selecciona un archivo.');if(file.size>4*1024*1024)throw Error('Máximo 4 MB por archivo.');const reader=new FileReader();const base64=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)});await invoke($('ccttEditTemplateId').value?'update-template':'upload-template',{id:$('ccttEditTemplateId').value||undefined,moduleId:$('ccttTemplateModule').value,name:$('ccttTemplateName').value.trim()||file.name,filename:file.name,contentType:file.type,base64},secret);$('ccttTemplateFile').value='';$('ccttEditTemplateId').value='';$('ccttUploadTemplate').textContent='Publicar formato';notify('Formato publicado.');await loadAdminData();await showSharedFormats()}catch(e){notify(e.message,true)}};
  page.addEventListener('click',async e=>{const fmt=e.target.closest('[data-edit-template]');if(fmt){$('ccttEditTemplateId').value=fmt.dataset.editTemplate;$('ccttTemplateModule').value=fmt.dataset.templateModule;$('ccttTemplateName').value=fmt.dataset.templateName;$('ccttUploadTemplate').textContent='Guardar cambios del formato';$('ccttTemplateEditNote').textContent='Selecciona el archivo actualizado (PDF, DOCX o imagen). Se reemplazará el formato publicado.';$('ccttTemplateFile').focus();return;}const edit=e.target.closest('[data-edit-user]');if(edit){$('ccttTargetUser').value=edit.dataset.editUser;$('ccttFindUser').click();return}const del=e.target.closest('[data-remove-template]');if(del&&confirm('¿Eliminar este formato compartido?')){try{await invoke('delete-template',{id:del.dataset.removeTemplate},secret);await loadAdminData()}catch(err){notify(err.message,true)}}});
@@ -2647,6 +2651,47 @@ function init(){const sel=$('shiftMonth');if(!sel)return;sel.innerHTML=MONTHS.ma
  $('repCopyImageV23')?.addEventListener('click',copyReportImage);
  render();
 }
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<script id="ccttFixesV24">
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+// Guardado explícito de eliminaciones: no se anuncia éxito antes de recibir confirmación de Supabase.
+let operationQueue=Promise.resolve();
+function remoteMutation(change,description){
+ operationQueue=operationQueue.catch(()=>{}).then(async()=>{
+  const sb=window.ccttSupabaseClient;
+  if(!sb)throw Error('La conexión con Supabase no está disponible.');
+  const {data:{user},error:authError}=await sb.auth.getUser();
+  if(authError||!user)throw Error('Inicia sesión para modificar los registros.');
+  const {data,error}=await sb.from('cctt_operator_state').select('data').eq('user_id',user.id).maybeSingle();
+  if(error)throw error;
+  const remote=data?.data;
+  if(!remote||typeof remote!=='object')throw Error('No se encontraron los datos remotos. Actualiza la página y vuelve a intentarlo.');
+  const updated=structuredClone(remote);
+  updated.inc35=updated.inc35||{};
+  change(updated.inc35);
+  const {error:writeError}=await sb.from('cctt_operator_state').upsert({user_id:user.id,data:updated,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  if(writeError)throw writeError;
+  // Sincronizar la copia en memoria y el mecanismo de guardado automático existente.
+  state.inc35.incidents=updated.inc35.incidents||[];
+  state.inc35.bulletins=updated.inc35.bulletins||[];
+  if(typeof renderI35==='function')renderI35();
+  if(typeof renderBol==='function')renderBol();
+  if(typeof toast==='function')toast(description+' Guardado en Supabase.');
+ });
+ return operationQueue.catch(e=>{alert('No se pudo guardar el cambio en Supabase: '+(e.message||e));console.error('CCTT historial',e)});
+}
+function installHistory(){
+ const incidents=$('i35History'); const clearIncidents=$('i35ClearHistory');
+ if(clearIncidents){clearIncidents.onclick=async()=>{if(!confirm('¿Eliminar definitivamente TODO el historial del Generador de incidentes?'))return;await remoteMutation(data=>{data.incidents=[]},'Historial de incidentes eliminado.')}}
+ if(incidents){incidents.addEventListener('click',async e=>{const btn=e.target.closest('[data-i35-del]');if(!btn)return;e.preventDefault();e.stopImmediatePropagation();const idx=Number(btn.dataset.i35Del);const item=state.inc35.incidents?.[idx];if(!item||!confirm('¿Eliminar este incidente?'))return;const occurrence=(state.inc35.incidents||[]).slice(0,idx+1).filter(x=>JSON.stringify(x)===JSON.stringify(item)).length-1;await remoteMutation(data=>{let count=0;data.incidents=(data.incidents||[]).filter(x=>{if(JSON.stringify(x)===JSON.stringify(item)){if(count++===occurrence)return false}return true})},'Incidente eliminado.');},true)}
+ const bol=$('bolHistory');if(bol)bol.addEventListener('click',async e=>{const btn=e.target.closest('[data-bol-index]');if(!btn)return;const item=state.inc35.bulletins?.[Number(btn.dataset.bolIndex)];if(!item||!confirm('¿Eliminar este boletinado?'))return;const idx=Number(btn.dataset.bolIndex);const occurrence=(state.inc35.bulletins||[]).slice(0,idx+1).filter(x=>JSON.stringify(x)===JSON.stringify(item)).length-1;await remoteMutation(data=>{let count=0;data.bulletins=(data.bulletins||[]).filter(x=>{if(JSON.stringify(x)===JSON.stringify(item)){if(count++===occurrence)return false}return true})},'Boletinado eliminado.');});
+ const allBol=$('bolClearHistory');if(allBol)allBol.onclick=async()=>{if(confirm('¿Eliminar definitivamente TODOS los boletinados guardados?'))await remoteMutation(data=>{data.bulletins=[]},'Historial de boletinados eliminado.')};
+}
+function init(){installHistory();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
