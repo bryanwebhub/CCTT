@@ -37,6 +37,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.7/pizzip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.52.0/docxtemplater.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%23620024%22/%3E%3Ctext%20x%3D%2232%22%20y%3D%2240%22%20text-anchor%3D%22middle%22%20font-size%3D%2222%22%20font-weight%3D%22900%22%20font-family%3D%22Arial%2Csans-serif%22%20fill%3D%22white%22%3ECCTT%3C/text%3E%3C/svg%3E"/>
 </head>
 <body>
 <div class="app">
@@ -241,10 +242,10 @@ function shiftFor(t){if(!t)return'';let [h,m]=t.split(':').map(Number),x=h*60+m;
 function nextAccId(){let max=0;for(const a of state.accidents||[]){let m=String(a.id||'').match(/(\d+)/);if(m)max=Math.max(max,+m[1])}return String(max+1).padStart(2,'0')+'-CCTT'}
 function kpi(label,value){return `<div class="kpi"><b>${esc(value)}</b><span>${esc(label)}</span></div>`}
 function barChart(items){if(!items.length)return '<div class="empty">Sin datos</div>';let max=Math.max(...items.map(x=>x[1]),1);return `<div class="chart">${items.map(([l,v])=>`<div class="bar" style="height:${Math.max(4,v/max*150)}px"><i>${v}</i><small>${esc(l)}</small></div>`).join('')}</div><div style="height:34px"></div>`}
-function renderProfile(){let p=state.profile||baseState.profile;for(const [id,v] of [['profName',p.name],['profRole',p.role],['profEntity',p.entity]])document.getElementById(id).value=v||'';document.getElementById('miniName').textContent=p.name||'Operador CCTT';document.getElementById('miniRole').textContent=p.role||'Control operativo';let av=document.getElementById('miniAvatar');av.innerHTML=p.photo?`<img src="${p.photo}">`:esc((p.name||'CC').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase());let pp=document.getElementById('profilePreview');pp.src=p.photo||'data:image/svg+xml;charset=utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="50" fill="#dce8f5"/><text x="50" y="58" text-anchor="middle" font-size="28">CCTT</text></svg>');let lp=document.getElementById('logoPreview');lp.src=p.logo||'data:image/svg+xml;charset=utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="16" fill="#10233f"/><text x="60" y="70" fill="white" text-anchor="middle" font-size="26" font-family="Arial" font-weight="700">CCTT</text></svg>');let sl=document.getElementById('sideLogo');sl.innerHTML=p.logo?`<img src="${p.logo}">`:'<span data-brand-icon="traffic"></span>';decorateNavIcons()}
+function renderProfile(){let p=state.profile||baseState.profile;for(const [id,v] of [['profName',p.name],['profRole',p.role],['profEntity',p.entity]])document.getElementById(id).value=v||'';document.getElementById('miniName').textContent=p.name||'Operador CCTT';document.getElementById('miniRole').textContent=p.role||'Control operativo';let av=document.getElementById('miniAvatar');av.innerHTML=p.photo?`<img src="${p.photo}">`:esc((p.name||'CC').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase());let pp=document.getElementById('profilePreview');pp.src=p.photo||'data:image/svg+xml;charset=utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="50" fill="#dce8f5"/><text x="50" y="58" text-anchor="middle" font-size="28">CCTT</text></svg>');let lp=document.getElementById('logoPreview');lp.src=window.CCTT_SHARED_LOGO||'data:image/svg+xml;charset=utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="16" fill="#10233f"/><text x="60" y="70" fill="white" text-anchor="middle" font-size="26" font-family="Arial" font-weight="700">CCTT</text></svg>');let sl=document.getElementById('sideLogo');sl.innerHTML=window.CCTT_SHARED_LOGO?`<img src="${window.CCTT_SHARED_LOGO}" alt="Logo CCTT">`:'<span data-brand-icon="traffic"></span>';decorateNavIcons()}
 function readImg(input,cb){let f=input.files[0];if(!f)return;let r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f)}
 function renderHome(){const pisTotal=Object.values(state.pis).reduce((a,b)=>a+b.length,0);const cmp=state.cmp?.length||0;const msgs=state.messages?.length||0;document.getElementById('homeKpis').innerHTML=kpi('Registros PIS',pisTotal)+kpi('Accidentes',state.accidents?.length||0)+kpi('Citas procesadas',cmp)+kpi('Comunicados',msgs+(state.pdfHistory?.length||0));const mods=[['pis','Bitácoras PIS','Carga DEI/DEV/DEC/DEO/DEA/DEP, consolidación y exportación.'],['accidentes','Accidentes CCTT','Registro con ID y turno automáticos; estadísticas mensual/anual.'],['comparador','Comparación terminales','Procesamiento de consultas Impo/Expo y estadísticas diaria/horaria.'],['reporte','Reporte cesionarios','Estado operativo por zona, leyenda y reporte imprimible/PDF.'],['balance','Balance de citas','Comparación antes/después del incremento por terminal y día.'],['comunicadosPdf','Registro comunicados','Registro de PDF o múltiples imágenes y generación de PDF.'],['mensajes','Mensajes comunicados','Guardar, buscar por palabra/ID/etiqueta y deshacer.'],['controlCitas','Control citas portuarias','Resumen, No Show, cumplidas/no cumplidas y tipo de operación.'],['inc35macro','Generador de incidentes','Replica la hoja MACRO: plantillas, normalización de datos y salida lista para comunicación.'],['inc35copoma','COPOMA','Editor de comunicados con fecha/hora y formato institucional.'],['inc35vial','Reporte de vialidades','Estatus de vialidades internas/externas y texto listo para WhatsApp.'],['inc35bolet','Boletinados','Registro de conductas e incidencias con formato automático.'],['inc35redes','Redes y reporte','Composición de imágenes, logo, texto y exportación PNG.'],['inc35pisrep','PIS-REP','Catálogo de códigos, prioridad, tiempo de respuesta e historial.']];document.getElementById('moduleCards').innerHTML=mods.map(([id,t,d])=>`<div class="card"><h3>${t}</h3><p class="muted">${d}</p><button class="btn" onclick="go('${id}')">Abrir módulo</button></div>`).join('')}
-function go(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.page===id));const n=document.querySelector(`.navbtn[data-page="${id}"] .lbl`)?.textContent||'Centro de Control de Tráfico Terrestre';document.getElementById('pageTitle').textContent=n;window.scrollTo({top:0,behavior:'smooth'});renderAll()}
+function go(id){document.querySelectorAll('.page').forEach(x=>{x.classList.remove('active');if(x.id==='page-adminUsuarios')x.style.removeProperty('display')});document.getElementById('page-'+id).classList.add('active');document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.page===id));const n=document.querySelector(`.navbtn[data-page="${id}"] .lbl`)?.textContent||'Centro de Control de Tráfico Terrestre';document.getElementById('pageTitle').textContent=n;window.scrollTo({top:0,behavior:'smooth'});renderAll()}
 document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>go(b.dataset.page));
 // PIS
 const PIS_FORMATS=['DEI','DEV','DEC','DEO','DEA','DEP'];
@@ -2002,7 +2003,7 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
-const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
+  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
   let sb=null,currentSession=null;
   function buildGate(){
@@ -2256,11 +2257,11 @@ let session=null,admin=false,secret='',permissions=null,adminReady=false;
 const $=id=>document.getElementById(id);
 const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const notify=(msg,error=false)=>{const el=$('ccttAdminMsg');if(el){el.textContent=msg;el.style.color=error?'#aa1b3e':'#205f48'}else alert(msg)};
-function hasAccess(id){return admin || !permissions || id==='inicio' || permissions.includes(id)}
+function hasAccess(id){if(id==='adminUsuarios')return admin;return admin || !permissions || id==='inicio' || permissions.includes(id)}
 function applyAccess(){
  document.querySelectorAll('.sidebar [data-page]').forEach(b=>{b.hidden=!hasAccess(b.dataset.page);b.style.display=hasAccess(b.dataset.page)?'':'none'});
  document.querySelectorAll('#moduleCards [data-page]').forEach(b=>{b.style.display=hasAccess(b.dataset.page)?'':'none'});
- document.querySelectorAll('.page').forEach(p=>{if(p.id==='page-adminUsuarios')return;if(!hasAccess(p.id.replace(/^page-/,''))){p.classList.remove('active');p.style.display='none'}else p.style.removeProperty('display')});
+ document.querySelectorAll('.page').forEach(p=>{if(p.id==='page-adminUsuarios'){if(!admin){p.classList.remove('active');p.style.removeProperty('display')}return;}if(!hasAccess(p.id.replace(/^page-/,''))){p.classList.remove('active');p.style.display='none'}else p.style.removeProperty('display')});
  const active=document.querySelector('.page.active');if(!active||!hasAccess(active.id.replace('page-',''))){document.querySelector('.sidebar [data-page="inicio"]')?.click()}
 }
 async function invoke(action,data={},password=''){
@@ -2275,7 +2276,7 @@ function createAdminUI(){if($('page-adminUsuarios'))return;
  const nav=document.createElement('button');nav.type='button';nav.className='navbtn cctt-admin-nav';nav.dataset.page='adminUsuarios';nav.innerHTML='<span class="ico">⚙</span><span class="lbl">Administrar accesos</span>';nav.hidden=true;nav.style.display='none';document.querySelector('.sidebar')?.append(nav);
  const page=document.createElement('section');page.className='page';page.id='page-adminUsuarios';page.innerHTML=`<div class="section-title"><h2>Administración de usuarios y formatos</h2><span class="module-tag">Acceso exclusivo del administrador</span></div><div class="card cctt-admin-card"><h3>Verificación adicional</h3><p class="muted">Esta sección no crea cuentas ni modifica contraseñas de usuarios. Crea cada usuario en Supabase Auth y pega aquí su UUID para asignar módulos.</p><div class="row"><div class="field" style="flex:1;min-width:250px"><label>Contraseña administrativa adicional</label><input type="password" id="ccttSecondaryPassword" autocomplete="off" placeholder="Contraseña adicional"></div><button type="button" class="btn primary" id="ccttUnlockAdmin">Desbloquear</button><button type="button" class="btn" id="ccttLockAdmin">Bloquear</button></div><p id="ccttAdminMsg" class="cctt-admin-log" role="status"></p><div id="ccttAdminPanel" class="cctt-admin-panel"><div class="section-title"><h2>Asignar módulos a un usuario</h2></div><div class="grid g2"><div class="field"><label>ID (UUID) del usuario en Supabase</label><input id="ccttTargetUser" type="text" spellcheck="false" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></div><div class="field"><label>Nombre de referencia (opcional)</label><input id="ccttTargetName" placeholder="Ej. Operador zona norte"></div></div><div class="row" style="margin-top:12px"><button class="btn" id="ccttFindUser">Consultar permisos</button><button class="btn" id="ccttAllModules">Seleccionar todos</button><button class="btn" id="ccttNoModules">Desmarcar todos</button></div><div class="cctt-permission-grid" id="ccttPermGrid">${modules.filter(m=>m[0]!=='inicio').map(([id,name])=>`<label class="cctt-perm-option"><input type="checkbox" value="${id}"><span>${escapeHtml(name)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="ccttSaveUser">Guardar permisos</button><span class="muted">Inicio permanece disponible para todos.</span></div><div class="section-title"><h2>Usuarios configurados</h2></div><div id="ccttUsersList" class="table-wrap"></div><div class="section-title"><h2>Formatos institucionales por módulo</h2></div><p class="muted">Sube un PDF, DOCX o imagen y compártelo con los usuarios que tengan acceso al módulo. El archivo se almacena en Supabase Storage.</p><div class="grid g2"><div class="field"><label>Módulo</label><select id="ccttTemplateModule">${modules.filter(m=>m[0]!=='inicio').map(([id,name])=>`<option value="${id}">${escapeHtml(name)}</option>`).join('')}</select></div><div class="field"><label>Nombre del formato</label><input id="ccttTemplateName" placeholder="Ej. Reporte oficial 2026"></div><div class="field"><label>Archivo</label><input id="ccttTemplateFile" type="file" accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"></div></div><div class="row" style="margin-top:12px"><button class="btn primary" id="ccttUploadTemplate">Publicar formato</button></div><div id="ccttTemplatesList" class="table-wrap" style="margin-top:12px"></div></div></div>`;
  document.querySelector('.content')?.append(page);
- nav.addEventListener('click',()=>{if(!admin)return;document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));nav.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));page.classList.add('active');page.style.display='block';if($('pageTitle'))$('pageTitle').textContent='Administración de accesos';if(adminReady)loadAdminData()});
+ nav.addEventListener('click',()=>{if(!admin)return;document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));nav.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));page.classList.add('active');page.style.removeProperty('display');if($('pageTitle'))$('pageTitle').textContent='Administración de accesos';if(adminReady)loadAdminData()});
  $('ccttUnlockAdmin').onclick=async()=>{const pwd=$('ccttSecondaryPassword').value;if(!pwd)return notify('Ingresa la contraseña adicional.',true);try{await invoke('unlock',{},pwd);secret=pwd;adminReady=true;$('ccttSecondaryPassword').value='';$('ccttAdminPanel').classList.add('unlocked');notify('Acceso administrativo verificado.');await loadAdminData()}catch(e){notify(e.message,true)}};
  $('ccttLockAdmin').onclick=()=>{secret='';adminReady=false;$('ccttAdminPanel').classList.remove('unlocked');notify('Administración bloqueada.')};
  $('ccttAllModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=true);
@@ -2325,8 +2326,8 @@ async function showSharedFormats(){
   }
  }catch(e){console.warn('Formatos:',e.message)}
 }
-window.addEventListener('cctt:session',async e=>{session=e.detail.session;admin=session?.user?.app_metadata?.role==='admin';secret='';adminReady=false;createAdminUI();$('ccttAdminPanel')?.classList.remove('unlocked');const nav=document.querySelector('.cctt-admin-nav');if(nav){nav.hidden=!admin;nav.style.display=admin?'':'none'}await refreshPermissions();await showSharedFormats()});
-window.addEventListener('cctt:logout',()=>{session=null;admin=false;secret='';adminReady=false;permissions=['inicio'];const nav=document.querySelector('.cctt-admin-nav');if(nav)nav.style.display='none';$('ccttAdminPanel')?.classList.remove('unlocked')});
+window.addEventListener('cctt:session',async e=>{session=e.detail.session;admin=session?.user?.app_metadata?.role==='admin';secret='';adminReady=false;createAdminUI();$('ccttAdminPanel')?.classList.remove('unlocked');const nav=document.querySelector('.cctt-admin-nav');if(nav){nav.hidden=!admin;nav.style.display=admin?'':'none'}if(!admin && $('page-adminUsuarios')?.classList.contains('active'))document.querySelector('.sidebar [data-page="inicio"]')?.click();await refreshPermissions();await showSharedFormats()});
+window.addEventListener('cctt:logout',()=>{session=null;admin=false;secret='';adminReady=false;permissions=['inicio'];const nav=document.querySelector('.cctt-admin-nav');if(nav)nav.style.display='none';$('page-adminUsuarios')?.classList.remove('active');$('page-adminUsuarios')?.style.removeProperty('display');$('ccttAdminPanel')?.classList.remove('unlocked')});
 function boot(){createAdminUI();const btn=$('repAddRowTop');if(btn)btn.onclick=()=>$('repAddRow')?.click();const watcher=new MutationObserver(()=>{if(session)applyAccess()});const cards=$('moduleCards');if(cards)watcher.observe(cards,{childList:true});const sb=window.ccttSupabaseClient;if(sb)sb.auth.getSession().then(({data})=>{if(data?.session)window.dispatchEvent(new CustomEvent('cctt:session',{detail:{session:data.session}}))})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
@@ -2351,7 +2352,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (()=>{
 let currentUser=null,ready=false,pending=false,writing=false,retry=0,lastJSON='',loading=false;
 let sb=()=>window.ccttSupabaseClient;
-function status(text,isError=false){let el=document.getElementById('ccttCloudStatus');if(!el){el=document.createElement('div');el.id='ccttCloudStatus';el.style.cssText='position:fixed;bottom:14px;left:15px;z-index:1200;padding:9px 14px;border-radius:10px;max-width:380px;font:13px system-ui;background:#e9f5ed;color:#165c39;box-shadow:0 4px 20px #0002';document.body.append(el)}el.textContent=text;el.style.background=isError?'#fff0ed':'#e9f5ed';el.style.color=isError?'#9b2836':'#165c39'}
+function status(text,isError=false){if(isError)console.error('[CCTT Supabase]',text);else console.info('[CCTT Supabase]',text)}
 function serialize(){return JSON.stringify(state)}
 window.ccttCloudSave=()=>{if(!ready||!currentUser||loading)return;pending=true;setTimeout(flush,600)};
 async function flush(){if(!ready||!pending||writing||!currentUser)return;writing=true;pending=false;const uid=currentUser;let snapshot;
@@ -2375,6 +2376,95 @@ document.getElementById('ccttImportLegacy').onclick=()=>{if(!confirm('Esto reemp
 window.addEventListener('cctt:session',e=>begin(e.detail.session));
 window.addEventListener('cctt:logout',()=>{ready=false;currentUser=null;pending=false;lastJSON='';});
 const existing=sb();if(existing)existing.auth.getSession().then(({data})=>{if(data?.session)begin(data.session)});
+})();
+</script>
+<style id="ccttV16SecurityStyle">
+/* Control oculto por defecto: solo se muestra en su pagina activa y con permiso */
+#page-adminUsuarios{display:none!important}
+#page-adminUsuarios.active{display:block!important}
+body:not(.cctt-v16-admin) #page-adminUsuarios,body:not(.cctt-v16-admin) .cctt-admin-nav{display:none!important}
+#ccttCloudStatus{display:none!important}
+body:not(.cctt-v16-admin) #profLogo,body:not(.cctt-v16-admin) #ccttInstitutionalLogoGroup{display:none!important}
+.cctt-brand-help{margin:4px 0 0;color:#586a7e;font-size:12px}
+</style>
+<script id="ccttV16PersonalBrand">
+(()=>{
+'use strict';
+let activeSession=null,latestBrand='',brandLoaded=false;
+const isAdmin=()=>activeSession?.user?.app_metadata?.role==='admin';
+const sb=()=>window.ccttSupabaseClient;
+const brandFallback='data:image/svg+xml;charset=utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="16" fill="#620024"/><text x="60" y="69" text-anchor="middle" fill="white" font-size="28" font-weight="bold" font-family="Arial">CCTT</text></svg>');
+function updateBrand(){
+ if(!activeSession)return;
+ const src=latestBrand||brandFallback;window.CCTT_SHARED_LOGO=src;
+ const sidebar=document.getElementById('sideLogo');
+ if(sidebar){sidebar.replaceChildren();const img=document.createElement('img');img.src=src;img.alt='Logo institucional CCTT';sidebar.append(img)}
+ const preview=document.getElementById('logoPreview');if(preview)preview.src=src;
+ // No guardar el logo institucional dentro del perfil personal.
+}
+function applyRoleUI(){
+ document.body.classList.toggle('cctt-v16-admin',isAdmin());
+ const logoInput=document.getElementById('profLogo');
+ if(!logoInput)return;
+ let group=document.getElementById('ccttInstitutionalLogoGroup');
+ if(!group){group=logoInput.closest('.field');group.id='ccttInstitutionalLogoGroup';const note=group.querySelector('.muted');if(note)note.textContent='Solo el administrador puede cambiar el logo institucional. Se comparte entre todas las cuentas mediante Supabase.'}
+ group.style.display=isAdmin()?'':'none';
+ const side=document.getElementById('logoPreview')?.parentElement;
+ if(side){const p=side.querySelector('.cctt-brand-help')||document.createElement('p');p.className='cctt-brand-help';p.textContent='Logo institucional compartido · solo editable por administración';side.append(p)}
+}
+async function fetchBrand(){
+ if(!activeSession||!sb())return;
+ const {data,error}=await sb().from('cctt_site_settings').select('logo_data').eq('id',1).maybeSingle();
+ if(error){console.warn('El logo institucional requiere aplicar el SQL de v16:',error.message);return}
+ latestBrand=data?.logo_data||'';brandLoaded=true;updateBrand();
+}
+function resizedImage(file){return new Promise((resolve,reject)=>{
+ if(!file.type.startsWith('image/'))return reject(Error('Selecciona una imagen válida.'));
+ const img=new Image(),url=URL.createObjectURL(file);
+ img.onload=()=>{URL.revokeObjectURL(url);const scale=Math.min(1,440/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);resolve(canvas.toDataURL('image/webp',.78))};
+ img.onerror=()=>{URL.revokeObjectURL(url);reject(Error('No se pudo abrir la imagen.'))};img.src=url;
+ })}
+function bindProfileHandlers(){
+ const logo=document.getElementById('profLogo');if(!logo)return;
+ logo.onchange=async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  if(!isAdmin()){alert('Solo administración puede cambiar el logo institucional.');e.target.value='';return}
+  try{
+   const data=await resizedImage(file);
+   const {error}=await sb().from('cctt_site_settings').upsert({id:1,logo_data:data,updated_at:new Date().toISOString()},{onConflict:'id'});
+   if(error)throw error;
+   latestBrand=data;brandLoaded=true;updateBrand();alert('Logo institucional guardado en Supabase y compartido para todos los usuarios.');
+  }catch(err){alert('No se pudo guardar el logo: '+err.message)}
+  e.target.value='';
+ };
+ const photo=document.getElementById('profPhoto');
+ photo.onchange=async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{state.profile.photo=await resizedImage(file);renderProfile();updateBrand();save()}
+  catch(err){alert('No se pudo guardar la foto: '+err.message)}e.target.value='';
+ };
+ const saveBtn=document.getElementById('saveProfile');
+ if(saveBtn){const original=saveBtn.onclick;saveBtn.onclick=function(ev){if(!isAdmin()&&state.profile)delete state.profile.logo;if(original)original.call(this,ev);updateBrand()}}
+}
+function repairUI(){
+ if(!activeSession)return;
+ applyRoleUI();
+ // Forzar el logo institucional tras los renderizados históricos de perfil.
+ if(brandLoaded)updateBrand();
+ const page=document.getElementById('page-adminUsuarios');
+ if(page&&!isAdmin()){page.classList.remove('active');page.style.removeProperty('display')}
+}
+window.addEventListener('cctt:session',e=>{
+ const before=activeSession?.user?.id;
+ activeSession=e.detail.session;
+ brandLoaded=false;latestBrand='';window.CCTT_SHARED_LOGO=brandFallback;applyRoleUI();
+ // Los usuarios tienen perfiles separados en cctt_operator_state; no reutilizar el estado de otro usuario.
+ if(before&&before!==activeSession?.user?.id){const preview=document.getElementById('miniAvatar');if(preview)preview.textContent='CC'}
+ fetchBrand().then(repairUI);
+});
+window.addEventListener('cctt:logout',()=>{activeSession=null;brandLoaded=false;latestBrand='';window.CCTT_SHARED_LOGO='';document.body.classList.remove('cctt-v16-admin');document.getElementById('page-adminUsuarios')?.classList.remove('active')});
+function boot(){bindProfileHandlers();applyRoleUI();const observer=new MutationObserver(()=>{if(activeSession){const adminPage=document.getElementById('page-adminUsuarios');if(adminPage&&!isAdmin()&&adminPage.classList.contains('active'))adminPage.classList.remove('active')}});observer.observe(document.querySelector('.content')||document.body,{childList:true,subtree:false});const client=sb();if(client)client.auth.getSession().then(({data})=>{if(data?.session){activeSession=data.session;applyRoleUI();fetchBrand()}})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 </script>
 </body></html>
