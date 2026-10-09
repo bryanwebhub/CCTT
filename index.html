@@ -109,7 +109,7 @@
 
 Lo anterior permitirá generar y emitir información operativa ante la presencia de eventos que puedan afectar de manera general o parcial la continuidad de las operaciones, tanto al interior del recinto portuario como en sus accesos y vialidades exteriores, tales como fallas en el suministro eléctrico, eventos climatológicos, fallas o intermitencias en el sistema PIS, afectaciones en los sistemas operativos, restricciones de acceso, contingencias viales u otras situaciones que puedan modificar el flujo habitual de las operaciones.
 
-A continuación se anexa el estado de los cesionarios:</textarea></div><div class="row"><button class="btn primary" id="repUpdate">Actualizar vista</button><button class="btn" id="repResetStyle">Restablecer boletín</button><button class="btn" id="repAddRow">Agregar cesionario</button><button class="btn" id="repResetRows">Restablecer tabla</button><button class="btn" id="repImage">Generar imagen</button><button class="btn dark" id="repPdf">Generar PDF</button><button class="btn" id="repPrint">Imprimir</button></div></div><div class="card"><div class="row"><h3 style="margin:0">Estado operativo</h3><span class="pill">Filas editables</span></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Zona</th><th>Cesionario</th><th>Estatus</th><th>Comentarios</th><th></th></tr></thead><tbody id="repEditTable"></tbody></table></div></div></div>
+A continuación se anexa el estado de los cesionarios:</textarea></div><div class="row"><button class="btn primary" id="repUpdate">Actualizar vista</button><button class="btn" id="repResetStyle">Restablecer boletín</button><button class="btn" id="repAddRow">Agregar cesionario</button><button class="btn" id="repResetRows">Restablecer tabla</button><button class="btn" id="repImage">Generar imagen</button><button class="btn dark" id="repPdf">Generar PDF</button><button class="btn" id="repPrint">Imprimir</button></div></div><div class="card"><div class="row"><h3 style="margin:0">Estado operativo</h3><span class="pill">Filas editables</span></div><div class="notice" style="margin:12px 0">Agrega tantos cesionarios como necesites; cada fila permite seleccionar <b>Zona Norte</b> o <b>Zona Sur</b>. Los cambios se reflejan en la vista previa.</div><div class="row" style="margin:0 0 12px"><button type="button" class="btn primary" id="repAddRowTop">＋ Añadir cesionario</button><span class="muted">También puedes editar el nombre de cada cesionario.</span></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Zona</th><th>Cesionario</th><th>Estatus</th><th>Comentarios</th><th></th></tr></thead><tbody id="repEditTable"></tbody></table></div></div></div>
  <div class="grid g2" style="margin-top:16px"><div class="card"><h3>Formatos base</h3><p class="muted">Adjunta hasta tres plantillas DOCX o PDF y elige cuál usar como referencia visual.</p><input id="repTemplates" type="file" multiple accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><div id="repTemplateList" class="template-list"></div></div><div class="card"><h3>Vista del formato seleccionado</h3><div id="repTemplatePreview" class="doc-preview"><div class="empty">Sin formato seleccionado.</div></div></div></div>
  <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Vista previa del reporte</h3><span id="repChosenTemplate" class="pill right">Diseño boletín institucional</span></div><div id="reportPreview" style="margin-top:12px"></div></div>
 </section>
@@ -2019,7 +2019,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
     if(window.supabase&&configured){
       try{sb=window.supabase.createClient(url,anon,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}catch(e){console.error('Error al iniciar Supabase',e);sb=null}
     }else sb=null;
-    return sb;
+    window.ccttSupabaseClient=sb;return sb;
   }
   function showGate(){document.getElementById('ccttLoginGate')?.classList.add('show')}
   function hideGate(){document.getElementById('ccttLoginGate')?.classList.remove('show')}
@@ -2028,9 +2028,9 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
     let box=document.getElementById('ccttAuthUserControls');if(!box){box=document.createElement('div');box.id='ccttAuthUserControls';box.style.display='flex';box.style.gap='8px';box.style.alignItems='center';pm.prepend(box)}
     const user=session?.user,email=user?.email||'Usuario',role=user?.app_metadata?.role||user?.user_metadata?.role||'';
     box.innerHTML=`<span class="cctt-user-chip">${email}${role?` · ${role}`:''}</span><button type="button" class="cctt-logout" id="ccttLogoutBtn">Salir</button>`;
-    document.getElementById('ccttLogoutBtn').onclick=async()=>{if(sb)await sb.auth.signOut();currentSession=null;box.innerHTML='';showGate()};
+    document.getElementById('ccttLogoutBtn').onclick=async()=>{if(sb)await sb.auth.signOut();currentSession=null;box.innerHTML='';window.dispatchEvent(new Event("cctt:logout"));showGate()};
   }
-  function showApp(session){currentSession=session;hideGate();ensureUserControls(session)}
+  function showApp(session){currentSession=session;hideGate();ensureUserControls(session);window.dispatchEvent(new CustomEvent("cctt:session",{detail:{session}}))}
   async function bootAuth(){
     buildGate();initSupabase();
     if(!sb){showGate();const msg=document.getElementById('ccttAuthMsg');if(msg)msg.textContent='Supabase aún no está configurado en el código del sitio.';return}
@@ -2206,5 +2206,92 @@ body.cctt-authenticated .cctt-topbar-tools{background:#fffaf5;border-color:#ecdc
 .cctt-login-shell,.cctt-login-card,.cctt-login-card *{pointer-events:auto}
 #ccttLoginEmail,#ccttLoginPassword{position:relative;z-index:3;pointer-events:auto!important;user-select:text!important;-webkit-user-select:text!important}
 </style>
+
+
+<style id="ccttEnhancementsV14">
+/* La ilustración queda por debajo del bloque de texto, sin tapar titulares. */
+.cctt-login-stage{isolation:isolate;min-height:720px}
+.cctt-login-copy{z-index:5;max-width:590px;top:24px;left:32px}
+.cctt-login-copy h1{font-size:clamp(36px,3.8vw,56px);line-height:1.04;max-width:580px}
+.cctt-login-copy p{max-width:550px}
+.cctt-character{z-index:2!important;max-height:46%!important;bottom:0!important;object-fit:contain;object-position:bottom;}
+.cctt-character.left{left:9%!important;height:43%!important;transform:none!important}
+.cctt-character.right{left:40%!important;height:46%!important;transform:none!important}
+body.cctt-authenticated .sidebar{padding:22px 14px;background:linear-gradient(180deg,#52001e,#78183a 75%,#5b0926)}
+body.cctt-authenticated .navbtn{font-size:15px;font-weight:650;min-height:47px;gap:14px;padding:11px 13px;color:#fff4f8;line-height:1.3}
+body.cctt-authenticated .navbtn .ico{width:26px;height:26px;flex:none;color:white}
+body.cctt-authenticated .navbtn .ico svg{width:23px;height:23px;stroke-width:2.2}
+body.cctt-authenticated .nav-title{font-size:11px;font-weight:850;letter-spacing:1.2px;color:#f7c4d6;padding-top:20px}
+body.cctt-authenticated .navbtn.active{background:#ffffff24;box-shadow:inset 3px 0 #ffd6a7}
+body.cctt-authenticated .navbtn:hover{background:#ffffff20}
+body.cctt-authenticated .brand-mark{font-size:25px}
+body.cctt-authenticated .brand-sub{font-size:12px;color:#fce3ed}
+body.cctt-authenticated .top-title{font-size:21px}
+body.cctt-authenticated .top-sub{font-size:13px;color:#69525a}
+body.cctt-authenticated .field label{font-size:13px;color:#593e4a}
+body.cctt-authenticated .module-tag{font-size:12px}
+body.cctt-authenticated .tbl{font-size:13px}
+body.cctt-authenticated .tbl th{font-size:12px}
+#repEditTable input,#repEditTable select{min-height:40px;border:1px solid #d9cbd0;border-radius:8px;padding:7px;background:#fff;min-width:125px}
+#repEditTable input[data-rep-name]{min-width:190px}
+.cctt-permission-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:15px 0}
+.cctt-perm-option{border:1px solid #e4d2d9;background:#fff;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;cursor:pointer}
+.cctt-perm-option:has(input:checked){background:#fcf0f4;border-color:#a64163}
+.cctt-perm-option input{width:18px;height:18px;accent-color:#7b1740}
+.cctt-admin-card{max-width:1100px}.cctt-admin-card .notice{margin:12px 0}
+.cctt-admin-panel{display:none}.cctt-admin-panel.unlocked{display:block}
+.cctt-admin-log{padding:12px;color:#684556}
+.cctt-admin-nav{margin-top:16px;border-top:1px solid #ffffff35!important}
+@media(min-width:1051px){.app{grid-template-columns:305px minmax(0,1fr)}}
+@media(max-width:1180px){.cctt-login-stage{min-height:270px}.cctt-character{display:none!important}.cctt-login-copy{position:relative;left:auto;top:auto}}
+@media(max-width:1050px){body.cctt-authenticated .navbtn .ico{width:25px}body.cctt-authenticated .sidebar{padding:14px 8px}}
+@media(max-width:720px){body.cctt-authenticated .sidebar{gap:5px}body.cctt-authenticated .navbtn{min-width:54px}.cctt-permission-grid{grid-template-columns:1fr}}
+</style>
+<script id="ccttEnhancementsV14Script">
+(()=>{
+'use strict';
+const modules=[['inicio','Inicio'],['perfil','Perfil y logo'],['pis','Bitácoras PIS'],['accidentes','Accidentes CCTT'],['comparador','Comparación terminales'],['reporte','Reporte cesionarios'],['balance','Balance de citas'],['comunicadosPdf','Registro comunicados'],['mensajes','Mensajes comunicados'],['controlCitas','Control citas portuarias'],['inc35macro','Generador de incidentes'],['inc35copoma','COPOMA'],['inc35vial','Reporte de vialidades'],['inc35bolet','Boletinados'],['inc35redes','Redes y reporte'],['inc35pisrep','PIS-REP']];
+const moduleIds=modules.map(m=>m[0]);
+let session=null,admin=false,secret='',permissions=null,adminReady=false;
+const $=id=>document.getElementById(id);
+const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const notify=(msg,error=false)=>{const el=$('ccttAdminMsg');if(el){el.textContent=msg;el.style.color=error?'#aa1b3e':'#205f48'}else alert(msg)};
+function hasAccess(id){return admin || !permissions || id==='inicio' || permissions.includes(id)}
+function applyAccess(){
+ document.querySelectorAll('.sidebar [data-page]').forEach(b=>{b.hidden=!hasAccess(b.dataset.page);b.style.display=hasAccess(b.dataset.page)?'':'none'});
+ document.querySelectorAll('#moduleCards [data-page]').forEach(b=>{b.style.display=hasAccess(b.dataset.page)?'':'none'});
+ document.querySelectorAll('.page').forEach(p=>{if(p.id==='page-adminUsuarios')return;if(!hasAccess(p.id.replace(/^page-/,''))){p.classList.remove('active');p.style.display='none'}else p.style.removeProperty('display')});
+ const active=document.querySelector('.page.active');if(!active||!hasAccess(active.id.replace('page-',''))){document.querySelector('.sidebar [data-page="inicio"]')?.click()}
+}
+async function invoke(action,data={},password=''){
+ const sb=window.ccttSupabaseClient;if(!sb)throw new Error('Configura Supabase para utilizar la administración.');
+ const {data:result,error}=await sb.functions.invoke('cctt-admin',{body:{action,...data,secondaryPassword:password||undefined}});
+ if(error)throw new Error(error.message||'No se pudo consultar el servidor.');
+ if(result?.error)throw new Error(result.error);
+ return result;
+}
+async function refreshPermissions(){try{const result=await invoke('my-access');permissions=Array.isArray(result.modules)?result.modules:[];applyAccess()}catch(e){permissions=['inicio'];applyAccess();console.warn('Permisos no disponibles:',e.message)}}
+function createAdminUI(){if($('page-adminUsuarios'))return;
+ const nav=document.createElement('button');nav.type='button';nav.className='navbtn cctt-admin-nav';nav.dataset.page='adminUsuarios';nav.innerHTML='<span class="ico">⚙</span><span class="lbl">Administrar accesos</span>';nav.hidden=true;nav.style.display='none';document.querySelector('.sidebar')?.append(nav);
+ const page=document.createElement('section');page.className='page';page.id='page-adminUsuarios';page.innerHTML=`<div class="section-title"><h2>Administración de usuarios y formatos</h2><span class="module-tag">Acceso exclusivo del administrador</span></div><div class="card cctt-admin-card"><h3>Verificación adicional</h3><p class="muted">Esta sección no crea cuentas ni modifica contraseñas de usuarios. Crea cada usuario en Supabase Auth y pega aquí su UUID para asignar módulos.</p><div class="row"><div class="field" style="flex:1;min-width:250px"><label>Contraseña administrativa adicional</label><input type="password" id="ccttSecondaryPassword" autocomplete="off" placeholder="Contraseña adicional"></div><button type="button" class="btn primary" id="ccttUnlockAdmin">Desbloquear</button><button type="button" class="btn" id="ccttLockAdmin">Bloquear</button></div><p id="ccttAdminMsg" class="cctt-admin-log" role="status"></p><div id="ccttAdminPanel" class="cctt-admin-panel"><div class="section-title"><h2>Asignar módulos a un usuario</h2></div><div class="grid g2"><div class="field"><label>ID (UUID) del usuario en Supabase</label><input id="ccttTargetUser" type="text" spellcheck="false" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></div><div class="field"><label>Nombre de referencia (opcional)</label><input id="ccttTargetName" placeholder="Ej. Operador zona norte"></div></div><div class="row" style="margin-top:12px"><button class="btn" id="ccttFindUser">Consultar permisos</button><button class="btn" id="ccttAllModules">Seleccionar todos</button><button class="btn" id="ccttNoModules">Desmarcar todos</button></div><div class="cctt-permission-grid" id="ccttPermGrid">${modules.filter(m=>m[0]!=='inicio').map(([id,name])=>`<label class="cctt-perm-option"><input type="checkbox" value="${id}"><span>${escapeHtml(name)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="ccttSaveUser">Guardar permisos</button><span class="muted">Inicio permanece disponible para todos.</span></div><div class="section-title"><h2>Usuarios configurados</h2></div><div id="ccttUsersList" class="table-wrap"></div><div class="section-title"><h2>Formatos institucionales por módulo</h2></div><p class="muted">Sube un PDF, DOCX o imagen y compártelo con los usuarios que tengan acceso al módulo. El archivo se almacena en Supabase Storage.</p><div class="grid g2"><div class="field"><label>Módulo</label><select id="ccttTemplateModule">${modules.filter(m=>m[0]!=='inicio').map(([id,name])=>`<option value="${id}">${escapeHtml(name)}</option>`).join('')}</select></div><div class="field"><label>Nombre del formato</label><input id="ccttTemplateName" placeholder="Ej. Reporte oficial 2026"></div><div class="field"><label>Archivo</label><input id="ccttTemplateFile" type="file" accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"></div></div><div class="row" style="margin-top:12px"><button class="btn primary" id="ccttUploadTemplate">Publicar formato</button></div><div id="ccttTemplatesList" class="table-wrap" style="margin-top:12px"></div></div></div>`;
+ document.querySelector('.content')?.append(page);
+ nav.addEventListener('click',()=>{if(!admin)return;document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));nav.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));page.classList.add('active');page.style.display='block';if($('pageTitle'))$('pageTitle').textContent='Administración de accesos';if(adminReady)loadAdminData()});
+ $('ccttUnlockAdmin').onclick=async()=>{const pwd=$('ccttSecondaryPassword').value;if(!pwd)return notify('Ingresa la contraseña adicional.',true);try{await invoke('unlock',{},pwd);secret=pwd;adminReady=true;$('ccttSecondaryPassword').value='';$('ccttAdminPanel').classList.add('unlocked');notify('Acceso administrativo verificado.');await loadAdminData()}catch(e){notify(e.message,true)}};
+ $('ccttLockAdmin').onclick=()=>{secret='';adminReady=false;$('ccttAdminPanel').classList.remove('unlocked');notify('Administración bloqueada.')};
+ $('ccttAllModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=true);
+ $('ccttNoModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=false);
+ $('ccttFindUser').onclick=async()=>{try{const r=await invoke('get-user',{userId:$('ccttTargetUser').value.trim()},secret);$('ccttTargetName').value=r.name||'';document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=(r.modules||[]).includes(el.value));notify('Permisos cargados.')}catch(e){notify(e.message,true)}};
+ $('ccttSaveUser').onclick=async()=>{try{const userId=$('ccttTargetUser').value.trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId))throw Error('Introduce un UUID válido.');const selected=[...document.querySelectorAll('#ccttPermGrid input:checked')].map(x=>x.value);await invoke('save-user',{userId,name:$('ccttTargetName').value.trim(),modules:selected},secret);notify('Permisos guardados en Supabase.');await loadAdminData()}catch(e){notify(e.message,true)}};
+ $('ccttUploadTemplate').onclick=async()=>{try{const file=$('ccttTemplateFile').files[0];if(!file)throw Error('Selecciona un archivo.');if(file.size>4*1024*1024)throw Error('Máximo 4 MB por archivo.');const reader=new FileReader();const base64=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)});await invoke('upload-template',{moduleId:$('ccttTemplateModule').value,name:$('ccttTemplateName').value.trim()||file.name,filename:file.name,contentType:file.type,base64},secret);$('ccttTemplateFile').value='';notify('Formato publicado.');await loadAdminData()}catch(e){notify(e.message,true)}};
+ page.addEventListener('click',async e=>{const edit=e.target.closest('[data-edit-user]');if(edit){$('ccttTargetUser').value=edit.dataset.editUser;$('ccttFindUser').click();return}const del=e.target.closest('[data-remove-template]');if(del&&confirm('¿Eliminar este formato compartido?')){try{await invoke('delete-template',{id:del.dataset.removeTemplate},secret);await loadAdminData()}catch(err){notify(err.message,true)}}});
+}
+async function loadAdminData(){if(!adminReady)return;try{const [u,t]=await Promise.all([invoke('list-users',{},secret),invoke('list-templates',{},secret)]);$('ccttUsersList').innerHTML=`<table class="tbl"><thead><tr><th>Referencia</th><th>UUID</th><th>Módulos</th><th>Acción</th></tr></thead><tbody>${(u.users||[]).map(x=>`<tr><td>${escapeHtml(x.name||'Sin nombre')}</td><td>${escapeHtml(x.user_id)}</td><td>${(x.modules||[]).length}</td><td><button class="btn" data-edit-user="${escapeHtml(x.user_id)}">Editar</button></td></tr>`).join('')||'<tr><td colspan="4">Aún no hay usuarios configurados.</td></tr>'}</tbody></table>`;$('ccttTemplatesList').innerHTML=`<table class="tbl"><thead><tr><th>Módulo</th><th>Formato</th><th>Acción</th></tr></thead><tbody>${(t.templates||[]).map(x=>`<tr><td>${escapeHtml(modules.find(m=>m[0]===x.module_id)?.[1]||x.module_id)}</td><td>${escapeHtml(x.name)}</td><td><button class="btn bad" data-remove-template="${escapeHtml(x.id)}">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="3">No hay formatos publicados.</td></tr>'}</tbody></table>`}catch(e){notify(e.message,true)}}
+async function showSharedFormats(){if(!session)return;try{const {templates=[]}=await invoke('visible-templates');document.querySelectorAll('.cctt-shared-formats').forEach(el=>el.remove());for(const [moduleId] of modules){const items=templates.filter(t=>t.module_id===moduleId);if(!items.length)continue;const page=$('page-'+moduleId);if(!page)continue;const div=document.createElement('div');div.className='card cctt-shared-formats';div.style.margin='12px 0';const title=document.createElement('h3');title.textContent='Formatos institucionales compartidos';div.append(title);for(const item of items){const a=document.createElement('a');a.className='btn';a.style.margin='5px';a.textContent='↧ '+item.name;a.href=item.url;a.target='_blank';a.rel='noopener noreferrer';div.append(a)}page.insertBefore(div,page.children[1]||null)}}catch(e){console.warn('Formatos:',e.message)}}
+window.addEventListener('cctt:session',async e=>{session=e.detail.session;admin=session?.user?.app_metadata?.role==='admin';secret='';adminReady=false;createAdminUI();$('ccttAdminPanel')?.classList.remove('unlocked');const nav=document.querySelector('.cctt-admin-nav');if(nav){nav.hidden=!admin;nav.style.display=admin?'':'none'}await refreshPermissions();await showSharedFormats()});
+window.addEventListener('cctt:logout',()=>{session=null;admin=false;secret='';adminReady=false;permissions=['inicio'];const nav=document.querySelector('.cctt-admin-nav');if(nav)nav.style.display='none';$('ccttAdminPanel')?.classList.remove('unlocked')});
+function boot(){createAdminUI();const btn=$('repAddRowTop');if(btn)btn.onclick=()=>$('repAddRow')?.click();const watcher=new MutationObserver(()=>{if(session)applyAccess()});const cards=$('moduleCards');if(cards)watcher.observe(cards,{childList:true});const sb=window.ccttSupabaseClient;if(sb)sb.auth.getSession().then(({data})=>{if(data?.session)window.dispatchEvent(new CustomEvent('cctt:session',{detail:{session:data.session}}))})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
 
 </body></html>
