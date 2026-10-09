@@ -1754,4 +1754,151 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
 })();
 </script>
 
+
+<style id="reportTemplatePreviewFixV10Style">
+#reportPreview .report-v10-shell{background:#eaf0f7;padding:14px;border-radius:12px;overflow:auto}
+#reportPreview .report-v10-page{position:relative;margin:0 auto;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+#reportPreview .report-v10-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;z-index:0}
+#reportPreview .report-v10-overlay{position:absolute;z-index:25;box-sizing:border-box;overflow:hidden;background:transparent;color:#111;font-family:"Noto Sans",Arial,sans-serif}
+#reportPreview .report-v10-overlay .report-bulletin-shell{padding:0!important;margin:0!important;max-width:none!important;background:transparent!important;color:#111!important;font-family:"Noto Sans",Arial,sans-serif!important}
+#reportPreview .report-v10-overlay .bulletin-top{display:block!important;margin:0 0 14px!important}
+#reportPreview .report-v10-overlay .bulletin-headings{font-size:11.2px!important;line-height:1.16!important;text-align:right!important;margin:0!important}
+#reportPreview .report-v10-overlay .bulletin-date{font-size:11px!important;line-height:1.18!important;text-align:right!important;margin:16px 0 22px!important}
+#reportPreview .report-v10-overlay .bulletin-meta p{font-size:10.8px!important;line-height:14px!important;margin:0 0 10px!important;font-weight:700!important}
+#reportPreview .report-v10-overlay .bulletin-paragraphs p{font-size:10.7px!important;line-height:15px!important;text-align:justify!important;margin:0 0 12px!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table{width:100%!important;border-collapse:collapse!important;margin-top:8px!important;table-layout:fixed!important;font-size:10px!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table th,#reportPreview .report-v10-overlay .rep-bulletin-table td{border:1px solid #777!important;padding:4px 5px!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;height:auto!important;text-align:center!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table th{background:#225f9b!important;color:#fff!important;font-size:10px!important;line-height:1.08!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table td:nth-child(4){text-align:center!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table .zone-cell{text-align:center!important;vertical-align:middle!important;font-weight:700!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table .zone-cell.north{background:#f0c232!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table .zone-cell.south{background:#15b74a!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table col.zone{width:17%!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table col.name{width:16%!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table col.status{width:19%!important}
+#reportPreview .report-v10-overlay .rep-bulletin-table col.comments{width:48%!important}
+#reportPreview .report-v10-overlay .bulletin-footer{display:none!important}
+</style>
+<script id="reportTemplatePreviewFixV10Js">
+(function(){
+  function repV10Placement(){
+    const p=((state||{}).report||{}).templatePlacement||{};
+    const pick=(keys,fb)=>{for(const k of keys){const v=+p[k]; if(Number.isFinite(v)) return v;} return fb;};
+    return {
+      top: pick(['topV10','topV9','topV8','topV7','top'], 9.0),
+      left: pick(['leftV10','leftV9','leftV8','leftV7','left'], 6.6),
+      width: pick(['widthV10','widthV9','widthV8','widthV7','width'], 87.0),
+      height: pick(['heightV10','heightV9','heightV8','heightV7','height'], 74.5),
+      font: pick(['fontV10','fontV9','fontV8','fontV7','font'], 11.0)
+    };
+  }
+  function repV10AddColGroup(html){
+    return String(html||'').replace('<table class="rep-bulletin-table">','<table class="rep-bulletin-table"><colgroup><col class="zone"><col class="name"><col class="status"><col class="comments"></colgroup>');
+  }
+  function repV10ContentHtml(){
+    const host=document.getElementById('reportPreview');
+    if(!host) return '';
+    const prev=host.innerHTML;
+    try{
+      if(typeof oldUpdateReportPreview==='function') oldUpdateReportPreview();
+      const shell=host.querySelector('.report-bulletin-shell');
+      if(shell){
+        const clone=shell.cloneNode(true);
+        clone.classList.add('in-template');
+        clone.querySelectorAll('.bulletin-logo,.bulletin-footer').forEach(n=>n.remove());
+        return repV10AddColGroup(clone.outerHTML);
+      }
+    }catch(err){ console.warn('V10 no pudo clonar la vista institucional', err); }
+    finally{ host.innerHTML=prev; }
+    if(typeof canonicalReportBulletinHtml==='function'){
+      try{return repV10AddColGroup(canonicalReportBulletinHtml({inTemplate:true}));}catch(err){console.warn(err)}
+    }
+    return '';
+  }
+  function repV10PreviewRaster(){
+    const root=document.getElementById('repTemplatePreview');
+    if(!root) return null;
+    const img=root.querySelector('.report-exact-stage img, .format-preview img, img');
+    if(img&&img.src) return {src:img.src,width:img.naturalWidth||img.width||1240,height:img.naturalHeight||img.height||1754};
+    const cv=root.querySelector('canvas');
+    if(cv&&cv.width&&cv.height) return {src:cv.toDataURL('image/png'),width:cv.width,height:cv.height};
+    return null;
+  }
+  async function repV10Raster(file){
+    let ras=null;
+    try{ if(file && typeof getCachedRaster==='function') ras=getCachedRaster(file); }catch(e){}
+    if(!ras){ try{ if(file && typeof templateRaster==='function') ras=await templateRaster(file); }catch(e){ console.warn('V10 raster falló',e); } }
+    if(!ras) ras=repV10PreviewRaster();
+    if(ras&&file&&typeof cacheRasterOnTemplate==='function'){ try{cacheRasterOnTemplate(file,ras);}catch(e){} }
+    return ras;
+  }
+  function repV10Fit(overlay,d){
+    let scale=1,guard=240;
+    overlay.style.transform='';
+    overlay.style.transformOrigin='top left';
+    overlay.style.width=d.width+'%';
+    overlay.style.height=d.height+'%';
+    while(guard-- > 0 && (overlay.scrollHeight>overlay.clientHeight+2 || overlay.scrollWidth>overlay.clientWidth+2) && scale>0.46){
+      scale -= 0.01;
+      overlay.style.transform='scale('+scale+')';
+      overlay.style.width=(d.width/scale)+'%';
+      overlay.style.height=(d.height/scale)+'%';
+    }
+    overlay.dataset.scale=String(scale);
+  }
+  async function renderReportPreviewV10(file){
+    const host=document.getElementById('reportPreview');
+    if(!host) return null;
+    const ras=await repV10Raster(file);
+    if(!ras) throw new Error('No se pudo obtener la imagen de la plantilla base.');
+    const html=repV10ContentHtml();
+    if(!html) throw new Error('No se pudo construir el contenido del reporte.');
+    host.innerHTML='';
+    const shell=document.createElement('div'); shell.className='report-v10-shell';
+    const page=document.createElement('div'); page.className='report-v10-page report-fixed-page';
+    const max=Math.min(760, Math.max(360,(host.clientWidth||760)-36));
+    const ratio=(+ras.width||1240)/(+ras.height||1754);
+    page.style.width=max+'px';
+    page.style.height=(max/ratio)+'px';
+    page.style.aspectRatio=`${ras.width}/${ras.height}`;
+    const bg=document.createElement('img'); bg.className='report-v10-bg'; bg.src=ras.src; bg.alt=(file&&file.name)||'Formato base';
+    page.appendChild(bg);
+    const d=repV10Placement();
+    const ov=document.createElement('div'); ov.className='report-v10-overlay';
+    Object.assign(ov.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.font+'px'});
+    ov.innerHTML=html;
+    page.appendChild(ov);
+    shell.appendChild(page);
+    host.appendChild(shell);
+    const chosen=document.getElementById('repChosenTemplate');
+    if(chosen && file) chosen.textContent=(file.name||'Formato base')+' · vista aplicada';
+    requestAnimationFrame(()=>{repV10Fit(ov,d); setTimeout(()=>repV10Fit(ov,d),90); setTimeout(()=>repV10Fit(ov,d),260);});
+    return page;
+  }
+  const v10Compat=window.updateReportPreview;
+  window.updateReportPreview = async function(){
+    if(typeof syncReportMetaFromInputs==='function') syncReportMetaFromInputs();
+    const legendInput=document.getElementById('repLegend');
+    if(legendInput && typeof cleanLegendText==='function'){ state.report.legend=cleanLegendText(legendInput.value); legendInput.value=state.report.legend; }
+    if(typeof save==='function') save();
+    const file=(typeof reportTemplateIndex!=='undefined' && reportTemplateIndex>=0 && typeof reportTemplates!=='undefined') ? reportTemplates[reportTemplateIndex] : null;
+    if(!file){
+      const chosen=document.getElementById('repChosenTemplate');
+      if(chosen) chosen.textContent='Diseño boletín institucional';
+      return typeof oldUpdateReportPreview==='function' ? oldUpdateReportPreview() : (typeof v10Compat==='function' ? v10Compat() : null);
+    }
+    try{ return await renderReportPreviewV10(file); }
+    catch(err){
+      console.warn('V10: no se pudo aplicar la plantilla al reporte, se usa vista institucional.', err);
+      const chosen=document.getElementById('repChosenTemplate');
+      if(chosen) chosen.textContent=(file.name||'Formato base')+' · vista compatible';
+      return typeof oldUpdateReportPreview==='function' ? oldUpdateReportPreview() : (typeof v10Compat==='function' ? v10Compat() : null);
+    }
+  };
+  window.renderFinalReportWithTemplate = async function(file){ return renderReportPreviewV10(file); };
+  window.reportCaptureNode = async function(){ await window.updateReportPreview(); return document.querySelector('#reportPreview .report-v10-page')||document.querySelector('#reportPreview .report-fixed-page')||document.getElementById('printReport')||document.getElementById('reportPreview'); };
+  setTimeout(()=>{try{window.updateReportPreview();}catch(e){console.warn(e)}},220);
+})();
+</script>
+
 </body></html>
