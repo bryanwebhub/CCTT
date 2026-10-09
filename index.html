@@ -216,7 +216,7 @@ let state=(()=>{try{return Object.assign(clone(baseState),JSON.parse(localStorag
 for(const k of ['pis','balance','report','control','inc35']) if(!state[k]) state[k]=clone(baseState[k]);
 for(const k of ['DEI','DEV','DEC','DEO','DEA','DEP']) if(!state.pis[k])state.pis[k]=[];
 if(!state.inc35)state.inc35=clone(baseState.inc35);for(const k of ['incidents','copoma','bulletins','pisrep'])if(!state.inc35[k])state.inc35[k]=[];if(!state.inc35.roads)state.inc35.roads={};if(!state.inc35.social)state.inc35.social=clone(baseState.inc35.social);
-function save(){try{localStorage.setItem(APPKEY,JSON.stringify(state))}catch(e){toast('El almacenamiento local está lleno. Exporte o reduzca archivos.',true)}}
+function save(){if(typeof window.ccttCloudSave==='function')window.ccttCloudSave();else console.warn('Guardado remoto pendiente: inicia sesión en Supabase.')}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function norm(s){return String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().trim()}
 function today(){return new Date().toISOString().slice(0,10)}
@@ -2002,7 +2002,7 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
-  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
+const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
   let sb=null,currentSession=null;
   function buildGate(){
@@ -2282,11 +2282,49 @@ function createAdminUI(){if($('page-adminUsuarios'))return;
  $('ccttNoModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=false);
  $('ccttFindUser').onclick=async()=>{try{const r=await invoke('get-user',{userId:$('ccttTargetUser').value.trim()},secret);$('ccttTargetName').value=r.name||'';document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=(r.modules||[]).includes(el.value));notify('Permisos cargados.')}catch(e){notify(e.message,true)}};
  $('ccttSaveUser').onclick=async()=>{try{const userId=$('ccttTargetUser').value.trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId))throw Error('Introduce un UUID válido.');const selected=[...document.querySelectorAll('#ccttPermGrid input:checked')].map(x=>x.value);await invoke('save-user',{userId,name:$('ccttTargetName').value.trim(),modules:selected},secret);notify('Permisos guardados en Supabase.');await loadAdminData()}catch(e){notify(e.message,true)}};
- $('ccttUploadTemplate').onclick=async()=>{try{const file=$('ccttTemplateFile').files[0];if(!file)throw Error('Selecciona un archivo.');if(file.size>4*1024*1024)throw Error('Máximo 4 MB por archivo.');const reader=new FileReader();const base64=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)});await invoke('upload-template',{moduleId:$('ccttTemplateModule').value,name:$('ccttTemplateName').value.trim()||file.name,filename:file.name,contentType:file.type,base64},secret);$('ccttTemplateFile').value='';notify('Formato publicado.');await loadAdminData()}catch(e){notify(e.message,true)}};
- page.addEventListener('click',async e=>{const edit=e.target.closest('[data-edit-user]');if(edit){$('ccttTargetUser').value=edit.dataset.editUser;$('ccttFindUser').click();return}const del=e.target.closest('[data-remove-template]');if(del&&confirm('¿Eliminar este formato compartido?')){try{await invoke('delete-template',{id:del.dataset.removeTemplate},secret);await loadAdminData()}catch(err){notify(err.message,true)}}});
+ $('ccttTemplateFile').insertAdjacentHTML('afterend','<input id="ccttEditTemplateId" type="hidden"><p class="muted" id="ccttTemplateEditNote">Publicar nuevo formato, o seleccionar Editar en la tabla para reemplazarlo.</p>');
+ $('ccttUploadTemplate').onclick=async()=>{try{const file=$('ccttTemplateFile').files[0];if(!file)throw Error('Selecciona un archivo.');if(file.size>4*1024*1024)throw Error('Máximo 4 MB por archivo.');const reader=new FileReader();const base64=await new Promise((resolve,reject)=>{reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)});await invoke($('ccttEditTemplateId').value?'update-template':'upload-template',{id:$('ccttEditTemplateId').value||undefined,moduleId:$('ccttTemplateModule').value,name:$('ccttTemplateName').value.trim()||file.name,filename:file.name,contentType:file.type,base64},secret);$('ccttTemplateFile').value='';$('ccttEditTemplateId').value='';$('ccttUploadTemplate').textContent='Publicar formato';notify('Formato publicado.');await loadAdminData();await showSharedFormats()}catch(e){notify(e.message,true)}};
+ page.addEventListener('click',async e=>{const fmt=e.target.closest('[data-edit-template]');if(fmt){$('ccttEditTemplateId').value=fmt.dataset.editTemplate;$('ccttTemplateModule').value=fmt.dataset.templateModule;$('ccttTemplateName').value=fmt.dataset.templateName;$('ccttUploadTemplate').textContent='Guardar cambios del formato';$('ccttTemplateEditNote').textContent='Selecciona el archivo actualizado (PDF, DOCX o imagen). Se reemplazará el formato publicado.';$('ccttTemplateFile').focus();return;}const edit=e.target.closest('[data-edit-user]');if(edit){$('ccttTargetUser').value=edit.dataset.editUser;$('ccttFindUser').click();return}const del=e.target.closest('[data-remove-template]');if(del&&confirm('¿Eliminar este formato compartido?')){try{await invoke('delete-template',{id:del.dataset.removeTemplate},secret);await loadAdminData()}catch(err){notify(err.message,true)}}});
 }
-async function loadAdminData(){if(!adminReady)return;try{const [u,t]=await Promise.all([invoke('list-users',{},secret),invoke('list-templates',{},secret)]);$('ccttUsersList').innerHTML=`<table class="tbl"><thead><tr><th>Referencia</th><th>UUID</th><th>Módulos</th><th>Acción</th></tr></thead><tbody>${(u.users||[]).map(x=>`<tr><td>${escapeHtml(x.name||'Sin nombre')}</td><td>${escapeHtml(x.user_id)}</td><td>${(x.modules||[]).length}</td><td><button class="btn" data-edit-user="${escapeHtml(x.user_id)}">Editar</button></td></tr>`).join('')||'<tr><td colspan="4">Aún no hay usuarios configurados.</td></tr>'}</tbody></table>`;$('ccttTemplatesList').innerHTML=`<table class="tbl"><thead><tr><th>Módulo</th><th>Formato</th><th>Acción</th></tr></thead><tbody>${(t.templates||[]).map(x=>`<tr><td>${escapeHtml(modules.find(m=>m[0]===x.module_id)?.[1]||x.module_id)}</td><td>${escapeHtml(x.name)}</td><td><button class="btn bad" data-remove-template="${escapeHtml(x.id)}">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="3">No hay formatos publicados.</td></tr>'}</tbody></table>`}catch(e){notify(e.message,true)}}
-async function showSharedFormats(){if(!session)return;try{const {templates=[]}=await invoke('visible-templates');document.querySelectorAll('.cctt-shared-formats').forEach(el=>el.remove());for(const [moduleId] of modules){const items=templates.filter(t=>t.module_id===moduleId);if(!items.length)continue;const page=$('page-'+moduleId);if(!page)continue;const div=document.createElement('div');div.className='card cctt-shared-formats';div.style.margin='12px 0';const title=document.createElement('h3');title.textContent='Formatos institucionales compartidos';div.append(title);for(const item of items){const a=document.createElement('a');a.className='btn';a.style.margin='5px';a.textContent='↧ '+item.name;a.href=item.url;a.target='_blank';a.rel='noopener noreferrer';div.append(a)}page.insertBefore(div,page.children[1]||null)}}catch(e){console.warn('Formatos:',e.message)}}
+async function loadAdminData(){if(!adminReady)return;try{const [u,t]=await Promise.all([invoke('list-users',{},secret),invoke('list-templates',{},secret)]);$('ccttUsersList').innerHTML=`<table class="tbl"><thead><tr><th>Referencia</th><th>UUID</th><th>Módulos</th><th>Acción</th></tr></thead><tbody>${(u.users||[]).map(x=>`<tr><td>${escapeHtml(x.name||'Sin nombre')}</td><td>${escapeHtml(x.user_id)}</td><td>${(x.modules||[]).length}</td><td><button class="btn" data-edit-user="${escapeHtml(x.user_id)}">Editar</button></td></tr>`).join('')||'<tr><td colspan="4">Aún no hay usuarios configurados.</td></tr>'}</tbody></table>`;$('ccttTemplatesList').innerHTML=`<table class="tbl"><thead><tr><th>Módulo</th><th>Formato</th><th>Acción</th></tr></thead><tbody>${(t.templates||[]).map(x=>`<tr><td>${escapeHtml(modules.find(m=>m[0]===x.module_id)?.[1]||x.module_id)}</td><td>${escapeHtml(x.name)}</td><td><button class="btn" data-edit-template="${escapeHtml(x.id)}" data-template-name="${escapeHtml(x.name)}" data-template-module="${escapeHtml(x.module_id)}">Editar</button> <button class="btn bad" data-remove-template="${escapeHtml(x.id)}">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="3">No hay formatos publicados.</td></tr>'}</tbody></table>`}catch(e){notify(e.message,true)}}
+async function showSharedFormats(){
+ if(!session)return;
+ try{
+  const {templates=[]}=await invoke('visible-templates');
+  document.querySelectorAll('.cctt-shared-formats').forEach(el=>el.remove());
+  for(const [moduleId] of modules){
+   const items=templates.filter(t=>t.module_id===moduleId).slice(0,moduleId==='inc35copoma'?3:99);
+   if(!items.length)continue;
+   const page=$('page-'+moduleId);if(!page)continue;
+   const div=document.createElement('div');div.className='card cctt-shared-formats';div.style.margin='12px 0';
+   const title=document.createElement('h3');title.textContent=moduleId==='inc35copoma'?'Selecciona uno de los formatos oficiales de COPOMA':'Formato institucional disponible';div.append(title);
+   const message=document.createElement('p');message.className='muted';message.textContent='Publicado por administración. No necesitas adjuntar el formato nuevamente.';div.append(message);
+   for(const item of items){
+    const b=document.createElement('button');b.type='button';b.className='btn';b.style.margin='5px';b.textContent='Usar formato: '+item.name;
+    b.onclick=async()=>{try{
+      if(moduleId==='inc35copoma'||moduleId==='reporte'){
+       const resp=await fetch(item.url);if(!resp.ok)throw Error('No se pudo descargar la plantilla.');
+       const blob=await resp.blob();const f=new File([blob],item.name,{type:blob.type});
+       if(moduleId==='inc35copoma'){copTemplates=[f];copTemplateIndex=0;renderCopTemplates();await chooseCopTemplate(0)}
+       else{reportTemplates=[f];reportTemplateIndex=0;renderReportTemplates();await chooseReportTemplate(0)}
+       notify('Plantilla institucional seleccionada.');
+      }else window.open(item.url,'_blank','noopener,noreferrer');
+     }catch(e){notify(e.message,true)}};
+    div.append(b);
+    const a=document.createElement('a');a.href=item.url;a.target='_blank';a.rel='noopener noreferrer';a.className='btn';a.style.margin='5px';a.textContent='Descargar';div.append(a);
+   }
+   page.insertBefore(div,page.children[1]||null);
+  }
+  for(const id of ['repTemplates','copTemplates']){
+    const el=$(id);if(!el)continue;
+    const parent=el.closest('.card');if(!parent)continue;
+    el.style.display='none';
+    const label=parent.querySelector('h3');if(label)label.textContent='Formatos oficiales (definidos por administración)';
+    parent.querySelectorAll('.persist-note').forEach(note=>note.textContent='Las plantillas compartidas se administran exclusivamente desde Administrar accesos.');
+    parent.querySelectorAll('[onclick*="replacePersistedTemplate"],[onclick*="removePersistedTemplate"]').forEach(btn=>btn.style.display='none');
+  }
+ }catch(e){console.warn('Formatos:',e.message)}
+}
 window.addEventListener('cctt:session',async e=>{session=e.detail.session;admin=session?.user?.app_metadata?.role==='admin';secret='';adminReady=false;createAdminUI();$('ccttAdminPanel')?.classList.remove('unlocked');const nav=document.querySelector('.cctt-admin-nav');if(nav){nav.hidden=!admin;nav.style.display=admin?'':'none'}await refreshPermissions();await showSharedFormats()});
 window.addEventListener('cctt:logout',()=>{session=null;admin=false;secret='';adminReady=false;permissions=['inicio'];const nav=document.querySelector('.cctt-admin-nav');if(nav)nav.style.display='none';$('ccttAdminPanel')?.classList.remove('unlocked')});
 function boot(){createAdminUI();const btn=$('repAddRowTop');if(btn)btn.onclick=()=>$('repAddRow')?.click();const watcher=new MutationObserver(()=>{if(session)applyAccess()});const cards=$('moduleCards');if(cards)watcher.observe(cards,{childList:true});const sb=window.ccttSupabaseClient;if(sb)sb.auth.getSession().then(({data})=>{if(data?.session)window.dispatchEvent(new CustomEvent('cctt:session',{detail:{session:data.session}}))})}
@@ -2294,4 +2332,49 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
+
+<style id="ccttCloudThemeV15">
+#ccttLoginGate{background:linear-gradient(115deg,#416585 0%,#6a92b1 43%,#decdb7 100%)!important}
+#ccttLoginGate::before{opacity:.76!important;filter:brightness(1.55) saturate(1.04)!important}
+#ccttLoginGate::after{background:linear-gradient(90deg,rgba(8,31,55,.40),rgba(26,56,81,.20) 66%,rgba(34,49,67,.10))!important;opacity:1!important}
+.cctt-login-stage{min-height:710px!important;overflow:visible!important;isolation:isolate}
+.cctt-login-copy{top:32px!important;z-index:5!important}
+.cctt-login-copy h1{max-width:620px!important}
+.cctt-character{max-height:none!important;bottom:-18px!important;z-index:2!important;object-fit:contain!important}
+.cctt-character.left{left:6%!important;height:55%!important}
+.cctt-character.right{left:39%!important;height:60%!important}
+.cctt-shared-formats{border-left:4px solid #245f98!important}
+.cctt-shared-formats .btn{white-space:normal}
+@media(max-width:1180px){.cctt-character{display:none!important}.cctt-login-stage{min-height:270px!important}}
+</style>
+<script id="ccttCloudV15">
+(()=>{
+let currentUser=null,ready=false,pending=false,writing=false,retry=0,lastJSON='',loading=false;
+let sb=()=>window.ccttSupabaseClient;
+function status(text,isError=false){let el=document.getElementById('ccttCloudStatus');if(!el){el=document.createElement('div');el.id='ccttCloudStatus';el.style.cssText='position:fixed;bottom:14px;left:15px;z-index:1200;padding:9px 14px;border-radius:10px;max-width:380px;font:13px system-ui;background:#e9f5ed;color:#165c39;box-shadow:0 4px 20px #0002';document.body.append(el)}el.textContent=text;el.style.background=isError?'#fff0ed':'#e9f5ed';el.style.color=isError?'#9b2836':'#165c39'}
+function serialize(){return JSON.stringify(state)}
+window.ccttCloudSave=()=>{if(!ready||!currentUser||loading)return;pending=true;setTimeout(flush,600)};
+async function flush(){if(!ready||!pending||writing||!currentUser)return;writing=true;pending=false;const uid=currentUser;let snapshot;
+try{snapshot=serialize();if(snapshot===lastJSON)return;const {error}=await sb().from('cctt_operator_state').upsert({user_id:uid,data:JSON.parse(snapshot),updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;lastJSON=snapshot;retry=0;status('Cambios guardados en Supabase');}
+catch(err){pending=true;retry++;status('Error al guardar en Supabase: '+(err.message||err),true);console.error('cctt cloud save',err);}
+finally{writing=false;if(pending&&retry<4)setTimeout(flush,3000)} }
+async function begin(session){const userId=session?.user?.id;if(!userId||!sb())return;if(ready&&currentUser===userId)return;ready=false;loading=true;currentUser=userId;
+try{const {data,error}=await sb().from('cctt_operator_state').select('data').eq('user_id',userId).maybeSingle();if(error)throw error;
+if(data?.data&&typeof data.data==='object'){
+ Object.assign(state,JSON.parse(JSON.stringify(data.data)));
+ for(const key of ['pis','balance','report','control','inc35'])if(!state[key])state[key]=clone(baseState[key]);
+ renderAll();lastJSON=serialize();status('Datos recuperados desde Supabase');
+}else{Object.assign(state,clone(baseState));renderAll();lastJSON=serialize();status('Sin datos remotos. Supabase está listo para guardar.');}
+ready=true;installMigrationButton();}
+catch(e){status('No se pudo cargar el estado remoto: '+e.message,true);console.error(e);ready=false}
+finally{loading=false}}
+function installMigrationButton(){if(document.getElementById('ccttMigrationBox'))return;const home=document.getElementById('page-inicio');if(!home)return;
+const box=document.createElement('div');box.id='ccttMigrationBox';box.className='notice';box.style.margin='12px 0';box.innerHTML='<b>Migración opcional</b><p>Si tienes registros antiguos guardados en este navegador, puedes importarlos a tu cuenta de Supabase. Primero exporta un respaldo. No se borrarán automáticamente los datos locales.</p><button class="btn" id="ccttImportLegacy">Importar datos antiguos del navegador</button>';
+home.insertBefore(box,home.children[1]||null);
+document.getElementById('ccttImportLegacy').onclick=()=>{if(!confirm('Esto reemplazará los datos remotos de esta cuenta por los datos que aún tenga este navegador. ¿Continuar?'))return;try{const legacy=JSON.parse(localStorage.getItem(APPKEY)||'null');if(!legacy)throw Error('No hay datos locales antiguos.');Object.assign(state,clone(baseState),legacy);renderAll();window.ccttCloudSave();status('Importación enviada a Supabase. Comprueba el guardado.')}catch(e){status(e.message,true)}}}
+window.addEventListener('cctt:session',e=>begin(e.detail.session));
+window.addEventListener('cctt:logout',()=>{ready=false;currentUser=null;pending=false;lastJSON='';});
+const existing=sb();if(existing)existing.auth.getSession().then(({data})=>{if(data?.session)begin(data.session)});
+})();
+</script>
 </body></html>
