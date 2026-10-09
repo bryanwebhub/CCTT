@@ -991,4 +991,237 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
 })();
 </script>
 
+
+<style id="reportTemplateFinalFixV6">
+/* V6: una sola geometría para vista, PNG y PDF del reporte */
+#reportPreview .report-final-shell{background:#eaf0f7;padding:14px;border-radius:12px;overflow:auto}
+#reportPreview .report-fixed-page{position:relative!important;margin:0 auto!important;overflow:hidden!important;background:#fff!important;box-sizing:border-box!important}
+#reportPreview .report-fixed-page>.report-overlay-v6{position:absolute;z-index:30;box-sizing:border-box;overflow:hidden;background:transparent;color:#111;font-family:"Noto Sans",Arial,sans-serif}
+.report-overlay-v6 .report-bulletin-shell{padding:0!important;margin:0!important;max-width:none!important;background:transparent!important}
+.report-overlay-v6 .bulletin-top{display:block!important;margin:0 0 18px!important}
+.report-overlay-v6 .bulletin-headings{font-size:11.5px!important;line-height:1.18!important;text-align:right!important;margin:0!important}
+.report-overlay-v6 .bulletin-date{font-size:11.5px!important;line-height:1.18!important;text-align:right!important;margin:17px 0 23px!important}
+.report-overlay-v6 .bulletin-meta p{font-size:11.5px!important;line-height:15.5px!important;margin:0 0 12px!important;font-weight:700!important}
+.report-overlay-v6 .bulletin-paragraphs p{font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:11.5px!important;line-height:15.5px!important;text-align:justify!important;margin:0 0 12px!important}
+.report-overlay-v6 .rep-bulletin-table{font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:10.5px!important;line-height:13px!important;margin-top:11px!important;width:100%!important;border-collapse:collapse!important}
+.report-overlay-v6 .rep-bulletin-table th,.report-overlay-v6 .rep-bulletin-table td{padding:2px 4px!important;height:17px!important;vertical-align:middle!important}
+.report-overlay-v6 .rep-bulletin-table .zone-cell{text-align:center!important;vertical-align:middle!important;font-weight:700!important}
+/* Respaldo: que el boletín nunca quede pegado al borde superior */
+#reportPreview #printReport>.report-bulletin-shell{padding-top:42px!important;padding-left:58px!important;padding-right:58px!important;max-width:900px!important}
+#reportPreview #printReport .bulletin-headings{margin-top:18px!important}
+#reportPreview #printReport .bulletin-date{margin-top:26px!important}
+</style>
+<script id="reportTemplateFinalFixV6Js">
+(function(){
+  function v6Placement(){
+    const d=state.report.templatePlacement||{};
+    return {
+      top:Number.isFinite(+d.topV6)?+d.topV6:8.7,
+      left:Number.isFinite(+d.leftV6)?+d.leftV6:10.6,
+      width:Number.isFinite(+d.widthV6)?+d.widthV6:78.8,
+      height:Number.isFinite(+d.heightV6)?+d.heightV6:73.8,
+      font:Number.isFinite(+d.fontV6)?+d.fontV6:11.5
+    };
+  }
+  function v6Overlay(page){
+    page.querySelectorAll(':scope > .report-overlay,:scope > .report-overlay-v6').forEach(x=>x.remove());
+    const d=v6Placement(),ov=document.createElement('div');
+    ov.className='report-overlay-v6';
+    Object.assign(ov.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.font+'px'});
+    ov.innerHTML=canonicalReportBulletinHtml({inTemplate:true});
+    page.appendChild(ov);
+    requestAnimationFrame(()=>{
+      let scale=1,guard=50;
+      while(guard--&&(ov.scrollHeight>ov.clientHeight+2||ov.scrollWidth>ov.clientWidth+2)&&scale>.78){
+        scale-=.015;ov.style.transformOrigin='top left';ov.style.transform=`scale(${scale})`;ov.style.width=(100/scale)+'%';ov.style.height=(100/scale)+'%';
+      }
+    });
+    return ov;
+  }
+  function normalizeV6Page(page){
+    page.classList.add('report-fixed-page');
+    page.style.position='relative';page.style.overflow='hidden';page.style.margin='0 auto';
+    return page;
+  }
+  async function exactStageV6(f,ras){
+    const host=document.getElementById('reportPreview');host.innerHTML='';
+    const shell=document.createElement('div');shell.className='report-final-shell';
+    const stage=document.createElement('div');stage.className='report-fixed-page report-exact-stage';
+    const max=Math.min(930,Math.max(420,(host.clientWidth||930)-28)),ratio=ras.width/ras.height;
+    stage.style.width=max+'px';stage.style.height=(max/ratio)+'px';stage.style.aspectRatio=`${ras.width}/${ras.height}`;
+    const bg=document.createElement('img');bg.src=ras.src;bg.alt='Formato base';Object.assign(bg.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'fill',display:'block'});
+    stage.appendChild(bg);shell.appendChild(stage);host.appendChild(shell);v6Overlay(stage);return stage;
+  }
+  async function docxStageV6(f){
+    const host=document.getElementById('reportPreview');host.innerHTML='';
+    const shell=document.createElement('div');shell.className='report-final-shell';
+    const holder=document.createElement('div');holder.className='docx-render-host';shell.appendChild(holder);host.appendChild(shell);
+    /* Si la vista del formato ya tiene una página DOCX válida, reutilizarla: evita una segunda lectura innecesaria. */
+    const cached=document.querySelector('#repTemplatePreview section.docx');
+    if(cached){
+      const page=cached.cloneNode(true);holder.innerHTML='';holder.appendChild(page);normalizeV6Page(page);v6Overlay(page);return page;
+    }
+    await renderDocxVisual(f,holder);
+    const page=holder.querySelector('section.docx');
+    if(!page) throw new Error('El DOCX no produjo una página con geometría de Word.');
+    [...holder.querySelectorAll('section.docx')].slice(1).forEach(x=>x.remove());
+    normalizeV6Page(page);v6Overlay(page);return page;
+  }
+  renderFinalReportWithTemplate=async function(f){
+    if(!f) throw new Error('No hay plantilla seleccionada.');
+    const isImg=(f.type||'').startsWith('image/')||/\.(png|jpe?g|webp)$/i.test(f.name||'');
+    const isPdf=(f.type||'')==='application/pdf'||/\.pdf$/i.test(f.name||'');
+    if(isImg||isPdf){const ras=await templateRaster(f);if(!ras)throw new Error('No se pudo rasterizar la plantilla.');return exactStageV6(f,ras)}
+    if(/\.docx$/i.test(f.name||''))return docxStageV6(f);
+    throw new Error('Formato de plantilla no compatible.');
+  };
+  updateReportPreview=async function(){
+    syncReportMetaFromInputs();
+    state.report.legend=cleanLegendText(document.getElementById('repLegend').value);save();
+    const f=reportTemplateIndex>=0?reportTemplates[reportTemplateIndex]:null;
+    if(!f){oldUpdateReportPreview();return}
+    try{await renderFinalReportWithTemplate(f);}
+    catch(e){
+      console.warn('Plantilla de reporte no aplicada:',e);
+      /* Respaldo limpio: no mostrar el aviso rojo en cada actualización. */
+      oldUpdateReportPreview();
+      const chosen=document.getElementById('repChosenTemplate');if(chosen)chosen.textContent=(f.name||'Plantilla')+' · vista compatible';
+    }
+  };
+  async function captureV6(){await updateReportPreview();return document.querySelector('#reportPreview .report-fixed-page')||document.getElementById('printReport')||document.getElementById('reportPreview')}
+  exportReportImage=async function(){if(!window.html2canvas)return toast('No se pudo cargar el generador de imágenes.',true);const el=await captureV6(),cv=await html2canvas(el,{scale:2.5,backgroundColor:'#ffffff',useCORS:true,scrollX:0,scrollY:0});cv.toBlob(b=>downloadBlob(b,'Reporte_Cesionarios_'+today()+'.png'),'image/png')};
+  exportReportPdf=async function(){if(!window.html2canvas||!window.jspdf)return toast('No se pudo cargar el generador de PDF.',true);const el=await captureV6(),cv=await html2canvas(el,{scale:2.5,backgroundColor:'#ffffff',useCORS:true,scrollX:0,scrollY:0}),{jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'}),pw=210,ph=297,m=5,sc=Math.min((pw-m*2)/cv.width,(ph-m*2)/cv.height),w=cv.width*sc,h=cv.height*sc;pdf.addImage(cv.toDataURL('image/jpeg',.97),'JPEG',(pw-w)/2,(ph-h)/2,w,h);pdf.save('Reporte_Cesionarios_'+today()+'.pdf')};
+  const imgBtn=document.getElementById('repImage'),pdfBtn=document.getElementById('repPdf');if(imgBtn)imgBtn.onclick=exportReportImage;if(pdfBtn)pdfBtn.onclick=exportReportPdf;
+  /* Evitar que configuraciones V5 antiguas sigan desplazando encabezados. */
+  if(!state.report.templatePlacement||!('topV6' in state.report.templatePlacement)){
+    state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{},{topV6:8.7,leftV6:10.6,widthV6:78.8,heightV6:73.8,fontV6:11.5});save();
+  }
+  setTimeout(()=>{try{updateReportPreview()}catch(e){}},250);
+})();
+</script>
+
+<script id="portableBackupAndTemplateFixes">
+(function(){
+  function dataUrlFromBlob(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(r.error||new Error('No se pudo leer el archivo'));r.readAsDataURL(blob);});}
+  function blobFromDataUrl(url){const m=String(url||'').match(/^data:([^;,]+)?(;base64)?,(.*)$/);if(!m)throw new Error('Respaldo inválido');const mime=m[1]||'application/octet-stream';const data=m[3]||'';const bin=m[2]?atob(data):decodeURIComponent(data);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime});}
+  async function exportPortableBackup(){
+    const assets=await assetPrefix('');
+    const rows=[];
+    for(const a of assets){rows.push({key:a.key,name:a.name||'archivo',type:a.type||a.blob?.type||'',meta:a.meta||{},updated:a.updated||new Date().toISOString(),data:await dataUrlFromBlob(a.blob)});}
+    const payload={app:'CCTT',kind:'portable-backup',version:1,exportedAt:new Date().toISOString(),state:JSON.parse(JSON.stringify(state||{})),assets:rows};
+    downloadBlob(new Blob([JSON.stringify(payload)],{type:'application/json'}),'CCTT_respaldo_'+today()+'.json');
+    toast('Respaldo exportado. Puede importarlo en otro dispositivo.');
+  }
+  async function importPortableBackup(file){
+    const raw=await file.text();
+    let payload;
+    try{payload=JSON.parse(raw)}catch(e){throw new Error('El archivo de respaldo no es JSON válido.')}
+    if(!payload||payload.kind!=='portable-backup')throw new Error('El archivo no corresponde a un respaldo del sistema.');
+    if(!confirm('Se reemplazarán los datos y archivos guardados en este navegador por el contenido del respaldo. ¿Desea continuar?'))return;
+    const existing=await assetPrefix('');
+    for(const a of existing)await assetDelete(a.key);
+    for(const a of payload.assets||[]){const blob=blobFromDataUrl(a.data);await assetPut(a.key,blob,a.name,a.type,a.meta||{});}
+    state=Object.assign(clone(baseState),payload.state||{});
+    save();
+    try{await restorePersistentAssets()}catch(e){console.warn('No fue posible restaurar formatos tras la importación',e)}
+    try{renderAll()}catch(e){console.warn(e)}
+    const active=document.querySelector('.page.active')?.id?.replace('page-','');
+    if(active&&typeof go==='function')go(active);
+    toast('Respaldo importado correctamente.');
+  }
+  function addBackupUi(hostId,prefix){
+    const host=document.getElementById(hostId);
+    if(!host||document.getElementById(prefix+'BackupTools'))return;
+    const wrap=document.createElement('div');
+    wrap.id=prefix+'BackupTools';
+    wrap.innerHTML=`<div class="row" style="margin-top:9px;flex-wrap:wrap"><button class="btn" id="${prefix}BackupExport">Exportar respaldo</button><button class="btn" id="${prefix}BackupImport">Importar respaldo</button><input id="${prefix}BackupFile" type="file" accept=".json,application/json" style="display:none"><div class="template-help" style="flex-basis:100%">Los archivos base y plantillas siguen guardándose localmente en este navegador. Para utilizarlos en <b>otro dispositivo</b>, exporte un respaldo e impórtelo en el otro equipo. Un archivo HTML sin servidor no puede sincronizar archivos automáticamente entre dispositivos.</div></div>`;
+    host.appendChild(wrap);
+    document.getElementById(prefix+'BackupExport').onclick=()=>exportPortableBackup();
+    document.getElementById(prefix+'BackupImport').onclick=()=>document.getElementById(prefix+'BackupFile').click();
+    document.getElementById(prefix+'BackupFile').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{await importPortableBackup(f)}catch(err){toast(err.message||'No fue posible importar el respaldo.',true)}e.target.value=''};
+  }
+  function renderExactTemplatePreview(target,file,ras,title){
+    target.classList.remove('docx-render-host');
+    target.innerHTML='';
+    const stage=document.createElement('div');
+    stage.className='report-exact-stage';
+    stageSize(stage,ras.width,ras.height,560);
+    const img=document.createElement('img');img.src=ras.src;img.alt=title||'Plantilla seleccionada';
+    stage.appendChild(img);
+    target.appendChild(stage);
+  }
+  const toastBase=toast;
+  toast=function(msg,bad){
+    const txt=String(msg||'');
+    if(/No fue posible aplicar la plantilla/i.test(txt)){console.warn(txt);return;}
+    return toastBase.apply(this,arguments);
+  };
+  const chooseReportTemplateBase=chooseReportTemplate;
+  chooseReportTemplate=async function(i){
+    reportTemplateIndex=i;state.report.templateIndex=i;save();renderReportTemplates();
+    const target=document.getElementById('repTemplatePreview');
+    const f=reportTemplates[i];
+    if(!target){if(typeof chooseReportTemplateBase==='function')return chooseReportTemplateBase(i);return}
+    if(!f){target.innerHTML='<div class="empty">Sin formato seleccionado.</div>';return}
+    try{
+      const isImg=(f.type||'').startsWith('image/')||/\.(png|jpe?g|webp)$/i.test(f.name||'');
+      const isPdf=(f.type||'')==='application/pdf'||/\.pdf$/i.test(f.name||'');
+      if(isImg||isPdf){
+        const ras=await templateRaster(f);
+        if(ras) renderExactTemplatePreview(target,f,ras,f.name||'Formato seleccionado');
+        else if(isPdf){target.innerHTML=`<iframe style="width:100%;height:100%;min-height:340px;border:0" src="${URL.createObjectURL(f)}#toolbar=0&navpanes=0"></iframe>`;}
+        else {const img=document.createElement('img');img.style.cssText='display:block;max-width:100%;max-height:100%;margin:auto';img.src=await fileData(f);target.innerHTML='';target.appendChild(img);}
+      }else if(/\.docx$/i.test(f.name||'')){
+        await renderDocxVisual(f,target);
+        const note=document.createElement('div');note.className='template-fidelity-note';note.textContent='Vista DOCX compatible. Si desea una coincidencia exacta con Word, convierta el archivo a PDF y cárguelo como plantilla base.';target.prepend(note);
+      }else target.innerHTML='<div class="empty">Formato no compatible.</div>';
+    }catch(err){
+      console.warn('Vista previa de formato no disponible',err);
+      target.innerHTML='<div class="empty">No se pudo generar la vista previa de esta plantilla, pero el archivo quedó guardado. Puede continuar con el diseño institucional o exportar un respaldo para mover el formato a otro dispositivo.</div>';
+    }
+    try{await updateReportPreview()}catch(err){console.warn(err)}
+  };
+  const updateReportPreviewBase=updateReportPreview;
+  updateReportPreview=async function(){
+    try{
+      if(typeof syncReportMetaFromInputs==='function')syncReportMetaFromInputs();
+      const legendInput=document.getElementById('repLegend');
+      if(legendInput){state.report.legend=cleanLegendText(legendInput.value);legendInput.value=state.report.legend;}
+      save();
+      const f=reportTemplateIndex>=0?reportTemplates[reportTemplateIndex]:null;
+      if(!f){if(typeof oldUpdateReportPreview==='function')return oldUpdateReportPreview();return updateReportPreviewBase()}
+      try{return await renderFinalReportWithTemplate(f)}catch(err){console.warn('Modo compatible para plantilla de reporte:',err);if(typeof oldUpdateReportPreview==='function')oldUpdateReportPreview();else if(typeof updateReportPreviewBase==='function')updateReportPreviewBase();const chosen=document.getElementById('repChosenTemplate');if(chosen)chosen.textContent=(f.name||'Formato')+' · vista compatible';}
+    }catch(err){console.warn(err);if(typeof oldUpdateReportPreview==='function')oldUpdateReportPreview();}
+  };
+  const renderCopTemplateFinalBase=renderCopTemplateFinal;
+  renderCopTemplateFinal=async function(){
+    const box=document.getElementById('copTemplatePreview'),f=copTemplateIndex>=0?copTemplates[copTemplateIndex]:null;
+    if(!box)return renderCopTemplateFinalBase();
+    box.className='format-preview';
+    if(!f){box.innerHTML='<div class="empty">Adjunte una plantilla de imagen o PDF.</div>';if(typeof copSavedStatus==='function')copSavedStatus();return}
+    try{
+      const isImg=(f.type||'').startsWith('image/')||/\.(png|jpe?g|webp)$/i.test(f.name||'');
+      const isPdf=(f.type||'')==='application/pdf'||/\.pdf$/i.test(f.name||'');
+      if(isImg||isPdf){
+        const ras=await templateRaster(f);
+        if(ras){box.innerHTML='';const stage=document.createElement('div');stage.className='cop-exact-stage';stageSize(stage,ras.width,ras.height,760);stage.innerHTML=`<img class="template-bg" src="${ras.src}" alt="Plantilla COPOMA">`;box.appendChild(stage);buildCopLayers(stage);applyCopDesign();if(typeof copSavedStatus==='function')copSavedStatus();return;}
+        if(isPdf){box.innerHTML=`<iframe style="width:100%;height:100%;min-height:360px;border:0" src="${URL.createObjectURL(f)}#toolbar=0&navpanes=0"></iframe>`;return;}
+      }
+      return await renderCopTemplateFinalBase();
+    }catch(err){
+      console.warn('Vista previa COPOMA no disponible',err);
+      return await renderCopTemplateFinalBase();
+    }
+  };
+  const injectTemplateToolsBase=injectTemplateTools;
+  injectTemplateTools=function(){
+    injectTemplateToolsBase();
+    const repNote=document.getElementById('repPersistNote');
+    if(repNote){const p=repNote.querySelector('.persist-note');if(p)p.innerHTML='Los formatos base quedan guardados localmente en este navegador. También puede exportar un respaldo para usarlos en otro dispositivo.';addBackupUi('repPersistNote','rep');}
+    const copNote=document.getElementById('copPersistNote');
+    if(copNote){const p=copNote.querySelector('.persist-note');if(p)p.innerHTML='Las plantillas de COPOMA quedan guardadas localmente en este navegador. También puede exportar un respaldo para moverlas a otro dispositivo.';addBackupUi('copPersistNote','cop');}
+  };
+  setTimeout(()=>{try{injectTemplateTools()}catch(e){console.warn(e)}},200);
+})();
+</script>
 </body></html>
