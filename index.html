@@ -1624,4 +1624,134 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
 })();
 </script>
 
+
+<style id="reportTemplateLivePreviewFixV9Style">
+#reportPreview .report-v9-shell{background:#eaf0f7;padding:14px;border-radius:12px;overflow:auto}
+#reportPreview .report-v9-page{position:relative;margin:0 auto;background:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+#reportPreview .report-v9-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block}
+#reportPreview .report-v9-overlay{position:absolute;z-index:20;box-sizing:border-box;overflow:hidden;background:transparent;color:#111;font-family:"Noto Sans",Arial,sans-serif}
+#reportPreview .report-v9-overlay .report-bulletin-shell{padding:0!important;margin:0!important;max-width:none!important;background:transparent!important;color:#111!important}
+#reportPreview .report-v9-overlay .bulletin-top{display:block!important;margin:0 0 14px!important}
+#reportPreview .report-v9-overlay .bulletin-headings{font-size:11.2px!important;line-height:1.16!important;text-align:right!important;margin:0!important}
+#reportPreview .report-v9-overlay .bulletin-date{font-size:11px!important;line-height:1.18!important;text-align:right!important;margin:16px 0 22px!important}
+#reportPreview .report-v9-overlay .bulletin-meta p{font-size:10.8px!important;line-height:14px!important;margin:0 0 10px!important;font-weight:700!important}
+#reportPreview .report-v9-overlay .bulletin-paragraphs p{font-size:10.7px!important;line-height:15px!important;text-align:justify!important;margin:0 0 12px!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table{width:100%!important;border-collapse:collapse!important;margin-top:8px!important;table-layout:fixed!important;font-size:10px!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table th,#reportPreview .report-v9-overlay .rep-bulletin-table td{border:1px solid #777!important;padding:4px 5px!important;vertical-align:middle!important;word-break:break-word!important;white-space:normal!important;height:auto!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table th{background:#225f9b!important;color:#fff!important;font-size:10px!important;line-height:1.08!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table .zone-cell{text-align:center!important;vertical-align:middle!important;font-weight:700!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table .zone-cell.north{background:#f0c232!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table .zone-cell.south{background:#15b74a!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table col.zone{width:17%!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table col.name{width:20%!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table col.status{width:22%!important}
+#reportPreview .report-v9-overlay .rep-bulletin-table col.comments{width:41%!important}
+#reportPreview .report-v9-overlay .bulletin-footer{display:none!important}
+</style>
+<script id="reportTemplateLivePreviewFixV9Js">
+(function(){
+  function repV9Placement(){
+    const p=((state||{}).report||{}).templatePlacement||{};
+    const pick=(keys,fb)=>{for(const k of keys){const v=+p[k]; if(Number.isFinite(v)) return v;} return fb;};
+    return {
+      top: pick(['topV9','topV8','topV7','top'], 9.2),
+      left: pick(['leftV9','leftV8','leftV7','left'], 6.6),
+      width: pick(['widthV9','widthV8','widthV7','width'], 87.0),
+      height: pick(['heightV9','heightV8','heightV7','height'], 74.5),
+      font: pick(['fontV9','fontV8','fontV7','font'], 11.0)
+    };
+  }
+  function repV9BulletinHtml(){
+    const raw=(typeof canonicalReportBulletinHtml==='function'?canonicalReportBulletinHtml({inTemplate:true}):'');
+    return raw.replace('<table class="rep-bulletin-table">','<table class="rep-bulletin-table"><colgroup><col class="zone"><col class="name"><col class="status"><col class="comments"></colgroup>');
+  }
+  function repV9PreviewRaster(){
+    const root=document.getElementById('repTemplatePreview');
+    if(!root) return null;
+    const img=root.querySelector('.report-exact-stage img, .format-preview img, img');
+    if(img&&img.src) return {src:img.src,width:img.naturalWidth||img.width||1240,height:img.naturalHeight||img.height||1754};
+    const cv=root.querySelector('canvas');
+    if(cv&&cv.width&&cv.height) return {src:cv.toDataURL('image/png'),width:cv.width,height:cv.height};
+    return null;
+  }
+  async function repV9Raster(file){
+    let ras=null;
+    try{ if(file && typeof getCachedRaster==='function') ras=getCachedRaster(file); }catch(e){}
+    if(!ras){ try{ if(file && typeof templateRaster==='function') ras=await templateRaster(file); }catch(e){ console.warn('V9 raster directo falló',e); } }
+    if(!ras) ras=repV9PreviewRaster();
+    if(ras&&file&&typeof cacheRasterOnTemplate==='function'){ try{cacheRasterOnTemplate(file,ras);}catch(e){} }
+    return ras;
+  }
+  function repV9Fit(overlay,d){
+    let scale=1,guard=200;
+    overlay.style.transform='';
+    overlay.style.transformOrigin='top left';
+    overlay.style.width=d.width+'%';
+    overlay.style.height=d.height+'%';
+    while(guard-- > 0 && (overlay.scrollHeight>overlay.clientHeight+2 || overlay.scrollWidth>overlay.clientWidth+2) && scale>0.52){
+      scale -= 0.01;
+      overlay.style.transform='scale('+scale+')';
+      overlay.style.width=(d.width/scale)+'%';
+      overlay.style.height=(d.height/scale)+'%';
+    }
+    overlay.dataset.scale=String(scale);
+  }
+  async function renderReportPreviewV9(file){
+    const host=document.getElementById('reportPreview');
+    if(!host) return null;
+    const ras=await repV9Raster(file);
+    if(!ras) throw new Error('No se pudo obtener la imagen de la plantilla base.');
+    host.innerHTML='';
+    const shell=document.createElement('div'); shell.className='report-v9-shell';
+    const page=document.createElement('div'); page.className='report-v9-page report-fixed-page';
+    const max=Math.min(760, Math.max(360,(host.clientWidth||760)-36));
+    const ratio=(+ras.width||1240)/(+ras.height||1754);
+    page.style.width=max+'px';
+    page.style.height=(max/ratio)+'px';
+    page.style.aspectRatio=`${ras.width}/${ras.height}`;
+    const bg=document.createElement('img'); bg.className='report-v9-bg'; bg.src=ras.src; bg.alt=(file&&file.name)||'Formato base';
+    page.appendChild(bg);
+    const d=repV9Placement();
+    const ov=document.createElement('div'); ov.className='report-v9-overlay';
+    Object.assign(ov.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.font+'px'});
+    ov.innerHTML=repV9BulletinHtml();
+    page.appendChild(ov);
+    shell.appendChild(page);
+    host.appendChild(shell);
+    const chosen=document.getElementById('repChosenTemplate');
+    if(chosen && file) chosen.textContent=(file.name||'Formato base')+' · vista aplicada';
+    requestAnimationFrame(()=>{repV9Fit(ov,d); setTimeout(()=>repV9Fit(ov,d),90); setTimeout(()=>repV9Fit(ov,d),260);});
+    return page;
+  }
+  const prevChoose = window.chooseReportTemplate;
+  window.chooseReportTemplate = async function(i){
+    if(typeof prevChoose==='function'){ await prevChoose(i); }
+    try{ await window.updateReportPreview(); }catch(e){ console.warn(e); }
+  };
+  const compatPreview = window.oldUpdateReportPreview || window.updateReportPreview;
+  window.updateReportPreview = async function(){
+    if(typeof syncReportMetaFromInputs==='function') syncReportMetaFromInputs();
+    const legendInput=document.getElementById('repLegend');
+    if(legendInput && typeof cleanLegendText==='function'){ state.report.legend=cleanLegendText(legendInput.value); legendInput.value=state.report.legend; }
+    if(typeof save==='function') save();
+    const file=(typeof reportTemplateIndex!=='undefined' && reportTemplateIndex>=0 && typeof reportTemplates!=='undefined') ? reportTemplates[reportTemplateIndex] : null;
+    if(!file){
+      const chosen=document.getElementById('repChosenTemplate');
+      if(chosen) chosen.textContent='Diseño boletín institucional';
+      return typeof compatPreview==='function' ? compatPreview() : null;
+    }
+    try{ return await renderReportPreviewV9(file); }
+    catch(err){
+      console.warn('V9: no se pudo aplicar la plantilla al reporte, se usa vista institucional.', err);
+      const chosen=document.getElementById('repChosenTemplate');
+      if(chosen) chosen.textContent=(file.name||'Formato base')+' · vista compatible';
+      return typeof compatPreview==='function' ? compatPreview() : null;
+    }
+  };
+  window.renderFinalReportWithTemplate = async function(file){ return renderReportPreviewV9(file); };
+  window.reportCaptureNode = async function(){ await window.updateReportPreview(); return document.querySelector('#reportPreview .report-v9-page')||document.querySelector('#reportPreview .report-fixed-page')||document.getElementById('printReport')||document.getElementById('reportPreview'); };
+  setTimeout(()=>{try{window.updateReportPreview();}catch(e){console.warn(e)}},200);
+})();
+</script>
+
 </body></html>
