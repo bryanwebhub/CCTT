@@ -1992,24 +1992,28 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   window.reportCaptureNode=settledReportPage;
 
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
-  const CFG_KEY='cctt_supabase_config_v1';
+  // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
+  // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
+  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
   let sb=null,currentSession=null;
-  function loadCfg(){try{return JSON.parse(localStorage.getItem(CFG_KEY)||'{}')}catch(e){return {}}}
-  function saveCfg(c){localStorage.setItem(CFG_KEY,JSON.stringify(c))}
   function buildGate(){
     if(document.getElementById('ccttLoginGate'))return;
     const gate=document.createElement('div');gate.id='ccttLoginGate';gate.innerHTML=`<div class="cctt-login-card">
       <div class="cctt-login-brand"><div class="cctt-login-mark">CCTT</div><div><div class="cctt-login-title">Centro de Control de Tráfico Terrestre</div><div class="cctt-login-sub">Acceso al panel operativo</div></div></div>
       <form id="ccttLoginForm" autocomplete="on"><div class="field"><label>Correo electrónico</label><input id="ccttLoginEmail" type="email" autocomplete="username" required></div><div class="field"><label>Contraseña</label><input id="ccttLoginPassword" type="password" autocomplete="current-password" required></div><button class="btn primary cctt-login-btn" type="submit">Iniciar sesión</button><div id="ccttAuthMsg" class="cctt-auth-msg"></div></form>
       <div class="cctt-auth-help">No existe registro público. Solo pueden ingresar usuarios creados previamente por el administrador en Supabase.</div>
-      <div id="ccttSupabaseConfig"><button type="button" class="cctt-config-toggle" id="ccttCfgToggle">Configurar conexión Supabase</button><div class="cctt-config-fields" id="ccttCfgFields"><div class="field"><label>Project URL</label><input id="ccttSbUrl" placeholder="https://xxxx.supabase.co"></div><div class="field"><label>Anon / publishable key</label><input id="ccttSbAnon" type="password" placeholder="Clave pública del proyecto"></div><button type="button" class="btn" id="ccttSaveCfg">Guardar conexión</button></div></div>
     </div>`;document.body.appendChild(gate);
-    const cfg=loadCfg();document.getElementById('ccttSbUrl').value=cfg.url||'';document.getElementById('ccttSbAnon').value=cfg.anon||'';
-    document.getElementById('ccttCfgToggle').onclick=()=>document.getElementById('ccttCfgFields').classList.toggle('show');
-    document.getElementById('ccttSaveCfg').onclick=async()=>{const url=document.getElementById('ccttSbUrl').value.trim(),anon=document.getElementById('ccttSbAnon').value.trim();saveCfg({url,anon});initSupabase();document.getElementById('ccttAuthMsg').textContent=url&&anon?'Conexión guardada. Ya puede iniciar sesión.':'Complete URL y clave pública.'};
-    document.getElementById('ccttLoginForm').onsubmit=async ev=>{ev.preventDefault();const msg=document.getElementById('ccttAuthMsg');msg.textContent='Validando acceso...';if(!sb){msg.textContent='Configure primero la conexión con Supabase.';return}const email=document.getElementById('ccttLoginEmail').value.trim(),password=document.getElementById('ccttLoginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error){msg.textContent='Acceso denegado: '+error.message;return}currentSession=data.session;msg.textContent='';showApp(data.session)};
+    document.getElementById('ccttLoginForm').onsubmit=async ev=>{ev.preventDefault();const msg=document.getElementById('ccttAuthMsg');msg.textContent='Validando acceso...';if(!sb){msg.textContent='La conexión con Supabase no está configurada en el código.';return}const email=document.getElementById('ccttLoginEmail').value.trim(),password=document.getElementById('ccttLoginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error){msg.textContent='Acceso denegado: '+error.message;return}currentSession=data.session;msg.textContent='';showApp(data.session)};
   }
-  function initSupabase(){const cfg=loadCfg();if(window.supabase&&cfg.url&&cfg.anon){try{sb=window.supabase.createClient(cfg.url,cfg.anon,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}catch(e){sb=null}}return sb}
+  function initSupabase(){
+    const url=String(SUPABASE_URL||'').trim(),anon=String(SUPABASE_ANON_KEY||'').trim();
+    const configured=url && anon && !url.includes('TU-PROYECTO') && !anon.includes('TU_ANON_O_PUBLISHABLE_KEY');
+    if(window.supabase&&configured){
+      try{sb=window.supabase.createClient(url,anon,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}catch(e){console.error('Error al iniciar Supabase',e);sb=null}
+    }else sb=null;
+    return sb;
+  }
   function showGate(){document.getElementById('ccttLoginGate')?.classList.add('show')}
   function hideGate(){document.getElementById('ccttLoginGate')?.classList.remove('show')}
   function ensureUserControls(session){
@@ -2022,7 +2026,7 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   function showApp(session){currentSession=session;hideGate();ensureUserControls(session)}
   async function bootAuth(){
     buildGate();initSupabase();
-    if(!sb){showGate();document.getElementById('ccttCfgFields').classList.add('show');return}
+    if(!sb){showGate();const msg=document.getElementById('ccttAuthMsg');if(msg)msg.textContent='Supabase aún no está configurado en el código del sitio.';return}
     const {data}=await sb.auth.getSession();if(data?.session)showApp(data.session);else showGate();
     sb.auth.onAuthStateChange((_event,session)=>{if(session)showApp(session);else showGate()});
   }
