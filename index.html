@@ -387,8 +387,12 @@ function renderCopTemplates(){let list=document.getElementById('copTemplateList'
 async function chooseCopTemplate(i){copTemplateIndex=i;renderCopTemplates();let box=document.getElementById('copTemplatePreview'),f=copTemplates[i];box.innerHTML='<div class="overlay-content" id="copPreview"></div>';if(f&&f.type.startsWith('image/')){let data=await fileData(f),im=document.createElement('img');im.className='template-bg';im.src=data;box.prepend(im)}else if(f){let src=document.createElement('div');src.className='mini-file';src.style.cssText='position:absolute;left:14px;right:14px;bottom:10px;z-index:3;background:#ffffffdd;padding:7px;border-radius:8px';src.textContent='Formato seleccionado: '+f.name;box.append(src)}renderCop()}
 function renderCop(){let pv=document.getElementById('copPreview');if(!pv)return;let ed=document.getElementById('copRichEditor');pv.innerHTML=ed&&ed.innerHTML.trim()?ed.innerHTML:`<div style="white-space:pre-wrap">${esc(copomaText())}</div>`}
 document.getElementById('copTemplates').onchange=e=>{copTemplates=[...e.target.files].slice(0,3);copTemplateIndex=copTemplates.length?0:-1;renderCopTemplates();if(copTemplates.length)chooseCopTemplate(0);if(e.target.files.length>3)toast('Solo se utilizaron las primeras tres opciones.',true)};document.getElementById('copGenerate').onclick=()=>{syncCopEditor();let text=copomaText();state.inc35.copoma.push({at:new Date().toISOString(),text,html:document.getElementById('copRichEditor').innerHTML});save();renderCop();toast('Comunicado generado.')};document.getElementById('copCopy').onclick=()=>copyPlain(document.getElementById('copRichEditor').innerText||copomaText());document.getElementById('copClear').onclick=()=>{document.getElementById('copText').value='';syncCopEditor()};['copDate','copTime','copHeader','copText','copFooter'].forEach(id=>document.getElementById(id).addEventListener('input',syncCopEditor));document.getElementById('copRichEditor').addEventListener('input',renderCop);document.getElementById('copToolbar').addEventListener('click',e=>{let b=e.target.closest('button[data-cmd]');if(!b)return;document.execCommand(b.dataset.cmd,false,null);document.getElementById('copRichEditor').focus();renderCop()});document.getElementById('copFontSize').onchange=e=>{document.execCommand('fontSize',false,e.target.value);document.getElementById('copRichEditor').focus();renderCop()};
-const VIAL35=['Vialidad Jalipa-Puerto','Vialidad Puerto-Jalipa','Acceso Pez Vela','Salida Pez Vela','Acceso Puerta 15','Ruta Fiscal Zona Sur','Acceso Zona Norte','Ruta Fiscal Zona Norte','Segundo Acceso al Recinto Portuario','Primer Carril','Segundo Carril','Tercer Carril','Carretera Colima-Manzanillo','Carretera Manzanillo-Colima','OCUPA','TIMSA','TAP','SSA MÉXICO','MULTIMODAL','FRIMAN','CONTECON','HAZESA'];
-function buildVialFields(){document.getElementById('vialFields').innerHTML=VIAL35.map((n,i)=>`<div class="field"><label>${n}</label><input id="vf${i}" placeholder="Sin novedad / Fluido / Saturado..." value="${esc(state.inc35.roads[n]||'')}"></div>`).join('');VIAL35.forEach((n,i)=>document.getElementById('vf'+i).addEventListener('input',e=>{state.inc35.roads[n]=e.target.value;renderVial()}))}
+const VIAL35=['Jalipa-Puerto','Puerto-Jalipa','Pez Vela Acceso','Pez Vela Salida','Puerta 15 Acceso','Zona Norte-Pez Vela','Pez Vela-Zona Norte','Acceso Zona Norte','Ruta Fiscal Zona Norte','Ruta Fiscal Zona Sur','Primer carril (Zona Sur)','Segundo carril (Zona Norte)','Tercer carril (Zona Norte)','Carretera Colima-Manzanillo','Carretera Manzanillo-Colima'];
+const VIAL35_LEGACY={'Jalipa-Puerto':'Vialidad Jalipa-Puerto','Puerto-Jalipa':'Vialidad Puerto-Jalipa','Pez Vela Acceso':'Acceso Pez Vela','Pez Vela Salida':'Salida Pez Vela','Puerta 15 Acceso':'Acceso Puerta 15','Primer carril (Zona Sur)':'Primer Carril','Segundo carril (Zona Norte)':'Segundo Carril','Tercer carril (Zona Norte)':'Tercer Carril'};
+// Conserva registros existentes al cambiar los títulos y la estructura del informe.
+function vialSavedValue(name){const roads=state.inc35.roads||{};return roads[name]??(VIAL35_LEGACY[name]?roads[VIAL35_LEGACY[name]]:'')??''}
+
+function buildVialFields(){document.getElementById('vialFields').innerHTML=VIAL35.map((n,i)=>`<div class="field"><label>${n}</label><input id="vf${i}" placeholder="Sin novedad / Fluido / Saturado..." value="${esc(vialSavedValue(n))}"></div>`).join('');VIAL35.forEach((n,i)=>document.getElementById('vf'+i).addEventListener('input',e=>{state.inc35.roads[n]=e.target.value;renderVial()}))}
 // Normalización conservadora para textos operativos; las palabras desconocidas se conservan.
 function ccttSentenceMX(value){
  const raw=String(value??'').trim().replace(/[ \t]+/g,' ');
@@ -407,7 +411,25 @@ function ccttBolMotive(){const sel=document.getElementById('bolType');return cct
 function ccttToggleBolCustom(){document.getElementById('bolCustomWrap').style.display=document.getElementById('bolType').value==='__custom__'?'flex':'none';renderBol()}
 function ccttLocalDate(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function ccttVialDateTime(){const d=document.getElementById('vialDate')?.value||ccttLocalDate();const t=document.getElementById('vialTime')?.value||timeNow();const [yy,mm,dd]=d.split('-');return `${dd}/${mm}/${yy}\n${t} hrs.`}
-function vialText(){let lines=['*INFORME DE VIALIDADES INTERNAS Y EXTERNAS DEL PUERTO DE MANZANILLO*','',ccttVialDateTime(),'','*VIALIDAD JALIPA*'];VIAL35.forEach((n,i)=>{let v=document.getElementById('vf'+i)?.value.trim();if(v){if(i===6)lines.push('','*VIALIDAD CONFINADA*');if(i===8)lines.push('','*SEGUNDO INGRESO AL RECINTO PORTUARIO*');if(i===12)lines.push('','*VIALIDADES EXTERNAS*');lines.push(`*${n}:*`,ccttSentenceMX(v))}});lines.push('','*Reporte elaborado por el Centro de Control de Tráfico Terrestre al servicio de ASIPONA.*');return lines.join('\n')}
+function vialText(){
+ const sections=[
+  ['VIALIDAD JALIPA',0,5],
+  ['VIALIDAD CONFINADA',5,10],
+  ['SEGUNDO INGRESO AL RECINTO PORTUARIO',10,13],
+  ['VIALIDADES EXTERNAS',13,15]
+ ];
+ const lines=['*INFORME DE VIALIDADES INTERNAS Y EXTERNAS DEL PUERTO DE MANZANILLO*','',ccttVialDateTime()];
+ for(const [title,start,end] of sections){
+  const filled=[];
+  for(let i=start;i<end;i++){
+   const value=document.getElementById('vf'+i)?.value.trim()||'';
+   if(value)filled.push(`*${VIAL35[i]}:*`,ccttSentenceMX(value));
+  }
+  if(filled.length)lines.push('','*'+title+'*',...filled);
+ }
+ lines.push('','*REPORTE ELABORADO POR CENTRO DE CONTROL DE TRÁFICO TERRESTRE AL SERVICIO DE ASIPONA*');
+ return lines.join('\n');
+}
 function renderVial(){document.getElementById('vialPreview').textContent=vialText()}
 document.getElementById('vialGenerate').onclick=()=>{VIAL35.forEach((n,i)=>state.inc35.roads[n]=document.getElementById('vf'+i).value);state.inc35.vialDate=document.getElementById('vialDate').value;state.inc35.vialTime=document.getElementById('vialTime').value;save();renderVial();toast('Reporte vial actualizado.')};document.getElementById('vialCopy').onclick=()=>copyPlain(vialText());document.getElementById('vialClear').onclick=()=>{VIAL35.forEach((n,i)=>{state.inc35.roads[n]='';document.getElementById('vf'+i).value=''});save();renderVial()};
 function bulletin35Text(){let f=[['Ubicación:',proper35(document.getElementById('bolLocation').value)],['Empresa:',company35(document.getElementById('bolCompany').value)],['Placa:',document.getElementById('bolPlate').value.trim().toUpperCase()],['Operador:',proper35(document.getElementById('bolOperator').value)],['Antecedente:',proper35(document.getElementById('bolBackground').value)]];return [ccttBolMotive(),...f.filter(x=>x[1]).map(x=>x[0]+' '+x[1])].join('\n')}
