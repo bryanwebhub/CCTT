@@ -1100,6 +1100,83 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
 })();
 </script>
 
+<script id="globalTemplateRasterFix">
+/* Fix definitivo: helpers globales para plantillas PDF/imagen usados por los parches V6/V7. */
+(function(){
+  window.stageSize=function(stage,w,h,max=840){
+    const ratio=(+w||1)/(+h||1);
+    const parentW=stage.parentElement?.clientWidth||max;
+    const width=Math.min(max,Math.max(280,parentW-20));
+    stage.style.width=width+'px';
+    stage.style.height=(width/ratio)+'px';
+    stage.style.aspectRatio=`${w}/${h}`;
+    stage.style.position='relative';
+    stage.style.overflow='hidden';
+    stage.style.margin='0 auto';
+    stage.style.background='#fff';
+    return stage;
+  };
+  async function ccttLoadScript(url){
+    return new Promise((resolve,reject)=>{
+      const old=[...document.scripts].find(x=>x.src===url);
+      if(old){ if(window.pdfjsLib) return resolve(); old.addEventListener('load',resolve,{once:true}); old.addEventListener('error',reject,{once:true}); return; }
+      const sc=document.createElement('script');sc.src=url;sc.async=true;sc.onload=resolve;sc.onerror=()=>reject(new Error('No se pudo cargar '+url));document.head.appendChild(sc);
+    });
+  }
+  async function ccttPdfEngine(){
+    if(window.pdfjsLib?.getDocument)return window.pdfjsLib;
+    const sources=[
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+      'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
+    ];
+    let last;
+    for(const src of sources){
+      try{await ccttLoadScript(src);if(window.pdfjsLib?.getDocument)return window.pdfjsLib}catch(e){last=e}
+    }
+    throw last||new Error('No fue posible cargar el motor PDF.');
+  }
+  async function ccttPdfRaster(file,scale=2){
+    const lib=await ccttPdfEngine();
+    const workers=[
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
+      'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+    ];
+    let last;
+    for(const worker of workers){
+      try{
+        lib.GlobalWorkerOptions.workerSrc=worker;
+        const data=new Uint8Array(await file.arrayBuffer());
+        const task=lib.getDocument({data});
+        const pdf=await task.promise;
+        const page=await pdf.getPage(1);
+        const vp=page.getViewport({scale});
+        const cv=document.createElement('canvas');
+        cv.width=Math.ceil(vp.width);cv.height=Math.ceil(vp.height);
+        const ctx=cv.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
+        await page.render({canvasContext:ctx,viewport:vp}).promise;
+        try{await pdf.destroy()}catch(e){}
+        return {src:cv.toDataURL('image/png'),width:cv.width,height:cv.height};
+      }catch(e){last=e;console.warn('Intento PDF falló con worker',worker,e)}
+    }
+    throw last||new Error('No fue posible rasterizar el PDF.');
+  }
+  window.templateRaster=async function(file){
+    if(!file)return null;
+    const name=String(file.name||'');
+    const type=String(file.type||'');
+    if(type.startsWith('image/')||/\.(png|jpe?g|webp|gif)$/i.test(name)){
+      const src=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=()=>reject(r.error);r.readAsDataURL(file)});
+      const im=await new Promise((resolve,reject)=>{const x=new Image();x.onload=()=>resolve(x);x.onerror=()=>reject(new Error('No se pudo leer la imagen'));x.src=src});
+      return {src,width:im.naturalWidth||im.width||1000,height:im.naturalHeight||im.height||1400};
+    }
+    if(type==='application/pdf'||/\.pdf$/i.test(name))return ccttPdfRaster(file,2);
+    return null;
+  };
+  window.ccttPdfRaster=ccttPdfRaster;
+})();
+</script>
 <script id="portableBackupAndTemplateFixes">
 (function(){
   function dataUrlFromBlob(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(r.error||new Error('No se pudo leer el archivo'));r.readAsDataURL(blob);});}
