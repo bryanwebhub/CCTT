@@ -1960,10 +1960,16 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
     const wrap=document.createElement('div');wrap.className='report-export-clone-wrap';
     const scope=document.createElement('div');scope.id='reportPreview';
     const clone=src.cloneNode(true);
-    const exportW=1200, exportH=Math.round(exportW/ratio);
+    // Mantener exactamente la misma geometría de la vista previa.
+    // La calidad se incrementa con html2canvas(scale), no agrandando el DOM.
+    const exportW=Math.max(1,Math.round(rect.width));
+    const exportH=Math.max(1,Math.round(rect.height));
     Object.assign(clone.style,{width:exportW+'px',height:exportH+'px',maxWidth:'none',maxHeight:'none',margin:'0',transform:'none'});
     clone.querySelectorAll('img').forEach(img=>{img.style.maxWidth='none'});
+    scope.style.width=exportW+'px';
+    scope.style.height=exportH+'px';
     scope.appendChild(clone);
+    wrap.style.width=exportW+'px';
     wrap.appendChild(scope);document.body.appendChild(wrap);
     await waitImages(clone);await waitFrame();forceFitOverlay(clone);await waitFrame();
     return {wrap,clone};
@@ -1977,12 +1983,12 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
     }finally{wrap.remove()}
   }
   window.exportReportImage=async function(){
-    try{const cv=await captureReportStable(2);cv.toBlob(b=>downloadBlob(b,'Reporte_Cesionarios_'+today()+'.png'),'image/png',1)}catch(e){toast('No se pudo generar la imagen: '+e.message,true)}
+    try{const cv=await captureReportStable(3);cv.toBlob(b=>downloadBlob(b,'Reporte_Cesionarios_'+today()+'.png'),'image/png',1)}catch(e){toast('No se pudo generar la imagen: '+e.message,true)}
   };
   window.exportReportPdf=async function(){
     if(!window.jspdf)return toast('No se cargó el generador de PDF.',true);
     try{
-      const cv=await captureReportStable(2);
+      const cv=await captureReportStable(3);
       const {jsPDF}=window.jspdf,pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'}),pw=210,ph=297,m=4;
       const sc=Math.min((pw-m*2)/cv.width,(ph-m*2)/cv.height),w=cv.width*sc,h=cv.height*sc;
       pdf.addImage(cv.toDataURL('image/jpeg',.97),'JPEG',(pw-w)/2,(ph-h)/2,w,h);
@@ -1996,9 +2002,9 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
-  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
-  let sb=null,currentSession=null;
+ const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m'; 
+ let sb=null,currentSession=null;
   function buildGate(){
     if(document.getElementById('ccttLoginGate'))return;
     const gate=document.createElement('div');gate.id='ccttLoginGate';gate.innerHTML=`<div class="cctt-login-card">
