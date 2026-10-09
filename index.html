@@ -1301,4 +1301,190 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   setTimeout(()=>{try{injectTemplateTools()}catch(e){console.warn(e)}},200);
 })();
 </script>
+
+<style id="reportTemplateBindFixV7Style">
+/* V7: aplicar de forma consistente la plantilla seleccionada en vista previa/PNG/PDF */
+#reportPreview #printReport .bulletin-headings{text-align:right!important}
+#reportPreview #printReport .bulletin-top{display:block!important}
+#reportPreview #printReport .bulletin-date{text-align:right!important}
+#reportPreview .report-fixed-page>.report-overlay-v7{position:absolute;z-index:30;box-sizing:border-box;overflow:hidden;background:transparent;color:#111;font-family:"Noto Sans",Arial,sans-serif}
+.report-overlay-v7 .report-bulletin-shell{padding:0!important;margin:0!important;max-width:none!important;background:transparent!important}
+.report-overlay-v7 .bulletin-top{display:block!important;margin:0 0 16px!important}
+.report-overlay-v7 .bulletin-headings{font-size:11.7px!important;line-height:1.18!important;text-align:right!important;margin:0!important}
+.report-overlay-v7 .bulletin-date{font-size:11.7px!important;line-height:1.18!important;text-align:right!important;margin:16px 0 22px!important}
+.report-overlay-v7 .bulletin-meta p{font-size:11.7px!important;line-height:15.6px!important;margin:0 0 12px!important;font-weight:700!important}
+.report-overlay-v7 .bulletin-paragraphs p{font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:11.7px!important;line-height:15.6px!important;text-align:justify!important;margin:0 0 12px!important}
+.report-overlay-v7 .rep-bulletin-table{font-family:"Noto Sans Medium","Noto Sans",Arial,sans-serif!important;font-size:10.6px!important;line-height:13px!important;margin-top:11px!important;width:100%!important;border-collapse:collapse!important}
+.report-overlay-v7 .rep-bulletin-table th,.report-overlay-v7 .rep-bulletin-table td{padding:2px 4px!important;height:17px!important;vertical-align:middle!important}
+.report-overlay-v7 .rep-bulletin-table .zone-cell{text-align:center!important;vertical-align:middle!important;font-weight:700!important}
+</style>
+<script id="reportTemplateBindFixV7Js">
+(function(){
+  function isReportTemplateImage(f){
+    const n=String(f?.name||'');
+    const t=String(f?.type||'');
+    return t.startsWith('image/')||/\.(png|jpe?g|webp|gif)$/i.test(n);
+  }
+  function isReportTemplatePdf(f){
+    const n=String(f?.name||'');
+    const t=String(f?.type||'');
+    return t==='application/pdf'||/\.pdf$/i.test(n);
+  }
+  function cacheRasterOnTemplate(f,ras){
+    if(!f||!ras)return ras;
+    try{f.__ccttRaster=ras}catch(e){}
+    return ras;
+  }
+  function getCachedRaster(f){
+    return f&&f.__ccttRaster&&f.__ccttRaster.src?f.__ccttRaster:null;
+  }
+  function getPreviewRasterFallback(){
+    const img=document.querySelector('#repTemplatePreview .report-exact-stage img, #repTemplatePreview img');
+    if(img&&img.src){
+      return {src:img.src,width:img.naturalWidth||img.width||1240,height:img.naturalHeight||img.height||1754};
+    }
+    return null;
+  }
+  function paintExactTemplatePreview(target,ras,title){
+    if(!target||!ras)return;
+    target.classList.remove('docx-render-host');
+    target.innerHTML='';
+    const stage=document.createElement('div');
+    stage.className='report-exact-stage';
+    if(typeof stageSize==='function') stageSize(stage,ras.width,ras.height,560);
+    else {
+      const ratio=(+ras.width||1)/(+ras.height||1);
+      const max=560; const width=Math.min(max,Math.max(280,(target.clientWidth||max)-20));
+      stage.style.width=width+'px'; stage.style.height=(width/ratio)+'px'; stage.style.aspectRatio=`${ras.width}/${ras.height}`;
+      stage.style.position='relative'; stage.style.overflow='hidden'; stage.style.margin='0 auto'; stage.style.background='#fff';
+    }
+    const img=document.createElement('img'); img.src=ras.src; img.alt=title||'Plantilla seleccionada';
+    img.style.width='100%'; img.style.height='100%'; img.style.objectFit='contain'; img.style.display='block';
+    stage.appendChild(img); target.appendChild(stage);
+  }
+  function v7Placement(){
+    const d=state.report.templatePlacement||{};
+    const usingLegacyDefaults = !Number.isFinite(+d.topV7)&&!Number.isFinite(+d.leftV7)&&!Number.isFinite(+d.widthV7)&&!Number.isFinite(+d.heightV7);
+    if(usingLegacyDefaults){
+      return {
+        top:Number.isFinite(+d.topV6)?+d.topV6:6.6,
+        left:Number.isFinite(+d.leftV6)?+d.leftV6:6.8,
+        width:Number.isFinite(+d.widthV6)?+d.widthV6:86.3,
+        height:Number.isFinite(+d.heightV6)?+d.heightV6:77.8,
+        font:Number.isFinite(+d.fontV6)?+d.fontV6:11.7
+      };
+    }
+    return {
+      top:Number.isFinite(+d.topV7)?+d.topV7:6.6,
+      left:Number.isFinite(+d.leftV7)?+d.leftV7:6.8,
+      width:Number.isFinite(+d.widthV7)?+d.widthV7:86.3,
+      height:Number.isFinite(+d.heightV7)?+d.heightV7:77.8,
+      font:Number.isFinite(+d.fontV7)?+d.fontV7:11.7
+    };
+  }
+  function ensureV7Defaults(){
+    state.report.templatePlacement=Object.assign({},state.report.templatePlacement||{});
+    let changed=false;
+    for(const [k,v] of Object.entries({topV7:6.6,leftV7:6.8,widthV7:86.3,heightV7:77.8,fontV7:11.7})){
+      if(!Number.isFinite(+state.report.templatePlacement[k])){state.report.templatePlacement[k]=v;changed=true;}
+    }
+    if(changed) save();
+  }
+  function overlayV7(page){
+    page.querySelectorAll(':scope > .report-overlay,:scope > .report-overlay-v6,:scope > .report-overlay-v7').forEach(x=>x.remove());
+    const d=v7Placement();
+    const ov=document.createElement('div');
+    ov.className='report-overlay-v7';
+    Object.assign(ov.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.font+'px'});
+    ov.innerHTML=canonicalReportBulletinHtml({inTemplate:true});
+    page.appendChild(ov);
+    requestAnimationFrame(()=>{
+      let scale=1,guard=60;
+      while(guard--&&(ov.scrollHeight>ov.clientHeight+2||ov.scrollWidth>ov.clientWidth+2)&&scale>.76){
+        scale-=.0125;
+        ov.style.transformOrigin='top left';
+        ov.style.transform=`scale(${scale})`;
+        ov.style.width=(100/scale)+'%';
+        ov.style.height=(100/scale)+'%';
+      }
+    });
+    return ov;
+  }
+  async function exactStageV7(f,ras){
+    const host=document.getElementById('reportPreview');
+    host.innerHTML='';
+    const shell=document.createElement('div');shell.className='report-final-shell';
+    const stage=document.createElement('div');stage.className='report-fixed-page report-exact-stage';
+    const max=Math.min(930,Math.max(420,(host.clientWidth||930)-28));
+    const ratio=(+ras.width||1240)/(+ras.height||1754);
+    stage.style.width=max+'px';
+    stage.style.height=(max/ratio)+'px';
+    stage.style.aspectRatio=`${ras.width}/${ras.height}`;
+    stage.style.position='relative';
+    stage.style.overflow='hidden';
+    const bg=document.createElement('img');
+    bg.src=ras.src;bg.alt=f?.name||'Formato base';
+    Object.assign(bg.style,{position:'absolute',inset:'0',width:'100%',height:'100%',objectFit:'fill',display:'block'});
+    stage.appendChild(bg);
+    shell.appendChild(stage);
+    host.appendChild(shell);
+    overlayV7(stage);
+    return stage;
+  }
+  const chooseReportTemplatePrev = chooseReportTemplate;
+  chooseReportTemplate = async function(i){
+    reportTemplateIndex=i;state.report.templateIndex=i;save();renderReportTemplates();
+    const f=reportTemplates[i],target=document.getElementById('repTemplatePreview');
+    if(target) target.classList.remove('docx-render-host');
+    if(!f){if(target)target.innerHTML='<div class="empty">Sin formato seleccionado.</div>'; return;}
+    try{
+      if(isReportTemplateImage(f)||isReportTemplatePdf(f)){
+        const ras=await templateRaster(f);
+        if(ras){cacheRasterOnTemplate(f,ras); paintExactTemplatePreview(target,ras,f.name||'Formato seleccionado');}
+        else if(typeof chooseReportTemplatePrev==='function') await chooseReportTemplatePrev(i);
+      }else if(typeof chooseReportTemplatePrev==='function') await chooseReportTemplatePrev(i);
+    }catch(err){
+      console.warn('No se pudo preparar la plantilla de reporte',err);
+      if(typeof chooseReportTemplatePrev==='function') await chooseReportTemplatePrev(i);
+    }
+    await updateReportPreview();
+  };
+  renderFinalReportWithTemplate = async function(f){
+    if(!f) throw new Error('No hay plantilla seleccionada.');
+    if(isReportTemplateImage(f)||isReportTemplatePdf(f)){
+      let ras=getCachedRaster(f);
+      if(!ras){
+        try{ras=await templateRaster(f);}catch(e){console.warn('Raster directo falló; se intentará usar la vista previa.',e)}
+      }
+      if(!ras) ras=getPreviewRasterFallback();
+      if(!ras) throw new Error('No se pudo obtener una imagen utilizable de la plantilla.');
+      cacheRasterOnTemplate(f,ras);
+      return exactStageV7(f,ras);
+    }
+    if(/\.docx$/i.test(String(f.name||'')) && typeof docxStageV6==='function') return docxStageV6(f);
+    throw new Error('Formato de plantilla no compatible.');
+  };
+  const oldCompatPreview = oldUpdateReportPreview;
+  updateReportPreview = async function(){
+    try{
+      if(typeof syncReportMetaFromInputs==='function') syncReportMetaFromInputs();
+      const legendInput=document.getElementById('repLegend');
+      if(legendInput){state.report.legend=cleanLegendText(legendInput.value);legendInput.value=state.report.legend;}
+      save();
+      const f=reportTemplateIndex>=0?reportTemplates[reportTemplateIndex]:null;
+      if(!f){return typeof oldCompatPreview==='function'?oldCompatPreview():null;}
+      return await renderFinalReportWithTemplate(f);
+    }catch(err){
+      console.warn('Vista previa con plantilla no disponible; se usa modo institucional.',err);
+      if(typeof oldCompatPreview==='function') oldCompatPreview();
+      const chosen=document.getElementById('repChosenTemplate');
+      const f=reportTemplateIndex>=0?reportTemplates[reportTemplateIndex]:null;
+      if(chosen&&f) chosen.textContent=(f.name||'Formato')+' · vista compatible';
+    }
+  };
+  ensureV7Defaults();
+  setTimeout(()=>{try{updateReportPreview()}catch(e){console.warn(e)}},100);
+})();
+</script>
+
 </body></html>
