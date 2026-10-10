@@ -2072,7 +2072,7 @@ window.addEventListener('DOMContentLoaded',initGlobalEnhancements);
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
-const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
+  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
   let sb=null,currentSession=null;
   function buildGate(){
@@ -2424,7 +2424,8 @@ let sb=()=>window.ccttSupabaseClient;
 function status(text,isError=false){if(isError)console.error('[CCTT Supabase]',text);else console.info('[CCTT Supabase]',text)}
 function serialize(){return JSON.stringify(state)}
 window.ccttCloudSave=()=>{if(!ready||!currentUser||loading)return;pending=true;setTimeout(flush,600)};
-async function flush(){if(!ready||!pending||writing||!currentUser)return;writing=true;pending=false;const uid=currentUser;let snapshot;
+window.ccttCloudHistorySync=()=>{lastJSON=serialize();pending=false;retry=0};
+async function flush(){if(window.ccttHistoryBusy||!ready||!pending||writing||!currentUser)return;writing=true;pending=false;const uid=currentUser;let snapshot;
 try{snapshot=serialize();if(snapshot===lastJSON)return;const {error}=await sb().from('cctt_operator_state').upsert({user_id:uid,data:JSON.parse(snapshot),updated_at:new Date().toISOString()},{onConflict:'user_id'});if(error)throw error;lastJSON=snapshot;retry=0;status('Cambios guardados en Supabase');}
 catch(err){pending=true;retry++;status('Error al guardar en Supabase: '+(err.message||err),true);console.error('cctt cloud save',err);}
 finally{writing=false;if(pending&&retry<4)setTimeout(flush,3000)} }
@@ -2654,44 +2655,60 @@ function init(){const sel=$('shiftMonth');if(!sel)return;sel.innerHTML=MONTHS.ma
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
-<script id="ccttFixesV24">
+<script id="ccttHistoryV26">
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-// Guardado explícito de eliminaciones: no se anuncia éxito antes de recibir confirmación de Supabase.
-let operationQueue=Promise.resolve();
-function remoteMutation(change,description){
- operationQueue=operationQueue.catch(()=>{}).then(async()=>{
+let queue=Promise.resolve();
+window.ccttHistoryBusy=false;
+const copy=arr=>Array.isArray(arr)?arr.slice():[];
+function repaint(){try{renderI35();renderBol()}catch(e){console.error('Render historial',e)}}
+function run(kind,index){
+ queue=queue.catch(()=>{}).then(async()=>{
   const sb=window.ccttSupabaseClient;
-  if(!sb)throw Error('La conexión con Supabase no está disponible.');
-  const {data:{user},error:authError}=await sb.auth.getUser();
-  if(authError||!user)throw Error('Inicia sesión para modificar los registros.');
-  const {data,error}=await sb.from('cctt_operator_state').select('data').eq('user_id',user.id).maybeSingle();
-  if(error)throw error;
-  const remote=data?.data;
-  if(!remote||typeof remote!=='object')throw Error('No se encontraron los datos remotos. Actualiza la página y vuelve a intentarlo.');
-  const updated=structuredClone(remote);
-  updated.inc35=updated.inc35||{};
-  change(updated.inc35);
-  const {error:writeError}=await sb.from('cctt_operator_state').upsert({user_id:user.id,data:updated,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-  if(writeError)throw writeError;
-  // Sincronizar la copia en memoria y el mecanismo de guardado automático existente.
-  state.inc35.incidents=updated.inc35.incidents||[];
-  state.inc35.bulletins=updated.inc35.bulletins||[];
-  if(typeof renderI35==='function')renderI35();
-  if(typeof renderBol==='function')renderBol();
-  if(typeof toast==='function')toast(description+' Guardado en Supabase.');
+  if(!sb)throw Error('No está disponible Supabase.');
+  const {data:{user},error:ae}=await sb.auth.getUser();
+  if(ae||!user)throw Error('Necesitas iniciar sesión en Supabase.');
+  const key=kind==='incident'?'incidents':'bulletins';
+  const previous=copy(state.inc35[key]);
+  if(index!==null&&(index<0||index>=previous.length))return;
+  const next=index===null?[]:previous.filter((_,i)=>i!==index);
+  window.ccttHistoryBusy=true;
+  state.inc35[key]=next;
+  repaint();
+  try{
+   // Solo modifica el arreglo indicado; no lee ni transmite el estado operativo completo.
+   const {data,error}=await sb.rpc('cctt_delete_history_v26',{p_kind:kind,p_index:index});
+   if(error)throw error;
+   if(!data?.ok)throw Error('Supabase no confirmó la operación.');
+   if(typeof window.ccttCloudHistorySync==='function')window.ccttCloudHistorySync();
+   if(typeof toast==='function')toast(index===null?'Historial eliminado en Supabase.':'Registro eliminado en Supabase.');
+  }catch(err){
+   state.inc35[key]=previous;
+   repaint();
+   console.error('CCTT borrado remoto',err);
+   alert('No se pudo eliminar en Supabase. Se restauró el registro: '+(err.message||err));
+  }finally{window.ccttHistoryBusy=false}
  });
- return operationQueue.catch(e=>{alert('No se pudo guardar el cambio en Supabase: '+(e.message||e));console.error('CCTT historial',e)});
+ return queue;
 }
-function installHistory(){
- const incidents=$('i35History'); const clearIncidents=$('i35ClearHistory');
- if(clearIncidents){clearIncidents.onclick=async()=>{if(!confirm('¿Eliminar definitivamente TODO el historial del Generador de incidentes?'))return;await remoteMutation(data=>{data.incidents=[]},'Historial de incidentes eliminado.')}}
- if(incidents){incidents.addEventListener('click',async e=>{const btn=e.target.closest('[data-i35-del]');if(!btn)return;e.preventDefault();e.stopImmediatePropagation();const idx=Number(btn.dataset.i35Del);const item=state.inc35.incidents?.[idx];if(!item||!confirm('¿Eliminar este incidente?'))return;const occurrence=(state.inc35.incidents||[]).slice(0,idx+1).filter(x=>JSON.stringify(x)===JSON.stringify(item)).length-1;await remoteMutation(data=>{let count=0;data.incidents=(data.incidents||[]).filter(x=>{if(JSON.stringify(x)===JSON.stringify(item)){if(count++===occurrence)return false}return true})},'Incidente eliminado.');},true)}
- const bol=$('bolHistory');if(bol)bol.addEventListener('click',async e=>{const btn=e.target.closest('[data-bol-index]');if(!btn)return;const item=state.inc35.bulletins?.[Number(btn.dataset.bolIndex)];if(!item||!confirm('¿Eliminar este boletinado?'))return;const idx=Number(btn.dataset.bolIndex);const occurrence=(state.inc35.bulletins||[]).slice(0,idx+1).filter(x=>JSON.stringify(x)===JSON.stringify(item)).length-1;await remoteMutation(data=>{let count=0;data.bulletins=(data.bulletins||[]).filter(x=>{if(JSON.stringify(x)===JSON.stringify(item)){if(count++===occurrence)return false}return true})},'Boletinado eliminado.');});
- const allBol=$('bolClearHistory');if(allBol)allBol.onclick=async()=>{if(confirm('¿Eliminar definitivamente TODOS los boletinados guardados?'))await remoteMutation(data=>{data.bulletins=[]},'Historial de boletinados eliminado.')};
+function init(){
+ const allI=$('i35ClearHistory'),allB=$('bolClearHistory');
+ if(allI)allI.onclick=()=>{if(confirm('¿Eliminar definitivamente todo el historial de incidentes?'))run('incident',null)};
+ if(allB)allB.onclick=()=>{if(confirm('¿Eliminar definitivamente todo el historial de boletinados?'))run('bulletin',null)};
+ const i=$('i35History'),b=$('bolHistory');
+ // Captura antes de los eventos antiguos, que llamaban save() y sobrescribían el borrado.
+ if(i)i.addEventListener('click',e=>{
+  const el=e.target.closest('[data-i35-del]');if(!el)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  if(confirm('¿Eliminar este incidente?'))run('incident',Number(el.dataset.i35Del));
+ },true);
+ if(b)b.addEventListener('click',e=>{
+  const el=e.target.closest('[data-bol-index]');if(!el)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  if(confirm('¿Eliminar este boletinado?'))run('bulletin',Number(el.dataset.bolIndex));
+ },true);
 }
-function init(){installHistory();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
