@@ -2882,4 +2882,67 @@ body{background:#f7f0e8!important}
 })();
 </script>
 
+<script id="cctt-copy-report-v29">
+/* Copia segura del reporte: captura completa y activación directa del portapapeles. */
+(() => {
+ 'use strict';
+ const buttonId='repCopyImageV23';
+ const labelDefault='Copiar imagen del reporte';
+ const $=id=>document.getElementById(id);
+ function message(txt,bad=false){
+   let node=$('ccttCopyReportStatusV29');
+   if(!node){node=document.createElement('div');node.id='ccttCopyReportStatusV29';node.setAttribute('role','status');node.setAttribute('aria-live','polite');node.style.cssText='margin-top:8px;font-size:13px;font-weight:650;';$('repCopyImageV23')?.insertAdjacentElement('afterend',node)}
+   if(node){node.textContent=txt;node.style.color=bad?'#ad263d':'#147553'}
+ }
+ async function imageReady(root){
+   await Promise.all(Array.from(root.querySelectorAll('img')).map(el=>{
+     if(el.complete)return Promise.resolve();
+     return new Promise(resolve=>{el.addEventListener('load',resolve,{once:true});el.addEventListener('error',resolve,{once:true});setTimeout(resolve,3500)})
+   }));
+   if(document.fonts?.ready)await document.fonts.ready;
+ }
+ async function capture(){
+   if(typeof window.html2canvas!=='function')throw Error('El generador de imágenes no está disponible.');
+   if(typeof window.updateReportPreview==='function')await window.updateReportPreview();
+   const src=document.querySelector('#reportPreview .report-v10-page,#reportPreview .report-v9-page,#reportPreview .report-fixed-page') || $('printReport') || $('reportPreview');
+   if(!src)throw Error('No se encontró la vista previa del reporte.');
+   await imageReady(src);
+   const r=src.getBoundingClientRect();
+   const w=Math.max(1,Math.ceil(r.width||src.offsetWidth||900)),h=Math.max(1,Math.ceil(r.height||src.offsetHeight||1100));
+   const wrap=document.createElement('div');
+   Object.assign(wrap.style,{position:'fixed',left:'0',top:'0',width:w+'px',height:h+'px',overflow:'visible',opacity:'1',zIndex:'-9999',pointerEvents:'none'});
+   // La copia mantiene el mismo aspecto y dimensiones del reporte mostrado.
+   const scope=document.createElement('div');scope.id='reportPreview';scope.style.cssText=`width:${w}px;height:${h}px;`;
+   const clone=src.cloneNode(true);
+   Object.assign(clone.style,{width:w+'px',height:h+'px',maxWidth:'none',maxHeight:'none',margin:'0',boxShadow:'none'});
+   scope.appendChild(clone);wrap.appendChild(scope);document.body.appendChild(wrap);
+   try{
+     await imageReady(clone);
+     return await window.html2canvas(clone,{scale:2,backgroundColor:'#ffffff',useCORS:true,allowTaint:false,scrollX:0,scrollY:0,width:w,height:h,windowWidth:w,windowHeight:h,logging:false});
+   }finally{wrap.remove()}
+ }
+ function toPng(canvas){return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('No se pudo crear el PNG.')),'image/png'))}
+ function download(blob){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Reporte_Cesionarios.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000)}
+ function click(e){
+   const btn=e.target.closest?.('#'+buttonId);if(!btn)return;
+   e.preventDefault();e.stopImmediatePropagation();
+   if(btn.disabled)return;
+   btn.disabled=true;btn.textContent='Preparando imagen…';message('Preparando imagen del reporte…');
+   const pngPromise=capture().then(toPng);
+   // Debe llamarse a clipboard.write dentro de la activación del clic, no tras un await.
+   let work;
+   if(window.isSecureContext && navigator.clipboard?.write && typeof window.ClipboardItem!=='undefined'){
+     try{work=navigator.clipboard.write([new ClipboardItem({'image/png':pngPromise})]);}
+     catch(err){work=Promise.reject(err)}
+   }else{work=Promise.reject(Error('El navegador no permite copiar imágenes directamente.'))}
+   Promise.resolve(work).then(()=>message('Imagen copiada. Ya puedes pegarla con Ctrl + V.')).catch(async err=>{
+     console.warn('No se pudo copiar la imagen; se ofrece descarga',err);
+     try{download(await pngPromise);message('El navegador bloqueó la copia. Se descargó el PNG para compartirlo.');}
+     catch(error){message('No se pudo generar la imagen: '+error.message,true)}
+   }).finally(()=>{btn.disabled=false;btn.textContent=labelDefault});
+ }
+ document.addEventListener('click',click,true);
+})();
+</script>
+
 </body></html>
