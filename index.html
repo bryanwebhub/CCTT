@@ -1957,6 +1957,7 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
     const token=++window.__ccttReportRenderToken;
     const ras=await repV10Raster(file);
     if(!ras) throw new Error('No se pudo obtener la imagen de la plantilla base.');
+    if(token!==window.__ccttReportRenderToken)return null;
     const html=repV10ContentHtml();
     if(!html) throw new Error('No se pudo construir el contenido del reporte.');
     const shell=document.createElement('div'); shell.className='report-v10-shell';
@@ -1974,7 +1975,8 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
     ov.innerHTML=html;
     page.appendChild(ov);
     shell.appendChild(page);
-    host.appendChild(shell);
+    if(token!==window.__ccttReportRenderToken)return null;
+    host.replaceChildren(shell);
     const chosen=document.getElementById('repChosenTemplate');
     if(chosen && file) chosen.textContent=(file.name||'Formato base')+' · vista aplicada';
     requestAnimationFrame(()=>{repV10Fit(ov,d); setTimeout(()=>repV10Fit(ov,d),90); setTimeout(()=>repV10Fit(ov,d),260);});
@@ -2106,8 +2108,8 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
-  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
+  const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
+  const SUPABASE_ANON_KEY = 'TU_ANON_O_PUBLISHABLE_KEY';
   let sb=null,currentSession=null;
   function buildGate(){
     if(document.getElementById('ccttLoginGate'))return;
@@ -3116,6 +3118,28 @@ body{background:#f7f0e8!important}
  function boot(){try{renderCopTemplateFinal=async()=>paint();renderCop=()=>paint()}catch(e){}const host=q('copTemplateList');if(host)observer.observe(host,{childList:true});for(const id of ['copText','copHeader','copFooter','copDate','copTime','copFontSize']){const e=q(id);if(e){e.addEventListener('input',paint,true);e.addEventListener('change',paint,true)}}const preview=q('copTemplatePreview');if(preview){new ResizeObserver(entries=>{const w=Math.round(entries[0]?.contentRect?.width||0);if(w&&w!==lastStageWidth){lastStageWidth=w;requestAnimationFrame(paint)}}).observe(preview)}load()}
  window.addEventListener('cctt:session',()=>load());document.addEventListener('visibilitychange',()=>{if(!document.hidden){const host=q('copTemplateList');if(host&&items.length&&!host.querySelector('.cctt-v35-option'))renderChoices();const stage=q('copTemplatePreview')?.querySelector('.cctt-v35-stage');if(stage&&!stage.querySelector('.cctt-v35-text'))requestAnimationFrame(paint)}});
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+
+<script id="cctt-v38-report-preview-singleton">
+(()=>{
+  'use strict';
+  const holder=document.getElementById('reportPreview');
+  if(!holder)return;
+  let checking=false;
+  function keepSingle(){
+    if(checking)return;checking=true;
+    try{
+      const children=Array.from(holder.children);
+      if(children.length<=1)return;
+      // The newest complete render replaces any earlier page.
+      const preferred=children.filter(e=>e.classList.contains('report-v10-shell'));
+      const latest=(preferred.length?preferred:children).at(-1);
+      for(const el of children)if(el!==latest)el.remove();
+    }finally{checking=false}
+  }
+  new MutationObserver(keepSingle).observe(holder,{childList:true});
+  keepSingle();
 })();
 </script>
 </body></html>
