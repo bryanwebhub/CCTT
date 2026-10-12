@@ -2814,24 +2814,65 @@ body{background:#f7f0e8!important}
   throw Error('Para COPOMA publica una plantilla PNG, JPG, WEBP o PDF.');
  }
  function txt(id){return q(id)?.value||''}
- function paintText(stage){const design=state?.inc35?.copomaDesign||{};
-  const top=Number(design.top??21),left=Number(design.left??3.3),width=Number(design.width??90.8),height=Number(design.height??55);
-  const wrap=document.createElement('div');wrap.className='cctt-v25-layer';Object.assign(wrap.style,{top:top+'%',left:left+'%',width:width+'%',maxHeight:height+'%',fontSize:(Number(design.fontSize)||24)+'px',color:design.color||'#111',textAlign:design.align||'left'});
-  const date=txt('copDate'),hour=txt('copTime');const header=txt('copHeader'),body=txt('copText'),footer=txt('copFooter');
-  for(const [value,weight,margin] of [[date+(hour?'   '+hour+' horas':''),'normal','0 0 12px'],[header,'bold','0 0 12px'],[body,'normal','0 0 12px'],[footer,'bold','0']]){const block=document.createElement('div');block.textContent=value;block.style.fontWeight=weight;block.style.margin=margin;wrap.appendChild(block)}stage.appendChild(wrap);
+ function paintText(stage){
+  stage.querySelectorAll('.cctt-v25-layer').forEach(n=>n.remove());
+  const group=stage.dataset.layout==='photo'?'photo':'plain';
+  const outer=document.createElement('div');outer.className='cctt-v25-layer cctt-v34-document '+group;
+  const date=q('copDate')?.value||'',hour=q('copTime')?.value||'';
+  const dateText=date?new Date(date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}).toUpperCase():'';
+  const make=(className,value)=>{const node=document.createElement('div');node.className=className;node.textContent=value||'';outer.appendChild(node);return node};
+  make('cctt-v34-date',[dateText,hour?hour+' horas':''].filter(Boolean).join('\n'));
+  make('cctt-v34-header',q('copHeader')?.value||'');
+  make('cctt-v34-body',q('copText')?.value||'');
+  make('cctt-v34-footer',q('copFooter')?.value||'');
+  stage.appendChild(outer);
  }
- async function showCop(file){const n=++renderSequence,box=q('copTemplatePreview');if(!box)return;box.innerHTML='<div class="empty">Cargando plantilla institucional…</div>';
-  try{const img=await raster(file);if(n!==renderSequence){img.cleanup();return}const stage=document.createElement('div');stage.className='cctt-v25-stage';const el=document.createElement('img');el.src=img.uri;el.alt='Formato institucional COPOMA';await new Promise((resolve,reject)=>{el.onload=resolve;el.onerror=reject});stage.style.aspectRatio=(el.naturalWidth||1000)+'/'+(el.naturalHeight||1400);stage.appendChild(el);paintText(stage);box.replaceChildren(stage);
-  }catch(e){box.innerHTML='';const msg=document.createElement('div');msg.className='empty';msg.textContent='No se pudo mostrar la plantilla: '+e.message;box.append(msg)}
+ const rasterCache=new Map(),blobCache=new Map();let currentDownload=0;
+ async function resolveTemplate(item){
+  if(rasterCache.has(item.id))return rasterCache.get(item.id);
+  const result=(async()=>{let blob=blobCache.get(item.id);if(!blob){const resp=await fetch(item.url,{cache:'no-store'});if(!resp.ok)throw Error('No se pudo cargar el formato seleccionado.');blob=await resp.blob();blobCache.set(item.id,blob)}
+   const f=new File([blob],item.name||'formato.png',{type:blob.type||'image/png'});
+   return raster(f);
+  })(); rasterCache.set(item.id,result);try{return await result}catch(e){rasterCache.delete(item.id);throw e}
+ }
+ async function showCop(item){
+  const n=++renderSequence,box=q('copTemplatePreview');if(!box)return;
+  box.setAttribute('aria-busy','true');
+  let status=box.querySelector('.cctt-v34-loading');
+  if(!status){status=document.createElement('div');status.className='cctt-v34-loading';status.textContent='Preparando formato…';box.appendChild(status)}
+  try{
+   const img=await resolveTemplate(item);if(n!==renderSequence)return;
+   const stage=document.createElement('div');stage.className='cctt-v25-stage';
+   const el=document.createElement('img');el.src=img.uri;el.alt='Plantilla institucional: '+item.name;
+   await new Promise((res,rej)=>{if(el.complete&&el.naturalWidth)return res();el.onload=res;el.onerror=rej});
+   if(n!==renderSequence)return;
+   const w=el.naturalWidth||1000,h=el.naturalHeight||1400;
+   stage.style.aspectRatio=w+'/'+h;stage.dataset.templateId=item.id;
+   // Detect photograph/banner in upper band by sampling color variance.
+   const cv=document.createElement('canvas');cv.width=24;cv.height=24;
+   const ctx=cv.getContext('2d',{willReadFrequently:true});ctx.drawImage(el,0,0,w,Math.max(1,h*.26),0,0,24,24);
+   const dat=ctx.getImageData(0,0,24,24).data;let saturated=0,dark=0;
+   for(let k=0;k<dat.length;k+=4){const r=dat[k],g=dat[k+1],b=dat[k+2],max=Math.max(r,g,b),min=Math.min(r,g,b);if(max-min>35&&max<245)saturated++;if((r+g+b)/3<165)dark++}
+   stage.dataset.layout=(saturated>90||dark>120)?'photo':'plain';
+   stage.append(el);paintText(stage);box.replaceChildren(stage);
+  }catch(e){if(n===renderSequence){box.replaceChildren();const msg=document.createElement('div');msg.className='empty';msg.textContent='No se pudo preparar el formato: '+e.message;box.append(msg)}}
+  finally{if(n===renderSequence)box.removeAttribute('aria-busy')}
  }
  async function loadPublic(){try{
-  const {client}=await identity();const {data,error}=await client.functions.invoke('cctt-admin',{body:{action:'visible-templates'}});if(error||data?.error)throw error||Error(data.error);
+  const {client}=await identity();const {data,error}=await client.functions.invoke('cctt-admin',{body:{action:'visible-templates'}});
+  if(error||data?.error)throw error||Error(data.error);
   publicList=(data?.templates||[]).filter(x=>x.module_id==='inc35copoma').slice(0,3);
-  const host=q('copTemplateList');if(!host)return;host.innerHTML='';host.className='cctt-v25-cop-choices';
-  if(!publicList.length){const note=document.createElement('div');note.className='cctt-v25-cop-note';note.textContent='No hay plantillas institucionales de COPOMA publicadas. Solicita al administrador que publique una.';host.append(note);return}
-  for(const item of publicList){const btn=document.createElement('button');btn.type='button';btn.className='btn';btn.textContent=item.name;btn.onclick=async()=>{selectedId=item.id;host.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===btn));const res=await fetch(item.url);if(!res.ok)throw Error('No se pudo abrir la plantilla institucional.');const blob=await res.blob();const file=new File([blob],item.name,{type:blob.type||(/\.pdf$/i.test(item.name)?'application/pdf':'image/png')});await showCop(file)};host.append(btn)}
-  (host.querySelector('button'))?.click();
- }catch(e){console.error('COPOMA Supabase:',e);const host=q('copTemplateList');if(host)host.textContent='No se pudieron recuperar los formatos. Inténtalo nuevamente.'}}
+  const host=q('copTemplateList');if(!host)return;
+  host.innerHTML='';host.className='cctt-v25-cop-choices cctt-v34-options';
+  if(!publicList.length){host.textContent='No hay formatos institucionales de COPOMA disponibles.';return}
+  for(const item of publicList){const btn=document.createElement('button');btn.type='button';btn.className='btn cctt-v34-choice';btn.textContent=item.name;
+   btn.dataset.templateId=item.id;
+   btn.onclick=async()=>{selectedId=item.id;host.querySelectorAll('button').forEach(x=>{x.classList.toggle('active',x===btn);x.setAttribute('aria-pressed',String(x===btn))});await showCop(item)};
+   btn.setAttribute('aria-pressed','false');host.append(btn)
+  }
+  const selected=publicList.find(x=>x.id===selectedId)||publicList[0];host.querySelector('[data-template-id="'+selected.id+'"]')?.click();
+ }catch(e){const host=q('copTemplateList');if(host)host.textContent='No se pudieron cargar los formatos. Intenta nuevamente.'}}
+
  function bind(){cleanLegacy();
   // Prevent older COPOMA renderers from replacing the institutional preview.
   renderCopTemplateFinal=async()=>{const stage=q('copTemplatePreview')?.querySelector('.cctt-v25-stage');if(stage){stage.querySelectorAll('.cctt-v25-layer').forEach(x=>x.remove());paintText(stage)}};
@@ -2992,4 +3033,39 @@ body{background:#f7f0e8!important}
 </script>
 
 <style>#ccttMigrationBox{display:none!important}</style>
+<style id="cctt-v34-style">
+.cctt-v34-options{display:flex!important;flex-wrap:wrap;gap:10px}
+.cctt-v34-choice{border:1px solid #d6dce5!important;cursor:pointer!important;white-space:normal;text-align:left;padding:14px 18px!important}
+.cctt-v34-choice.active,.cctt-v34-choice[aria-pressed="true"]{border:2px solid #2563eb!important;background:#eaf2ff!important;color:#153663!important}
+#copTemplatePreview{position:relative;min-height:320px;overflow:hidden}
+#copTemplatePreview .cctt-v25-stage{position:relative;display:block;width:100%;height:auto;overflow:hidden}
+#copTemplatePreview .cctt-v25-stage>img{display:block;width:100%;height:100%;object-fit:fill}
+#copTemplatePreview .cctt-v34-loading{position:absolute;bottom:10px;left:10px;z-index:4;background:#fff;padding:7px;border-radius:8px}
+#copTemplatePreview .cctt-v34-document{position:absolute;inset:0;color:#111;font-family:Arial,sans-serif;pointer-events:none;line-height:1.32}
+.cctt-v34-document>div{position:absolute;box-sizing:border-box;white-space:pre-wrap;overflow-wrap:break-word}
+/* Blank stationery: protect header logo and footer strip. */
+.cctt-v34-document.plain .cctt-v34-date{right:6%;top:6.5%;width:36%;font-weight:750;text-align:right;font-size:clamp(10px,2.2vw,23px)}
+.cctt-v34-document.plain .cctt-v34-header{top:16%;left:4%;width:92%;font-weight:750;font-size:clamp(11px,2.1vw,24px)}
+.cctt-v34-document.plain .cctt-v34-body{top:23%;left:4%;width:92%;max-height:44%;font-size:clamp(12px,2.9vw,34px)}
+.cctt-v34-document.plain .cctt-v34-footer{top:72%;left:4%;width:92%;font-weight:750;font-size:clamp(10px,2.1vw,24px)}
+/* Photograph header: all the text is below the aerial photograph, dates at the right. */
+.cctt-v34-document.photo .cctt-v34-date{top:27%;right:4%;width:44%;text-align:right;font-weight:750;font-size:clamp(11px,2.35vw,26px)}
+.cctt-v34-document.photo .cctt-v34-header{top:37%;left:5%;width:90%;font-weight:750;font-size:clamp(11px,2.15vw,24px)}
+.cctt-v34-document.photo .cctt-v34-body{top:43%;left:5%;width:90%;max-height:30%;font-size:clamp(13px,2.85vw,32px)}
+.cctt-v34-document.photo .cctt-v34-footer{top:76%;left:5%;width:90%;font-weight:750;font-size:clamp(11px,2.15vw,25px)}
+#ccttUploadTemplate[disabled], [data-remove-template][disabled]{opacity:.55;cursor:wait}
+</style>
+<script id="cctt-v34-admin-lock">
+(()=>{const pending=new WeakSet();function getButton(e){return e.target.closest?.('#ccttUploadTemplate,[data-remove-template]')}
+ document.addEventListener('click',e=>{const b=getButton(e);if(!b)return;if(pending.has(b)){e.preventDefault();e.stopImmediatePropagation();return}
+  pending.add(b);b.disabled=true;b.dataset.originalText=b.textContent;b.textContent=b.id==='ccttUploadTemplate'?'Publicando…':'Eliminando…';
+  // Existing async handler remains responsible for the network request.
+  // Restore after an explicit app confirmation or failure, with an upper bound to prevent stuck buttons.
+  const reset=()=>{pending.delete(b);if(b.isConnected){b.disabled=false;b.textContent=b.dataset.originalText||'Publicar formato'}};
+  const host=document.getElementById('ccttTemplatesList');let observer;
+  if(host){observer=new MutationObserver(()=>{observer.disconnect();reset()});observer.observe(host,{childList:true,subtree:true})}
+  setTimeout(()=>{observer?.disconnect();reset()},20000)
+ },true)
+})();
+</script>
 </body></html>
