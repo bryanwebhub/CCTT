@@ -42,7 +42,29 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Serif:wght@400;600;700&family=Source+Sans+3:wght@400;600;700;800&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Serif:wght@400;600;700&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-<style id="ccttV25Critical">html{background:#f7f0e8}body{background:#f7f0e8!important}.sidebar{background:linear-gradient(165deg,#56001e,#801d41)!important}</style></head>
+<style id="ccttV25Critical">html{background:#f7f0e8}body{background:#f7f0e8!important}.sidebar{background:linear-gradient(165deg,#56001e,#801d41)!important}</style>
+<style id="cctt-v32-presentation-fixes">
+/* El documento nunca debe pasar por encima de la cabecera fija. */
+.topbar{z-index:1000!important;isolation:isolate;background:#fffaf5!important}
+.main{min-width:0;isolation:isolate}
+#page-reporte,#reportPreview{position:relative;z-index:0}
+#reportPreview{overflow:hidden;contain:layout paint;isolation:isolate}
+#reportPreview .report-v10-shell,#reportPreview .report-final-shell{position:relative;overflow:hidden;isolation:isolate}
+#reportPreview .report-v10-page{overflow:hidden!important;isolation:isolate;background:#fff!important;opacity:1!important}
+#reportPreview .report-v10-bg{opacity:1!important;display:block!important}
+#reportPreview .report-v10-overlay{isolation:isolate}
+.profile-mini{position:relative;gap:10px}
+.cctt-profile-trigger{border:0;background:none;border-radius:50%;padding:2px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cctt-profile-trigger:focus-visible{outline:3px solid #4b86d8;outline-offset:3px}
+.cctt-profile-menu{position:absolute;right:0;top:calc(100% + 14px);min-width:260px;max-width:min(340px,calc(100vw - 30px));background:#fff;border:1px solid #e1d6dc;border-radius:14px;box-shadow:0 18px 48px #07152b30;padding:14px;z-index:1100;color:#16233c}
+.cctt-profile-menu[hidden]{display:none!important}
+.cctt-profile-menu-title{font-weight:900;color:#650924;margin-bottom:8px}
+.cctt-profile-menu-email{font-size:13px;overflow-wrap:anywhere;padding-bottom:12px;border-bottom:1px solid #ecedf1}
+.cctt-profile-menu-logout{margin-top:12px;width:100%;border:0;background:#670626;color:#fff;border-radius:10px;padding:12px;font-weight:800;cursor:pointer}
+.cctt-profile-menu-logout:disabled{opacity:.65;cursor:wait}
+</style>
+<script>window.__ccttReportRenderToken=0;</script>
+</head>
 <body>
 <div class="app">
 <aside class="sidebar">
@@ -1796,7 +1818,11 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
     ov.innerHTML=repV9BulletinHtml();
     page.appendChild(ov);
     shell.appendChild(page);
-    host.appendChild(shell);
+    // Renderizado atómico: una captura anterior no puede sobrescribir una vista nueva.
+    if(token!==window.__ccttReportRenderToken)return null;
+    try{await bg.decode();}catch(_){/* La plantilla puede venir de un objeto URL o imagen ya decodificada. */}
+    if(token!==window.__ccttReportRenderToken)return null;
+    host.replaceChildren(shell);
     const chosen=document.getElementById('repChosenTemplate');
     if(chosen && file) chosen.textContent=(file.name||'Formato base')+' · vista aplicada';
     requestAnimationFrame(()=>{repV9Fit(ov,d); setTimeout(()=>repV9Fit(ov,d),90); setTimeout(()=>repV9Fit(ov,d),260);});
@@ -1928,11 +1954,11 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
   async function renderReportPreviewV10(file){
     const host=document.getElementById('reportPreview');
     if(!host) return null;
+    const token=++window.__ccttReportRenderToken;
     const ras=await repV10Raster(file);
     if(!ras) throw new Error('No se pudo obtener la imagen de la plantilla base.');
     const html=repV10ContentHtml();
     if(!html) throw new Error('No se pudo construir el contenido del reporte.');
-    host.innerHTML='';
     const shell=document.createElement('div'); shell.className='report-v10-shell';
     const page=document.createElement('div'); page.className='report-v10-page report-fixed-page';
     const max=Math.min(760, Math.max(360,(host.clientWidth||760)-36));
@@ -2080,8 +2106,8 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
   /* ---------- Supabase Auth: solo inicio de sesión, sin registro ---------- */
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
-  const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
+  const SUPABASE_URL = 'https://TU-PROYECTO.supabase.co';
+  const SUPABASE_ANON_KEY = 'TU_ANON_O_PUBLISHABLE_KEY';
   let sb=null,currentSession=null;
   function buildGate(){
     if(document.getElementById('ccttLoginGate'))return;
@@ -2105,8 +2131,24 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
     const pm=document.querySelector('.profile-mini');if(!pm)return;
     let box=document.getElementById('ccttAuthUserControls');if(!box){box=document.createElement('div');box.id='ccttAuthUserControls';box.style.display='flex';box.style.gap='8px';box.style.alignItems='center';pm.prepend(box)}
     const user=session?.user,email=user?.email||'Usuario',role=user?.app_metadata?.role||user?.user_metadata?.role||'';
-    box.innerHTML=`<span class="cctt-user-chip">${email}${role?` · ${role}`:''}</span><button type="button" class="cctt-logout" id="ccttLogoutBtn">Salir</button>`;
-    document.getElementById('ccttLogoutBtn').onclick=async()=>{if(sb)await sb.auth.signOut();currentSession=null;box.innerHTML='';window.dispatchEvent(new Event("cctt:logout"));showGate()};
+    // El correo y la salida se muestran exclusivamente al pulsar el avatar.
+    box.replaceChildren();
+    const oldChip=pm.querySelector('.cctt-user-chip');if(oldChip)oldChip.remove();
+    pm.classList.add('cctt-profile-menu-anchor');
+    const avatar=document.getElementById('miniAvatar');
+    let trigger=document.getElementById('ccttProfileTrigger');
+    if(!trigger&&avatar){trigger=document.createElement('button');trigger.type='button';trigger.id='ccttProfileTrigger';trigger.className='cctt-profile-trigger';trigger.setAttribute('aria-label','Abrir menú de perfil');trigger.setAttribute('aria-expanded','false');avatar.parentNode.insertBefore(trigger,avatar);trigger.appendChild(avatar);}
+    if(!trigger)return;
+    let menu=document.getElementById('ccttProfileMenu');
+    if(!menu){menu=document.createElement('div');menu.id='ccttProfileMenu';menu.className='cctt-profile-menu';menu.hidden=true;pm.appendChild(menu);}
+    menu.replaceChildren();
+    const heading=document.createElement('div');heading.className='cctt-profile-menu-title';heading.textContent='Mi cuenta';menu.appendChild(heading);
+    const detail=document.createElement('div');detail.className='cctt-profile-menu-email';detail.textContent=email+(role?' · '+role:'');menu.appendChild(detail);
+    const logout=document.createElement('button');logout.type='button';logout.className='cctt-profile-menu-logout';logout.textContent='Cerrar sesión';menu.appendChild(logout);
+    const close=()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false')};
+    trigger.onclick=(ev)=>{ev.stopPropagation();menu.hidden=!menu.hidden;trigger.setAttribute('aria-expanded',String(!menu.hidden))};
+    logout.onclick=async()=>{logout.disabled=true;logout.textContent='Cerrando sesión…';try{if(sb){const {error}=await sb.auth.signOut();if(error)throw error;}currentSession=null;close();window.dispatchEvent(new Event('cctt:logout'));showGate();}catch(e){logout.disabled=false;logout.textContent='Cerrar sesión';console.error('No se pudo cerrar la sesión',e);}};
+    if(!window.__ccttProfileMenuListeners){window.__ccttProfileMenuListeners=true;document.addEventListener('click',ev=>{const m=document.getElementById('ccttProfileMenu'),t=document.getElementById('ccttProfileTrigger');if(m&&!m.hidden&&!m.contains(ev.target)&&!t?.contains(ev.target)){m.hidden=true;t?.setAttribute('aria-expanded','false')}});document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){const m=document.getElementById('ccttProfileMenu'),t=document.getElementById('ccttProfileTrigger');if(m){m.hidden=true;t?.setAttribute('aria-expanded','false')}}});}
   }
   function showApp(session){currentSession=session;hideGate();ensureUserControls(session);window.dispatchEvent(new CustomEvent("cctt:session",{detail:{session}}))}
   async function bootAuth(){
