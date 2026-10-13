@@ -2122,7 +2122,7 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
   // CONFIGURACIÓN SUPABASE: coloque aquí los datos públicos de su proyecto.
   // IMPORTANTE: use únicamente la ANON/PUBLISHABLE KEY. Nunca coloque la service_role en este HTML.
   const SUPABASE_URL = 'https://iwmbkvwvwfxsiojweprf.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
+  const SUPABASE_ANON_KEY = 'sb_publishable_Ifj9mlUIw3Ht8Mw_SawV4A_JLLasZ8m';
   let sb=null,currentSession=null;
   function buildGate(){
     if(document.getElementById('ccttLoginGate'))return;
@@ -3197,7 +3197,38 @@ const parseDate=t=>{t=String(t||'');let m=t.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-
 const mondayOf=val=>{if(!val)return null;let d=new Date(val+'T12:00:00');if(Number.isNaN(d.getTime()))return null;d.setDate(d.getDate()-(d.getDay()+6)%7);return iso(d)};
 const datesOf=m=>Array.from({length:7},(_,i)=>{let d=new Date(m+'T12:00:00');d.setDate(d.getDate()+i);return iso(d)});
 const textGrid=t=>String(t||'').replace(/\r/g,'').split('\n').map(r=>r.split('\t')).filter(r=>r.some(x=>String(x).trim()));
-const htmlGrid=h=>{const doc=new DOMParser().parseFromString(h,'text/html');const tables=[...doc.querySelectorAll('table')];const table=tables.sort((a,b)=>b.querySelectorAll('td,th').length-a.querySelectorAll('td,th').length)[0];if(!table)return [];const rows=[],occupied=[];for(const tr of table.rows){const i=rows.length,row=[];let column=0;for(const cell of tr.cells){while(occupied[column]>i)column++;const text=norm(cell.innerText||cell.textContent||'');const span=Math.min(Math.max(1,cell.colSpan||1),50),height=Math.max(1,cell.rowSpan||1);for(let j=0;j<span;j++){row[column+j]=text;occupied[column+j]=i+height}column+=span}rows.push(row)}return rows.map(row=>Array.from({length:Math.max(8,row.length)},(_,i)=>row[i]||''));};
+const htmlGrid=h=>{
+ const doc=new DOMParser().parseFromString(h,'text/html');
+ const tables=[...doc.querySelectorAll('table')];
+ const table=tables.sort((a,b)=>b.querySelectorAll('td,th').length-a.querySelectorAll('td,th').length)[0];
+ if(!table)return [];
+ const rows=[],occupied=new Map();
+ function cellText(cell){
+  // textContent une SSA, Impo y Expo; preservar los saltos que muestra el portal.
+  const clone=cell.cloneNode(true);
+  clone.querySelectorAll('br').forEach(br=>br.replaceWith(doc.createTextNode('\n')));
+  clone.querySelectorAll('div,p,li,section,article,tr').forEach(el=>{
+   el.insertBefore(doc.createTextNode('\n'),el.firstChild);
+   el.append(doc.createTextNode('\n'));
+  });
+  return String(clone.textContent||'').replace(/\u00a0/g,' ').replace(/\r/g,'')
+   .replace(/\n[ \t]*\n+/g,'\n').trim();
+ }
+ for(const tr of table.rows){
+  const i=rows.length,row=[];let column=0;
+  for(const cell of tr.cells){
+   while((occupied.get(column)||0)>i)column++;
+   const text=cellText(cell),span=Math.min(Math.max(1,cell.colSpan||1),50),height=Math.max(1,cell.rowSpan||1);
+   for(let j=0;j<span;j++){
+    row[column+j]=text;
+    occupied.set(column+j,i+height);
+   }
+   column+=span;
+  }
+  rows.push(row);
+ }
+ return rows.map(row=>Array.from({length:Math.max(8,row.length)},(_,i)=>row[i]||''));
+};
 const prepareRows=rows=>rows.map(row=>Array.from({length:8},(_,j)=>norm(row[j]||''))).filter(row=>row.some(Boolean));
 
 function buildGrid(rows){grid=rows&&rows.length?Array.from({length:1127},(_,i)=>Array.from({length:8},(_,j)=>norm(rows[i]?.[j]||''))):Array.from({length:1127},()=>Array(8).fill(''));renderGrid();}
@@ -3210,43 +3241,54 @@ function findTerminal(rows,i,day,allowed){for(let k=i-1;k>=Math.max(0,i-7);k--){
 function parseRecords(rows,zone,mon){
  const allowed=TERMINALS[zone],out=[],issues=[],dates=datesOf(mon);
  const names=[...allowed].sort((a,b)=>b.length-a.length);
- const reName=new RegExp('('+names.map(n=>n.replace(/ /g,'\\s+')).join('|')+')\\s*', 'giu');
- const valueMatch=/\b(IMPO|EXPO)\s*:?\s*(-?\d[\d,.]*)/giu;
+ const escaped=names.map(n=>n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/\s+/g,'\\s*'));
+ const reName=new RegExp('('+escaped.join('|')+')(?=\\s*(?:Impo|Expo|$|\\n))','giu');
+ const reValue=/(Impo|Expo)\s*:?\s*(-?\d[\d,.]*)/giu;
  let hour='';
- function embedded(text,day,rowNumber){
-  const raw=norm(text);if(!raw)return false;
-  let matches=[...raw.matchAll(reName)];if(!matches.length)return false;
-  const hourValid=!!hour;
+ function parseJoined(text,day,rowNumber){
+  const raw=String(text||'').replace(/\u00a0/g,' ').replace(/\r/g,'');
+  if(!raw.trim())return false;
+  const matches=[...raw.matchAll(reName)];
+  if(!matches.length)return false;
   for(let n=0;n<matches.length;n++){
-   const m=matches[n],name=allowed.find(t=>key(t)===key(m[1]))||m[1].toUpperCase();
+   const m=matches[n],terminal=allowed.find(t=>key(t)===key(m[1]));
+   if(!terminal)continue;
    const segment=raw.slice(m.index+m[0].length,n+1<matches.length?matches[n+1].index:raw.length);
-   let impo=null,expo=null;
-   for(const hit of segment.matchAll(valueMatch)){const v=Number(hit[2].replace(/,/g,''));if(hit[1].toUpperCase()==='IMPO')impo=v;else expo=v;}
-   if(impo===null&&expo===null)continue;
-   if(!hourValid){issues.push(`Fila ${rowNumber}, ${D[day]}: hora no identificada`);continue;}
-   if(impo===null||expo===null){issues.push(`Fila ${rowNumber}, ${D[day]}: faltan Impo o Expo de ${name}`);continue;}
-   if(!Number.isFinite(impo)||!Number.isFinite(expo)){issues.push(`Fila ${rowNumber}: valor no válido`);continue;}
-   if(impo||expo)out.push({date:dates[day],day,zone,terminal:name,hour,impo,expo});
+   const values={};
+   for(const hit of segment.matchAll(reValue)){
+    const v=Number(hit[2].replace(/,/g,''));
+    values[hit[1].toLowerCase()]=v;
+   }
+   if(values.impo===undefined&&values.expo===undefined)continue;
+   if(!hour){issues.push(`Fila ${rowNumber}, ${D[day]}: falta hora`);continue}
+   if(values.impo===undefined||values.expo===undefined){issues.push(`Fila ${rowNumber}, ${D[day]}: revisar Impo/Expo de ${terminal}`);continue}
+   if(!Number.isFinite(values.impo)||!Number.isFinite(values.expo)){issues.push(`Fila ${rowNumber}: cantidad inválida`);continue}
+   if(values.impo||values.expo)out.push({date:dates[day],day,zone,terminal,hour,impo:values.impo,expo:values.expo});
   }
   return true;
  }
+ const knownHours=/\b([01]?\d|2[0-3]):[0-5]\d\s*[-–]\s*([01]?\d|2[0-3]):[0-5]\d/;
  for(let i=0;i<rows.length;i++){
-  const row=rows[i]||[],a=norm(row[0]);const hm=a.match(/(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})/);
-  if(hm)hour=hm[1]+' - '+hm[2];
+  const row=rows[i]||[],a=String(row[0]||'').trim();
+  const hm=a.match(knownHours);if(hm)hour=hm[0].replace(/\s*[-–]\s*/,' - ');
   for(let d=0;d<7;d++){
-   const val=norm(row[d+1]);if(!val)continue;
-   if(val.length>40 && !names.some(t=>key(val).includes(key(t))))issues.push(`Fila ${i+1}, ${D[d]}: contenido extenso`);
-   if(embedded(val,d,i+1))continue;
-   if(!/^Impo\s/i.test(val))continue;
-   const exp=norm(rows[i+1]?.[d+1]);if(!/^Expo\s/i.test(exp)){issues.push(`Fila ${i+1}, ${D[d]}: falta Expo`);continue;}
-   const terminal=findTerminal(rows,i,d,allowed);if(!terminal){issues.push(`Fila ${i+1}, ${D[d]}: terminal no identificada`);continue;}
-   const impo=number(val),expo=number(exp);if(!Number.isFinite(impo)||!Number.isFinite(expo)||!hour)continue;
-   if(impo||expo)out.push({date:dates[d],day:d,zone,terminal,hour,impo,expo});
+   const val=String(row[d+1]||'').trim();if(!val)continue;
+   if(parseJoined(val,d,i+1))continue;
+   const imp=val.match(/^Impo\s*:?\s*(-?\d[\d,.]*)/i);
+   if(!imp)continue;
+   const exp=String(rows[i+1]?.[d+1]||'').trim().match(/^Expo\s*:?\s*(-?\d[\d,.]*)/i);
+   const terminal=findTerminal(rows,i,d,allowed);
+   if(!exp||!terminal||!hour){issues.push(`Fila ${i+1}, ${D[d]}: revisar bloque de ${terminal||'terminal no identificada'}`);continue}
+   const impo=Number(imp[1].replace(/,/g,'')),expo=Number(exp[1].replace(/,/g,''));
+   if(Number.isFinite(impo)&&Number.isFinite(expo)&&(impo||expo))out.push({date:dates[d],day:d,zone,terminal,hour,impo,expo});
   }
  }
- const groups=new Map();for(const r of out){const k=r.terminal+'|'+r.hour;const a=groups.get(k)||[];a.push(r.impo+r.expo);groups.set(k,a)}
- for(const r of out){const others=groups.get(r.terminal+'|'+r.hour).filter(v=>v>0).sort((a,b)=>a-b);if(others.length>=3){const mid=others[Math.floor(others.length/2)];if(mid>0&&r.impo+r.expo>2*mid)issues.push(`${r.terminal}, ${D[r.day]}, ${r.hour}: valor atípico`)}}
- return {records:out,issues:[...new Set(issues)]};
+ // Un solo registro por fecha, hora y terminal: el pegado repetido no multiplica citas.
+ const unique=new Map();for(const r of out)unique.set([r.date,r.zone,r.terminal,r.hour].join('|'),r);
+ const results=[...unique.values()];
+ const groups=new Map();for(const r of results){const k=r.terminal+'|'+r.hour;let a=groups.get(k)||[];a.push(r.impo+r.expo);groups.set(k,a)}
+ for(const r of results){const others=groups.get(r.terminal+'|'+r.hour).filter(v=>v>0).sort((a,b)=>a-b);if(others.length>=3){const mid=others[Math.floor(others.length/2)];if(mid>0&&r.impo+r.expo>2*mid)issues.push(`${r.terminal}, ${D[r.day]}, ${r.hour}: valor atípico`)}}
+ return {records:results,issues:[...new Set(issues)]};
 }
 function store(){if(!state.balancePortal)state.balancePortal={captures:{},log:[],version:1};return state.balancePortal}
 function captureKey(week,zone,scenario){return [week,zone,scenario].join('|')}
@@ -3257,8 +3299,8 @@ function renderBalance(){const rows=balanceRows();compared=rows;const labels=[['
 function download(name,text,type){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([text],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
 function csv(){const lines=[['Semana','Zona','Terminal','Escenario','Indicador',...D,'Total']];for(const x of compared)for(const [k,t] of [['b','Antes'],['a','Después'],['delta','Incremento']])for(const z of ['impo','expo']){let arr=x[k][z];lines.push([$('bcCompareWeek').value,x.b.zone,x.b.terminal,t,z.toUpperCase(),...arr,arr.reduce((a,b)=>a+b,0)])}return lines.map(x=>x.map(y=>'"'+String(y).replace(/"/g,'""')+'"').join(',')).join('\r\n')}
 function processCapture(){const rows=readGrid();const mon=detectMonday(rows,currentHTML+'\n'+$('bcRaw').value);if(!mon){setStatus('No se identificó una fecha válida; indica el lunes para procesar esta semana.');return}const zone=$('bcZone').value,scenario=$('bcScenario').value,result=parseRecords(rows,zone,mon);const warnCount=result.issues.length;$('bcWarnings').innerHTML=warnCount?`<b>${warnCount} avisos para revisar:</b><ul>${result.issues.slice(0,35).map(x=>`<li>${x.replace(/</g,'&lt;')}</li>`).join('')}</ul>`:'Sin anomalías detectadas.';if(!result.records.length){setStatus('No se identificaron datos con terminal, hora, Impo y Expo. Comprueba el pegado.');return}if(warnCount&&!confirm(`Hay ${warnCount} avisos. ¿Guardar esta captura después de revisarlos?`))return;const v=store(),k=captureKey(mon,zone,scenario);const existing=v.captures[k];const previousCount=existing?.records.length||0;const item={week:mon,zone,scenario,records:result.records,issues:result.issues,processedAt:new Date().toISOString(),id:++changeSeq};v.captures[k]=item;v.log.push({key:k,previous:existing||null,at:item.processedAt});save();refresh();setStatus(`${result.records.length} registros procesados (${zone}, ${scenario==='before'?'antes':'después'}). ${previousCount?'Captura anterior reemplazada.':''}`)}
-function prepare(){const txt=$('bcRaw').value;let rows=currentHTML?htmlGrid(currentHTML):[];if(!rows.length)rows=textGrid(txt);if(!rows.length){setStatus('Pega primero la información cruda del portal.');return}const filtered=rows.map(row=>Array.from({length:8},(_,j)=>norm(row[j]||'')));if(filtered.length){buildGrid(filtered);setStatus(`${filtered.length} filas distribuidas en celdas. Revisa cada terminal, día, Impo y Expo antes de procesar.`)}else{setStatus('No se encontraron celdas para distribuir.')}let mon=detectMonday(rows,txt);if(mon)$('bcMonday').value=mon;}
-function init(){if(!$('bcPortal'))return;store();buildGrid();refresh();$('bcMonday').value=mondayOf(iso(new Date()));$('bcCells').addEventListener('paste',pasteInto);$('bcRaw').addEventListener('paste',e=>{currentHTML=e.clipboardData?.getData('text/html')||''});$('bcParse').onclick=prepare;$('bcProcess').onclick=processCapture;$('bcClear').onclick=()=>{currentHTML='';$('bcRaw').value='';buildGrid();setStatus('Captura limpia.');};$('bcRefresh').onclick=refresh;$('bcCompare').onclick=renderBalance;$('bcCompareZone').onchange=renderBalance;$('bcCompareTerminal').onchange=renderBalance;$('bcCompareWeek').onchange=renderBalance;$('bcWeeks').onclick=e=>{const b=e.target.closest('.bc-open');if(!b)return;$('bcCompareWeek').value=b.dataset.week;$('bcCompareZone').value=b.dataset.zone;renderBalance();};$('bcCSV').onclick=()=>{renderBalance();download('Balance_Citas.csv','\ufeff'+csv(),'text/csv;charset=utf-8')};$('bcExcel').onclick=()=>{renderBalance();if(typeof exportSimpleXlsx==='function'){const arr=csv().split('\r\n').map(line=>{const out=[];line.replace(/"((?:[^"]|"")*)"(?:,|$)/g,(_,v)=>{out.push(v.replace(/""/g,'"'));return ''});return out});exportSimpleXlsx([{name:'Balance de citas',rows:arr}],`Balance_Citas_${$('bcCompareWeek').value}.xlsx`)}else $('bcCSV').click()};$('bcPDF').onclick=()=>{renderBalance();const w=window.open('','_blank');if(!w)return alert('Habilita las ventanas emergentes para imprimir.');w.document.write('<!doctype html><html lang="es"><head><title>Balance de citas</title><style>body{font-family:Arial;margin:25px}table{width:100%;border-collapse:collapse;margin-bottom:20px}td,th{border:1px solid #aaa;padding:5px;font-size:11px}h3{color:#70072a}</style></head><body>'+$('bcResults').innerHTML+'</body></html>');w.document.close();w.focus();w.print();};$('bcUndo').onclick=()=>{const v=store(),log=v.log.pop();if(!log)return alert('No hay actualizaciones.');if(!confirm('¿Borrar la última actualización?')){v.log.push(log);return}if(log.previous)v.captures[log.key]=log.previous;else delete v.captures[log.key];save();refresh();renderBalance()};$('bcWeekDelete').onclick=()=>{const week=$('bcCompareWeek').value;if(!week)return;if(!confirm(`¿Borrar todos los datos de la semana ${week}?`))return;const v=store();Object.keys(v.captures).filter(k=>k.startsWith(week+'|')).forEach(k=>delete v.captures[k]);v.log=[];save();refresh();renderBalance()};$('bcReset').onclick=()=>{if(!confirm('¿Restablecer TODOS los registros del Balance de citas?'))return;state.balancePortal={captures:{},log:[],version:1};save();refresh();renderBalance()};}
+function prepare(){const txt=$('bcRaw').value;let rows=currentHTML?htmlGrid(currentHTML):[];if(!rows.length)rows=textGrid(txt);if(!rows.length){setStatus('Pega primero la información cruda del portal.');return}const filtered=rows.map(row=>Array.from({length:8},(_,j)=>norm(row[j]||'')));if(filtered.length){buildGrid(filtered);setStatus(`${filtered.length} filas distribuidas en 8 columnas. Ahora pulsa Procesar y guardar esta captura.`)}else{setStatus('No se encontraron celdas para distribuir.')}let mon=detectMonday(rows,txt);if(mon)$('bcMonday').value=mon;}
+function init(){if(!$('bcPortal'))return;store();buildGrid();refresh();$('bcMonday').value=mondayOf(iso(new Date()));$('bcCells').addEventListener('paste',pasteInto);$('bcRaw').addEventListener('paste',e=>{currentHTML=e.clipboardData?.getData('text/html')||''});$('bcRaw').addEventListener('input',e=>{if(!e.isTrusted)return;if(!e.inputType?.includes('insertFromPaste'))currentHTML=''});$('bcParse').onclick=prepare;$('bcProcess').onclick=processCapture;$('bcClear').onclick=()=>{currentHTML='';$('bcRaw').value='';buildGrid();setStatus('Captura limpia.');};$('bcRefresh').onclick=refresh;$('bcCompare').onclick=renderBalance;$('bcCompareZone').onchange=renderBalance;$('bcCompareTerminal').onchange=renderBalance;$('bcCompareWeek').onchange=renderBalance;$('bcWeeks').onclick=e=>{const b=e.target.closest('.bc-open');if(!b)return;$('bcCompareWeek').value=b.dataset.week;$('bcCompareZone').value=b.dataset.zone;renderBalance();};$('bcCSV').onclick=()=>{renderBalance();download('Balance_Citas.csv','\ufeff'+csv(),'text/csv;charset=utf-8')};$('bcExcel').onclick=()=>{renderBalance();if(typeof exportSimpleXlsx==='function'){const arr=csv().split('\r\n').map(line=>{const out=[];line.replace(/"((?:[^"]|"")*)"(?:,|$)/g,(_,v)=>{out.push(v.replace(/""/g,'"'));return ''});return out});exportSimpleXlsx([{name:'Balance de citas',rows:arr}],`Balance_Citas_${$('bcCompareWeek').value}.xlsx`)}else $('bcCSV').click()};$('bcPDF').onclick=()=>{renderBalance();const w=window.open('','_blank');if(!w)return alert('Habilita las ventanas emergentes para imprimir.');w.document.write('<!doctype html><html lang="es"><head><title>Balance de citas</title><style>body{font-family:Arial;margin:25px}table{width:100%;border-collapse:collapse;margin-bottom:20px}td,th{border:1px solid #aaa;padding:5px;font-size:11px}h3{color:#70072a}</style></head><body>'+$('bcResults').innerHTML+'</body></html>');w.document.close();w.focus();w.print();};$('bcUndo').onclick=()=>{const v=store(),log=v.log.pop();if(!log)return alert('No hay actualizaciones.');if(!confirm('¿Borrar la última actualización?')){v.log.push(log);return}if(log.previous)v.captures[log.key]=log.previous;else delete v.captures[log.key];save();refresh();renderBalance()};$('bcWeekDelete').onclick=()=>{const week=$('bcCompareWeek').value;if(!week)return;if(!confirm(`¿Borrar todos los datos de la semana ${week}?`))return;const v=store();Object.keys(v.captures).filter(k=>k.startsWith(week+'|')).forEach(k=>delete v.captures[k]);v.log=[];save();refresh();renderBalance()};$('bcReset').onclick=()=>{if(!confirm('¿Restablecer TODOS los registros del Balance de citas?'))return;state.balancePortal={captures:{},log:[],version:1};save();refresh();renderBalance()};}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
