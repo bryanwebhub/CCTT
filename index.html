@@ -384,7 +384,48 @@ function balGridDate(value){let v=String(value||'').trim(),m=v.match(/^(\d{1,2})
 function balGridRefreshStatus(){const {raw,zone}=balGridRef(balGridActive),content=raw[zone]||'';const dateRow=balGridRows(content).find(r=>r.slice(1).filter(c=>balGridDate(c)).length>=4);document.getElementById('balGridDates').textContent=dateRow?'Fechas detectadas: '+dateRow.slice(1).map(balGridDate).join(' · '):'Fechas: pendientes de detectar.';document.getElementById('balGridStatus').textContent=content?`${content.split('\n').length} filas con contenido`:'Sin datos capturados'}
 function balGridRender(){balGridMatrix=balGridRows(balGridRef(balGridActive).raw[balGridRef(balGridActive).zone]);const tbody=document.getElementById('balGridBody');let markup='';for(let r=0;r<BAL_GRID_ROWS;r++){markup+='<tr><td>'+(r+1)+'</td>';for(let c=0;c<BAL_GRID_COLS;c++){let v=balGridMatrix[r][c],klass=c===0&&balIsTimeRow(v)?' class="bal-grid-time"':balGridDate(v)?' class="bal-grid-date"':'';markup+=`<td${klass}><input aria-label="${String.fromCharCode(65+c)}${r+1}" data-r="${r}" data-c="${c}" value="${esc(v).replace(/&quot;/g,'&quot;')}" autocomplete="off" spellcheck="false"></td>`}markup+='</tr>'}tbody.innerHTML=markup;tbody.querySelectorAll('input[data-r]').forEach(balGridFitInput);document.querySelectorAll('[data-bal-grid]').forEach(btn=>{const active=btn.dataset.balGrid===balGridActive;btn.classList.toggle('primary',active);btn.classList.toggle('btn',true)});balGridRefreshStatus()}
 function balGridSet(key){if(balGridActive===key&&balGridReady)return;balGridFlush();balGridActive=key;balGridReady=true;balGridRender();document.getElementById('balGridScroll').scrollTop=0}
-function balGridPasteArray(text,html){if(html){const doc=new DOMParser().parseFromString(html,'text/html'),table=doc.querySelector('table');if(table){const data=[];for(const tr of table.querySelectorAll('tr')){let cells=data.length;data[cells]??=[];let col=0;for(const td of tr.children){if(!/^(TD|TH)$/i.test(td.tagName))continue;while(data[cells][col]!==undefined)col++;const value=td.innerText||td.textContent||'',span=Math.max(1,+td.getAttribute('colspan')||1),height=Math.max(1,+td.getAttribute('rowspan')||1);for(let i=0;i<height;i++){data[cells+i]??=[];for(let j=0;j<span;j++)data[cells+i][col+j]=i===0&&j===0?value.trim():''}col+=span}}return data}}return String(text||'').replace(/\r/g,'').replace(/\n$/,'').split('\n').map(r=>r.split('\t'))}
+// MODIFICADO: interpreta el portapapeles HTML de PIS, incluyendo celdas combinadas y bloques por cesionario.
+function balGridPasteArray(text,html){
+ const normal=v=>String(v??'').replace(/\u00a0/g,' ').replace(/\r/g,'').replace(/\b(Impo|Expo):\s*/gi,'$1 ').trim();
+ const plain=()=>String(text||'').replace(/\r/g,'').replace(/\n$/,'').split('\n').map(r=>r.split('\t').map(normal));
+ if(!html||!/<table[\s>]/i.test(html))return plain();
+ const doc=new DOMParser().parseFromString(html,'text/html');
+ const tables=[...doc.querySelectorAll('table')].filter(t=>t.querySelectorAll('tr').length>=2);
+ if(!tables.length)return plain();
+ // La tabla de siete días suele ser la mayor con encabezados LUNES ... DOMINGO.
+ const score=t=>{const sample=(t.textContent||'').slice(0,1800);return (/(lunes|martes|miercoles|miércoles)/i.test(sample)?10000:0)+t.querySelectorAll('tr').length*10+t.querySelectorAll('td,th').length};
+ tables.sort((x,y)=>score(y)-score(x));const table=tables[0];
+ const cellText=cell=>{const copy=cell.cloneNode(true);copy.querySelectorAll('br').forEach(br=>br.replaceWith('\n'));copy.querySelectorAll('p,div,li').forEach(el=>{el.insertAdjacentText('afterend','\n')});return normal(copy.textContent).replace(/\n\s*/g,'\n').trim()};
+ const matrix=[];let rowIndex=0;
+ for(const tr of table.querySelectorAll('tr')){
+  if(tr.closest('table')!==table)continue;
+  matrix[rowIndex]??=[];let col=0;
+  for(const td of tr.children){if(!/^(TD|TH)$/i.test(td.tagName))continue;while(matrix[rowIndex][col]!==undefined)col++;
+   const value=cellText(td),span=Math.max(1,Math.min(100,Number(td.getAttribute('colspan'))||1)),height=Math.max(1,Math.min(1127,Number(td.getAttribute('rowspan'))||1));
+   for(let r=0;r<height;r++){matrix[rowIndex+r]??=[];for(let c=0;c<span;c++)matrix[rowIndex+r][col+c]=(r===0&&c===0)?value:''}col+=span;
+  }rowIndex++;
+ }
+ // Cuando PIS entrega un bloque completo en cada celda diaria, reproducir las filas
+ // que Excel crea al pegar (terminal, Impo, Expo) antes de efectuar el balance.
+ const expanded=[];
+ for(const row of matrix){
+  if(row.length!==8){expanded.push(row.map(v=>normal(v)));continue}
+  const blocks=row.slice(1).map(v=>{
+   const src=normal(v).replace(/\n/g,' ');
+   const re=/([^\n]*?)\bImpo\s*:?\s*(-?\d+)\s*\bExpo\s*:?\s*(-?\d+)/gi;
+   let m,out=[];while((m=re.exec(src))!==null){let name=m[1].replace(/^(?:\s*Expo\s*:?\s*-?\d+\s*)+/i,'').trim();
+    // El nombre puede seguir al bloque anterior: tomar solo el último cesionario.
+    const known=[...BAL_BASE_TERMINALS].sort((a,b)=>b.length-a.length);const found=known.find(t=>new RegExp('(?:^|\\s)'+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*$','i').test(name));if(found)name=found;
+    out.push([name,'Impo '+m[2],'Expo '+m[3]]);
+   }return out;
+  });
+  const max=Math.max(...blocks.map(b=>b.length));
+  if(max>=1&&blocks.filter(b=>b.length).length>=2){
+   for(let k=0;k<max;k++)for(let line=0;line<3;line++)expanded.push([k===0&&line===0?normal(row[0]):'',...blocks.map(b=>b[k]?.[line]||'')]);
+  }else expanded.push(row.map(v=>normal(v)));
+ }
+ return expanded.length?expanded:plain();
+}
 // NUEVO: ancho visual automático; no altera el valor original ni los datos procesados.
 function balGridFitInput(input){if(!input)return;const text=String(input.value||'');const widest=text.split(/\r?\n/).reduce((n,line)=>Math.max(n,line.length),0);input.style.setProperty('--bal-cell-width',Math.min(720,Math.max(110,widest*7.4+24))+'px')}
 function balGridUpdateCell(r,c,value){if(!balGridMatrix||r<0||r>=BAL_GRID_ROWS||c<0||c>=BAL_GRID_COLS)return;balGridMatrix[r][c]=value;const input=document.querySelector(`#balGridBody input[data-r="${r}"][data-c="${c}"]`);if(input){input.value=value;balGridFitInput(input)}}
@@ -392,7 +433,8 @@ function balGridUpdateCell(r,c,value){if(!balGridMatrix||r<0||r>=BAL_GRID_ROWS||
 const balGridBody=document.getElementById('balGridBody');
 balGridBody.addEventListener('input',e=>{if(e.target.matches('input[data-r]')){balGridMatrix[+e.target.dataset.r][+e.target.dataset.c]=e.target.value;balGridFitInput(e.target)}});
 balGridBody.addEventListener('focusout',e=>{if(e.target.matches('input[data-r]')){balGridFlush();balGridRefreshStatus();save()}});
-balGridBody.addEventListener('paste',e=>{const target=e.target;if(!target.matches('input[data-r]'))return;const clip=e.clipboardData;if(!clip)return;const plain=clip.getData('text/plain'),html=clip.getData('text/html');const data=balGridPasteArray(plain,plain.includes('\t')?'':html);if(data.length===1&&data[0].length===1)return;e.preventDefault();const row=+target.dataset.r,col=+target.dataset.c;for(let r=0;r<data.length&&row+r<BAL_GRID_ROWS;r++)for(let c=0;c<data[r].length&&col+c<BAL_GRID_COLS;c++)balGridUpdateCell(row+r,col+c,String(data[r][c]??'').trim());balGridFlush();balGridRefreshStatus();save();toast(`Pegadas ${Math.min(data.length,BAL_GRID_ROWS-row)} filas desde la celda ${target.getAttribute('aria-label')}.`)});
+balGridBody.addEventListener('paste',e=>{const target=e.target;if(!target.matches('input[data-r]'))return;const clip=e.clipboardData;if(!clip)return;const plain=clip.getData('text/plain'),html=clip.getData('text/html');// MODIFICADO: prioriza HTML estructurado de PIS aunque el texto plano contenga tabulaciones.
+const data=balGridPasteArray(plain,html);if(data.length===1&&data[0].length===1&&!html)return;e.preventDefault();const row=+target.dataset.r,col=+target.dataset.c;for(let r=0;r<data.length&&row+r<BAL_GRID_ROWS;r++)for(let c=0;c<data[r].length&&col+c<BAL_GRID_COLS;c++)balGridUpdateCell(row+r,col+c,String(data[r][c]??'').replace(/\u00a0/g,' ').replace(/\b(Impo|Expo):\s*/gi,'$1 ').replace(/\s*\n\s*/g,' ').trim());balGridFlush();balGridRefreshStatus();save();toast(`Pegadas ${Math.min(data.length,BAL_GRID_ROWS-row)} filas desde la celda ${target.getAttribute('aria-label')}.`)});
 balGridBody.addEventListener('keydown',e=>{const t=e.target;if(!t.matches('input[data-r]')||e.ctrlKey||e.metaKey||e.altKey)return;let r=+t.dataset.r,c=+t.dataset.c;if(e.key==='Enter'){r=Math.min(BAL_GRID_ROWS-1,r+1)}else if(e.key==='ArrowDown'){r=Math.min(BAL_GRID_ROWS-1,r+1)}else if(e.key==='ArrowUp'){r=Math.max(0,r-1)}else if(e.key==='Tab'){c+=e.shiftKey?-1:1;if(c>=BAL_GRID_COLS){c=0;r=Math.min(BAL_GRID_ROWS-1,r+1)}if(c<0){c=BAL_GRID_COLS-1;r=Math.max(0,r-1)}}else return;if(e.key.startsWith('Arrow')&&t.selectionStart!==t.selectionEnd)return;e.preventDefault();const next=balGridBody.querySelector(`input[data-r="${r}"][data-c="${c}"]`);if(next){next.focus();next.select()}});
 document.getElementById('balGridTabs').addEventListener('click',e=>{const btn=e.target.closest('[data-bal-grid]');if(btn)balGridSet(btn.dataset.balGrid)});
 document.getElementById('balGridProcess').onclick=balProcessPasted;
