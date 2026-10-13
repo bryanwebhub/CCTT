@@ -67,6 +67,9 @@
 .bal-grid-switch{margin-top:14px}.bal-grid-scroll{height:510px;overflow:auto;border:1px solid #cbd7e5;border-radius:10px;background:#fff}.bal-grid-table{border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:930px;width:100%;font:12px Arial,sans-serif}.bal-grid-table th{position:sticky;top:0;background:#e8eff8;color:#17375e;z-index:2;border-bottom:1px solid #9baec6}.bal-grid-table th:first-child{left:0;z-index:4}.bal-grid-table th,.bal-grid-table td{padding:0;border-right:1px solid #d8e1ec;border-bottom:1px solid #e1e6ed}.bal-grid-table th:first-child,.bal-grid-table td:first-child{width:52px;min-width:52px;position:sticky;left:0;text-align:center;background:#f2f5f9;color:#5a687d}.bal-grid-table th:not(:first-child){min-width:109px}.bal-grid-table input{border:0;border-radius:0;background:transparent;display:block;width:100%;height:27px;padding:4px 6px;font:inherit;color:#1c2c42;outline:none}.bal-grid-table input:focus{background:#e8f2ff;box-shadow:inset 0 0 0 2px #3676c6}.bal-grid-table .bal-grid-date input{background:#effaf3;color:#167146}.bal-grid-table .bal-grid-time input{background:#fff8e5;font-weight:700}
 /* MODIFICADO: la cuadrícula admite contenido de anchura variable sin imponer formato a las celdas. */
 .bal-grid-table{table-layout:auto;width:max-content;min-width:100%}.bal-grid-table td:not(:first-child){min-width:110px;width:auto}.bal-grid-table input{width:var(--bal-cell-width,110px);min-width:110px;max-width:none;white-space:pre;height:29px}.bal-grid-table th:not(:first-child){min-width:110px;white-space:nowrap}
+
+/* NUEVO: colores y bordes de las celdas del balance al copiar a Excel. */
+#page-balance .bal-grid-table td.bal-grid-terminal{background:#f2f5fb;font-weight:700;border-top:1px solid #a8b6c7}#page-balance .bal-grid-table td.bal-grid-impo{background:#f1f8ff}#page-balance .bal-grid-table td.bal-grid-expo{background:#f5fbf1}#page-balance .bal-grid-table td.bal-grid-date{background:#e4eef8;border-bottom:2px solid #9db0cb}
 </style>
 <script>window.__ccttReportRenderToken=0;</script>
 </head>
@@ -157,7 +160,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
       <button type="button" class="btn" data-bal-grid="after|north">Después · Zona Norte</button>
       <button type="button" class="btn" data-bal-grid="after|south">Después · Zona Sur</button>
     </div>
-    <div class="row" style="margin:10px 0"><button type="button" class="btn primary" id="balGridProcess">Procesar cuadrículas</button><button type="button" class="btn" id="balGridClear">Limpiar cuadrícula activa</button><span class="muted" id="balGridDates">Fechas: pendientes de detectar.</span></div>
+    <div class="row" style="margin:10px 0"><button type="button" class="btn primary" id="balGridProcess">Procesar cuadrículas</button><!-- NUEVO: copia en formato de tabla para Excel --><button type="button" class="btn" id="balGridCopy">Copiar tabla para Excel</button><button type="button" class="btn" id="balGridClear">Limpiar cuadrícula activa</button><span class="muted" id="balGridDates">Fechas: pendientes de detectar.</span></div>
     <div class="bal-grid-scroll" id="balGridScroll"><table class="bal-grid-table" id="balGridTable" aria-label="Cuadrícula editable de 1127 filas y 8 columnas"><thead><tr><th>#</th><th>A · Hora</th><th>B · Lunes</th><th>C · Martes</th><th>D · Miércoles</th><th>E · Jueves</th><th>F · Viernes</th><th>G · Sábado</th><th>H · Domingo</th></tr></thead><tbody id="balGridBody"></tbody></table></div>
     <p class="muted" id="balGridHelp">Una tabla a la vez está visible; las cuatro conservan sus datos por separado. Puede moverse con Tab, Intro y las flechas.</p>
   </div>
@@ -382,49 +385,40 @@ function balGridText(rows){let last=rows.length-1;while(last>=0&&rows[last].ever
 function balGridFlush(){if(!balGridMatrix)return;const {zone,raw}=balGridRef(balGridActive);raw[zone]=balGridText(balGridMatrix)}
 function balGridDate(value){let v=String(value||'').trim(),m=v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);if(m){let y=+m[3];if(y<100)y+=2000;const date=new Date(y,+m[2]-1,+m[1]);return date.getFullYear()===y&&date.getMonth()===+m[2]-1&&date.getDate()===+m[1]?`${m[1].padStart(2,'0')}/${m[2].padStart(2,'0')}/${y}`:''}if(/^\d{4}-\d{2}-\d{2}$/.test(v)){const x=v.split('-');return `${x[2]}/${x[1]}/${x[0]}`}if(/^\d{5}(?:\.\d+)?$/.test(v)){const d=new Date(Date.UTC(1899,11,30)+Math.floor(+v)*86400000);return `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`}return ''}
 function balGridRefreshStatus(){const {raw,zone}=balGridRef(balGridActive),content=raw[zone]||'';const dateRow=balGridRows(content).find(r=>r.slice(1).filter(c=>balGridDate(c)).length>=4);document.getElementById('balGridDates').textContent=dateRow?'Fechas detectadas: '+dateRow.slice(1).map(balGridDate).join(' · '):'Fechas: pendientes de detectar.';document.getElementById('balGridStatus').textContent=content?`${content.split('\n').length} filas con contenido`:'Sin datos capturados'}
-function balGridRender(){balGridMatrix=balGridRows(balGridRef(balGridActive).raw[balGridRef(balGridActive).zone]);const tbody=document.getElementById('balGridBody');let markup='';for(let r=0;r<BAL_GRID_ROWS;r++){markup+='<tr><td>'+(r+1)+'</td>';for(let c=0;c<BAL_GRID_COLS;c++){let v=balGridMatrix[r][c],klass=c===0&&balIsTimeRow(v)?' class="bal-grid-time"':balGridDate(v)?' class="bal-grid-date"':'';markup+=`<td${klass}><input aria-label="${String.fromCharCode(65+c)}${r+1}" data-r="${r}" data-c="${c}" value="${esc(v).replace(/&quot;/g,'&quot;')}" autocomplete="off" spellcheck="false"></td>`}markup+='</tr>'}tbody.innerHTML=markup;tbody.querySelectorAll('input[data-r]').forEach(balGridFitInput);document.querySelectorAll('[data-bal-grid]').forEach(btn=>{const active=btn.dataset.balGrid===balGridActive;btn.classList.toggle('primary',active);btn.classList.toggle('btn',true)});balGridRefreshStatus()}
+function balGridRender(){balGridMatrix=balGridRows(balGridRef(balGridActive).raw[balGridRef(balGridActive).zone]);const tbody=document.getElementById('balGridBody');let markup='';for(let r=0;r<BAL_GRID_ROWS;r++){markup+='<tr><td>'+(r+1)+'</td>';for(let c=0;c<BAL_GRID_COLS;c++){let v=balGridMatrix[r][c],kind=c===0&&balIsTimeRow(v)?'time':balGridDate(v)?'date':BAL_BASE_TERMINALS.some(t=>t===String(v).trim().toUpperCase())?'terminal':/^Impo\s+\d+/i.test(v)?'impo':/^Expo\s+\d+/i.test(v)?'expo':'',klass=kind?' class="bal-grid-'+kind+'"':'';markup+=`<td${klass}><input aria-label="${String.fromCharCode(65+c)}${r+1}" data-r="${r}" data-c="${c}" value="${esc(v).replace(/&quot;/g,'&quot;')}" autocomplete="off" spellcheck="false"></td>`}markup+='</tr>'}tbody.innerHTML=markup;tbody.querySelectorAll('input[data-r]').forEach(balGridFitInput);document.querySelectorAll('[data-bal-grid]').forEach(btn=>{const active=btn.dataset.balGrid===balGridActive;btn.classList.toggle('primary',active);btn.classList.toggle('btn',true)});balGridRefreshStatus()}
 function balGridSet(key){if(balGridActive===key&&balGridReady)return;balGridFlush();balGridActive=key;balGridReady=true;balGridRender();document.getElementById('balGridScroll').scrollTop=0}
 // MODIFICADO: interpreta el portapapeles HTML de PIS, incluyendo celdas combinadas y bloques por cesionario.
+// MODIFICADO: interpreta la tabla HTML de PIS, incluidas sus celdas por día y bloques internos.
 function balGridPasteArray(text,html){
  const normal=v=>String(v??'').replace(/\u00a0/g,' ').replace(/\r/g,'').replace(/\b(Impo|Expo):\s*/gi,'$1 ').trim();
  const plain=()=>String(text||'').replace(/\r/g,'').replace(/\n$/,'').split('\n').map(r=>r.split('\t').map(normal));
- if(!html||!/<table[\s>]/i.test(html))return plain();
+ const terminals=BAL_BASE_TERMINALS.slice().sort((a,b)=>b.length-a.length);
+ const termPattern=terminals.map(v=>v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
+ const rx=new RegExp('('+termPattern+')\\s*Impo\\s*:?\\s*(-?\\d+)\\s*Expo\\s*:?\\s*(-?\\d+)','gi');
+ function blocks(value){const v=String(value||'').replace(/\u00a0/g,' ').replace(/\s+/g,' ');let out=[],m;rx.lastIndex=0;while((m=rx.exec(v))!==null)out.push([m[1].toUpperCase(),'Impo '+m[2],'Expo '+m[3]]);return out}
+ function expand(matrix){const out=[];for(const original of matrix){const row=Array.from({length:8},(_,i)=>normal(original?.[i]||''));const match=row.slice(1).map(blocks),max=Math.max(0,...match.map(x=>x.length));
+   if(max&&match.filter(x=>x.length).length>=2){for(let k=0;k<max;k++)for(let line=0;line<3;line++)out.push([k===0&&line===0?row[0]:'',...match.map(x=>x[k]?.[line]||'')]);continue}
+   // Cabeceras de PIS pueden contener día y fecha juntos dentro de cada celda.
+   if(row.slice(1).filter(v=>/(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)/i.test(v)).length>=4){out.push(['Hora',...row.slice(1).map(v=>(v.match(/\d{1,2}[/-]\d{1,2}[/-]\d{4}/)||[])[0]||v)]);continue}
+   out.push(row);
+  }return out}
+ if(!html||!/<table[\s>]/i.test(html))return expand(plain());
  const doc=new DOMParser().parseFromString(html,'text/html');
  const tables=[...doc.querySelectorAll('table')].filter(t=>t.querySelectorAll('tr').length>=2);
- if(!tables.length)return plain();
- // La tabla de siete días suele ser la mayor con encabezados LUNES ... DOMINGO.
- const score=t=>{const sample=(t.textContent||'').slice(0,1800);return (/(lunes|martes|miercoles|miércoles)/i.test(sample)?10000:0)+t.querySelectorAll('tr').length*10+t.querySelectorAll('td,th').length};
+ if(!tables.length)return expand(plain());
+ const score=t=>{const sample=(t.textContent||'').slice(0,5000);return (/(lunes|martes|mi[eé]rcoles)/i.test(sample)?100000:0)+(sample.match(/Impo\s*:/gi)||[]).length*50+t.querySelectorAll('tr').length*10};
  tables.sort((x,y)=>score(y)-score(x));const table=tables[0];
- const cellText=cell=>{const copy=cell.cloneNode(true);copy.querySelectorAll('br').forEach(br=>br.replaceWith('\n'));copy.querySelectorAll('p,div,li').forEach(el=>{el.insertAdjacentText('afterend','\n')});return normal(copy.textContent).replace(/\n\s*/g,'\n').trim()};
+ const cellText=cell=>{const clone=cell.cloneNode(true);clone.querySelectorAll('script,style').forEach(n=>n.remove());clone.querySelectorAll('br').forEach(n=>n.replaceWith('\n'));clone.querySelectorAll('p,div,li').forEach(n=>n.append('\n'));return normal(clone.textContent).replace(/\n\s*/g,'\n')};
  const matrix=[];let rowIndex=0;
- for(const tr of table.querySelectorAll('tr')){
-  if(tr.closest('table')!==table)continue;
-  matrix[rowIndex]??=[];let col=0;
+ for(const tr of table.querySelectorAll('tr')){if(tr.closest('table')!==table)continue;matrix[rowIndex]??=[];let col=0;
   for(const td of tr.children){if(!/^(TD|TH)$/i.test(td.tagName))continue;while(matrix[rowIndex][col]!==undefined)col++;
-   const value=cellText(td),span=Math.max(1,Math.min(100,Number(td.getAttribute('colspan'))||1)),height=Math.max(1,Math.min(1127,Number(td.getAttribute('rowspan'))||1));
+   const value=cellText(td),span=Math.max(1,Math.min(8,Number(td.getAttribute('colspan'))||1)),height=Math.max(1,Math.min(BAL_GRID_ROWS,Number(td.getAttribute('rowspan'))||1));
    for(let r=0;r<height;r++){matrix[rowIndex+r]??=[];for(let c=0;c<span;c++)matrix[rowIndex+r][col+c]=(r===0&&c===0)?value:''}col+=span;
   }rowIndex++;
  }
- // Cuando PIS entrega un bloque completo en cada celda diaria, reproducir las filas
- // que Excel crea al pegar (terminal, Impo, Expo) antes de efectuar el balance.
- const expanded=[];
- for(const row of matrix){
-  if(row.length!==8){expanded.push(row.map(v=>normal(v)));continue}
-  const blocks=row.slice(1).map(v=>{
-   const src=normal(v).replace(/\n/g,' ');
-   const re=/([^\n]*?)\bImpo\s*:?\s*(-?\d+)\s*\bExpo\s*:?\s*(-?\d+)/gi;
-   let m,out=[];while((m=re.exec(src))!==null){let name=m[1].replace(/^(?:\s*Expo\s*:?\s*-?\d+\s*)+/i,'').trim();
-    // El nombre puede seguir al bloque anterior: tomar solo el último cesionario.
-    const known=[...BAL_BASE_TERMINALS].sort((a,b)=>b.length-a.length);const found=known.find(t=>new RegExp('(?:^|\\s)'+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*$','i').test(name));if(found)name=found;
-    out.push([name,'Impo '+m[2],'Expo '+m[3]]);
-   }return out;
-  });
-  const max=Math.max(...blocks.map(b=>b.length));
-  if(max>=1&&blocks.filter(b=>b.length).length>=2){
-   for(let k=0;k<max;k++)for(let line=0;line<3;line++)expanded.push([k===0&&line===0?normal(row[0]):'',...blocks.map(b=>b[k]?.[line]||'')]);
-  }else expanded.push(row.map(v=>normal(v)));
- }
- return expanded.length?expanded:plain();
+ const result=expand(matrix);
+ // Cuando la selección HTML perdió alguna columna, utilizar el texto tabulado si es más completo.
+ const fallback=expand(plain());return result.some(r=>r.slice(1).some(v=>/^Impo\s+\d+/i.test(v)))||result.filter(r=>r.slice(1).some(Boolean)).length>=fallback.length?result:fallback;
 }
 // NUEVO: ancho visual automático; no altera el valor original ni los datos procesados.
 function balGridFitInput(input){if(!input)return;const text=String(input.value||'');const widest=text.split(/\r?\n/).reduce((n,line)=>Math.max(n,line.length),0);input.style.setProperty('--bal-cell-width',Math.min(720,Math.max(110,widest*7.4+24))+'px')}
@@ -437,6 +431,15 @@ balGridBody.addEventListener('paste',e=>{const target=e.target;if(!target.matche
 const data=balGridPasteArray(plain,html);if(data.length===1&&data[0].length===1&&!html)return;e.preventDefault();const row=+target.dataset.r,col=+target.dataset.c;for(let r=0;r<data.length&&row+r<BAL_GRID_ROWS;r++)for(let c=0;c<data[r].length&&col+c<BAL_GRID_COLS;c++)balGridUpdateCell(row+r,col+c,String(data[r][c]??'').replace(/\u00a0/g,' ').replace(/\b(Impo|Expo):\s*/gi,'$1 ').replace(/\s*\n\s*/g,' ').trim());balGridFlush();balGridRefreshStatus();save();toast(`Pegadas ${Math.min(data.length,BAL_GRID_ROWS-row)} filas desde la celda ${target.getAttribute('aria-label')}.`)});
 balGridBody.addEventListener('keydown',e=>{const t=e.target;if(!t.matches('input[data-r]')||e.ctrlKey||e.metaKey||e.altKey)return;let r=+t.dataset.r,c=+t.dataset.c;if(e.key==='Enter'){r=Math.min(BAL_GRID_ROWS-1,r+1)}else if(e.key==='ArrowDown'){r=Math.min(BAL_GRID_ROWS-1,r+1)}else if(e.key==='ArrowUp'){r=Math.max(0,r-1)}else if(e.key==='Tab'){c+=e.shiftKey?-1:1;if(c>=BAL_GRID_COLS){c=0;r=Math.min(BAL_GRID_ROWS-1,r+1)}if(c<0){c=BAL_GRID_COLS-1;r=Math.max(0,r-1)}}else return;if(e.key.startsWith('Arrow')&&t.selectionStart!==t.selectionEnd)return;e.preventDefault();const next=balGridBody.querySelector(`input[data-r="${r}"][data-c="${c}"]`);if(next){next.focus();next.select()}});
 document.getElementById('balGridTabs').addEventListener('click',e=>{const btn=e.target.closest('[data-bal-grid]');if(btn)balGridSet(btn.dataset.balGrid)});
+// NUEVO: copia HTML tabular con formato en línea (Excel conserva filas, columnas, fondos y bordes).
+document.getElementById('balGridCopy').onclick=async()=>{
+ balGridFlush();const rows=balGridMatrix||[];let last=rows.length-1;while(last>=0&&rows[last].every(v=>!v))last--;
+ if(last<0){toast('La cuadrícula no contiene información para copiar.',true);return}
+ const clean=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+ const html='<table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:12px"><tbody>'+rows.slice(0,last+1).map(row=>'<tr>'+row.map((value,c)=>{const v=String(value||''),kind=balGridDate(v)?'date':c===0&&balIsTimeRow(v)?'time':BAL_BASE_TERMINALS.includes(v.toUpperCase())?'terminal':/^Impo\s+\d+/i.test(v)?'impo':/^Expo\s+\d+/i.test(v)?'expo':'';const bg={date:'#e4eef8',time:'#fff8e5',terminal:'#f2f5fb',impo:'#f1f8ff',expo:'#f5fbf1'}[kind]||'#ffffff';return '<td style="border:1px solid #cbd5e1;background-color:'+bg+';padding:4px 7px">'+clean(v)+'</td>'}).join('')+'</tr>').join('')+'</tbody></table>';
+ const plain=rows.slice(0,last+1).map(row=>row.join('\t')).join('\n');
+ try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);toast('Tabla copiada: puede pegarla en Excel conservando filas, columnas y formato.')}catch(err){try{await navigator.clipboard.writeText(plain);toast('Copiado como tabla de texto; el navegador no permitió copiar los colores.')}catch(e){toast('El navegador bloqueó el portapapeles.',true)}}
+};
 document.getElementById('balGridProcess').onclick=balProcessPasted;
 document.getElementById('balGridClear').onclick=()=>{if(!confirm('¿Borrar los datos pegados de la cuadrícula activa?'))return;const {raw,zone}=balGridRef(balGridActive);raw[zone]='';balGridMatrix=null;balGridRender();save();toast('Cuadrícula activa limpiada. Pulse Procesar cuadrículas para recalcular los resultados.')};
 balGridSet('before|north');
