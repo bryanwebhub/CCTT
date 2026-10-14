@@ -3480,7 +3480,85 @@ async function removeTask(){const row=tasks.find(x=>x.id===selectedTask);if(!row
 function showDetails(){const r=tasks.find(x=>x.id===selectedTask);if(!r)return;E('conDetails').style.display='block';E('conDetailText').innerHTML=`<strong>${safe(r.title)}</strong><p>${safe(r.context).replace(/\n/g,'<br>')}</p><p class="muted">Vencimiento: ${safe(dateLabel(r))} · Estado: ${safe(r.status)}</p>`}
 function renderTasks(){const node=E('conNodes'),edge=E('conEdges');E('conEmpty').style.display=tasks.length?'none':'';const cols=Math.min(4,Math.max(1,Math.ceil(Math.sqrt(tasks.length)))),rows=Math.max(1,Math.ceil(tasks.length/cols)),height=Math.max(330,rows*132+50);E('conMap').style.minHeight=height+'px';const coords=new Map();let html='';tasks.forEach((t,i)=>{const col=i%cols,row=Math.floor(i/cols),x=(col+.5)/cols*100,y=52+row*132;coords.set(t.id,{x,y});html+=`<button class="con-bubble ${selectedTask===t.id?'active':''}" data-con-id="${safe(t.id)}" data-status="${safe(t.status)}" data-overdue="${t.status!=='atendida'&&!!t.deadline&&new Date(t.deadline)<new Date()}" style="left:calc(${x}% - 76px);top:${y-37}px">${safe(t.title)}<small style="display:block;font-weight:500;margin-top:5px">${safe(t.status)}</small></button>`});node.innerHTML=html;let paths='';const done=new Set();for(const t of tasks)for(const id of t.related_ids||[]){if(!coords.has(id))continue;const k=[t.id,id].sort().join('|');if(done.has(k))continue;done.add(k);const a=coords.get(t.id),b=coords.get(id);paths+=`<line x1="${a.x}%" y1="${a.y}" x2="${b.x}%" y2="${b.y}" stroke="#4484aa" stroke-width="2"/>`}edge.innerHTML=paths;linksEditor()}
 function init(){if(!E('expRows'))return;E('expSearch').addEventListener('input',renderPeople);E('expAreaFilter').onchange=renderPeople;E('expClearSearch').onclick=()=>{E('expSearch').value='';E('expAreaFilter').value='';renderPeople()};E('expSave').onclick=savePerson;E('expReset').onclick=()=>setForm();E('expImport').onclick=importFile;E('expRows').onclick=e=>{const b=e.target.closest('[data-exp-edit]');if(!b)return;const p=people.find(x=>x.id===b.dataset.expEdit);if(p){setForm(p);E('expForm').scrollIntoView({behavior:'smooth',block:'start'})}};E('conSave').onclick=saveTask;E('conReset').onclick=cleanTaskForm;E('conNodes').onclick=e=>{const b=e.target.closest('[data-con-id]');if(!b)return;selectedTask=b.dataset.conId;renderTasks();showDetails()};E('conEdit').onclick=()=>{const x=tasks.find(t=>t.id===selectedTask);if(!x)return;editingTask=x.id;E('conTitle').value=x.title;E('conContext').value=x.context;if(x.deadline){E('conDate').value=x.deadline.slice(0,10);E('conTime').value=x.deadline.slice(11,16)}E('conEditLabel').textContent='Editando consigna';linksEditor();E('conTitle').scrollIntoView({behavior:'smooth'})};E('conActive').onclick=()=>changeStatus('vigente');E('conDone').onclick=()=>changeStatus('atendida');E('conDelete').onclick=removeTask;window.addEventListener('cctt:session',()=>load());window.addEventListener('cctt:logout',()=>{people=[];tasks=[];loaded=false;renderPeople();renderTasks()});getClient()?.auth.getSession().then(({data})=>{if(data?.session)load()});renderPeople();renderTasks()}
+
+/* NUEVO: confirmación institucional y vínculos interactivos de Consignas. */
+const conDialog=document.createElement('div');conDialog.id='ccttConDialog';conDialog.hidden=true;
+conDialog.innerHTML='<div class="cctt-con-dialog-panel" role="dialog" aria-modal="true" aria-labelledby="ccttConDialogTitle"><h3 id="ccttConDialogTitle">Confirmar eliminación</h3><p id="ccttConDialogBody"></p><div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="ccttConCancel">Cancelar</button><button type="button" class="btn bad" id="ccttConAccept">Eliminar consigna</button></div></div>';
+document.body.append(conDialog);
+let conPreviousFocus=null;
+const dismissConDialog=()=>{conDialog.hidden=true;conPreviousFocus?.focus?.();conPreviousFocus=null};
+E('ccttConCancel').onclick=dismissConDialog;
+conDialog.addEventListener('click',ev=>{if(ev.target===conDialog)dismissConDialog()});
+document.addEventListener('keydown',ev=>{if(conDialog.hidden)return;if(ev.key==='Escape'){ev.preventDefault();dismissConDialog()}if(ev.key==='Tab'){const els=[E('ccttConCancel'),E('ccttConAccept')];if(ev.shiftKey&&document.activeElement===els[0]){ev.preventDefault();els[1].focus()}else if(!ev.shiftKey&&document.activeElement===els[1]){ev.preventDefault();els[0].focus()}}},true);
+// NUEVO: se sustituye solo el manejador de eliminación de Consignas; se conservan los demás confirm() existentes.
+const originalConsignaDelete=removeTask;
+removeTask=async function(){
+ const row=tasks.find(t=>t.id===selectedTask);if(!row)return;
+ conPreviousFocus=document.activeElement;E('ccttConDialogBody').textContent=`¿Eliminar definitivamente «${row.title}»? Las demás consignas conservarán sus conexiones.`;
+ conDialog.hidden=false;E('ccttConCancel').focus();
+ E('ccttConAccept').onclick=async()=>{
+  const btn=E('ccttConAccept');btn.disabled=true;btn.textContent='Eliminando…';
+  try{const db=getClient();await request('',db.from('cctt_consignas').delete().eq('id',row.id));
+   for(const t of tasks.filter(x=>x.id!==row.id&&x.related_ids?.includes(row.id)))await request('',db.from('cctt_consignas').update({related_ids:t.related_ids.filter(id=>id!==row.id)}).eq('id',t.id));
+   selectedTask=null;E('conDetails').style.display='none';dismissConDialog();await load();toast('Consigna eliminada.');
+  }catch(e){err(e)}finally{btn.disabled=false;btn.textContent='Eliminar consigna'}
+ };
+};
+// NUEVO: acciones de conexión mediante dos pulsaciones y desplazamiento libre de burbujas.
+const conToolbar=document.createElement('div');conToolbar.className='cctt-con-network-toolbar row';
+conToolbar.innerHTML='<button type="button" class="btn" id="ccttConConnect">Conectar consignas</button><button type="button" class="btn" id="ccttConDisconnect">Quitar conexión</button><button type="button" class="btn" id="ccttConArrange">Reorganizar red</button><span class="muted" id="ccttConGuide" aria-live="polite">Puedes arrastrar las burbujas para organizar la red.</span>';
+E('conMap').parentElement.insertBefore(conToolbar,E('conMap'));
+let connectionMode='',connectionStart=null;
+const nodePositions=new Map();
+function redrawConEdges(){const svg=E('conEdges'),map=E('conMap'),bounds=map.getBoundingClientRect();svg.setAttribute('viewBox',`0 0 ${map.clientWidth} ${map.clientHeight}`);let lines='';const visited=new Set();
+ for(const t of tasks)for(const related of t.related_ids||[]){const partner=tasks.find(v=>v.id===related);if(!partner)continue;const key=[t.id,related].sort().join('|');if(visited.has(key))continue;visited.add(key);
+  const a=E('conNodes').querySelector(`[data-con-id="${CSS.escape(t.id)}"]`),b=E('conNodes').querySelector(`[data-con-id="${CSS.escape(related)}"]`);if(!a||!b)continue;
+  const ax=a.offsetLeft+a.offsetWidth/2,ay=a.offsetTop+a.offsetHeight/2,bx=b.offsetLeft+b.offsetWidth/2,by=b.offsetTop+b.offsetHeight/2;
+  lines+=`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="#487fad" stroke-width="2.5" opacity=".8"/>`;
+ }svg.innerHTML=lines;
+}
+const formerRenderTasks=renderTasks;
+renderTasks=function(){formerRenderTasks();const nodes=E('conNodes').querySelectorAll('[data-con-id]');nodes.forEach(b=>{const pos=nodePositions.get(b.dataset.conId);if(pos){b.style.left=pos.x+'px';b.style.top=pos.y+'px';}b.setAttribute('title','Pulsar para consultar o vincular; arrastrar para mover');});redrawConEdges()};
+function mode(mode){connectionMode=connectionMode===mode?'':mode;connectionStart=null;E('ccttConConnect').classList.toggle('primary',connectionMode==='connect');E('ccttConDisconnect').classList.toggle('bad',connectionMode==='disconnect');E('ccttConGuide').textContent=connectionMode?'Selecciona la primera burbuja y luego la segunda para '+(connectionMode==='connect'?'conectarlas.':'separarlas.'):'Puedes arrastrar las burbujas para organizar la red.';}
+E('ccttConConnect').onclick=()=>mode('connect');E('ccttConDisconnect').onclick=()=>mode('disconnect');E('ccttConArrange').onclick=()=>{nodePositions.clear();renderTasks()};
+let drag=null,suppressClick=false;
+E('conNodes').addEventListener('pointerdown',ev=>{if(connectionMode)return;const el=ev.target.closest('[data-con-id]');if(!el)return;drag={el,id:el.dataset.conId,x:ev.clientX,y:ev.clientY,left:el.offsetLeft,top:el.offsetTop,moved:false};el.setPointerCapture(ev.pointerId)},true);
+E('conNodes').addEventListener('pointermove',ev=>{if(!drag)return;const dx=ev.clientX-drag.x,dy=ev.clientY-drag.y;if(Math.hypot(dx,dy)<5&&!drag.moved)return;drag.moved=true;drag.el.style.left=Math.max(0,Math.min(E('conMap').clientWidth-drag.el.offsetWidth,drag.left+dx))+'px';drag.el.style.top=Math.max(0,Math.min(E('conMap').clientHeight-drag.el.offsetHeight,drag.top+dy))+'px';nodePositions.set(drag.id,{x:drag.el.offsetLeft,y:drag.el.offsetTop});redrawConEdges();},true);
+E('conNodes').addEventListener('pointerup',()=>{if(drag?.moved){suppressClick=true;setTimeout(()=>suppressClick=false,0)}drag=null},true);
+E('conNodes').addEventListener('click',async ev=>{const b=ev.target.closest('[data-con-id]');if(!b)return;if(suppressClick){ev.preventDefault();ev.stopImmediatePropagation();return}if(!connectionMode)return;
+ ev.preventDefault();ev.stopImmediatePropagation();const id=b.dataset.conId;if(!connectionStart){connectionStart=id;E('ccttConGuide').textContent='Ahora selecciona la segunda consigna.';return}if(id===connectionStart)return;
+ const first=tasks.find(t=>t.id===connectionStart),second=tasks.find(t=>t.id===id);const kind=connectionMode;mode('');if(!first||!second)return;
+ const update=async(t,other)=>{const rel=new Set(t.related_ids||[]);if(kind==='connect')rel.add(other);else rel.delete(other);await request('',getClient().from('cctt_consignas').update({related_ids:[...rel],updated_at:new Date().toISOString()}).eq('id',t.id))};
+ try{await update(first,id);await update(second,first.id);await load();toast(kind==='connect'?'Consignas vinculadas.':'Conexión eliminada.')}catch(e){err(e)}
+},true);
+window.addEventListener('resize',()=>{if(E('conMap').offsetParent)redrawConEdges()});
+
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+<!-- NUEVO: estilos aislados para contraseña visible, menú móvil y diálogo de Consignas. -->
+<style id="cctt-requested-ui-style">
+.cctt-password-box{position:relative}.cctt-password-box #ccttLoginPassword{padding-right:105px}.cctt-password-toggle{position:absolute;right:5px;top:4px;border:0;background:#e9eef5;color:#203a5b;border-radius:7px;padding:7px 9px;min-height:32px;cursor:pointer;font-size:12px;font-weight:800}
+#ccttConDialog[hidden]{display:none!important}#ccttConDialog{position:fixed;inset:0;z-index:99999;background:#09172c9e;display:grid;place-items:center;padding:20px}.cctt-con-dialog-panel{width:min(460px,100%);background:white;border:1px solid #dce4ef;border-radius:17px;padding:22px;box-shadow:0 22px 70px #0004}.cctt-con-dialog-panel h3{margin:0 0 12px;color:#650924}.cctt-con-dialog-panel p{line-height:1.5}.cctt-con-network-toolbar{margin-top:12px}.con-bubble{touch-action:none;user-select:none}.con-map #conNodes{position:relative;min-height:inherit}
+.cctt-mobile-hamburger{display:none;border:1px solid #dce4ef;background:white;border-radius:10px;padding:9px 12px;font-size:22px;line-height:1;cursor:pointer;color:#650924}.cctt-mobile-backdrop{display:none}
+@media(max-width:720px){.cctt-mobile-hamburger{display:inline-flex;align-items:center;justify-content:center;margin-right:10px}.topbar{justify-content:flex-start}.topbar .profile-mini{margin-left:auto}.app .sidebar{display:none!important}.app .sidebar.cctt-mobile-open{display:block!important;position:fixed;top:0;bottom:0;left:0;width:min(305px,85vw);height:100dvh;overflow-y:auto;overflow-x:hidden;padding:18px 14px;z-index:10003;box-shadow:0 20px 45px #0005}.app .sidebar.cctt-mobile-open .brand-text,.app .sidebar.cctt-mobile-open .navbtn .lbl,.app .sidebar.cctt-mobile-open .nav-title{display:block}.app .sidebar.cctt-mobile-open .navbtn{justify-content:flex-start;width:100%}.cctt-mobile-backdrop.cctt-mobile-open{display:block;position:fixed;inset:0;background:#081b37a8;z-index:10002}.cctt-con-network-toolbar .btn{font-size:12px;padding:8px}.con-map{overflow:hidden}}
+</style>
+<!-- NUEVO: comportamientos aislados de inicio de sesión y menú móvil. -->
+<script id="cctt-requested-ui-script">
+(()=>{'use strict';
+ const setup=()=>{
+  const pass=document.getElementById('ccttLoginPassword');if(pass&&!document.getElementById('ccttPasswordToggle')){const box=document.createElement('div');box.className='cctt-password-box';pass.parentNode.insertBefore(box,pass);box.append(pass);const btn=document.createElement('button');btn.type='button';btn.className='cctt-password-toggle';btn.id='ccttPasswordToggle';btn.textContent='Mostrar';btn.setAttribute('aria-label','Mostrar contraseña');btn.setAttribute('aria-pressed','false');box.append(btn);btn.onclick=()=>{const reveal=pass.type==='password';pass.type=reveal?'text':'password';btn.textContent=reveal?'Ocultar':'Mostrar';btn.setAttribute('aria-label',(reveal?'Ocultar':'Mostrar')+' contraseña');btn.setAttribute('aria-pressed',String(reveal))};}
+  const top=document.querySelector('.topbar'),sidebar=document.querySelector('.sidebar');if(!top||!sidebar)return;
+  if(!document.getElementById('ccttMobileMenuButton')){const btn=document.createElement('button');btn.type='button';btn.id='ccttMobileMenuButton';btn.className='cctt-mobile-hamburger';btn.textContent='☰';btn.setAttribute('aria-label','Abrir menú de módulos');btn.setAttribute('aria-expanded','false');top.prepend(btn);
+   const cover=document.createElement('div');cover.className='cctt-mobile-backdrop';document.body.append(cover);
+   const close=()=>{sidebar.classList.remove('cctt-mobile-open');cover.classList.remove('cctt-mobile-open');btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-label','Abrir menú de módulos')};
+   btn.onclick=()=>{const open=!sidebar.classList.contains('cctt-mobile-open');sidebar.classList.toggle('cctt-mobile-open',open);cover.classList.toggle('cctt-mobile-open',open);btn.setAttribute('aria-expanded',String(open));btn.setAttribute('aria-label',open?'Cerrar menú de módulos':'Abrir menú de módulos')};
+   cover.onclick=close;sidebar.addEventListener('click',e=>{if(e.target.closest('[data-page]'))close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});window.addEventListener('resize',()=>{if(window.innerWidth>720)close()});
+  }
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+ new MutationObserver(()=>{if(document.getElementById('ccttLoginPassword')&&!document.getElementById('ccttPasswordToggle'))setup()}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
 </body></html>
