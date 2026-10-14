@@ -3362,4 +3362,62 @@ body{background:#f7f0e8!important}
   keepSingle();
 })();
 </script>
+
+<!-- NUEVO: revisión es-MX focalizada y cierre por inactividad de operadores. -->
+<style id="cctt-mx-review-additions">
+/* NUEVO: ventana de revisión integrada a la apariencia institucional. */
+.cctt-mx-shade{position:fixed;inset:0;z-index:100000;background:rgba(20,12,24,.58);display:flex;align-items:center;justify-content:center;padding:16px}
+.cctt-mx-shade[hidden]{display:none!important}.cctt-mx-panel{width:min(680px,100%);max-height:88vh;overflow:auto;background:#fffaf5;border:1px solid #e6d2cc;border-radius:17px;box-shadow:0 28px 75px #0005;padding:22px;color:#251a1e}
+.cctt-mx-panel h2{margin:0 0 5px;font-size:20px;color:#650924}.cctt-mx-panel p{font-size:13px;color:#6c5961}.cctt-mx-box{white-space:pre-wrap;overflow-wrap:anywhere;max-height:190px;overflow:auto;border-radius:10px;background:#f8f0ed;border:1px solid #e9d9d1;padding:12px;line-height:1.55;margin:12px 0}
+.cctt-mx-box.proposed{background:#eaf3ff;border-color:#bfcfe6}.cctt-mx-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end;margin-top:15px}.cctt-mx-actions button{border:0;border-radius:9px;padding:11px 15px;font:inherit;font-weight:750;cursor:pointer}.cctt-mx-confirm{background:#650924;color:white}.cctt-mx-cancel{background:#e9edf4;color:#19314f}
+</style>
+<script id="cctt-mx-review-behavior">
+// NUEVO: acciones añadidas sin sustituir ni modificar las funciones existentes.
+(()=>{
+ 'use strict';
+ const pages=new Set(['page-inc35macro','page-inc35bolet','page-inc35vial','page-reporte']);
+ const relevant=el=>!!(el&&el.matches?.('input,textarea,[contenteditable="true"]')&&el.closest('.page')&&pages.has(el.closest('.page').id)&&!(el.matches('input[type="date"],input[type="time"],input[type="number"],input[type="password"],input[type="email"],input[type="file"],input[readonly],[disabled]'))&&!/plate|placa|folio|uuid|^i35(?:dec|dea|deo|dei|dev|dep)$/i.test(el.id||''));
+ let target=null;
+ const nativeReview=document.getElementById('ccttReviewFloating');
+ const getText=el=>el.isContentEditable?el.innerText:el.value;
+ const reviewText=(value,el)=>{
+   let text=String(value||'');
+   if(typeof ccttSentenceMX==='function')text=ccttSentenceMX(text);
+   // NUEVO: palabras con escritura frecuente y nombres propios comprobables.
+   const corrections={rodriguez:'Rodríguez',sanchez:'Sánchez',hernandez:'Hernández',martinez:'Martínez',garcia:'García',gonzalez:'González',lopez:'López',perez:'Pérez',vazquez:'Vázquez',jose:'José',maria:'María',jesus:'Jesús',angel:'Ángel',ubicacion:'ubicación',mecanica:'mecánica',electrica:'eléctrica',transito:'tránsito',trafico:'tráfico',saturacion:'saturación',circulacion:'circulación',obstruccion:'obstrucción',operacion:'operación',revision:'revisión',caida:'caída',diesel:'diésel'};
+   text=text.replace(/\p{L}+/gu,w=>{const replacement=corrections[w.toLocaleLowerCase('es-MX')];if(!replacement)return w;return /^[\p{Lu}]+$/u.test(w)?replacement.toLocaleUpperCase('es-MX'):replacement});
+   return text;
+ };
+ const shade=document.createElement('div');shade.className='cctt-mx-shade';shade.hidden=true;shade.innerHTML='<section class="cctt-mx-panel" role="dialog" aria-modal="true" aria-labelledby="ccttMxTitle"><h2 id="ccttMxTitle">Revisión de redacción · Español (México)</h2><p>Compara la propuesta antes de aplicarla. La revisión automática es orientativa y no sustituye la corrección ortográfica del navegador ni la verificación de nombres propios.</p><strong>Texto actual</strong><div class="cctt-mx-box" id="ccttMxOriginal"></div><strong>Propuesta</strong><div class="cctt-mx-box proposed" id="ccttMxProposal"></div><div class="cctt-mx-actions"><button type="button" class="cctt-mx-cancel" id="ccttMxCancel">Conservar original</button><button type="button" class="cctt-mx-confirm" id="ccttMxApply">Aplicar propuesta</button></div></section>';
+ document.body.append(shade);
+ let originalFocus=null, currentEl=null;
+ function close(){shade.hidden=true;const previous=originalFocus;originalFocus=null;currentEl=null;previous?.focus?.()}
+ shade.querySelector('#ccttMxCancel').onclick=close;
+ shade.addEventListener('click',e=>{if(e.target===shade)close()});
+ document.addEventListener('keydown',e=>{if(!shade.hidden&&e.key==='Escape'){e.preventDefault();close()}},true);
+ shade.querySelector('#ccttMxApply').onclick=()=>{const el=currentEl;if(!el)return close();const next=shade.querySelector('#ccttMxProposal').textContent;if(el.isContentEditable)el.innerText=next;else el.value=next;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));close()};
+ const openReview=el=>{if(!relevant(el))return;const original=getText(el);if(!original?.trim())return;originalFocus=el;currentEl=el;shade.querySelector('#ccttMxOriginal').textContent=original;shade.querySelector('#ccttMxProposal').textContent=reviewText(original,el);shade.hidden=false;shade.querySelector('#ccttMxCancel').focus()};
+ document.addEventListener('focusin',e=>{if(relevant(e.target))target=e.target},true);
+ // NUEVO: impedir únicamente la alerta nativa de revisión en los cuatro módulos pedidos.
+ window.addEventListener('click',e=>{if(e.target.closest?.('#ccttReviewFloating')&&relevant(target)){e.stopImmediatePropagation();e.preventDefault();openReview(target)}},true);
+ window.addEventListener('keydown',e=>{if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='r'&&relevant(document.activeElement)){e.preventDefault();e.stopImmediatePropagation();openReview(document.activeElement)}},true);
+ // NUEVO: aplicar atributo de idioma a campos nuevos generados dinámicamente, sin modificar sus valores.
+ const activate=()=>document.querySelectorAll('#page-inc35macro input,#page-inc35macro textarea,#page-inc35bolet input,#page-inc35bolet textarea,#page-inc35vial input,#page-inc35vial textarea,#page-reporte #repLegend').forEach(el=>{if(relevant(el)){el.lang='es-MX';el.spellcheck=true;el.setAttribute('spellcheck','true')}});
+ activate();new MutationObserver(activate).observe(document.querySelector('.content')||document.body,{subtree:true,childList:true});
+ // NUEVO: caducidad de actividad solo para usuarios no administradores.
+ const ONE_HOUR=60*60*1000;
+ let active=false,admin=false,lastActivity=Date.now(),signingOut=false;
+ const activity=()=>{if(active&&!admin)lastActivity=Date.now()};
+ ['pointerdown','keydown','touchstart','scroll'].forEach(type=>document.addEventListener(type,activity,{passive:true,capture:true}));
+ window.addEventListener('cctt:session',e=>{active=true;admin=e.detail?.session?.user?.app_metadata?.role==='admin';lastActivity=Date.now();signingOut=false});
+ window.addEventListener('cctt:logout',()=>{active=false;signingOut=false});
+ async function expire(){if(!active||admin||signingOut||Date.now()-lastActivity<ONE_HOUR)return;signingOut=true;active=false;
+   try{const client=window.ccttSupabaseClient;if(client){const {error}=await client.auth.signOut();if(error)throw error;}window.dispatchEvent(new Event('cctt:logout'));document.getElementById('ccttLoginGate')?.classList.add('show');}
+   catch(err){console.error('No fue posible finalizar automáticamente la sesión.',err);signingOut=false;active=true;}
+ }
+ setInterval(expire,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)void expire()});window.addEventListener('focus',()=>void expire());
+ // NUEVO: consulta inicial del rol, por si el evento de sesión ocurrió antes de este bloque.
+ window.ccttSupabaseClient?.auth?.getSession().then(({data})=>{if(data?.session&&!active){active=true;admin=data.session.user?.app_metadata?.role==='admin';lastActivity=Date.now()}}).catch(()=>{});
+})();
+</script>
 </body></html>
