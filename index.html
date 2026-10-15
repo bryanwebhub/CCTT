@@ -722,7 +722,9 @@ async function socialLoadMedia(){let out=[];for(const item of socialImgs){try{ou
 function socialDrawGrid(ctx,pics,box){ctx.save();ctx.fillStyle='#eef2f7';ctx.fillRect(box.x,box.y,box.w,box.h);if(!pics.length){ctx.fillStyle='#7b8ea8';ctx.font='28px Arial';ctx.textAlign='center';ctx.fillText('Sin imagen adjunta',box.x+box.w/2,box.y+box.h/2);ctx.textAlign='left';ctx.restore();return}if(pics.length===1){ctx.drawImage(pics[0],box.x,box.y,box.w,box.h)}else{const pairW=box.w/2;ctx.drawImage(pics[0],box.x,box.y,pairW,box.h);ctx.drawImage(pics[1],box.x+pairW,box.y,pairW,box.h)}ctx.restore()}
 async function socialDrawMark(ctx,mark,box){if(!mark)return;try{const logo=await imgFrom(mark);let maxW=Math.min(210,box.w*.23),w=maxW,h=logo.height*(w/logo.width);if(h>150){h=150;w=logo.width*(h/logo.height)}const pad=18,x=box.x+pad,y=box.y+pad;ctx.save();ctx.globalAlpha=1;ctx.fillStyle='rgba(255,255,255,.90)';ctx.fillRect(x-10,y-8,w+20,h+16);ctx.drawImage(logo,x,y,w,h);ctx.restore()}catch(e){}}
 function socialDefaultTime(){const d=new Date();return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`}
-function socialReportText(){const event=(document.getElementById('socialEvent')?.value||'').trim(),time=(document.getElementById('socialTime')?.value||socialDefaultTime()).trim(),loc=(document.getElementById('socialLoc')?.value||'').trim();const ev=event?event.replace(/[.\s]+$/,''):'Evento vial en seguimiento';const where=loc||'Ubicación por confirmar';return `#Reporte Vial ⚠️ ${ev}. Registrado a las ${time} horas. Ubicación: ${where}. Se atiende por la autoridad correspondiente. #CCTTASIPONA
+function socialReportText(){const event=(document.getElementById('socialEvent')?.value||'').trim(),time=(document.getElementById('socialTime')?.value||socialDefaultTime()).trim(),loc=(document.getElementById('socialLoc')?.value||'').trim();const ev=event?event.replace(/[.\s]+$/,''):'Evento vial en seguimiento';const where=loc||'Ubicación por confirmar';/* MODIFICADO: encabezado predeterminado en negritas para WhatsApp. */return `*ASIPONA informa:*
+
+#Reporte Vial ⚠️ ${ev}. Registrado a las ${time} horas. Ubicación: ${where}. Se atiende por la autoridad correspondiente. #CCTTASIPONA
 
 Se invita al público en general y a los transportistas a extremar precauciones y considerar su impacto en el tráfico.`}
 async function renderSocial(){const c=document.getElementById('socialCanvas'),ctx=c.getContext('2d'),pics=await socialLoadMedia(),isDual=pics.length===2;c.width=isDual?1600:1080;c.height=isDual?900:1080;ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#eef2f7';ctx.fillRect(0,0,c.width,c.height);const imageBox={x:0,y:0,w:c.width,h:c.height};socialDrawGrid(ctx,pics,imageBox);await socialDrawMark(ctx,window.ccttOfficialBrandData||state.inc35?.social?.brandIcon||state.profile.logo,imageBox);const txt=socialReportText(),ta=document.getElementById('socialText'),tp=document.getElementById('socialTextPreview');if(ta)ta.value=txt;if(tp)tp.textContent=txt}
@@ -3435,8 +3437,9 @@ body{background:#f7f0e8!important}
  // NUEVO: caducidad de actividad solo para usuarios no administradores.
  const ONE_HOUR=60*60*1000;
  let active=false,admin=false,lastActivity=Date.now(),signingOut=false;
- const activity=()=>{if(active&&!admin)lastActivity=Date.now()};
- ['pointerdown','keydown','touchstart','scroll'].forEach(type=>document.addEventListener(type,activity,{passive:true,capture:true}));
+ // MODIFICADO: registrar toda interacción real (incluido mouse, escritura y controles) y renovar la hora desde esa actividad.
+ const activity=()=>{if(active&&!admin&&!signingOut)lastActivity=Date.now()};
+ ['pointerdown','pointermove','mousemove','mousedown','click','keydown','keyup','input','change','touchstart','touchmove','wheel','scroll'].forEach(type=>document.addEventListener(type,activity,{passive:true,capture:true}));
  window.addEventListener('cctt:session',e=>{active=true;admin=e.detail?.session?.user?.app_metadata?.role==='admin';lastActivity=Date.now();signingOut=false});
  window.addEventListener('cctt:logout',()=>{active=false;signingOut=false});
  async function expire(){if(!active||admin||signingOut||Date.now()-lastActivity<ONE_HOUR)return;signingOut=true;active=false;
