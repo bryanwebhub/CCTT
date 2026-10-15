@@ -3405,7 +3405,8 @@ body{background:#f7f0e8!important}
 // NUEVO: acciones añadidas sin sustituir ni modificar las funciones existentes.
 (()=>{
  'use strict';
- const pages=new Set(['page-inc35macro','page-inc35bolet','page-inc35vial','page-reporte']);
+ // MODIFICADO: incluir Redes y reporte en la revisión de redacción existente.
+ const pages=new Set(['page-inc35macro','page-inc35bolet','page-inc35vial','page-inc35redes','page-reporte']);
  const relevant=el=>!!(el&&el.matches?.('input,textarea,[contenteditable="true"]')&&el.closest('.page')&&pages.has(el.closest('.page').id)&&!(el.matches('input[type="date"],input[type="time"],input[type="number"],input[type="password"],input[type="email"],input[type="file"],input[readonly],[disabled]'))&&!/plate|placa|folio|uuid|^i35(?:dec|dea|deo|dei|dev|dep)$/i.test(el.id||''));
  let target=null;
  const nativeReview=document.getElementById('ccttReviewFloating');
@@ -3432,10 +3433,12 @@ body{background:#f7f0e8!important}
  window.addEventListener('click',e=>{if(e.target.closest?.('#ccttReviewFloating')&&relevant(target)){e.stopImmediatePropagation();e.preventDefault();openReview(target)}},true);
  window.addEventListener('keydown',e=>{if(e.altKey&&e.shiftKey&&e.key.toLowerCase()==='r'&&relevant(document.activeElement)){e.preventDefault();e.stopImmediatePropagation();openReview(document.activeElement)}},true);
  // NUEVO: aplicar atributo de idioma a campos nuevos generados dinámicamente, sin modificar sus valores.
- const activate=()=>document.querySelectorAll('#page-inc35macro input,#page-inc35macro textarea,#page-inc35bolet input,#page-inc35bolet textarea,#page-inc35vial input,#page-inc35vial textarea,#page-reporte #repLegend').forEach(el=>{if(relevant(el)){el.lang='es-MX';el.spellcheck=true;el.setAttribute('spellcheck','true')}});
+ // MODIFICADO: habilitar el mismo idioma y corrector para los campos de Redes y reporte.
+ const activate=()=>document.querySelectorAll('#page-inc35macro input,#page-inc35macro textarea,#page-inc35bolet input,#page-inc35bolet textarea,#page-inc35vial input,#page-inc35vial textarea,#page-inc35redes input,#page-inc35redes textarea,#page-reporte #repLegend').forEach(el=>{if(relevant(el)){el.lang='es-MX';el.spellcheck=true;el.setAttribute('spellcheck','true')}});
  activate();new MutationObserver(activate).observe(document.querySelector('.content')||document.body,{subtree:true,childList:true});
  // NUEVO: caducidad de actividad solo para usuarios no administradores.
- const ONE_HOUR=60*60*1000;
+ // MODIFICADO: límite de inactividad ampliado a 180 minutos; se mantiene el identificador existente.
+ const ONE_HOUR=180*60*1000;
  let active=false,admin=false,lastActivity=Date.now(),signingOut=false;
  // MODIFICADO: registrar toda interacción real (incluido mouse, escritura y controles) y renovar la hora desde esa actividad.
  const activity=()=>{if(active&&!admin&&!signingOut)lastActivity=Date.now()};
