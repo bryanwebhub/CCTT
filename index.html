@@ -113,6 +113,25 @@
 @media(max-width:720px){.cctt-home-icon-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.cctt-home-icon-tile{min-height:120px;padding:10px 6px}.cctt-home-icon-tile .cctt-home-icon-symbol{width:47px;height:47px}.cctt-home-icon-tile svg{width:26px;height:26px}.cctt-quick-theme{max-width:126px}.cctt-quick-theme label{display:none}.cctt-quick-theme select{max-width:120px}}
 @media(prefers-reduced-motion:reduce){.cctt-home-icon-tile{transition:none}}
 </style>
+
+<!-- NUEVO: preferencias de navegación, control de modo y galería El Recuerdo. -->
+<style id="ccttRecuerdoStyles">
+html.cctt-icons-only .app{grid-template-columns:minmax(0,1fr)!important}html.cctt-icons-only #page-inicio .hero,html.cctt-icons-only #page-inicio #homeKpis{display:none!important}html.cctt-icons-only .sidebar{display:none!important}
+#ccttPanelBack{display:none;align-items:center;gap:8px}html.cctt-icons-only #ccttPanelBack{display:inline-flex}
+#ccttQuickModeButton{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;width:43px;height:41px;padding:8px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));cursor:pointer}
+#ccttQuickModeButton svg,#ccttPanelBack svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#ccttProfileViewChoice{margin-top:15px}#ccttProfileViewChoice label{display:flex;gap:8px;align-items:center;margin:7px 0;cursor:pointer}
+#ccttRecuerdoTrack{display:flex;gap:14px;width:max-content;animation:ccttRecuerdoFlow 45s linear infinite}
+#ccttRecuerdoTrack:hover,#ccttRecuerdoTrack:focus-within{animation-play-state:paused}
+#ccttRecuerdoViewport{overflow:hidden;position:relative;max-width:100%;padding:12px 0}
+.cctt-recuerdo-photo{width:230px;height:175px;flex:0 0 230px;border-radius:13px;overflow:hidden;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-card,var(--card));padding:0;cursor:pointer}
+.cctt-recuerdo-photo img{width:100%;height:100%;object-fit:cover;display:block}
+@keyframes ccttRecuerdoFlow{to{transform:translateX(-50%)}}
+#ccttRecuerdoLightbox[hidden]{display:none!important}#ccttRecuerdoLightbox{position:fixed;inset:0;z-index:260000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#060a14e8;padding:18px;gap:12px;color:#fff}
+#ccttRecuerdoLightbox img{max-width:min(94vw,1200px);max-height:76vh;object-fit:contain;border-radius:12px}
+#ccttRecuerdoLightbox .row{justify-content:center}#ccttRecuerdoLightbox button{color:white;border:1px solid #ffffff65;background:#ffffff23;border-radius:10px;padding:9px 15px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){#ccttRecuerdoTrack{animation:none;overflow-x:auto}}@media(max-width:720px){.cctt-recuerdo-photo{width:155px;height:130px;flex-basis:155px}#ccttPanelBack{font-size:12px}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -120,7 +139,7 @@
  <div class="brand"><div class="brand-logo" id="sideLogo"><span data-brand-icon="traffic"></span></div><div class="brand-text"><div class="brand-mark">CCTT</div><div class="brand-sub">Centro de Control</div></div></div>
  <div class="nav-title">Principal</div>
  <button class="navbtn active" data-page="inicio"><span class="ico"><span data-nav-icon="home"></span></span><span class="lbl">Inicio</span></button>
- <button class="navbtn" data-page="perfil"><span class="ico"><span data-nav-icon="user"></span></span><span class="lbl">Perfil y logo</span></button>
+ <!-- MODIFICADO: Perfil y logo se abre desde el menú de la fotografía. -->
  <div class="nav-title">Módulos de los archivos</div>
  <button class="navbtn" data-page="pis"><span class="ico"><span data-nav-icon="table"></span></span><span class="lbl">Bitácoras PIS</span></button>
  <button class="navbtn" data-page="accidentes"><span class="ico"><span data-nav-icon="alert"></span></span><span class="lbl">Accidentes CCTT</span></button>
@@ -2717,7 +2736,7 @@ let session=null,admin=false,secret='',permissions=null,adminReady=false;
 const $=id=>document.getElementById(id);
 const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const notify=(msg,error=false)=>{const el=$('ccttAdminMsg');if(el){el.textContent=msg;el.style.color=error?'#aa1b3e':'#205f48'}else ccttSiteNotice(msg)};
-/* MODIFICADO: los permisos pendientes nunca equivalen a acceso general. */function hasAccess(id){if(!session)return false;if(id==='adminUsuarios')return admin;return admin || (Array.isArray(permissions) && (id==='inicio' || permissions.includes(id)))}
+/* MODIFICADO: los permisos pendientes nunca equivalen a acceso general. */function hasAccess(id){if(!session)return false;if(id==='adminUsuarios')return admin;/* NUEVO: galería global accesible a cuentas verificadas. */if(id==='recuerdo')return true;return admin || (Array.isArray(permissions) && (id==='inicio' || permissions.includes(id)))}
 /* NUEVO: protección de la navegación por tarjetas y llamadas directas. */window.ccttCanAccess=id=>hasAccess(id);
 function applyAccess(){
  document.querySelectorAll('.sidebar [data-page]').forEach(b=>{b.hidden=!hasAccess(b.dataset.page);b.style.display=hasAccess(b.dataset.page)?'':'none'});
@@ -3955,6 +3974,52 @@ const original=window.renderHome;
 window.ccttRenderIconHome=()=>{refreshTiles();applyView()};
 refreshTiles();applyView();
 window.addEventListener('cctt:session',()=>setTimeout(()=>{refreshTiles();applyView()},0));
+})();
+</script>
+
+<!-- NUEVO: navegación personalizada, temas existentes y galería compartida. -->
+<script id="ccttRecuerdoBehavior">
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const sun='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const moon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 15.6A9 9 0 0 1 8.4 3.6 9 9 0 1 0 20.4 15.6Z"/></svg>';
+const homeIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/></svg>';
+const profile=document.querySelector('.profile-mini');
+// MODIFICADO: reutilizar el motor de apariencia existente, sin crear un segundo tema.
+const quick=$('ccttQuickAppearance');if(quick){const host=quick.closest('.cctt-quick-theme');if(host){const b=document.createElement('button');b.id='ccttQuickModeButton';b.type='button';b.setAttribute('aria-label','Cambiar modo de apariencia');b.title='Cambiar entre modo oscuro y predeterminado';host.replaceChildren(b);const sync=()=>{const dark=document.documentElement.dataset.ccttScheme==='dark';b.innerHTML=dark?sun:moon;b.setAttribute('aria-pressed',String(dark));};b.onclick=()=>{const dark=document.documentElement.dataset.ccttScheme==='dark';window.ccttSetExistingVisualMode?.(dark?'default':'dark');sync()};window.addEventListener('cctt:appearance-changed',sync);sync();}}
+// NUEVO: botón Panel disponible incluso cuando la barra lateral está oculta.
+const topTitle=$('pageTitle')?.parentElement;if(topTitle&&!$('ccttPanelBack')){const back=document.createElement('button');back.id='ccttPanelBack';back.className='btn';back.type='button';back.innerHTML=homeIcon+'<span>Panel</span>';back.onclick=()=>{if(typeof go==='function')go('inicio')};topTitle.prepend(back)}
+let userId='guest';const prefKey=()=>`cctt-navigation-view-${userId}`;
+function preference(){try{return localStorage.getItem(prefKey())==='icons'?'icons':'sidebar'}catch{return 'sidebar'}}
+function applyPref(){const icons=preference()==='icons';document.documentElement.classList.toggle('cctt-icons-only',icons);const c=$('ccttHomeCardsMode'),i=$('ccttHomeIconsMode');if(icons&&i?.getAttribute('aria-pressed')!=='true')i.click();if(!icons&&c?.getAttribute('aria-pressed')!=='true')c.click();document.querySelectorAll('input[name="ccttNavView"]').forEach(r=>r.checked=r.value===(icons?'icons':'sidebar'));}
+function choice(){const page=$('page-perfil');if(!page||$('ccttProfileViewChoice'))return;const box=document.createElement('div');box.id='ccttProfileViewChoice';box.className='card';box.innerHTML='<h3>Presentación de módulos</h3><p class="muted">Elige cómo deseas navegar por el panel.</p><label><input type="radio" name="ccttNavView" value="sidebar"> Barra lateral con módulos</label><label><input type="radio" name="ccttNavView" value="icons"> Panel de módulos con iconos</label>';page.append(box);box.querySelectorAll('input').forEach(x=>x.onchange=()=>{if(!x.checked)return;try{localStorage.setItem(prefKey(),x.value)}catch{}applyPref()});applyPref()}
+choice();
+function menuLink(){const menu=$('ccttProfileMenu');if(!menu||$('ccttOpenProfile'))return;const btn=document.createElement('button');btn.type='button';btn.id='ccttOpenProfile';btn.className='btn';btn.style.cssText='width:100%;margin:8px 0;color:var(--cctt-theme-text,var(--text));background:var(--cctt-theme-card,var(--card))';btn.textContent='Perfil y logo';btn.onclick=()=>{menu.hidden=true;$('ccttProfileTrigger')?.setAttribute('aria-expanded','false');go('perfil')};const logout=menu.querySelector('.cctt-profile-menu-logout');menu.insertBefore(btn,logout)}
+const menuObserver=new MutationObserver(()=>{if($('ccttProfileMenu')&&!$('ccttOpenProfile'))menuLink()});menuObserver.observe(document.querySelector('.profile-mini')||document.body,{childList:true,subtree:true});menuLink();
+// NUEVO: página propia, sin alterar las páginas originales.
+const content=document.querySelector('.content');const section=document.createElement('section');section.id='page-recuerdo';section.className='page';section.innerHTML=`<div class="section-title"><h2>El Recuerdo</h2><button type="button" class="btn" id="ccttRecuerdoRefresh">Actualizar fotografías</button></div><div class="card"><h3>Galería de recuerdos</h3><p class="muted">Fotografías compartidas. El carrusel avanza automáticamente hacia la izquierda; selecciona una fotografía para verla individualmente.</p><div id="ccttRecuerdoViewport"><div id="ccttRecuerdoTrack"></div></div><p class="muted" id="ccttRecuerdoStatus">Consultando fotografías…</p></div><div class="card" id="ccttRecuerdoAdmin" hidden style="margin-top:16px"><h3>Publicar fotografías</h3><p class="muted">Solo administración puede añadir imágenes para todos los usuarios.</p><input type="file" accept="image/jpeg,image/png,image/webp" multiple id="ccttRecuerdoFiles"><button type="button" class="btn primary" id="ccttRecuerdoUpload">Publicar fotografías</button></div>`;content.append(section);
+const lb=document.createElement('div');lb.id='ccttRecuerdoLightbox';lb.hidden=true;lb.setAttribute('role','dialog');lb.setAttribute('aria-modal','true');lb.innerHTML='<img alt="Fotografía ampliada"><div class="row"><button type="button" data-lb="prev">◀ Anterior</button><span id="ccttRecuerdoCounter"></span><button type="button" data-lb="next">Siguiente ▶</button><button type="button" data-lb="close">Cerrar ×</button></div>';document.body.append(lb);
+const nav=document.createElement('button');nav.type='button';nav.className='navbtn';nav.dataset.page='recuerdo';nav.innerHTML='<span class="ico">▣</span><span class="lbl">El Recuerdo</span>';const side=document.querySelector('.sidebar');side?.append(nav);nav.onclick=()=>go('recuerdo');
+const originalGo=window.go;if(typeof originalGo==='function'){window.go=function(id){const r=originalGo(id);if(id==='recuerdo')load();return r};}
+// NUEVO: la galería utiliza el almacenamiento protegido del proyecto actual.
+const bucket='cctt-recuerdos';let photos=[],active=0,session=null;
+function admin(){return session?.user?.app_metadata?.role==='admin'}
+function syncAdminFont(){const el=$('ccttTopbarTools');if(el)el.hidden=!admin()}
+
+function client(){return window.ccttSupabaseClient}
+function report(text){$('ccttRecuerdoStatus').textContent=text}
+async function load(){if(!session||!client())return;report('Cargando fotografías…');const {data,error}=await client().storage.from(bucket).list('',{limit:1000,sortBy:{column:'name',order:'desc'}});if(error){report('No fue posible consultar la galería: '+error.message);return}const names=(data||[]).filter(f=>/\.(jpg|jpeg|png|webp)$/i.test(f.name));photos=[];for(const file of names){const {data:link,error:e}=await client().storage.from(bucket).createSignedUrl(file.name,3600);if(!e&&link?.signedUrl)photos.push({name:file.name,url:link.signedUrl})}render()}
+function render(){const track=$('ccttRecuerdoTrack');track.replaceChildren();if(!photos.length){report('Todavía no hay fotografías publicadas.');return}const make=(x,i)=>{const b=document.createElement('button');b.type='button';b.className='cctt-recuerdo-photo';b.setAttribute('aria-label','Ver fotografía '+(i+1));const img=document.createElement('img');img.src=x.url;img.loading='lazy';img.alt='Recuerdo '+(i+1);b.append(img);b.onclick=()=>open(i);return b};photos.forEach((x,i)=>track.append(make(x,i)));if(photos.length>1)photos.forEach((x,i)=>track.append(make(x,i)));track.style.animationDuration=Math.max(20,photos.length*7)+'s';report(photos.length+' fotografías disponibles.')}
+function open(i){if(!photos.length)return;active=(i+photos.length)%photos.length;lb.querySelector('img').src=photos[active].url;$('ccttRecuerdoCounter').textContent=(active+1)+' / '+photos.length;lb.hidden=false}
+lb.addEventListener('click',e=>{const a=e.target.closest('[data-lb]')?.dataset.lb;if(a==='close')lb.hidden=true;if(a==='prev')open(active-1);if(a==='next')open(active+1);if(e.target===lb)lb.hidden=true});document.addEventListener('keydown',e=>{if(lb.hidden)return;if(e.key==='Escape')lb.hidden=true;if(e.key==='ArrowRight')open(active+1);if(e.key==='ArrowLeft')open(active-1)});
+$('ccttRecuerdoRefresh').onclick=load;
+$('ccttRecuerdoUpload').onclick=async()=>{if(!admin()){report('Solo administración puede publicar fotografías.');return}const files=[...$('ccttRecuerdoFiles').files];if(!files.length)return;for(const file of files){if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>6*1024*1024){report('Solo imágenes JPG, PNG o WEBP de hasta 6 MB.');return}const name=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+(file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg');const {error}=await client().storage.from(bucket).upload(name,file,{contentType:file.type,upsert:false});if(error){report('Error al publicar: '+error.message);return}}$('ccttRecuerdoFiles').value='';await load()};
+// NUEVO: módulo disponible en ambos catálogos; la preferencia se conserva por cuenta.
+function addCatalog(){const cards=$('moduleCards');if(cards&&!cards.querySelector('[data-page="recuerdo"]')){const card=document.createElement('div');card.className='card';card.dataset.page='recuerdo';card.innerHTML='<h3>El Recuerdo</h3><p class="muted">Galería compartida de fotografías.</p><button type="button" class="btn">Abrir módulo</button>';card.querySelector('button').onclick=()=>go('recuerdo');cards.append(card)}const icons=$('ccttHomeIconGrid');if(icons&&!icons.querySelector('[data-page="recuerdo"]')){const b=document.createElement('button');b.type='button';b.className='cctt-home-icon-tile';b.dataset.page='recuerdo';b.innerHTML='<span class="cctt-home-icon-symbol">▣</span><span class="cctt-home-tile-label">El Recuerdo</span>';b.onclick=()=>go('recuerdo');icons.append(b)}}
+const base=window.ccttRenderIconHome;window.ccttRenderIconHome=function(){base?.();addCatalog()};addCatalog();
+window.addEventListener('cctt:session',e=>{session=e.detail?.session||null;userId=session?.user?.id||'guest';$('ccttRecuerdoAdmin').hidden=!admin();syncAdminFont();setTimeout(()=>{menuLink();addCatalog();applyPref();load()},80)});
+window.addEventListener('cctt:logout',()=>{session=null;photos=[];lb.hidden=true;syncAdminFont();document.documentElement.classList.remove('cctt-icons-only')});
+setTimeout(async()=>{try{const {data}=await client()?.auth.getSession();if(data?.session){session=data.session;userId=session.user.id;$('ccttRecuerdoAdmin').hidden=!admin();syncAdminFont();applyPref();load()}}catch{}},1200);
 })();
 </script>
 </body></html>
