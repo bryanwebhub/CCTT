@@ -266,6 +266,34 @@ html[data-cctt-scheme] body.cctt-authenticated .content{background:transparent!i
 /* NUEVO: mostrar las fotos disponibles tan pronto se carguen, sin ocultar las miniaturas durante la consulta. */
 #page-recuerdo #ccttRecuerdoViewport img{content-visibility:auto}#page-recuerdo #ccttRecuerdoCollage img{content-visibility:auto}
 </style>
+
+<!-- NUEVO: ajustes puntuales de copiado, iconografía de avisos, fondos de catálogo, login y contraste COPOMA. -->
+<style id="ccttRevisionFondosYContraste">
+/* MODIFICADO: botón de copiar compacto, sin cortes de texto. */
+#ccttSharedMessagesPanel .tbl th:nth-child(5){width:27%}#ccttSharedMessagesPanel .tbl th:nth-child(6){width:12%}
+#ccttSharedMessagesPanel .cctt-copy-compact{display:inline-flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:5px!important;width:100%!important;min-width:0!important;white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important;padding:8px 4px!important;font-size:clamp(10px,.8vw,12px)!important;line-height:1.2!important}
+#ccttSharedMessagesPanel .cctt-copy-compact svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+#ccttSharedMessagesPanel .cctt-copy-compact span{white-space:nowrap!important}
+/* MODIFICADO: cada operación de Avisos tiene pictograma SVG visible y propio. */
+#page-avisosRecurrentes #arManagementList .ar-actions button{display:inline-flex!important;align-items:center;gap:6px}
+#page-avisosRecurrentes #arManagementList .ar-actions button svg{display:block!important;width:17px!important;height:17px!important;min-width:17px;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round;stroke-linejoin:round}
+/* MODIFICADO: patrones de fondo solo en catálogo; las reglas del login quedan independientes. */
+html[data-cctt-scheme="dark"] body.cctt-authenticated{background-image:url("Fondos/Fondo modo oscuro.png")!important;background-repeat:repeat!important;background-size:660px auto!important;background-position:left top!important;background-attachment:fixed!important}
+html[data-cctt-scheme="light"] body.cctt-authenticated,html[data-cctt-scheme="default"] body.cctt-authenticated{background-image:url("Fondos/Fondo modo predeterminado.png")!important;background-repeat:repeat!important;background-size:660px auto!important;background-position:left top!important;background-attachment:fixed!important}
+@media(max-width:720px){html[data-cctt-scheme] body.cctt-authenticated{background-size:420px auto!important;background-attachment:scroll!important}}
+/* MODIFICADO: respetar espacio visible en orientación móvil sin cortar la tarjeta de acceso. */
+#ccttLoginGate.show{inset:0!important;width:100vw!important;height:100vh!important;height:100dvh!important;overflow:hidden!important;padding:max(6px,env(safe-area-inset-top)) max(6px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left))!important}
+#ccttLoginGate .cctt-login-shell{width:100%;max-height:100%;min-height:0;box-sizing:border-box}
+@media(max-width:900px){#ccttLoginGate .cctt-login-card{max-height:calc(100dvh - 20px)!important;overflow-y:auto!important;overscroll-behavior:contain!important}#ccttLoginGate .cctt-login-stage{min-width:0!important;min-height:0!important}}
+@media(max-width:600px),(max-height:640px){#ccttLoginGate .cctt-login-shell{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;overflow:hidden!important}#ccttLoginGate .cctt-login-card{width:min(100%,450px)!important;max-height:calc(100dvh - 18px)!important;overflow:auto!important;flex-shrink:1!important}#ccttLoginGate .cctt-login-copy{display:none!important}}
+/* MODIFICADO: campos de composición y editor COPOMA legibles al aplicar modo oscuro. */
+html[data-cctt-scheme="dark"] #page-inc35copoma .editor-toolbar,html[data-cctt-scheme="dark"] #page-inc35copoma .cop-visible-align{background:#253249!important;border-color:#55657d!important;color:#f0f4ff!important}
+html[data-cctt-scheme="dark"] #page-inc35copoma .editor-toolbar button{background:#34455e!important;border-color:#65758b!important;color:#fff!important}
+html[data-cctt-scheme="dark"] #page-inc35copoma .rich-editor,html[data-cctt-scheme="dark"] #page-inc35copoma [contenteditable="true"]{background:#243249!important;color:#f5f7ff!important;border-color:#65758b!important}
+html[data-cctt-scheme="dark"] #page-inc35copoma .cop-visible-align label,html[data-cctt-scheme="dark"] #page-inc35copoma .field label{color:#e1e9f5!important}
+html[data-cctt-scheme="dark"] #page-inc35copoma .cop-visible-align select,html[data-cctt-scheme="dark"] #page-inc35copoma .cop-visible-align input{background:#162338!important;color:#fff!important;border-color:#718198!important}
+/* No cambiar vistas previas de impresión: deben permanecer con su fondo blanco original. */
+</style>
 </head>
 <body>
 <div class="app">
@@ -4030,7 +4058,7 @@ async function query(table){const {data,error}=await client().from(table).select
 async function post(table,data){const {error}=await client().from(table).insert(data);if(error)throw error}
 function report(id,value){const node=$(id);if(node)node.textContent=value}
 async function copy(t){try{await navigator.clipboard.writeText(t);msg('Texto copiado.')}catch(_){const ta=document.createElement('textarea');ta.value=t;document.body.append(ta);ta.select();document.execCommand('copy');ta.remove();msg('Texto copiado.')}}
-function copyButton(text){const b=document.createElement('button');b.className='btn';b.type='button';b.textContent='Copiar texto';b.onclick=()=>copy(text);return b}
+function copyButton(text){const b=document.createElement('button');b.className='btn';b.type='button';/* MODIFICADO: icono SVG y etiqueta corta sin partir palabras. */b.classList.add('cctt-copy-compact');b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>Copiar</span>';b.title='Copiar texto completo';b.setAttribute('aria-label','Copiar texto');b.onclick=()=>copy(text);return b}
 // NUEVO: permite copiar cada registro local sin cambiar su guardado original.
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-cctt-copy-msg]');if(!b)return;const record=(window.state?.messages||[]).find(x=>String(x.id)===b.dataset.ccttCopyMsg);if(record)copy(record.text||'');else{const tr=b.closest('tr');copy(tr?.children?.[4]?.textContent||'')}});
 async function loadMessages(){if(!permitted('mensajes'))return;try{const rows=await query('cctt_shared_messages'),body=$('ccttSharedMessagesBody');body.replaceChildren();rows.forEach(x=>{const tr=document.createElement('tr');[x.entity,x.message_date,x.tag,x.author,x.body].forEach(v=>{const td=document.createElement('td');td.textContent=v??'';if(v===x.body){td.style.whiteSpace='normal';/* MODIFICADO: texto plegable sin alterar el valor almacenado. */const details=document.createElement('details');details.className='cctt-message-details';const summary=document.createElement('summary');summary.textContent='Ver / plegar texto';const preview=document.createElement('div');preview.className='cctt-message-preview';preview.textContent=v??'';details.append(summary,preview);td.replaceChildren(details)}tr.append(td)});const td=document.createElement('td');td.append(copyButton(x.body||''));tr.append(td);/* NUEVO: edición y eliminación por propietario con validación adicional de permisos en servidor. */const actions=document.createElement('td');if(sess?.user?.id===x.owner_id||sess?.user?.app_metadata?.role==='admin'){for(const action of ['Editar','Eliminar']){const b=document.createElement('button');b.type='button';b.className='btn'+(action==='Eliminar'?' bad':'');b.style.margin='2px';b.textContent=action;b.addEventListener('click',()=>manageSharedMessage(action,x));actions.append(b)}}tr.append(actions);body.append(tr)});report('ccttSharedMessagesStatus',rows.length+' mensajes compartidos.')}catch(err){report('ccttSharedMessagesStatus','No fue posible consultar mensajes compartidos: '+err.message)}}
