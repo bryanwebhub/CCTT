@@ -562,6 +562,29 @@ html[data-cctt-scheme="dark"] #page-inicio #ccttHomeIconGrid .cctt-home-icon-sym
 #page-consignas #conDeadlineIndefinite{accent-color:var(--cctt-theme-accent,#875fe1)}
 @media(prefers-reduced-motion:reduce){#page-consignas #conMap #conNodes,#page-consignas #conMap #conEdges,#page-consignas #conMap .con-bubble{transition:none!important}}
 </style>
+
+<!-- NUEVO: distribución exclusiva de COPOMA y alineación del control de contraseña. -->
+<style id="ccttCopomaLayout20261017">
+/* NUEVO: contenido, configuración y vista previa en orden vertical sin cambiar el tema. */
+#page-inc35copoma>.grid.g2{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px}
+#page-inc35copoma .cctt-cop-template-switch{background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-radius:var(--r,16px);padding:18px;min-width:0}
+#page-inc35copoma .cctt-cop-template-switch h3{margin:0 0 10px}
+#page-inc35copoma .cctt-cop-template-switch .template-list{display:flex;gap:9px;flex-wrap:wrap}
+#page-inc35copoma .cctt-cop-template-switch .template-option{flex:1 1 190px;min-width:0;background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+#page-inc35copoma .cctt-cop-preview-card{min-width:0}
+#page-inc35copoma .cctt-cop-preview-card #copTemplatePreview{max-width:950px;margin:12px auto 0;min-height:500px!important}
+#page-inc35copoma .cctt-cop-style-formats{padding-top:13px;margin-top:13px;border-top:1px solid var(--cctt-theme-line,var(--line))}
+#page-inc35copoma .cctt-cop-style-formats h4{margin:0 0 8px}
+#page-inc35copoma .cctt-cop-style-formats .cop-design-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* MODIFICADO: el botón Mostrar/Ocultar se centra dentro de la barra y se representa con SVG. */
+#ccttLoginGate .cctt-password-box{position:relative;display:block;width:100%;min-width:0}
+#ccttLoginGate .cctt-password-box #ccttLoginPassword{display:block;width:100%;box-sizing:border-box;padding-right:54px!important}
+#ccttLoginGate .cctt-password-box #ccttPasswordToggle{position:absolute!important;top:50%!important;right:7px!important;left:auto!important;transform:translateY(-50%)!important;display:flex!important;align-items:center!important;justify-content:center!important;width:40px!important;height:40px!important;min-height:0!important;padding:0!important;margin:0!important;line-height:1!important;font-size:0!important;border-radius:9px!important;background:transparent!important;color:#203a5b!important;z-index:2}
+#ccttLoginGate .cctt-password-box #ccttPasswordToggle::before{content:"";width:22px;height:22px;display:block;background:currentColor;mask:center / contain no-repeat url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="black" d="M12 5c5.3 0 9.3 5.3 10 7-.7 1.7-4.7 7-10 7S2.7 13.7 2 12c.7-1.7 4.7-7 10-7Zm0 2C8.3 7 5.4 10.4 4.2 12c1.2 1.6 4.1 5 7.8 5s6.6-3.4 7.8-5C18.6 10.4 15.7 7 12 7Zm0 1a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/%3E%3C/svg%3E')}
+#ccttLoginGate .cctt-password-box #ccttPasswordToggle[aria-pressed="true"]::after{content:"";position:absolute;width:27px;height:2px;background:currentColor;transform:rotate(-43deg);border-radius:3px;box-shadow:0 0 0 2px #f7f0e8}
+#ccttLoginGate .cctt-password-box #ccttPasswordToggle:focus-visible{outline:2px solid #2563eb;outline-offset:1px}
+@media(max-width:650px){#page-inc35copoma .cctt-cop-style-formats .cop-design-grid{grid-template-columns:1fr}#page-inc35copoma .cctt-cop-template-switch{padding:12px}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -4751,4 +4774,47 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 <!-- NUEVO: estabilizar iconos SVG de acciones de avisos desde su primer render. -->
 <script id="ccttAvisosIconosIniciales20261017">(()=>{'use strict';const shapes={Editar:'<path d="M12 20h9M16 4l4 4L7 21H3v-4z"/>',Pausar:'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',Reanudar:'<path d="M8 5l12 7-12 7z"/>',Eliminar:'<path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7m4-7v7"/>'};function init(){const box=document.getElementById('arManagementList');if(!box)return;const fix=()=>{for(const b of box.querySelectorAll('.ar-actions button')){const label=b.textContent.trim();const glyph=shapes[label];if(!glyph)continue;let svg=b.querySelector('svg');if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');b.prepend(svg)}if(svg.innerHTML!==glyph)svg.innerHTML=glyph;}};fix();new MutationObserver(fix).observe(box,{childList:true,subtree:false})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();</script>
+
+<!-- NUEVO: reubicar solamente los controles actuales de COPOMA, sin recrearlos ni alterar sus eventos. -->
+<script id="ccttCopomaLayout20261017Script">(()=>{'use strict';
+ function place(){
+  const page=document.getElementById('page-inc35copoma');if(!page)return;
+  const grid=page.querySelector(':scope > .grid.g2');if(!grid)return;
+  const editor=grid.querySelector('.cctt-cop-base')||grid.children[0];
+  const previewCard=grid.querySelector('.cctt-cop-templates')||grid.children[1];
+  if(!editor||!previewCard)return;
+  const editorDetails=Array.from(editor.querySelectorAll('details.cctt-ref-cop-fold')).find(d=>/Editor de estilo y tipografía/i.test(d.querySelector('summary')?.textContent||''));
+  if(!editorDetails)return;
+  let formatBox=editorDetails.querySelector('.cctt-cop-style-formats');
+  if(!formatBox){
+   formatBox=document.createElement('section');formatBox.className='cctt-cop-style-formats';
+   formatBox.innerHTML='<h4>Formatos oficiales y ajustes del mensaje</h4>';
+   editorDetails.append(formatBox);
+  }
+  const config=document.getElementById('copDesignControls');if(config&&config.parentElement!==formatBox)formatBox.append(config);
+  const formNotice=Array.from(previewCard.children).find(el=>el.matches('p.muted'));
+  if(formNotice&&formNotice.parentElement===previewCard)formatBox.insertBefore(formNotice,formatBox.querySelector('#copDesignControls'));
+  let switchCard=grid.querySelector('.cctt-cop-template-switch');
+  if(!switchCard){
+   switchCard=document.createElement('div');switchCard.className='cctt-cop-template-switch';
+   switchCard.innerHTML='<h3>Seleccionar plantilla oficial</h3>';
+   grid.insertBefore(switchCard,previewCard);
+  }
+  const select=document.getElementById('copTemplateList');if(select&&select.parentElement!==switchCard)switchCard.append(select);
+  const upload=document.getElementById('copTemplates');if(upload&&upload.parentElement!==formatBox){
+   const label=document.createElement('div');label.className='field';label.innerHTML='<label>Adjuntar formatos oficiales</label>';
+   label.append(upload);formatBox.insertBefore(label,formatBox.querySelector('#copDesignControls'));
+  }
+  previewCard.classList.add('cctt-cop-preview-card');
+  const oldHeading=Array.from(previewCard.children).find(el=>el.tagName==='H3'&&/Formatos/i.test(el.textContent));
+  if(oldHeading)oldHeading.remove();
+  const oldFold=Array.from(previewCard.children).find(el=>el.matches('details.cctt-ref-cop-fold'));
+  if(oldFold){const summary=oldFold.querySelector('summary');if(summary&&/maquetación y plantillas/i.test(summary.textContent)){oldFold.remove()}}
+ }
+ const start=()=>{place();const page=document.getElementById('page-inc35copoma');if(!page)return;
+  const watch=new MutationObserver(()=>{if(!document.getElementById('copDesignControls')?.closest('.cctt-cop-style-formats'))place()});
+  watch.observe(page,{childList:true,subtree:true});
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+})();</script>
 </body></html>
