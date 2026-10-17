@@ -4817,4 +4817,25 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();</script>
+
+<!-- NUEVO: acciones de imagen y PDF exclusivamente en la vista previa de COPOMA. -->
+<style id="ccttCopomaPreviewExportsStyle">
+#page-inc35copoma .cctt-cop-export-actions{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0 14px;align-items:center}
+#page-inc35copoma .cctt-cop-export-actions .btn{display:inline-flex;align-items:center;gap:8px;white-space:normal}
+#page-inc35copoma .cctt-cop-export-actions svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<!-- NUEVO: exportaciones COPOMA sobre la plantilla visual actualmente seleccionada. -->
+<script id="ccttCopomaPreviewExportsScript">(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ const paths={copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="m21 16-5-5L5 21"/>',pdf:'<path d="M6 2h9l4 4v16H6zM15 2v5h4M9 15h6m-6 3h6"/>'};
+ const icon=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+paths[k]+'</svg>';
+ function notice(message,bad=false){if(typeof window.toast==='function')window.toast(message,bad);else{let n=$('ccttCopExportNotice');if(n){n.textContent=message;n.hidden=false;}}}
+ function stage(){const host=$('copTemplatePreview');return host?.querySelector('.cctt-v35-stage,.cctt-v25-stage,.cop-exact-stage')||host;}
+ async function snapshot(){const el=stage();if(!el||!el.getBoundingClientRect().width||!el.getBoundingClientRect().height)throw Error('Primero selecciona una plantilla visible.');if(typeof window.html2canvas!=='function')throw Error('No se pudo cargar la herramienta de exportación.');if(typeof window.renderCop==='function')window.renderCop();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));const images=[...el.querySelectorAll('img')];await Promise.all(images.map(im=>im.decode?.().catch(()=>{})||Promise.resolve()));return window.html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0,logging:false});}
+ function saveBlob(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);}
+ const blobOf=(canvas,type,quality)=>new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('No se pudo generar la imagen.')),type,quality));
+ async function run(kind,button){button.disabled=true;try{const canvas=await snapshot();if(kind==='copy'){const blob=await blobOf(canvas,'image/png');if(!navigator.clipboard?.write||typeof ClipboardItem==='undefined')throw Error('Tu navegador no permite copiar imágenes desde este sitio.');await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);notice('Imagen de COPOMA copiada.');}else if(kind==='jpeg'){saveBlob(await blobOf(canvas,'image/jpeg',.95),'COPOMA_reporte.jpeg');notice('Imagen JPEG generada.');}else{const jsPDF=window.jspdf?.jsPDF;if(!jsPDF)throw Error('No se pudo cargar el generador de PDF.');const wide=canvas.width>=canvas.height,doc=new jsPDF({orientation:wide?'landscape':'portrait',unit:'mm',format:'a4',compress:true});const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight(),ratio=Math.min(pw/canvas.width,ph/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio;doc.addImage(canvas.toDataURL('image/jpeg',.94),'JPEG',(pw-w)/2,(ph-h)/2,w,h);doc.save('COPOMA_reporte.pdf');notice('PDF generado.');}}catch(e){notice(e.message||'No fue posible completar la exportación.',true)}finally{button.disabled=false}}
+ function init(){const page=$('page-inc35copoma'),preview=$('copTemplatePreview');if(!page||!preview)return;const card=preview.closest('.cctt-cop-preview-card')||preview.parentElement;if(!card||$('ccttCopExportActions'))return;const bar=document.createElement('div');bar.id='ccttCopExportActions';bar.className='cctt-cop-export-actions';for(const [kind,label,glyph] of [['copy','Copiar imagen','copy'],['jpeg','Descargar JPEG','image'],['pdf','Descargar PDF','pdf']]){const b=document.createElement('button');b.type='button';b.className='btn'+(kind==='copy'?' primary':'');b.innerHTML=icon(glyph)+'<span>'+label+'</span>';b.addEventListener('click',()=>run(kind,b));bar.append(b);}const msg=document.createElement('span');msg.id='ccttCopExportNotice';msg.className='muted';msg.hidden=true;bar.append(msg);preview.before(bar)}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script>
 </body></html>
