@@ -294,6 +294,33 @@ html[data-cctt-scheme="dark"] #page-inc35copoma .cop-visible-align label,html[da
 html[data-cctt-scheme="dark"] #page-inc35copoma .cop-visible-align select,html[data-cctt-scheme="dark"] #page-inc35copoma .cop-visible-align input{background:#162338!important;color:#fff!important;border-color:#718198!important}
 /* No cambiar vistas previas de impresión: deben permanecer con su fondo blanco original. */
 </style>
+
+<!-- NUEVO: vista Inicio solo iconos, inspirada en la captura del ZIP, sin alterar navegación, permisos ni temas existentes. -->
+<style id="ccttHomeIconReference20261017">
+/* MODIFICADO: un único cuadro de icono grande y nombre para cada módulo accesible. */
+#page-inicio #ccttHomeIconGrid.cctt-home-icon-grid{grid-template-columns:repeat(auto-fit,minmax(154px,1fr));column-gap:clamp(12px,2vw,32px);row-gap:34px;align-items:start;padding:22px 8px 30px}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile{--cctt-icon-tone:#6554ca;--cctt-icon-deep:#38267f;min-width:0;min-height:158px;padding:4px 6px 12px;gap:13px;border:0;border-radius:15px;background:transparent!important;box-shadow:none!important;color:var(--cctt-theme-text,var(--text));transform:none;isolation:isolate}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{position:relative;width:102px;height:102px;flex:0 0 102px;display:grid;place-items:center;overflow:hidden;border-radius:20px;background:linear-gradient(135deg,var(--cctt-icon-deep),var(--cctt-icon-tone));color:#fff;box-shadow:0 11px 23px color-mix(in srgb,var(--cctt-icon-tone) 26%,transparent),inset 0 1px 0 #ffffff35;border:1px solid #ffffff30;transition:transform .22s ease,box-shadow .22s ease,filter .22s ease}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol::before{content:"";position:absolute;inset:0;background-image:radial-gradient(#ffffff47 .9px,transparent 1px);background-size:12px 12px;opacity:.38;pointer-events:none}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol svg{position:relative;z-index:1;width:48px;height:48px;stroke:#fff;stroke-width:1.8;fill:none;filter:drop-shadow(0 2px 2px #0003)}
+#page-inicio #ccttHomeIconGrid .cctt-home-tile-label{max-width:170px;font-size:13px;font-weight:800;line-height:1.42;color:var(--cctt-theme-text,var(--text));text-wrap:balance}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:hover .cctt-home-icon-symbol,#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:focus-visible .cctt-home-icon-symbol{transform:translateY(-7px) scale(1.065);filter:saturate(1.15) brightness(1.08);box-shadow:0 18px 30px color-mix(in srgb,var(--cctt-icon-tone) 36%,transparent),0 0 0 3px color-mix(in srgb,var(--cctt-icon-tone) 24%,transparent)}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:active .cctt-home-icon-symbol{transform:translateY(-2px) scale(.97)}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:focus-visible{outline:2px solid var(--cctt-theme-accent,var(--blue));outline-offset:4px}
+/* NUEVO: colores de identificación solo en los cuadros, sin cambiar la paleta del sitio. */
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n + 1){--cctt-icon-tone:#4e4ab5;--cctt-icon-deep:#272263}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n + 2){--cctt-icon-tone:#b02b58;--cctt-icon-deep:#650d30}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n + 3){--cctt-icon-tone:#0d8fa5;--cctt-icon-deep:#07505f}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n + 4){--cctt-icon-tone:#b7680c;--cctt-icon-deep:#763700}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n + 5){--cctt-icon-tone:#009a74;--cctt-icon-deep:#006047}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n + 6){--cctt-icon-tone:#7439bd;--cctt-icon-deep:#421b85}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n + 7){--cctt-icon-tone:#a4185b;--cctt-icon-deep:#610b37}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:nth-child(8n){--cctt-icon-tone:#117e79;--cctt-icon-deep:#075450}
+html[data-cctt-scheme="dark"] #page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{border-color:#ffffff2d}
+@media(max-width:720px){#page-inicio #ccttHomeIconGrid.cctt-home-icon-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 6px;padding:15px 0}#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile{min-height:126px;padding:2px 2px 8px;gap:9px}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{width:clamp(65px,21vw,89px);height:clamp(65px,21vw,89px);flex-basis:auto;border-radius:16px}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol svg{width:39px;height:39px}#page-inicio #ccttHomeIconGrid .cctt-home-tile-label{font-size:11px}}
+@media(max-width:370px){#page-inicio #ccttHomeIconGrid.cctt-home-icon-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{transition:none!important}#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:hover .cctt-home-icon-symbol{transform:none!important}}
+</style>
 </head>
 <body>
 <div class="app">
