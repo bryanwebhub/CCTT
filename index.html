@@ -321,6 +321,61 @@ html[data-cctt-scheme="dark"] #page-inicio #ccttHomeIconGrid .cctt-home-icon-sym
 @media(max-width:370px){#page-inicio #ccttHomeIconGrid.cctt-home-icon-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{transition:none!important}#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:hover .cctt-home-icon-symbol{transform:none!important}}
 </style>
+<!-- NUEVO: referencias Tarjetas, Iconos y Reporte cesionarios; solo presentación y variables del tema existente. -->
+<style id="ccttReferenciaTarjetasIconosReporte">
+/* NUEVO: Inicio / presentación Tarjetas. */
+#page-inicio #homeKpis{gap:14px;margin-bottom:25px}
+#page-inicio #homeKpis .kpi{position:relative;min-height:112px;border-radius:15px;padding:19px;background:var(--cctt-theme-card,var(--card));border:1px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-text,var(--text));box-shadow:0 6px 22px #00000012;overflow:hidden}
+#page-inicio #homeKpis .kpi:before{content:"";position:absolute;right:18px;top:17px;width:27px;height:27px;border-radius:8px;background:var(--cctt-theme-accent,var(--blue));opacity:.22}
+#page-inicio #homeKpis .kpi b{font-size:30px;color:var(--cctt-theme-text,var(--text));margin:9px 0 4px}
+#page-inicio #homeKpis .kpi span{font-weight:700;color:var(--cctt-theme-muted,var(--muted))}
+#page-inicio #moduleCards{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+#page-inicio #moduleCards>.card{--cctt-tile-ink:var(--cctt-theme-accent,var(--blue));display:flex;flex-direction:column;position:relative;min-height:195px;border-radius:16px;padding:20px 18px 12px;overflow:hidden;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));box-shadow:0 6px 20px #0000000f;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+#page-inicio #moduleCards>.card:before{content:"";display:block;height:31px;width:31px;flex:0 0 31px;margin-bottom:12px;border-radius:10px;background:color-mix(in srgb,var(--cctt-tile-ink) 25%,transparent);border:1px solid color-mix(in srgb,var(--cctt-tile-ink) 40%,transparent)}
+#page-inicio #moduleCards>.card:after{content:"Operativo";position:absolute;top:20px;right:15px;font-size:10px;font-weight:800;padding:4px 7px;border-radius:6px;background:color-mix(in srgb,var(--cctt-tile-ink) 15%,transparent);color:var(--cctt-theme-text,var(--text))}
+#page-inicio #moduleCards>.card:nth-child(7n+1){--cctt-tile-ink:#7654d4}#page-inicio #moduleCards>.card:nth-child(7n+2){--cctt-tile-ink:#c03b67}#page-inicio #moduleCards>.card:nth-child(7n+3){--cctt-tile-ink:#0d9ca9}#page-inicio #moduleCards>.card:nth-child(7n+4){--cctt-tile-ink:#d78b13}#page-inicio #moduleCards>.card:nth-child(7n+5){--cctt-tile-ink:#08a17f}#page-inicio #moduleCards>.card:nth-child(7n+6){--cctt-tile-ink:#7d4bc9}#page-inicio #moduleCards>.card:nth-child(7n){--cctt-tile-ink:#3a83d8}
+#page-inicio #moduleCards>.card:hover{transform:translateY(-4px);border-color:var(--cctt-tile-ink);box-shadow:0 15px 28px #0000001f}
+#page-inicio #moduleCards>.card h3{font-size:15px;line-height:1.35;margin:0 0 7px}
+#page-inicio #moduleCards>.card p{font-size:12px;line-height:1.5;margin:0 0 13px;flex:1;color:var(--cctt-theme-muted,var(--muted))}
+#page-inicio #moduleCards>.card button{background:transparent;color:var(--cctt-tile-ink);padding:10px 0 3px;border-radius:0;justify-content:flex-end;border-top:1px solid var(--cctt-theme-line,var(--line));font-size:12px;box-shadow:none!important;transform:none!important}
+#page-inicio #moduleCards>.card button:after{content:" →"}
+/* MODIFICADO: Iconos con efecto de la referencia; se mantiene su generador y control de permisos. */
+#page-inicio #ccttHomeIconGrid{grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:27px 16px;align-items:start;padding:22px 8px}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile{min-height:156px;gap:13px}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{width:104px;height:104px;flex-basis:104px;border-radius:20px}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol svg{width:49px;height:49px}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:hover .cctt-home-icon-symbol{transform:translateY(-8px) scale(1.075) rotate(-2deg)}
+#page-inicio #ccttHomeIconGrid .cctt-home-icon-tile:active .cctt-home-icon-symbol{transform:scale(.95)}
+/* NUEVO: Reporte cesionarios, disposición compacta sin reemplazar campos o acciones. */
+#page-reporte .cctt-rep-header{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;padding:15px 17px;margin:0 0 16px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:15px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#page-reporte .cctt-rep-head-title{font-size:16px;font-weight:900;margin:0}#page-reporte .cctt-rep-head-sub{font-size:12px;color:var(--cctt-theme-muted,var(--muted));margin:5px 0 0}
+#page-reporte .cctt-rep-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+#page-reporte .cctt-rep-toolbar .btn{font-size:12px;padding:9px 11px;min-height:37px}
+#page-reporte .cctt-rep-layout{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(350px,.96fr);gap:16px;align-items:start}
+#page-reporte .cctt-rep-column{display:grid;gap:14px;min-width:0}
+#page-reporte .cctt-rep-layout>.card,#page-reporte .cctt-rep-column>.card{min-width:0}
+#page-reporte .cctt-rep-column .card{padding:15px}
+#page-reporte .cctt-rep-column .card h3{margin:0 0 12px;font-size:14px}
+#page-reporte .cctt-rep-column .field label{font-size:11px}
+#page-reporte .cctt-rep-column .field input,#page-reporte .cctt-rep-column .field select{min-height:34px;padding:7px 9px;font-size:12px}
+#page-reporte .cctt-rep-column .field textarea{font-size:12px;min-height:80px}
+#page-reporte .cctt-rep-column #repEditTable{font-size:11px}
+#page-reporte .cctt-rep-column .tbl{min-width:0;width:100%;font-size:11px}#page-reporte .cctt-rep-column .tbl td,#page-reporte .cctt-rep-column .tbl th{padding:6px 5px;white-space:normal}
+#page-reporte .cctt-rep-column #repStatusManager{max-height:170px;overflow:auto}
+#page-reporte .cctt-rep-preview{position:sticky;top:90px;max-height:calc(100vh - 105px);overflow:auto}
+#page-reporte #reportPreview{width:100%;overflow:hidden}
+/* NUEVO: diálogo Formato con plantillas y ajustes ya existentes. */
+#ccttRepFormatOverlay[hidden]{display:none!important}
+#ccttRepFormatOverlay{position:fixed;inset:0;z-index:270500;display:flex;align-items:center;justify-content:center;padding:16px;background:#030918b8;backdrop-filter:blur(4px)}
+#ccttRepFormatPanel{width:min(980px,100%);max-height:90vh;overflow:auto;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-radius:17px;padding:20px;box-shadow:0 25px 75px #0006}
+#ccttRepFormatPanel .cctt-rep-dialog-head{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:14px}
+#ccttRepFormatPanel .cctt-rep-format-inner{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+#ccttRepFormatPanel .cctt-rep-format-inner .card{min-width:0;margin:0!important;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#ccttRepFormatPanel #repTemplatePreview{max-height:52vh}
+@media(max-width:1100px){#page-reporte .cctt-rep-layout{grid-template-columns:1fr}#page-reporte .cctt-rep-preview{position:static;max-height:none}}
+@media(max-width:750px){#page-inicio #moduleCards{grid-template-columns:1fr}#page-inicio #ccttHomeIconGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px 5px}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{width:69px;height:69px;flex-basis:69px}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol svg{width:35px;height:35px}#ccttRepFormatPanel .cctt-rep-format-inner{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#page-inicio #moduleCards>.card{transition:none!important}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{transition:none!important}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -4269,6 +4324,45 @@ const base=window.ccttRenderIconHome;window.ccttRenderIconHome=function(){base?.
 window.addEventListener('cctt:session',e=>{session=e.detail?.session||null;userId=session?.user?.id||'guest';updateRecuerdoAdminButtons();syncAdminFont();setTimeout(()=>{menuLink();addCatalog();applyPref();load()},80)});
 window.addEventListener('cctt:logout',()=>{session=null;photos=[];lb.hidden=true;closeAdminPanel();updateRecuerdoAdminButtons();syncAdminFont();document.documentElement.classList.remove('cctt-icons-only')});
 setTimeout(async()=>{try{const {data}=await client()?.auth.getSession();if(data?.session){session=data.session;userId=session.user.id;updateRecuerdoAdminButtons();syncAdminFont();applyPref();load()}}catch{}},1200);
+})();
+</script>
+<!-- NUEVO: solo reorganiza visualmente los nodos ya existentes del Reporte; preserva sus IDs, listeners y funciones de exportación. -->
+<script id="ccttReporteReferenciaBehavior">
+(function(){
+ 'use strict';
+ function montar(){
+  const section=document.getElementById('page-reporte');if(!section||section.dataset.ccttRefMounted)return;
+  const title=section.querySelector(':scope > .section-title');
+  const grids=Array.from(section.children).filter(x=>x.classList.contains('grid'));
+  const fields=grids[0]?.children[0],status=grids[0]?.children[1];
+  const formats=grids[1],preview=Array.from(section.children).find(x=>x.classList.contains('card')&&x.querySelector('#reportPreview'));
+  if(!fields||!status||!formats||!preview)return;
+  section.dataset.ccttRefMounted='1';
+  const header=document.createElement('div');header.className='cctt-rep-header';
+  header.innerHTML='<div><h3 class="cctt-rep-head-title">Reporte Operativo de Cesionarios</h3><p class="cctt-rep-head-sub">Boletín informativo · Edición de datos y vista previa</p></div><div class="cctt-rep-toolbar" id="ccttRepToolbar"><button type="button" class="btn" id="ccttRepFormatOpen">▣ Formato</button></div>';
+  title.after(header);
+  const bar=header.querySelector('#ccttRepToolbar');
+  const buttonNames={repUpdate:'Actualizar vista',repAddRow:'Agregar cesionario',repImage:'Generar imagen',repPdf:'Generar PDF',repPrint:'Imprimir',repResetStyle:'Restablecer boletín',repResetRows:'Restablecer tabla',repCopyImageV23:'Copiar imagen'};
+  for(const [id,label] of Object.entries(buttonNames)){
+   const btn=document.getElementById(id);if(btn){bar.append(btn);btn.textContent=label;}
+  }
+  const layout=document.createElement('div');layout.className='cctt-rep-layout';
+  const left=document.createElement('div');left.className='cctt-rep-column';
+  left.append(fields,status);preview.classList.add('cctt-rep-preview');layout.append(left,preview);
+  header.after(layout);
+  grids[0].remove();
+  const overlay=document.createElement('div');overlay.id='ccttRepFormatOverlay';overlay.hidden=true;
+  overlay.innerHTML='<div id="ccttRepFormatPanel" role="dialog" aria-modal="true" aria-labelledby="ccttRepFormatTitle"><div class="cctt-rep-dialog-head"><h3 id="ccttRepFormatTitle">Formatos oficiales y configuración</h3><button type="button" class="btn" id="ccttRepFormatClose">Cerrar ✕</button></div><div class="cctt-rep-format-inner" id="ccttRepFormatInner"></div></div>';
+  document.body.append(overlay);
+  overlay.querySelector('#ccttRepFormatInner').append(...Array.from(formats.children));formats.remove();
+  const open=()=>{overlay.hidden=false;overlay.querySelector('#ccttRepFormatClose').focus()};
+  const close=()=>{overlay.hidden=true;document.getElementById('ccttRepFormatOpen').focus()};
+  document.getElementById('ccttRepFormatOpen').addEventListener('click',open);
+  document.getElementById('ccttRepFormatClose').addEventListener('click',close);
+  overlay.addEventListener('click',ev=>{if(ev.target===overlay)close()});
+  document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&!overlay.hidden)close()});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',montar);else montar();
 })();
 </script>
 </body></html>
