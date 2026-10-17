@@ -477,6 +477,91 @@ html[data-cctt-scheme="dark"] #page-inicio #ccttHomeIconGrid .cctt-home-icon-sym
 @media(max-width:1100px){#page-inc35vial .cctt-vial-main{grid-template-columns:1fr}#page-inc35vial .cctt-vial-preview{position:static}}
 @media(max-width:620px){#page-inc35vial #vialFields{grid-template-columns:1fr}#page-inc35vial .cctt-vial-header{align-items:stretch}}
 </style>
+<!-- NUEVO: aproximación estructural de las tres referencias, aislada por módulos y adaptable a los temas existentes. -->
+<style id="ccttReferenciaTriple20261017">
+/* MODIFICADO: un solo emblema por tarjeta de Inicio; eliminar el cuadrito decorativo vacío previo. */
+#moduleCards [data-page] .cctt-home-card-icon{display:flex!important;align-items:center;justify-content:center;width:49px!important;height:49px!important;flex:0 0 49px}
+#moduleCards [data-page] .cctt-home-card-icon svg{display:block!important;width:27px!important;height:27px!important}
+#moduleCards [data-page] .cctt-ref-empty-badge{display:none!important}
+#moduleCards [data-page]{position:relative}
+#homeKpis .cctt-home-kpi-icon{display:grid!important;place-items:center}
+/* MODIFICADO: Vialidades: diseño compacto de consola con botones alineados y previsualización independiente. */
+#page-inc35vial .cctt-vial-header{align-items:center!important;gap:12px!important;margin:0 0 14px!important}
+#page-inc35vial .cctt-vial-header h2{font-size:clamp(19px,2vw,24px)!important;margin:0 0 3px!important}
+#page-inc35vial .cctt-vial-header>.row{margin-left:auto;justify-content:flex-end}
+#page-inc35vial .cctt-vial-header .btn{font-size:12px!important;padding:8px 11px!important}
+#page-inc35vial .cctt-vial-main{display:grid!important;grid-template-columns:minmax(0,1.17fr) minmax(320px,.83fr)!important;gap:18px!important;align-items:start}
+#page-inc35vial .cctt-vial-main>.card{min-width:0!important;padding:20px!important;box-shadow:none!important}
+#page-inc35vial .cctt-vial-editor .grid.g2:not(#vialFields){border-bottom:1px solid var(--cctt-theme-line,var(--line));padding-bottom:16px;margin-bottom:20px!important}
+#page-inc35vial #vialFields{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important}
+#page-inc35vial #vialFields>.field{min-width:0;border:1px solid var(--cctt-theme-line,var(--line));border-radius:10px;padding:10px;background:var(--cctt-theme-card,var(--card))}
+#page-inc35vial #vialFields>.field label{font-size:12px!important;margin-bottom:2px;white-space:normal}
+#page-inc35vial #vialFields input{min-width:0;width:100%;font-size:12px;min-height:33px!important;padding:7px!important}
+#page-inc35vial #vialFields .mini-btn{font-size:10px!important;padding:6px 7px!important;white-space:normal;line-height:1.2!important}
+#page-inc35vial .cctt-vial-preview .cctt-vial-mode{display:flex;gap:7px;justify-content:flex-end;flex-wrap:nowrap}
+#page-inc35vial .cctt-vial-preview .cctt-vial-mode>.btn{font-size:11px!important;padding:7px 10px!important;min-width:0}
+#page-inc35vial #vialPreview{font-size:12px!important;line-height:1.8!important;min-height:410px!important;padding:18px!important;white-space:pre-wrap!important;overflow-wrap:anywhere}
+/* MODIFICADO: Redes y reporte: proporción de editor y visor, controles de acción compactos. */
+#page-inc35redes>.section-title{display:flex!important;margin:4px 0 13px!important}
+#page-inc35redes>.split{display:grid!important;grid-template-columns:minmax(0,1.38fr) minmax(315px,.92fr)!important;align-items:start!important;gap:18px}
+#page-inc35redes>.split>.card{min-width:0!important;padding:20px!important;box-shadow:none!important}
+#page-inc35redes .field{margin-bottom:13px}
+#page-inc35redes .field>label{font-size:12px!important;margin-bottom:2px}
+#page-inc35redes input,#page-inc35redes select,#page-inc35redes textarea{font-size:13px!important;max-width:100%}
+#page-inc35redes #socialText{min-height:112px!important;max-height:160px}
+#page-inc35redes #socialCanvas{display:block!important;max-height:510px!important;aspect-ratio:1/1;object-fit:contain!important}
+#page-inc35redes #socialTextPreview{min-height:105px!important;padding:14px!important}
+#page-inc35redes .cctt-ref-social-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+#page-inc35redes .cctt-ref-social-actions .btn{padding:8px 10px!important;font-size:12px!important}
+#page-inc35redes .cctt-ref-social-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px;padding-bottom:12px;border-bottom:1px solid var(--cctt-theme-line,var(--line))}
+#page-inc35redes .cctt-ref-social-header h3{margin:0}
+#page-inc35redes .cctt-ref-social-side{display:grid;gap:16px}
+#page-inc35redes .cctt-ref-social-side>.card{min-width:0}
+/* MODIFICADO: COPOMA: editor base, ajustes plegables y plantilla junto a la vista previa. */
+#page-inc35copoma>.grid.g2{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr)!important;gap:18px!important;align-items:start}
+#page-inc35copoma>.grid.g2>.card{min-width:0;padding:19px!important}
+#page-inc35copoma .cctt-cop-base h3{display:none}
+#page-inc35copoma .cctt-cop-base .field{margin-bottom:12px}
+#page-inc35copoma .cctt-cop-base textarea{min-height:140px!important}
+#page-inc35copoma .cctt-ref-cop-title{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:850;margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--cctt-theme-line,var(--line))}
+#page-inc35copoma .cctt-ref-cop-title:before{content:'';height:10px;width:10px;background:#18bd8f;border-radius:50%}
+#page-inc35copoma details.cctt-ref-cop-fold{margin-top:16px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:13px;padding:14px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#page-inc35copoma details.cctt-ref-cop-fold>summary{cursor:pointer;list-style:none;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:12px}
+#page-inc35copoma details.cctt-ref-cop-fold>summary:after{content:'⌄';font-size:18px}
+#page-inc35copoma details.cctt-ref-cop-fold[open]>summary:after{content:'⌃'}
+#page-inc35copoma details.cctt-ref-cop-fold>summary:focus-visible{outline:2px solid var(--cctt-theme-accent,#9870ee)}
+#page-inc35copoma details.cctt-ref-cop-fold .cop-visible-align{background:transparent!important;border:0!important;padding:5px 0!important}
+#page-inc35copoma #copTemplatePreview{min-height:430px!important}
+#page-inc35copoma #copTemplateList{margin-top:9px}
+@media(max-width:1000px){#page-inc35vial .cctt-vial-main,#page-inc35redes>.split,#page-inc35copoma>.grid.g2{grid-template-columns:1fr!important}}
+@media(max-width:600px){#page-inc35vial #vialFields{grid-template-columns:1fr!important}#page-inc35vial .cctt-vial-header{flex-direction:column!important;align-items:stretch!important}#page-inc35vial .cctt-vial-header>.row{justify-content:flex-start}#page-inc35redes .cctt-ref-social-header{flex-wrap:wrap}}
+</style>
+
+<!-- NUEVO: tarjeta de Inicio con un solo recuadro SVG, alineado al título. -->
+<style id="ccttHomeSingleIcon20261017">
+#page-inicio #moduleCards>.card::before{display:none!important;content:none!important}
+#page-inicio #moduleCards>.card{min-height:168px!important;padding:16px 18px 12px!important;align-items:stretch}
+#page-inicio #moduleCards>.card .cctt-home-card-icon{width:48px!important;height:48px!important;flex:0 0 48px!important;margin:0 0 12px!important;display:grid!important;place-items:center!important;align-self:flex-start!important}
+#page-inicio #moduleCards>.card .cctt-home-card-icon svg{width:28px!important;height:28px!important;display:block!important}
+#page-inicio #moduleCards>.card h3{margin-top:0!important}
+#page-inicio #moduleCards>.card::after{top:17px!important}
+/* NUEVO: acciones con pictogramas exclusivos en Avisos recurrentes y Consignas. */
+#page-avisosRecurrentes #arManagementList .ar-actions button{display:inline-flex!important;align-items:center;justify-content:center;gap:6px;min-width:86px}
+#page-avisosRecurrentes #arManagementList .ar-actions svg{display:block!important;flex:0 0 17px;width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#page-consignas #conDetails .row button{display:inline-flex;align-items:center;gap:8px}
+#page-consignas #conDetails .row button svg,#page-consignas .cctt-con-network-toolbar button svg{width:18px;height:18px;flex:0 0 18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* NUEVO: exploración de relaciones a distintos niveles, sin alterar los colores globales. */
+#page-consignas #conMap{overflow:hidden;min-height:390px}
+#page-consignas #conMap #conNodes,#page-consignas #conMap #conEdges{transition:transform .24s ease;transform-origin:50% 45%}
+#page-consignas #conMap .con-bubble{transition:opacity .2s ease,filter .2s ease,box-shadow .2s ease}
+#page-consignas #conMap .con-bubble.cctt-con-dim{opacity:.18;filter:grayscale(.65)}
+#page-consignas #conMap .con-bubble.cctt-con-focus{outline:4px solid #875fe1;z-index:3}
+#page-consignas #ccttConMapControls{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:12px 0 0}
+#page-consignas #ccttConMapControls .btn{padding:8px 12px}
+#page-consignas #ccttConMapControls output{font-size:12px;font-weight:800;min-width:45px;text-align:center;color:var(--cctt-theme-text,var(--text))}
+#page-consignas #conDeadlineIndefinite{accent-color:var(--cctt-theme-accent,#875fe1)}
+@media(prefers-reduced-motion:reduce){#page-consignas #conMap #conNodes,#page-consignas #conMap #conEdges,#page-consignas #conMap .con-bubble{transition:none!important}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -600,7 +685,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 </section>
 <!-- NUEVO: Módulo Consignas -->
 <section class="page" id="page-consignas"><div class="section-title"><h2>Consignas y seguimiento</h2></div>
- <div class="card"><h3>Nueva consigna</h3><div class="grid g3"><div class="field"><label>Título</label><input id="conTitle" maxlength="160"></div><div class="field"><label>Fecha de vencimiento</label><input id="conDate" type="date"></div><div class="field"><label>Hora de vencimiento</label><input id="conTime" type="time"></div></div><div class="field" style="margin-top:10px"><label>Contexto e instrucciones</label><textarea id="conContext" rows="4"></textarea></div><div class="field" style="margin-top:10px"><label>Relacionar con otras consignas</label><div id="conLinks" class="con-link-list"></div></div><div class="row" style="margin-top:12px"><button class="btn primary" id="conSave">Guardar consigna</button><button class="btn" id="conReset">Limpiar formulario</button><span id="conEditLabel" class="muted"></span></div></div>
+ <div class="card"><h3>Nueva consigna</h3><div class="grid g3"><div class="field"><label>Título</label><input id="conTitle" maxlength="160"></div><div class="field"><label>Fecha de vencimiento</label><input id="conDate" type="date"></div><div class="field"><label>Hora de vencimiento</label><input id="conTime" type="time"></div></div><!-- NUEVO: vencimiento opcional e indefinido. --><label class="row" style="margin:10px 0 0;font-size:13px;font-weight:700"><input type="checkbox" id="conDeadlineIndefinite"> Sin fecha ni hora de vencimiento (indefinida)</label><div class="field" style="margin-top:10px"><label>Contexto e instrucciones</label><textarea id="conContext" rows="4"></textarea></div><div class="field" style="margin-top:10px"><label>Relacionar con otras consignas</label><div id="conLinks" class="con-link-list"></div></div><div class="row" style="margin-top:12px"><button class="btn primary" id="conSave">Guardar consigna</button><button class="btn" id="conReset">Limpiar formulario</button><span id="conEditLabel" class="muted"></span></div></div>
  <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Mapa de consignas</h3><span class="muted">Selecciona una burbuja para abrir su contexto y actualizar el seguimiento.</span></div><div class="con-map" id="conMap"><svg id="conEdges" aria-hidden="true"></svg><div id="conNodes"></div></div><p id="conEmpty" class="empty">Aún no hay consignas registradas.</p></div>
  <div class="card" id="conDetails" style="margin-top:16px;display:none"><h3>Detalle de consigna</h3><div id="conDetailText"></div><div class="row" style="margin-top:12px"><button class="btn" id="conEdit">Editar</button><button class="btn ok" id="conActive">Vigente</button><button class="btn primary" id="conDone">Atendida</button><button class="btn bad" id="conDelete">Solicitar eliminación</button></div></div>
 </section>
@@ -4027,7 +4112,37 @@ E('conNodes').addEventListener('click',async ev=>{const b=ev.target.closest('[da
  const update=async(t,other)=>{const rel=new Set(t.related_ids||[]);if(kind==='connect')rel.add(other);else rel.delete(other);await request('',getClient().from('cctt_consignas').update({related_ids:[...rel],updated_at:new Date().toISOString()}).eq('id',t.id))};
  try{await update(first,id);await update(second,first.id);await load();toast(kind==='connect'?'Consignas vinculadas.':'Conexión eliminada.')}catch(e){err(e)}
 },true);
-window.addEventListener('resize',()=>{if(E('conMap').offsetParent)redrawConEdges()});
+window.addEventListener('resize',()=>{if(E('conMap').offsetParent)redrawConEdges()}); 
+// NUEVO: mapeo jerárquico exploratorio de consignas relacionadas, con zoom y foco seleccionable.
+const conMapControls=document.createElement('div');conMapControls.id='ccttConMapControls';
+conMapControls.innerHTML='<button type="button" class="btn" id="conExplore">Explorar conexiones</button><button type="button" class="btn" id="conZoomOut" aria-label="Alejar mapa">−</button><output id="conZoomValue">100%</output><button type="button" class="btn" id="conZoomIn" aria-label="Acercar mapa">+</button><button type="button" class="btn" id="conZoomReset">Mostrar toda la red</button><span class="muted" id="conMapInfo">Selecciona una consigna principal y explora sus conexiones.</span>';
+E('conMap').parentElement.insertBefore(conMapControls,E('conMap'));
+let conZoom=1,conFocus=null,conDepth=1;
+const conIndef=E('conDeadlineIndefinite');
+function syncConIndef(){const checked=conIndef.checked;for(const id of ['conDate','conTime']){E(id).disabled=checked;if(checked)E(id).value='';}}
+conIndef.onchange=syncConIndef;
+E('conReset').addEventListener('click',()=>{conIndef.checked=false;syncConIndef()});
+E('conEdit').addEventListener('click',()=>{const t=tasks.find(x=>x.id===selectedTask);conIndef.checked=!t?.deadline;syncConIndef()});
+const oldSaveConClick=E('conSave').onclick;
+E('conSave').onclick=async()=>{if(conIndef.checked){E('conDate').value='';E('conTime').value='';}await oldSaveConClick();};
+function updateConMapExplore(){
+ const label=E('conMapInfo'),nodes=E('conNodes'),edges=E('conEdges');if(!nodes||!edges)return;
+ const scale=Math.round(conZoom*100);E('conZoomValue').textContent=scale+'%';
+ nodes.style.transform=`scale(${conZoom})`;edges.style.transform=`scale(${conZoom})`;
+ const reachable=new Set();if(conFocus){reachable.add(conFocus);let frontier=[conFocus];for(let depth=0;depth<conDepth;depth++){const next=[];for(const id of frontier){const t=tasks.find(x=>x.id===id);for(const other of tasks){if(other.id!==id&&((t?.related_ids||[]).includes(other.id)||(other.related_ids||[]).includes(id))&&!reachable.has(other.id)){reachable.add(other.id);next.push(other.id)}}}frontier=next;}}
+ nodes.querySelectorAll('[data-con-id]').forEach(n=>{n.classList.toggle('cctt-con-dim',!!conFocus&&!reachable.has(n.dataset.conId));n.classList.toggle('cctt-con-focus',n.dataset.conId===conFocus)});
+ label.textContent=conFocus?`Consigna principal y conexiones hasta ${conDepth} nivel(es) · ${reachable.size} visibles. Usa acercar para profundizar.`:'Toda la red visible. Selecciona una burbuja y pulsa Explorar conexiones.';
+}
+E('conExplore').onclick=()=>{if(!selectedTask)return;conFocus=selectedTask;conDepth=1;conZoom=Math.max(conZoom,1.2);updateConMapExplore()};
+E('conZoomIn').onclick=()=>{conZoom=Math.min(2.1,Math.round((conZoom+.2)*10)/10);if(conFocus)conDepth=Math.min(8,conDepth+1);updateConMapExplore()};
+E('conZoomOut').onclick=()=>{conZoom=Math.max(.65,Math.round((conZoom-.2)*10)/10);if(conFocus)conDepth=Math.max(1,conDepth-1);updateConMapExplore()};
+E('conZoomReset').onclick=()=>{conZoom=1;conFocus=null;conDepth=1;updateConMapExplore()};
+const conRenderWithDrag=renderTasks;
+renderTasks=function(){conRenderWithDrag();if(conFocus&&!tasks.some(x=>x.id===conFocus))conFocus=null;updateConMapExplore()};
+E('conNodes').addEventListener('click',ev=>{const b=ev.target.closest('[data-con-id]');if(b&&!connectionMode&&conFocus){conFocus=b.dataset.conId;conDepth=1;updateConMapExplore()}},false);
+const conSvgIcons={conEdit:'<path d="M12 20h9M16 4l4 4L7 21H3v-4z"/>',conActive:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',conDone:'<path d="M4 12l5 5L20 6"/><path d="M4 19h16"/>',conDelete:'<path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7m4-7v7"/>',ccttConConnect:'<path d="M10 13a5 5 0 0 0 7 .5l3-3a5 5 0 0 0-7-7l-2 2M14 11a5 5 0 0 0-7-.5l-3 3a5 5 0 0 0 7 7l2-2"/>',ccttConDisconnect:'<path d="m3 3 18 18M10 13a5 5 0 0 0 7 .5l3-3M14 11a5 5 0 0 0-7-.5l-3 3"/>',ccttConArrange:'<path d="M4 7h16M4 12h16M4 17h16"/>'};
+for(const [id,glyph] of Object.entries(conSvgIcons)){const btn=E(id);if(!btn||btn.querySelector('svg'))continue;btn.insertAdjacentHTML('afterbegin',`<svg viewBox="0 0 24 24" aria-hidden="true">${glyph}</svg>`)}
+
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
@@ -4591,4 +4706,49 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+<!-- NUEVO: reubicar únicamente los nodos existentes de Inicio, Redes y COPOMA; se conservan identificadores y listeners. -->
+<script id="ccttReferenciaTripleBehavior20261017">
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ function initHome(){
+  const host=$('moduleCards');if(!host)return;
+  function fix(){host.querySelectorAll('[data-page]').forEach(card=>{
+   const existing=card.querySelector('.cctt-home-card-icon');if(!existing)return;
+   // Sólo se oculta el distintivo decorativo vacío; el SVG funcional permanece.
+   const all=Array.from(card.querySelectorAll('span,div')).filter(n=>n!==existing&&!n.contains(existing)&&!n.textContent.trim()&&!n.querySelector('svg')&&n.getBoundingClientRect().width>16&&n.getBoundingClientRect().width<65);
+   for(const n of all.slice(0,2))if(n.parentElement===existing.parentElement&&n!==existing)n.classList.add('cctt-ref-empty-badge');
+   existing.setAttribute('aria-hidden','true');
+  })}
+  fix(); const ob=new MutationObserver(()=>{ob.disconnect();fix();ob.observe(host,{childList:true})});ob.observe(host,{childList:true});
+ }
+ function initSocial(){const page=$('page-inc35redes');if(!page||page.dataset.ccttRefTriple)return;page.dataset.ccttRefTriple='1';
+  const split=page.querySelector(':scope > .split'),first=split?.children[0],second=split?.children[1];if(!first||!second)return;
+  const title=first.querySelector(':scope>h3');if(title){const header=document.createElement('div');header.className='cctt-ref-social-header';first.insertBefore(header,title);header.append(title)}
+  const actions=$('socialBuild')?.parentElement;if(actions)actions.classList.add('cctt-ref-social-actions');
+  const hint=first.querySelector(':scope>.notice');if(hint)hint.style.fontSize='12px';
+  const previewTitle=second.querySelector('h3');if(previewTitle)previewTitle.textContent='Vista previa de imagen';
+  const textTitle=Array.from(second.querySelectorAll('h3')).find(n=>n.textContent.includes('Texto independiente'));if(textTitle)textTitle.style.marginTop='22px';
+ }
+ function initCopoma(){const page=$('page-inc35copoma');if(!page||page.dataset.ccttRefTriple)return;page.dataset.ccttRefTriple='1';
+  const grid=page.querySelector(':scope>.grid.g2'),editor=grid?.children[0],templates=grid?.children[1];if(!editor||!templates)return;
+  editor.classList.add('cctt-cop-base');templates.classList.add('cctt-cop-templates');
+  const title=document.createElement('div');title.className='cctt-ref-cop-title';title.textContent='Contenido y formato base';editor.prepend(title);
+  const styleHead=Array.from(editor.querySelectorAll(':scope>h3')).find(e=>/Editor de estilo/i.test(e.textContent));
+  const toolbar=$('copToolbar'),align=$('copVisibleAlign'),rich=$('copRichEditor');
+  if(styleHead&&toolbar&&align&&rich){
+   const detail=document.createElement('details');detail.className='cctt-ref-cop-fold';const summary=document.createElement('summary');summary.textContent='Editor de estilo y tipografía';detail.append(summary,toolbar,align,rich);editor.append(detail);styleHead.remove();
+  }
+  const oldHead=templates.querySelector(':scope>h3');if(oldHead)oldHead.textContent='Formatos oficiales (administración)';
+  const templateInput=$('copTemplates'),list=$('copTemplateList');if(templateInput&&list){
+   const detail=document.createElement('details');detail.className='cctt-ref-cop-fold';const summary=document.createElement('summary');summary.textContent='Ajuste fino de maquetación y plantillas';detail.append(summary,templateInput,list);templates.insertBefore(detail,$('copTemplatePreview')?.previousElementSibling||null);
+  }
+  const preview=$('copTemplatePreview');if(preview){preview.setAttribute('aria-label','Vista previa interactiva del comunicado');}
+ }
+ const mount=()=>{initHome();initSocial();initCopoma()};
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+})();
+</script>
+
+<!-- NUEVO: estabilizar iconos SVG de acciones de avisos desde su primer render. -->
+<script id="ccttAvisosIconosIniciales20261017">(()=>{'use strict';const shapes={Editar:'<path d="M12 20h9M16 4l4 4L7 21H3v-4z"/>',Pausar:'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',Reanudar:'<path d="M8 5l12 7-12 7z"/>',Eliminar:'<path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7m4-7v7"/>'};function init(){const box=document.getElementById('arManagementList');if(!box)return;const fix=()=>{for(const b of box.querySelectorAll('.ar-actions button')){const label=b.textContent.trim();const glyph=shapes[label];if(!glyph)continue;let svg=b.querySelector('svg');if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');b.prepend(svg)}if(svg.innerHTML!==glyph)svg.innerHTML=glyph;}};fix();new MutationObserver(fix).observe(box,{childList:true,subtree:false})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();</script>
 </body></html>
