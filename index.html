@@ -410,6 +410,35 @@ html[data-cctt-scheme="dark"] #page-inicio #ccttHomeIconGrid .cctt-home-icon-sym
 @media(max-width:1140px){#page-reporte .cctt-rep-layout{grid-template-columns:1fr}#page-reporte .cctt-rep-preview{position:static;max-height:none}}
 @media(max-width:650px){#page-reporte .cctt-rep-toolbar{width:100%}#page-reporte .cctt-rep-toolbar .btn{flex:1 1 auto}}
 </style>
+
+<!-- NUEVO: distribución solicitada, exclusivamente en Reporte cesionarios. -->
+<style id="ccttRepEstructuraFinal">
+#page-reporte>.section-title{display:none!important}
+#page-reporte .cctt-rep-layout{display:flex!important;flex-direction:column!important;gap:16px!important;min-width:0}
+#page-reporte .cctt-rep-column{display:contents!important}
+#page-reporte .cctt-rep-status-wide{width:100%!important;max-width:none!important;min-width:0;order:1}
+#page-reporte .cctt-rep-status-wide .table-wrap{width:100%;overflow-x:auto}
+#page-reporte .cctt-rep-status-wide .tbl{width:100%;min-width:750px;table-layout:auto}
+#page-reporte .cctt-rep-status-wide .tbl th,#page-reporte .cctt-rep-status-wide .tbl td{white-space:normal;vertical-align:middle}
+#page-reporte .cctt-rep-status-wide .tbl td:nth-child(1){width:17%}
+#page-reporte .cctt-rep-status-wide .tbl td:nth-child(2){width:21%}
+#page-reporte .cctt-rep-status-wide .tbl td:nth-child(3){width:20%}
+#page-reporte .cctt-rep-status-wide .tbl td:nth-child(4){width:35%}
+#page-reporte .cctt-rep-status-wide .tbl input,#page-reporte .cctt-rep-status-wide .tbl select{width:100%;min-width:0;max-width:100%}
+#page-reporte .cctt-rep-status-wide .rep-status-control{min-width:0}
+#page-reporte .cctt-rep-header{order:2;width:100%;display:block!important}
+#page-reporte .cctt-rep-header>div:first-child{display:none!important}
+#page-reporte .cctt-rep-toolbar{display:flex!important;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;width:100%}
+#page-reporte .cctt-rep-toolbar .btn{flex:0 0 auto;max-width:100%;white-space:normal;text-align:center}
+#page-reporte .cctt-rep-preview{order:3;width:100%!important;max-width:none!important;max-height:none!important;position:static!important;overflow:visible!important}
+#page-reporte .cctt-rep-preview #reportPreview{max-width:100%;overflow:hidden}
+#page-reporte .cctt-rep-preview .cctt-rep-preview-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin:10px 0}
+#ccttRepFormatPanel .cctt-rep-emission-fields{display:block!important;margin:12px 0 20px;padding:14px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#ccttRepFormatPanel .cctt-rep-emission-fields .field input,#ccttRepFormatPanel .cctt-rep-emission-fields .field textarea{background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+#ccttRepFormatPanel .cctt-rep-emission-fields .field label{color:var(--cctt-theme-muted,var(--muted))}
+#page-reporte #repAddRowTop{display:none!important}
+@media(max-width:750px){#page-reporte .cctt-rep-toolbar{justify-content:flex-start}#ccttRepFormatPanel .cctt-rep-emission-fields .grid{grid-template-columns:1fr!important}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -4434,6 +4463,38 @@ setTimeout(async()=>{try{const {data}=await client()?.auth.getSession();if(data?
   const add=document.getElementById('repAddRow');if(add)add.textContent='Agregar cesionario';
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+})();
+</script>
+
+<!-- NUEVO: trasladar los controles ya existentes a su nueva posición sin sustituir listeners ni exportaciones. -->
+<script id="ccttRepEstructuraFinalJs">
+(function(){'use strict';
+function mount(){
+ const page=document.getElementById('page-reporte');
+ const layout=page&&page.querySelector('.cctt-rep-layout');
+ const header=page&&page.querySelector('.cctt-rep-header');
+ const status=page&&page.querySelector('.cctt-rep-column>.card:nth-child(2)');
+ const fields=page&&page.querySelector('.cctt-rep-column>.card:nth-child(1)');
+ const preview=page&&page.querySelector('.cctt-rep-preview');
+ const inner=document.getElementById('ccttRepFormatInner');
+ if(!page||!layout||!header||!status||!fields||!preview||!inner||page.dataset.ccttRepFinal)return;
+ page.dataset.ccttRepFinal='1';
+ fields.classList.add('cctt-rep-emission-fields');
+ inner.prepend(fields);
+ status.classList.add('cctt-rep-status-wide');
+ layout.append(status,header,preview);
+ const head=preview.querySelector(':scope > .row');
+ const copy=document.getElementById('repCopyImageV23');
+ if(copy&&head){
+  const actions=document.createElement('div');actions.className='cctt-rep-preview-actions';
+  actions.append(copy);head.after(actions);
+ }
+ const add=document.getElementById('repAddRow');
+ if(add){add.textContent='Agregar cesionario';add.setAttribute('title','Añadir una fila nueva a la tabla de cesionarios');}
+ const formatOpen=document.getElementById('ccttRepFormatOpen');
+ if(formatOpen)formatOpen.setAttribute('title','Abrir datos de emisión, tipografía, márgenes y plantillas oficiales');
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
 })();
 </script>
 </body></html>
