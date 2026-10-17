@@ -376,6 +376,40 @@ html[data-cctt-scheme="dark"] #page-inicio #ccttHomeIconGrid .cctt-home-icon-sym
 @media(max-width:750px){#page-inicio #moduleCards{grid-template-columns:1fr}#page-inicio #ccttHomeIconGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px 5px}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{width:69px;height:69px;flex-basis:69px}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol svg{width:35px;height:35px}#ccttRepFormatPanel .cctt-rep-format-inner{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){#page-inicio #moduleCards>.card{transition:none!important}#page-inicio #ccttHomeIconGrid .cctt-home-icon-symbol{transition:none!important}}
 </style>
+<!-- NUEVO: presentación fiel de Reporte cesionarios, delimitada al módulo. -->
+<style id="ccttRepFielReferencia">
+#page-reporte .cctt-rep-header{background:var(--cctt-theme-card,var(--card));padding:13px 15px;border-radius:14px}
+#page-reporte .cctt-rep-toolbar{gap:6px}
+#page-reporte .cctt-rep-toolbar .btn{font-size:11px;min-height:34px;padding:7px 9px;white-space:nowrap}
+#page-reporte .cctt-rep-layout{grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);align-items:start}
+#page-reporte .cctt-rep-column{min-width:0}
+#page-reporte .cctt-rep-column>.card:nth-child(2){padding:0;overflow:hidden}
+#page-reporte .cctt-rep-column>.card:nth-child(2)> .row:first-child{padding:14px 16px 4px}
+#page-reporte .cctt-rep-column>.card:nth-child(2)>.notice{display:none}
+#page-reporte .cctt-rep-column>.card:nth-child(2)> .row:nth-of-type(2){padding:4px 15px}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .table-wrap{border:0;border-radius:0;overflow-x:auto}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl{table-layout:fixed;min-width:610px;width:100%}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl th:nth-child(1){width:22%}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl th:nth-child(2){width:22%}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl th:nth-child(3){width:20%}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl th:nth-child(4){width:27%}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl th:nth-child(5){width:9%}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl :is(input,select,textarea){min-width:0!important;width:100%!important;max-width:100%!important;box-sizing:border-box}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .rep-status-control{min-width:0;width:100%}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .rep-status-control :is(input,select){min-width:0!important}
+#page-reporte .cctt-rep-column>.card:nth-child(2) .tbl td{overflow:hidden}
+#page-reporte .cctt-rep-preview{top:90px;max-height:calc(100dvh - 104px);overflow:auto}
+#page-reporte #repTypographyV28{display:none!important}
+#ccttRepFormatPanel #repTypographyV28{display:block!important;margin-bottom:14px;padding:14px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#ccttRepFormatPanel #repTypographyV28 :is(label,span,h3){color:var(--cctt-theme-text,var(--text))}
+#ccttRepFormatPanel .cctt-rep-format-inner{align-items:start}
+#ccttRepStatusOverlay[hidden]{display:none!important}
+#ccttRepStatusOverlay{position:fixed;inset:0;z-index:270501;display:grid;place-items:center;padding:16px;background:#050b17b8}
+#ccttRepStatusPanel{width:min(650px,100%);max-height:85dvh;overflow:auto;padding:18px;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-radius:16px}
+#ccttRepStatusPanel>.row{justify-content:space-between}
+@media(max-width:1140px){#page-reporte .cctt-rep-layout{grid-template-columns:1fr}#page-reporte .cctt-rep-preview{position:static;max-height:none}}
+@media(max-width:650px){#page-reporte .cctt-rep-toolbar{width:100%}#page-reporte .cctt-rep-toolbar .btn{flex:1 1 auto}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -4363,6 +4397,43 @@ setTimeout(async()=>{try{const {data}=await client()?.auth.getSession();if(data?
   document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&!overlay.hidden)close()});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',montar);else montar();
+})();
+</script>
+<!-- NUEVO: trasladar tipografía, separación y gestión de estatus a paneles, conservando controles originales. -->
+<script id="ccttRepFielReferenciaJs">
+(function(){'use strict';
+ function mount(){
+  const page=document.getElementById('page-reporte'),form=document.getElementById('ccttRepFormatPanel');
+  if(!page||!form||page.dataset.ccttRepFielMounted)return;
+  page.dataset.ccttRepFielMounted='1';
+  const body=form.querySelector('.cctt-rep-format-inner');
+  function moveTypography(){
+   const typ=document.getElementById('repTypographyV28');
+   if(typ&&typ.parentNode!==form){form.insertBefore(typ,body);return true}return false;
+  }
+  if(!moveTypography()){
+   const watcher=new MutationObserver(()=>{if(moveTypography())watcher.disconnect()});
+   watcher.observe(document.getElementById('reportPreview').parentElement,{childList:true,subtree:true});
+  }
+  const manager=document.getElementById('repStatusManager'), toolbar=document.getElementById('ccttRepToolbar');
+  if(manager&&toolbar){
+   const statusOpen=document.createElement('button');statusOpen.type='button';statusOpen.className='btn';statusOpen.textContent='⚙ Estatus';statusOpen.id='ccttRepStatusOpen';
+   toolbar.insertBefore(statusOpen,toolbar.querySelector('#ccttRepFormatOpen'));
+   const overlay=document.createElement('div');overlay.id='ccttRepStatusOverlay';overlay.hidden=true;
+   const panel=document.createElement('div');panel.id='ccttRepStatusPanel';panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');
+   const head=document.createElement('div');head.className='row';
+   const title=document.createElement('h3');title.textContent='Administrar estatus';
+   const closeBtn=document.createElement('button');closeBtn.type='button';closeBtn.className='btn';closeBtn.textContent='Cerrar ×';
+   head.append(title,closeBtn);panel.append(head,manager);overlay.append(panel);document.body.append(overlay);
+   const close=()=>{overlay.hidden=true;statusOpen.focus()};
+   statusOpen.addEventListener('click',()=>{overlay.hidden=false;closeBtn.focus()});closeBtn.addEventListener('click',close);
+   overlay.addEventListener('click',event=>{if(event.target===overlay)close()});
+   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!overlay.hidden)close()});
+  }
+  const pdf=document.getElementById('repPdf');if(pdf)pdf.textContent='Imprimir / Guardar PDF';
+  const add=document.getElementById('repAddRow');if(add)add.textContent='Agregar cesionario';
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
 })();
 </script>
 </body></html>
