@@ -956,6 +956,39 @@ html:not(.cctt-icons-only) .app #ccttSidebarReveal{display:inline-flex!important
 @media print{#ccttSidebarOverlayShade,#ccttConFormShade{display:none!important}}
 </style>
 
+
+<!-- NUEVO: corrección focalizada de Consignas y rediseño de Avisos recurrentes conforme al ZIP adjunto. -->
+<style id="ccttConsignasAvisosSurgical20261018">
+/* MODIFICADO: mantener una única acción azul de alta de consignas. */
+#page-consignas .con-page-heading>button{display:none!important}
+#page-consignas .con-reference-create{display:flex!important;align-items:center;justify-content:center}
+/* MODIFICADO: diálogo editable delante de su propia cortina, sin afectar otros módulos. */
+#page-consignas{isolation:isolate}
+#page-consignas #ccttConFormShade{z-index:21000!important}
+#page-consignas #conCommandForm.cctt-consigna-modal{z-index:21002!important;pointer-events:auto!important;filter:none!important;opacity:1!important;visibility:visible!important}
+#page-consignas #conCommandForm.cctt-consigna-modal input,#page-consignas #conCommandForm.cctt-consigna-modal textarea,#page-consignas #conCommandForm.cctt-consigna-modal select,#page-consignas #conCommandForm.cctt-consigna-modal button{pointer-events:auto!important}
+/* NUEVO: avisos con estructura compacta de la referencia, ajustada al esquema ya activo. */
+#page-avisosRecurrentes #arCreatePanel{max-width:1136px;margin:0 auto 20px;padding:0!important;overflow:hidden;border-radius:15px!important;background:var(--cctt-theme-card,var(--card));border:1px solid var(--cctt-theme-line,var(--line));box-shadow:0 3px 14px #0000000d}
+#page-avisosRecurrentes #arCreatePanel>.ar-reference-heading{padding:22px 30px;border-bottom:1px solid var(--cctt-theme-line,var(--line));display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--cctt-theme-card,var(--card))}
+#page-avisosRecurrentes #arCreatePanel>.ar-reference-heading h3{margin:0 0 6px;font-size:23px;line-height:1.3}
+#page-avisosRecurrentes .ar-reference-heading p{margin:0;color:var(--cctt-theme-muted,var(--muted));font-size:13px}
+#page-avisosRecurrentes .ar-reference-chip{padding:7px 11px;border-radius:8px;border:1px solid var(--cctt-theme-line,var(--line));font-size:12px;color:var(--cctt-theme-text,var(--text));white-space:nowrap}
+#page-avisosRecurrentes #arCreatePanel>.ar-reference-body{padding:26px 30px}
+#page-avisosRecurrentes #arCreatePanel .field{min-width:0;gap:7px}
+#page-avisosRecurrentes #arCreatePanel .field>label:first-child{font-size:13px;font-weight:800;color:var(--cctt-theme-text,var(--text))}
+#page-avisosRecurrentes #arCreatePanel .field>input:not([type=checkbox]),#page-avisosRecurrentes #arCreatePanel .field>select,#page-avisosRecurrentes #arCreatePanel textarea{background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line));border-radius:8px;min-height:43px;width:100%}
+#page-avisosRecurrentes #arCreatePanel .ar-reference-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px 32px}
+#page-avisosRecurrentes #arCreatePanel .ar-reference-footer{grid-column:1/-1;border-top:1px solid var(--cctt-theme-line,var(--line));padding-top:18px;display:flex;gap:12px;align-items:center}
+#page-avisosRecurrentes #arWeekdays{gap:6px!important}
+#page-avisosRecurrentes #arWeekdays label{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:49px;padding:9px 7px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:8px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));font-weight:700;font-size:12px;cursor:pointer}
+#page-avisosRecurrentes #arWeekdays label:has(input:checked){background:var(--cctt-theme-accent,#680529);color:var(--cctt-theme-onaccent,#fff)}
+#page-avisosRecurrentes #arWeekdays input{accent-color:var(--cctt-theme-accent,#680529)}
+#page-avisosRecurrentes #arCreatePanel textarea{min-height:110px}
+#page-avisosRecurrentes #arManagementPanel,#page-avisosRecurrentes #arCreatePanel{color:var(--cctt-theme-text,var(--text))}
+#page-avisosRecurrentes #arManagementList .ar-actions button{display:inline-flex!important;align-items:center;justify-content:center;gap:7px}
+#page-avisosRecurrentes #arManagementList .ar-actions svg{width:17px!important;height:17px!important;min-width:17px;display:block!important;stroke:currentColor!important;fill:none!important;stroke-width:2!important}
+@media(max-width:740px){#page-avisosRecurrentes #arCreatePanel>.ar-reference-heading{padding:17px;flex-wrap:wrap}#page-avisosRecurrentes #arCreatePanel>.ar-reference-body{padding:17px}#page-avisosRecurrentes #arCreatePanel .ar-reference-main{grid-template-columns:1fr;gap:15px}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -5437,7 +5470,7 @@ function init(){
  }
  const page=document.getElementById('page-consignas'),form=document.getElementById('conCommandForm'),tabs=document.getElementById('conCommandTabs');
  if(!page||!form||!tabs)return;
- const shade=document.createElement('div');shade.id='ccttConFormShade';document.body.appendChild(shade);
+ const shade=document.createElement('div');shade.id='ccttConFormShade';page.appendChild(shade);/* MODIFICADO: misma jerarquía de apilamiento que el formulario; evita bloquear su edición. */
  const closeButton=document.createElement('button');closeButton.type='button';closeButton.className='btn cctt-consigna-modal-close';closeButton.textContent='Cerrar ×';closeButton.setAttribute('aria-label','Cerrar ventana de nueva consigna');
  form.querySelector('.con-form-title')?.appendChild(closeButton);
  form.setAttribute('role','dialog');form.setAttribute('aria-modal','true');form.setAttribute('aria-label','Nueva consigna');
@@ -5457,4 +5490,30 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
+
+<!-- NUEVO: composición visual sin recrear ni renombrar campos, conservando sus listeners y guardado. -->
+<script id="ccttAvisosReferenceLayout20261018">
+(()=>{'use strict';
+ const shape={Editar:'<path d="M12 20h9M16 4l4 4L7 21H3v-4z"/>',Pausar:'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',Reanudar:'<path d="M8 5l12 7-12 7z"/>',Eliminar:'<path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7m4-7v7"/>'};
+ function init(){const panel=document.getElementById('arCreatePanel'),host=document.getElementById('arManagementList');if(!panel)return;
+  const title=panel.querySelector(':scope > h3');const originalGrid=panel.querySelector(':scope > .grid');const freq=panel.querySelector('#arFrequencyFields');const message=panel.querySelector('#arBody')?.closest('.field');const actions=panel.querySelector('#arSave')?.parentElement;
+  if(title&&originalGrid&&freq&&message&&actions&&!panel.querySelector('.ar-reference-heading')){
+   const heading=document.createElement('div');heading.className='ar-reference-heading';
+   const box=document.createElement('div');const subtitle=document.createElement('p');subtitle.textContent='Configura recordatorios cíclicos y notificaciones operativas dirigidas a operadores y supervisores.';box.append(title,subtitle);
+   const chip=document.createElement('span');chip.className='ar-reference-chip';chip.textContent='Frecuencia programada';heading.append(box,chip);
+   const body=document.createElement('div');body.className='ar-reference-body';const grid=document.createElement('div');grid.className='ar-reference-main';
+   const fields=Array.from(originalGrid.children);const byId=id=>fields.find(el=>el.querySelector('#'+id));
+   const titleField=byId('arTitle'),priority=byId('arPriority'),target=byId('arTarget'),admins=byId('arIncludeAdmin'),due=byId('arDue'),week=byId('arWeekdays');
+   for(const f of [titleField,priority,target,admins,due,week].filter(Boolean))grid.append(f);
+   const number=freq.querySelector('#arFrequencyNumber')?.closest('.field'),unit=freq.querySelector('#arFrequencyUnit')?.closest('.field');
+   if(number)grid.append(number);if(unit)grid.append(unit);
+   message.style.gridColumn='1/-1';grid.append(message);actions.classList.add('ar-reference-footer');grid.append(actions);
+   body.append(grid);panel.append(heading,body);originalGrid.remove();freq.remove();
+  }
+  // MODIFICADO: iconos SVG correctos desde la primera pintura y tras cualquier refresco de publicaciones.
+  if(host){const fix=()=>{for(const b of host.querySelectorAll('.ar-actions button')){const label=b.textContent.trim(),glyph=shape[label];if(!glyph)continue;let svg=b.querySelector('svg');if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');b.prepend(svg)}if(svg.innerHTML!==glyph)svg.innerHTML=glyph;}};fix();new MutationObserver(fix).observe(host,{childList:true,subtree:true});}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
 </body></html>
