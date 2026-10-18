@@ -5747,4 +5747,64 @@ function init(){
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+
+<!-- NUEVO: controles de filtrado y estado operativo, exclusivamente Consignas. -->
+<style id="ccttConSeguimientoFilters20261018">
+#page-consignas .con-extra-filterbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:9px 0;padding:9px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#page-consignas .con-extra-filterbar label{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700}
+#page-consignas .con-extra-filterbar select,#page-consignas .con-extra-filterbar input{min-height:34px;max-width:160px;padding:5px 8px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:8px;background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text))}
+#page-consignas .con-extra-filterbar button{padding:7px 10px}
+#page-consignas .con-status-indicator{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:999px;padding:4px 9px;font-size:11px;font-weight:800;color:var(--cctt-theme-text,var(--text));margin:2px 6px 4px 0}
+#page-consignas .con-priority-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#4682dc;box-shadow:0 0 0 3px #4682dc25;animation:ccttConPriorityPulse 2.6s ease-in-out infinite}
+#page-consignas .con-command-item[data-priority="alta"] .con-priority-dot{background:#e65a56;box-shadow:0 0 0 3px #e65a5625}
+#page-consignas .con-command-item[data-priority="media"] .con-priority-dot{background:#eba72e;box-shadow:0 0 0 3px #eba72e25}
+#page-consignas .con-command-item[data-priority="baja"] .con-priority-dot{background:#16a77c;box-shadow:0 0 0 3px #16a77c25}
+#page-consignas .con-inline-edit{padding:7px 11px!important;font-size:12px!important}
+#page-consignas #conCommandForm.cctt-consigna-modal{width:min(990px,calc(100vw - 22px))!important;max-height:min(94dvh,880px)!important;padding:14px!important;font-size:.91em!important}
+#page-consignas #conCommandForm.cctt-consigna-modal .con-form-layout{gap:12px!important}
+#page-consignas #conCommandForm.cctt-consigna-modal textarea{min-height:75px!important}
+#page-consignas #conCommandForm.cctt-consigna-modal .field input,#page-consignas #conCommandForm.cctt-consigna-modal .field select{min-height:34px!important;padding:6px 9px!important}
+@keyframes ccttConPriorityPulse{50%{opacity:.5;transform:scale(.86)}}
+@media(prefers-reduced-motion:reduce){#page-consignas .con-priority-dot{animation:none}}
+@media(max-width:700px){#page-consignas .con-extra-filterbar{align-items:stretch}#page-consignas .con-extra-filterbar label{flex:1 1 130px}#page-consignas .con-extra-filterbar select,#page-consignas .con-extra-filterbar input{max-width:100%}}
+</style>
+<!-- NUEVO: reparación de filtros, contadores, etiquetas y edición mediante los controles existentes de Consignas. -->
+<script id="ccttConSeguimientoJS20261018">
+(()=>{'use strict';
+function init(){
+const page=document.getElementById('page-consignas'),host=document.getElementById('conCommandItems'),tabs=document.getElementById('conReferenceSubtabs');
+if(!page||!host||!tabs||document.getElementById('conExtraFilters'))return;
+const id=n=>document.getElementById(n);let selected='urgent';
+const bar=document.createElement('div');bar.id='conExtraFilters';bar.className='con-extra-filterbar';bar.innerHTML='<label>Periodo <select id="conPeriodMode"><option value="all">Sin filtro de fecha</option><option value="day">Día</option><option value="month">Mes</option><option value="year">Año</option></select></label><label id="conPeriodDayField" hidden>Día <input id="conPeriodDay" type="date"></label><label id="conPeriodMonthField" hidden>Mes <input id="conPeriodMonth" type="month"></label><label id="conPeriodYearField" hidden>Año <input id="conPeriodYear" type="number" min="2000" max="2100" step="1" placeholder="AAAA"></label><button class="btn" type="button" id="conApplyDateFilters">Aplicar filtro</button><button class="btn" type="button" id="conClearDateFilters">Limpiar</button>';
+tabs.insertAdjacentElement('beforebegin',bar);
+const mode=id('conPeriodMode');let period={mode:'all',value:''};
+const dateVal=()=>{if(mode.value==='day')return id('conPeriodDay').value;if(mode.value==='month')return id('conPeriodMonth').value;if(mode.value==='year')return id('conPeriodYear').value.trim();return''};
+function updateFields(){for(const m of ['day','month','year'])id('conPeriod'+m[0].toUpperCase()+m.slice(1)+'Field').hidden=mode.value!==m}
+mode.addEventListener('change',updateFields);updateFields();
+function parseDateText(t){let match=t.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);if(match){let y=Number(match[3]);if(y<100)y+=2000;return new Date(y,Number(match[2])-1,Number(match[1]),23,59,59)}match=t.match(/(\d{4})-(\d{2})-(\d{2})/);if(match)return new Date(Number(match[1]),Number(match[2])-1,Number(match[3]),23,59,59);return null}
+function dayKey(d){return d?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`:''}
+function data(card){const footer=card.querySelector('.con-command-item-foot');const badge=card.querySelector('.con-command-item-header .pill');const dateText=footer?.children[1]?.textContent||'';const date=parseDateText(dateText);const status=(badge?.textContent||'vigente').trim().toLocaleLowerCase('es');const isDone=status==='atendida'||status==='cerrada';const today=dayKey(new Date());let bucket=isDone?'closed':date&&dayKey(date)<today?'overdue':date&&dayKey(date)>today?'upcoming':'today';let label=isDone?'Atendido':bucket==='overdue'?'Vencido':!date?'Activo':dayKey(date)===today?'Activo · vence hoy':'En proceso';return {date,status,bucket,label,isDone}}
+function periodPass(date){if(period.mode==='all'||!period.value)return true;if(!date)return false;const day=dayKey(date);return period.mode==='day'?day===period.value:period.mode==='month'?day.slice(0,7)===period.value:day.slice(0,4)===period.value}
+function render(){let overdue=0,todayCount=0,closed=0,upcoming=0,visible=0;const cards=[...host.querySelectorAll('.con-command-item')];for(const card of cards){const x=data(card);if(x.bucket==='closed')closed++;else if(x.bucket==='overdue')overdue++;else if(x.bucket==='upcoming'){upcoming++;todayCount++}else todayCount++;
+const heading=card.querySelector('.con-command-item-header');let indicator=card.querySelector('.con-status-indicator');if(heading&&!indicator){indicator=document.createElement('span');indicator.className='con-status-indicator';heading.insertAdjacentElement('afterend',indicator)}if(indicator){indicator.replaceChildren();const dot=document.createElement('i');dot.className='con-priority-dot';dot.setAttribute('aria-hidden','true');indicator.append(dot,document.createTextNode(x.label))}
+const open=card.querySelector('[data-con-open]');const foot=card.querySelector('.con-command-item-foot');if(open&&foot&&!card.querySelector('.con-inline-edit')){const edit=document.createElement('button');edit.type='button';edit.className='btn con-inline-edit';edit.textContent='Editar';edit.setAttribute('aria-label','Editar esta consigna');edit.dataset.conEditItem=open.dataset.conOpen;foot.insertBefore(edit,open)}
+const selectedPass=selected==='all'||(selected==='closed'?x.bucket==='closed':selected==='upcoming'?x.bucket==='upcoming':x.bucket!=='closed');const show=!card.hasAttribute('data-con-search-hidden')&&selectedPass&&periodPass(x.date);card.hidden=!show;if(show)visible++;}
+id('conRefUrgentCount').textContent=overdue+todayCount;id('conRefUpcomingCount').textContent=upcoming;id('conRefClosedCount').textContent=closed;
+id('conReferenceChips').innerHTML='<span>🔴 '+overdue+' vencidas</span><span>🟠 '+todayCount+' activas / hoy</span><span>🔵 '+upcoming+' próximas</span>';
+const info=id('conReferenceVisible');if(info)info.textContent=`Mostrando ${visible} de ${cards.length} consignas filtradas`;
+const alert=id('conReferenceAlert');if(alert)alert.hidden=!overdue&&!todayCount;const alertText=id('conReferenceAlertText');if(alertText)alertText.textContent=`Tienes ${overdue} vencidas y ${todayCount} activas en seguimiento.`;
+tabs.querySelectorAll('[data-ref-tab]').forEach(b=>b.classList.toggle('active',b.dataset.refTab===selected));}
+// NUEVO: registrar la selección antes de los manejadores anteriores y aplicar el cálculo de seguimiento al finalizar.
+tabs.addEventListener('click',e=>{const b=e.target.closest('[data-ref-tab]');if(!b)return;selected=b.dataset.refTab;queueMicrotask(render)},true);
+for(const key of ['conCommandStatus','conCommandPriority','conCommandSearch','conReferenceDate']){const el=id(key);if(!el)continue;el.addEventListener('change',()=>queueMicrotask(render));el.addEventListener('input',()=>queueMicrotask(render));}
+id('conApplyDateFilters').onclick=()=>{period={mode:mode.value,value:dateVal()};render()};id('conClearDateFilters').onclick=()=>{mode.value='all';for(const k of ['conPeriodDay','conPeriodMonth','conPeriodYear'])id(k).value='';period={mode:'all',value:''};id('conReferenceDate').value='';id('conCommandStatus').value='';id('conCommandPriority').value='';updateFields();render()};
+// NUEVO: edición mediante el botón original con sus permisos y guardado existente.
+host.addEventListener('click',e=>{const b=e.target.closest('[data-con-edit-item]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const open=host.querySelector('[data-con-open="'+CSS.escape(b.dataset.conEditItem)+'"]');if(!open)return;open.click();setTimeout(()=>id('conEdit')?.click(),30)},true);
+const observer=new MutationObserver(()=>queueMicrotask(render));observer.observe(host,{childList:true});
+page.addEventListener('click',e=>{if(e.target.closest('#conNewFast,#conSave,#conDone,#conActive,#conDelete,#conBackToList'))setTimeout(render,70)});
+setTimeout(render,180);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </body></html>
