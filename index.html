@@ -928,6 +928,34 @@ html:not(.cctt-icons-only) .app.cctt-sidebar-retracted #ccttSidebarReveal{displa
 (function(){function start(){const page=document.getElementById('page-consignas');if(!page)return;const paths={list:'<path d="M5 13l4 4L19 7"/>',new:'<path d="M12 5v14M5 12h14"/>',detail:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 10h6M9 14h6"/>',map:'<circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 11l10-5M7 13l10 5"/>'};const svg=(path)=>'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+path+'</svg>';page.querySelectorAll('.con-command-tabs [data-con-view]').forEach(btn=>{const kind=btn.dataset.conView;if(btn.querySelector('svg'))return;btn.insertAdjacentHTML('afterbegin',svg(paths[kind]||paths.list))});const input=document.getElementById('conCommandSearch');if(input&&input.parentElement&&!input.parentElement.querySelector('.cs-search-mark')){let mark=document.createElement('span');mark.className='cs-search-mark';mark.setAttribute('aria-hidden','true');mark.innerHTML=svg('<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>');input.parentElement.appendChild(mark)}const create=document.getElementById('conNewFast');if(create&&!create.querySelector('svg'))create.insertAdjacentHTML('afterbegin',svg(paths.new));}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start()})();
 </script>
 
+
+<!-- NUEVO: barra lateral superpuesta y formulario flotante, confinados a navegación y Consignas. -->
+<style id="ccttOverlaySurgical20261018">
+/* MODIFICADO: la barra no reserva columna cuando está abierta; se presenta delante del contenido. */
+html:not(.cctt-icons-only) .app{grid-template-columns:minmax(0,1fr)!important}
+html:not(.cctt-icons-only) .app>.main{min-width:0!important;width:100%!important;grid-column:1!important}
+html:not(.cctt-icons-only) .app>.sidebar{display:none!important}
+html:not(.cctt-icons-only) .app.cctt-overlay-side-open>.sidebar{display:block!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:min(355px,calc(100vw - 28px))!important;height:100dvh!important;max-height:100dvh!important;z-index:10510!important;overflow:auto!important;box-shadow:14px 0 48px #0007!important;transform:none!important}
+html:not(.cctt-icons-only) .app #ccttSidebarReveal{display:inline-flex!important;flex-shrink:0}
+#ccttSidebarOverlayShade{display:none;position:fixed;inset:0;background:#030a19a3;z-index:10500;backdrop-filter:blur(2px)}
+#ccttSidebarOverlayShade[data-open="true"]{display:block}
+/* NUEVO: limitar el control visual azul de Consignas a «Nueva consigna». */
+#page-consignas #conCommandTabs [data-con-view]{background:transparent!important;color:var(--cctt-theme-text,var(--text))!important;border-color:transparent!important;box-shadow:none!important}
+#page-consignas #conCommandTabs [data-con-view][aria-pressed="true"]{background:var(--cctt-theme-table,#e8eef8)!important;color:var(--cctt-theme-text,var(--text))!important}
+#page-consignas #conNewFast{background:#1d4ed8!important;color:white!important;border:1px solid #1d4ed8!important}
+#page-consignas .con-command-header{grid-template-columns:minmax(0,1fr) minmax(0,2fr)!important}
+#page-consignas .con-command-brand strong{overflow-wrap:normal!important;word-break:normal!important}
+#page-consignas #conCommandTabs{min-width:0;overflow:visible!important;white-space:normal!important;flex-wrap:wrap!important}
+/* NUEVO: diálogo que reutiliza los controles originales de captura y guardado. */
+#ccttConFormShade{display:none;position:fixed;inset:0;background:#020717c2;backdrop-filter:blur(4px);z-index:21000}
+#ccttConFormShade[data-open="true"]{display:block}
+#page-consignas #conCommandForm.cctt-consigna-modal{position:fixed!important;display:block!important;z-index:21001!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:min(1060px,calc(100vw - 24px))!important;max-height:min(92dvh,950px)!important;overflow:auto!important;margin:0!important;padding:22px!important;background:var(--cctt-theme-card,var(--card))!important;color:var(--cctt-theme-text,var(--text))!important;border:1px solid var(--cctt-theme-line,var(--line))!important;border-radius:18px!important;box-shadow:0 30px 85px #0008!important}
+#page-consignas #conCommandForm.cctt-consigna-modal .cctt-consigna-modal-close{margin-left:auto;flex-shrink:0}
+#page-consignas #conCommandForm.cctt-consigna-modal .con-form-title{display:flex!important;align-items:center!important;flex-wrap:wrap!important}
+@media(max-width:740px){#page-consignas .con-command-header{grid-template-columns:minmax(0,1fr)!important}#page-consignas #conCommandForm.cctt-consigna-modal{padding:13px!important}#page-consignas #conCommandForm.cctt-consigna-modal .con-form-layout{grid-template-columns:1fr!important}}
+@media print{#ccttSidebarOverlayShade,#ccttConFormShade{display:none!important}}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -5380,4 +5408,53 @@ setTimeout(decorate,150);
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
+
+<!-- NUEVO: orquestación de paneles superpuestos sin sustituir funciones ni guardar preferencias nuevas. -->
+<script id="ccttOverlaySurgicalBehavior20261018">
+(function(){'use strict';
+function init(){
+ const app=document.querySelector('.app'),sidebar=app?.querySelector('.sidebar'),reveal=document.getElementById('ccttSidebarReveal'),brand=sidebar?.querySelector('.brand');
+ if(app&&sidebar&&reveal&&brand){
+  const shade=document.createElement('div');shade.id='ccttSidebarOverlayShade';shade.setAttribute('aria-hidden','true');document.body.appendChild(shade);
+  let timeout;const stop=()=>{clearTimeout(timeout);timeout=undefined};
+  const opened=()=>app.classList.contains('cctt-overlay-side-open');
+  function close(){stop();app.classList.remove('cctt-overlay-side-open');shade.dataset.open='false';reveal.setAttribute('aria-expanded','false');brand.setAttribute('aria-expanded','false');}
+  function reset(){stop();if(opened())timeout=setTimeout(close,300000)}
+  function open(){app.classList.add('cctt-sidebar-retracted','cctt-overlay-side-open');shade.dataset.open='true';reveal.setAttribute('aria-expanded','true');brand.setAttribute('aria-expanded','true');reset()}
+  function toggle(){opened()?close():open()}
+  // MODIFICADO: capturar las pulsaciones anteriores al controlador antiguo para impedir que vuelva a ocupar espacio.
+  const handle=e=>{e.preventDefault();e.stopImmediatePropagation();toggle()};
+  reveal.addEventListener('click',handle,true);
+  brand.addEventListener('click',e=>{if(e.target.closest('button,a,input,select'))return;handle(e)},true);
+  brand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){handle(e)}},true);
+  sidebar.addEventListener('click',e=>{if(e.target.closest('[data-page]'))close()},true);
+  ['pointermove','pointerdown','wheel','scroll','touchstart','keydown'].forEach(ev=>sidebar.addEventListener(ev,reset,{passive:true}));
+  shade.addEventListener('click',close);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&opened())close()});
+  // Mantener la columna principal a ancho completo desde la primera activación.
+  app.classList.add('cctt-sidebar-retracted');
+  shade.dataset.open='false';reveal.setAttribute('aria-expanded','false');
+ }
+ const page=document.getElementById('page-consignas'),form=document.getElementById('conCommandForm'),tabs=document.getElementById('conCommandTabs');
+ if(!page||!form||!tabs)return;
+ const shade=document.createElement('div');shade.id='ccttConFormShade';document.body.appendChild(shade);
+ const closeButton=document.createElement('button');closeButton.type='button';closeButton.className='btn cctt-consigna-modal-close';closeButton.textContent='Cerrar ×';closeButton.setAttribute('aria-label','Cerrar ventana de nueva consigna');
+ form.querySelector('.con-form-title')?.appendChild(closeButton);
+ form.setAttribute('role','dialog');form.setAttribute('aria-modal','true');form.setAttribute('aria-label','Nueva consigna');
+ let wasOpen=false;
+ function sync(){const visible=form.style.display!=='none';form.classList.toggle('cctt-consigna-modal',visible);shade.dataset.open=String(visible);if(visible&&!wasOpen){form.scrollTop=0;}wasOpen=visible}
+ function close(){tabs.querySelector('[data-con-view="list"]')?.click();form.classList.remove('cctt-consigna-modal');shade.dataset.open='false';wasOpen=false}
+ closeButton.addEventListener('click',close);shade.addEventListener('click',close);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&form.classList.contains('cctt-consigna-modal')){e.preventDefault();close()}});
+ new MutationObserver(sync).observe(form,{attributes:true,attributeFilter:['style']});
+ // NUEVO: iconografía SVG para navegación: lista, agregar, detalle y mapa; sin duplicar iconos.
+ const icons={list:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h1M3 12h1M3 18h1"/>',new:'<path d="M12 5v14M5 12h14"/>',detail:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5h6M9 10h6M9 14h6"/>',map:'<circle cx="5" cy="5" r="2"/><circle cx="19" cy="7" r="2"/><circle cx="12" cy="19" r="2"/><path d="M7 5.3l10 1.4M18 9l-5 8M6 7l5 10"/>'};
+ tabs.querySelectorAll('[data-con-view]').forEach(button=>{const icon=button.querySelector('svg');const shape=icons[button.dataset.conView];if(shape){const svg='<svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+shape+'</svg>';if(icon)icon.outerHTML=svg;else button.insertAdjacentHTML('afterbegin',svg);}});
+ const brandBadge=page.querySelector('.con-brand-badge');if(brandBadge)brandBadge.innerHTML='<svg aria-hidden="true" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M8 4h8l4 4v12H4V4h4zM8 4v5h8V4M8 14h8M8 17h6"/></svg>';
+ sync();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,0),{once:true});else setTimeout(init,0);
+})();
+</script>
+
 </body></html>
