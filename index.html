@@ -835,6 +835,30 @@ html[data-cctt-scheme="dark"] #page-consignas{--con-ref-fill:#283950;--con-ref-p
 @media(max-width:1100px){#page-consignas #conDetails .con-detail-layout{grid-template-columns:1fr!important}}
 @media(max-width:900px){#page-consignas .con-command-item .con-command-item-foot{position:static!important;transform:none!important;justify-content:flex-start!important}#page-consignas .con-command-item .con-command-item-header{padding-right:0!important}}
 </style>
+
+<!-- NUEVO: repliegue de la navegación sin modificar la apariencia de los módulos ni los temas. -->
+<style id="ccttSidebarAutoCollapseStyles">
+/* NUEVO: la columna se elimina del flujo al replegarse y cada módulo utiliza el ancho disponible. */
+@media (min-width:721px){
+ html:not(.cctt-icons-only) .app.cctt-sidebar-retracted{grid-template-columns:minmax(0,1fr)!important}
+ html:not(.cctt-icons-only) .app.cctt-sidebar-retracted>.sidebar{display:none!important}
+ .app.cctt-sidebar-retracted>.main{width:100%;min-width:0}
+ .app.cctt-sidebar-retracted>.main .content{width:100%;max-width:none}
+}
+/* NUEVO: acceso constante al menú replegado, sin bloquear interacciones con formularios. */
+#ccttSidebarReveal{position:fixed;left:10px;top:92px;z-index:1001;display:none;align-items:center;justify-content:center;gap:7px;min-width:56px;min-height:43px;padding:8px 11px;border:1px solid #ffffff55;border-radius:12px;background:var(--cctt-theme-sidebar,#56001e);color:#fff;font-weight:850;box-shadow:0 8px 20px #0003;cursor:pointer;transition:transform .2s ease,opacity .2s ease}
+#ccttSidebarReveal:hover{transform:translateX(2px)}
+#ccttSidebarReveal svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+html:not(.cctt-icons-only) .app.cctt-sidebar-retracted #ccttSidebarReveal{display:inline-flex}
+.sidebar>.brand{cursor:pointer;border-radius:12px}
+.sidebar>.brand:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:720px){
+ html:not(.cctt-icons-only) .app.cctt-sidebar-retracted #ccttSidebarReveal{display:none!important}
+ .app.cctt-sidebar-retracted>.main{width:100%;min-width:0}
+}
+@media(prefers-reduced-motion:reduce){#ccttSidebarReveal{transition:none}}
+@media print{#ccttSidebarReveal{display:none!important}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -5220,6 +5244,64 @@ setTimeout(decorate,150);
  update();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+<!-- NUEVO: control de la barra lateral CCTT y cierre por cinco minutos de inactividad en la propia barra. -->
+<script id="ccttSidebarAutoCollapseScript">
+(function(){
+ 'use strict';
+ const WAIT_MS=5*60*1000;
+ function init(){
+  const app=document.querySelector('.app');
+  const sidebar=app&&app.querySelector('.sidebar');
+  const brand=sidebar&&sidebar.querySelector('.brand');
+  if(!app||!sidebar||!brand||document.getElementById('ccttSidebarReveal'))return;
+  const reveal=document.createElement('button');
+  reveal.id='ccttSidebarReveal';reveal.type='button';
+  reveal.setAttribute('aria-label','Mostrar barra lateral CCTT');
+  reveal.title='Mostrar módulos CCTT';
+  reveal.innerHTML='<span>CCTT</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
+  app.appendChild(reveal);
+  brand.setAttribute('role','button');brand.setAttribute('tabindex','0');
+  brand.setAttribute('aria-label','Replegar barra lateral CCTT');
+  brand.title='Pulsar para ocultar los módulos';
+  let timeoutId=null;
+  function stopTimer(){if(timeoutId!==null){clearTimeout(timeoutId);timeoutId=null;}}
+  function isOpen(){return !app.classList.contains('cctt-sidebar-retracted');}
+  function resetTimer(){
+   stopTimer();
+   if(!isOpen()||document.documentElement.classList.contains('cctt-icons-only'))return;
+   timeoutId=setTimeout(()=>setOpen(false),WAIT_MS);
+  }
+  function setOpen(open){
+   stopTimer();
+   app.classList.toggle('cctt-sidebar-retracted',!open);
+   reveal.setAttribute('aria-expanded',String(open));
+   brand.setAttribute('aria-expanded',String(open));
+   if(open)resetTimer();
+   if(!open&&window.innerWidth<=720&&sidebar.classList.contains('cctt-mobile-open')){
+    const mobileBtn=document.getElementById('ccttMobileMenuButton');
+    if(mobileBtn)mobileBtn.click();
+   }
+   if(open&&window.innerWidth<=720){
+    const mobileBtn=document.getElementById('ccttMobileMenuButton');
+    if(mobileBtn&&!sidebar.classList.contains('cctt-mobile-open'))mobileBtn.click();
+   }
+  }
+  brand.addEventListener('click',function(event){
+   if(event.target.closest('button,a,input,select'))return;
+   setOpen(false);
+  });
+  brand.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();setOpen(false);}});
+  reveal.addEventListener('click',()=>setOpen(true));
+  ['pointermove','pointerdown','click','keydown','wheel','touchstart','scroll'].forEach(evt=>sidebar.addEventListener(evt,resetTimer,{passive:true}));
+  // NUEVO: no alterar la preferencia «Solo iconos»; el repliegue se usa únicamente con barra lateral.
+  const observer=new MutationObserver(function(){if(isOpen())resetTimer();else stopTimer();});
+  observer.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  resetTimer();
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
 </body></html>
