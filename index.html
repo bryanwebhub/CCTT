@@ -5688,4 +5688,63 @@ save.addEventListener('click',()=>{const name=input.value.trim();if(!name)return
 render();
 })();
 </script>
+
+<!-- NUEVO: presentación flotante de Detalle y Trazabilidad y gestión compacta de sitios; solo módulo Consignas. -->
+<style id="ccttConsignasDialogsCompact20261018">
+body.cctt-con-detail-open::before{content:"";position:fixed;inset:0;z-index:299900;background:rgba(5,10,22,.76);backdrop-filter:blur(3px)}
+body.cctt-con-detail-open #page-consignas,body.cctt-con-detail-open .main{isolation:auto!important}
+body.cctt-con-detail-open #page-consignas #conDetails{display:block!important;position:fixed!important;inset:5vh auto auto 50%!important;transform:translateX(-50%)!important;z-index:300000!important;width:min(1000px,calc(100vw - 30px))!important;max-height:90dvh!important;overflow:auto!important;margin:0!important;overscroll-behavior:contain;box-shadow:0 24px 85px #0008;background:var(--cctt-theme-card,var(--card))!important;color:var(--cctt-theme-text,var(--text))!important;border:1px solid var(--cctt-theme-line,var(--line))!important;border-radius:17px!important;padding:22px!important}
+body.cctt-con-detail-open #page-consignas #conDetails .con-detail-heading{position:sticky;top:-22px;z-index:3;background:var(--cctt-theme-card,var(--card));padding:12px 0;border-bottom:1px solid var(--cctt-theme-line,var(--line))}
+#page-consignas #conReferenceSiteChips{display:none!important}
+#page-consignas #conCompactSiteButton{white-space:nowrap}
+#ccttConSiteManager[hidden]{display:none!important}
+#ccttConSiteManager{position:fixed;inset:0;z-index:310000;display:flex;align-items:center;justify-content:center;padding:15px;background:rgba(5,10,22,.72);backdrop-filter:blur(3px)}
+#ccttConSiteManager .cctt-con-site-panel{width:min(650px,100%);max-height:85dvh;display:flex;flex-direction:column;gap:13px;overflow:hidden;border:1px solid var(--cctt-theme-line,var(--line));border-radius:17px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));padding:19px;box-shadow:0 24px 70px #0006}
+#ccttConSiteManager .cctt-con-site-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#ccttConSiteManager .cctt-con-site-head h3{margin:0}
+#ccttConSiteManager .cctt-con-site-search{width:100%;padding:11px;border-radius:9px;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text))}
+#ccttConSiteManager .cctt-con-site-list{overflow-y:auto;min-height:70px;max-height:55dvh;border:1px solid var(--cctt-theme-line,var(--line));border-radius:10px;padding:6px}
+#ccttConSiteManager #conReferenceSiteChips{display:flex!important;flex-direction:column;gap:4px;margin:0!important}
+#ccttConSiteManager .con-reference-site-row{display:flex!important;align-items:center;justify-content:space-between;width:100%;gap:8px;flex-wrap:nowrap;margin:0!important;padding:5px;border-bottom:1px solid var(--cctt-theme-line,var(--line))}
+#ccttConSiteManager .con-reference-site-row>button{flex:1;min-width:0;text-align:left;overflow-wrap:anywhere;background:transparent!important;color:var(--cctt-theme-text,var(--text))!important}
+#ccttConSiteManager .con-reference-site-actions{flex-shrink:0}
+#ccttConSiteManager .con-reference-site-edit{width:100%}
+#ccttConSiteManager .con-reference-site-edit input{flex:1;max-width:none!important;min-width:100px}
+@media(max-width:650px){body.cctt-con-detail-open #page-consignas #conDetails{inset:2vh auto auto 50%!important;max-height:96dvh!important;padding:13px!important}#page-consignas .con-ref-site-row{flex-wrap:wrap}#ccttConSiteManager .cctt-con-site-panel{max-height:94dvh;padding:13px}}
+</style>
+<!-- NUEVO: abrir y cerrar el detalle como diálogo sin reemplazar sus manejadores; administrar sitios en una ventana compacta. -->
+<script id="ccttConsignasDialogsCompactJS20261018">
+(function(){
+'use strict';
+function init(){
+ const page=document.getElementById('page-consignas'),detail=document.getElementById('conDetails');
+ const chips=document.getElementById('conReferenceSiteChips'),save=document.getElementById('conReferenceSaveSite');
+ if(!page||!detail||!chips||!save||document.getElementById('ccttConSiteManager'))return;
+ const body=document.body;
+ const showDetail=()=>{body.classList.add('cctt-con-detail-open');detail.setAttribute('role','dialog');detail.setAttribute('aria-modal','true');detail.setAttribute('aria-label','Detalle y Trazabilidad');};
+ const hideDetail=()=>{body.classList.remove('cctt-con-detail-open');detail.removeAttribute('aria-modal');};
+ page.addEventListener('click',e=>{
+  if(e.target.closest('[data-con-open],[data-con-id],[data-con-view="detail"]'))setTimeout(()=>{if(detail.style.display!=='none')showDetail()},0);
+  if(e.target.closest('#conBackToList,#conEdit,[data-con-view="list"],[data-con-view="new"],[data-con-view="map"]'))hideDetail();
+ });
+ // NUEVO: el detalle se cierra por Escape mediante el control de regreso existente.
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&body.classList.contains('cctt-con-detail-open')){e.preventDefault();document.getElementById('conBackToList')?.click()}});
+ document.addEventListener('click',e=>{if(body.classList.contains('cctt-con-detail-open')&&!e.target.closest('#conDetails')&&!e.target.closest('[data-con-open],[data-con-id],[data-con-view="detail"]')&&e.target===document.querySelector('.content'))document.getElementById('conBackToList')?.click()});
+ const manager=document.createElement('div');manager.id='ccttConSiteManager';manager.hidden=true;manager.innerHTML='<div class="cctt-con-site-panel" role="dialog" aria-modal="true" aria-label="Administrar sitios guardados"><div class="cctt-con-site-head"><h3>Administrar sitios guardados</h3><button type="button" class="btn" data-con-site-close aria-label="Cerrar">✕ Cerrar</button></div><p class="muted" style="margin:0">Selecciona un sitio para utilizarlo, o edítalo o elimínalo individualmente.</p><input class="cctt-con-site-search" type="search" placeholder="Buscar sitio..." aria-label="Buscar sitio guardado"><div class="cctt-con-site-list"></div><div class="row" style="justify-content:flex-end"><button class="btn" type="button" data-con-site-close>Terminar</button></div></div>';
+ document.body.append(manager);
+ const anchor=document.createComment('NUEVO: posición original de sitios guardados');chips.parentNode.insertBefore(anchor,chips);
+ const list=manager.querySelector('.cctt-con-site-list'),search=manager.querySelector('input');
+ const opener=document.createElement('button');opener.id='conCompactSiteButton';opener.type='button';opener.className='btn';opener.textContent='⚙ Administrar sitios';save.insertAdjacentElement('afterend',opener);
+ let focusBefore=null;
+ const filter=()=>{const q=search.value.trim().toLocaleLowerCase('es-MX');for(const item of chips.querySelectorAll('.con-reference-site-row'))item.hidden=!item.textContent.toLocaleLowerCase('es-MX').includes(q)};
+ function close(){manager.hidden=true;anchor.parentNode.insertBefore(chips,anchor.nextSibling);focusBefore?.focus?.();}
+ opener.addEventListener('click',()=>{focusBefore=document.activeElement;list.append(chips);search.value='';filter();manager.hidden=false;search.focus()});
+ manager.querySelectorAll('[data-con-site-close]').forEach(b=>b.addEventListener('click',close));
+ manager.addEventListener('click',e=>{if(e.target===manager)close();if(e.target.closest('.con-reference-site-row>button'))setTimeout(()=>{if(!manager.hidden)filter()},0)});
+ manager.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();close()}});
+ search.addEventListener('input',filter);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </body></html>
