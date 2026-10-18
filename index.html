@@ -845,11 +845,18 @@ html[data-cctt-scheme="dark"] #page-consignas{--con-ref-fill:#283950;--con-ref-p
  .app.cctt-sidebar-retracted>.main{width:100%;min-width:0}
  .app.cctt-sidebar-retracted>.main .content{width:100%;max-width:none}
 }
-/* NUEVO: acceso constante al menú replegado, sin bloquear interacciones con formularios. */
-#ccttSidebarReveal{position:fixed;left:10px;top:92px;z-index:1001;display:none;align-items:center;justify-content:center;gap:7px;min-width:56px;min-height:43px;padding:8px 11px;border:1px solid #ffffff55;border-radius:12px;background:var(--cctt-theme-sidebar,#56001e);color:#fff;font-weight:850;box-shadow:0 8px 20px #0003;cursor:pointer;transition:transform .2s ease,opacity .2s ease}
-#ccttSidebarReveal:hover{transform:translateX(2px)}
-#ccttSidebarReveal svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* MODIFICADO: el acceso a la barra cerrada está integrado en la cabecera superior; nunca flota sobre el contenido. */
+#ccttSidebarReveal{display:none;align-items:center;gap:10px;min-height:48px;padding:4px 12px 4px 4px;border:0;border-radius:12px;background:transparent;color:var(--cctt-theme-text,var(--text));cursor:pointer;text-align:left;max-width:230px}
+#ccttSidebarReveal:hover{background:var(--cctt-theme-table,#f4e1e7)}
+#ccttSidebarReveal:focus-visible{outline:2px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
+#ccttSidebarReveal .cctt-reveal-logo{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;overflow:hidden;background:#620024;color:#fff;font-weight:900;font-size:13px;border-radius:12px;border:1px solid #ffffff26}
+#ccttSidebarReveal .cctt-reveal-logo img{width:100%;height:100%;object-fit:contain;background:#fff}
+#ccttSidebarReveal .cctt-reveal-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+#ccttSidebarReveal .cctt-reveal-copy strong{font-size:20px;line-height:1.15;font-weight:900}
+#ccttSidebarReveal .cctt-reveal-copy small{font-size:11px;white-space:nowrap;color:var(--cctt-theme-muted,var(--muted))}
 html:not(.cctt-icons-only) .app.cctt-sidebar-retracted #ccttSidebarReveal{display:inline-flex}
+.app.cctt-sidebar-retracted .topbar{gap:14px}
+.app.cctt-sidebar-retracted .topbar>#ccttSidebarReveal+div{min-width:0;flex:1}
 .sidebar>.brand{cursor:pointer;border-radius:12px}
 .sidebar>.brand:focus-visible{outline:2px solid #fff;outline-offset:2px}
 @media(max-width:720px){
@@ -5257,12 +5264,19 @@ setTimeout(decorate,150);
   const sidebar=app&&app.querySelector('.sidebar');
   const brand=sidebar&&sidebar.querySelector('.brand');
   if(!app||!sidebar||!brand||document.getElementById('ccttSidebarReveal'))return;
+  const topbar=app.querySelector('.topbar');
+  if(!topbar)return;
   const reveal=document.createElement('button');
   reveal.id='ccttSidebarReveal';reveal.type='button';
   reveal.setAttribute('aria-label','Mostrar barra lateral CCTT');
   reveal.title='Mostrar módulos CCTT';
-  reveal.innerHTML='<span>CCTT</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
-  app.appendChild(reveal);
+  // MODIFICADO: el encabezado CCTT permanece en el navbar al cerrar la barra.
+  reveal.innerHTML='<span class="cctt-reveal-logo">CCTT</span><span class="cctt-reveal-copy"><strong>CCTT</strong><small>Centro de Control</small></span>';
+  topbar.insertBefore(reveal,topbar.firstChild);
+  const sideLogo=brand.querySelector('#sideLogo');
+  const syncLogo=()=>{const original=sideLogo?.querySelector('img');const target=reveal.querySelector('.cctt-reveal-logo');if(target)target.innerHTML=original?original.outerHTML:'CCTT';};
+  syncLogo();
+  if(sideLogo)new MutationObserver(syncLogo).observe(sideLogo,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});
   brand.setAttribute('role','button');brand.setAttribute('tabindex','0');
   brand.setAttribute('aria-label','Replegar barra lateral CCTT');
   brand.title='Pulsar para ocultar los módulos';
@@ -5291,10 +5305,10 @@ setTimeout(decorate,150);
   }
   brand.addEventListener('click',function(event){
    if(event.target.closest('button,a,input,select'))return;
-   setOpen(false);
+   setOpen(!isOpen());
   });
-  brand.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();setOpen(false);}});
-  reveal.addEventListener('click',()=>setOpen(true));
+  brand.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();setOpen(!isOpen());}});
+  reveal.addEventListener('click',()=>setOpen(!isOpen()));
   ['pointermove','pointerdown','click','keydown','wheel','touchstart','scroll'].forEach(evt=>sidebar.addEventListener(evt,resetTimer,{passive:true}));
   // NUEVO: no alterar la preferencia «Solo iconos»; el repliegue se usa únicamente con barra lateral.
   const observer=new MutationObserver(function(){if(isOpen())resetTimer();else stopTimer();});
