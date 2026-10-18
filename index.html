@@ -696,6 +696,43 @@ html[data-cctt-scheme="dark"] #page-consignas{--con-ref-fill:#283950;--con-ref-p
 @media(max-width:1100px){#page-consignas .con-reference-toolbar{position:static;justify-content:flex-end;margin:8px 0}#page-consignas .con-command-filters{margin-top:65px}#page-consignas .con-form-layout{grid-template-columns:1fr}}
 @media(max-width:750px){#page-consignas .con-command-header{flex-wrap:wrap}#page-consignas .con-reference-alert{position:static;flex-wrap:wrap}#page-consignas .con-command-filters{margin-top:15px;flex-wrap:wrap}#page-consignas .con-reference-subtabs{overflow-x:auto}#page-consignas .con-reference-subtabs small{display:none}#page-consignas .con-form-fields .grid.g3{grid-template-columns:1fr 1fr}#page-consignas .con-ref-site-row{flex-wrap:wrap}#page-consignas .con-command-header::after{display:none}}
 </style>
+<!-- NUEVO: adaptación visual fiel del listado de Consignas basada en code(20261018-001801).html; únicamente #page-consignas. -->
+<style id="ccttConsignasListaReferencia20261018">
+#page-consignas{--cl-bg:var(--cctt-theme-card,var(--card));--cl-text:var(--cctt-theme-text,var(--text));--cl-line:var(--cctt-theme-line,var(--line));--cl-muted:var(--cctt-theme-muted,var(--muted));--cl-accent:#24438b}
+#page-consignas .con-command-header{max-width:none!important;margin:0 0 24px!important;padding:10px 14px!important;min-height:65px!important;background:var(--cl-bg)!important;border:0!important;border-bottom:1px solid var(--cl-line)!important;border-radius:0!important;align-items:center!important}
+#page-consignas .con-command-brand{min-width:185px;gap:10px!important}#page-consignas .con-command-brand strong{font-size:17px!important}#page-consignas .con-command-tabs{background:var(--cctt-theme-table,#eaf0fa)!important;width:auto!important;max-width:none!important;flex:0 1 auto!important}
+#page-consignas .con-command-tabs .btn{padding:11px 14px!important;font-size:14px!important;border-radius:6px!important}#page-consignas .con-command-tabs .btn.primary{background:#e4ecfe!important;color:#1c3b7c!important}
+#page-consignas .con-reference-create{margin-left:auto!important;padding:10px 15px!important;border-radius:5px!important;background:#173681!important;color:#fff!important}
+#page-consignas #conCommandList{position:static!important;display:flex;flex-direction:column;gap:16px!important;background:transparent!important;border:0!important;box-shadow:none!important}
+#page-consignas .con-reference-alert{order:0!important;position:relative!important;top:auto!important;left:auto!important;right:auto!important;margin:0!important;min-height:48px!important;padding:10px 15px!important;display:flex!important;flex-wrap:wrap!important;background:#fdebe3!important;color:#472d28!important;gap:9px!important}
+#page-consignas .con-reference-alert[hidden]{display:none!important}#page-consignas .con-reference-alert .btn{margin-left:auto!important;border-radius:30px!important;background:#ff942e!important;color:#513008!important}
+#page-consignas .con-command-filters{order:1!important;margin:0!important;padding:0!important;display:flex!important;align-items:center!important;gap:10px!important;min-height:50px!important;flex-wrap:wrap!important}
+#page-consignas #conCommandSearch{height:49px!important;background:var(--cl-bg)!important;border:1px solid var(--cl-line)!important;border-radius:12px!important;padding:11px 18px 11px 42px!important;box-shadow:0 2px 9px #00000008!important;min-width:220px!important}
+#page-consignas .con-command-filters{position:relative!important}#page-consignas .con-command-filters:before{content:'⌕';font-size:24px;position:absolute;left:14px;top:7px;color:var(--cl-muted);z-index:1;pointer-events:none}
+#page-consignas .con-reference-toolbar{order:2!important;position:static!important;top:auto!important;right:auto!important;margin:-66px 0 0 auto!important;height:50px!important;max-width:55%;pointer-events:none!important;z-index:3!important;gap:8px!important}
+#page-consignas .con-reference-toolbar>*{pointer-events:auto!important}#page-consignas .con-reference-date{background:var(--cl-bg)!important;color:var(--cl-text)!important;height:45px!important;white-space:nowrap!important}
+#page-consignas .con-reference-chips span{background:var(--cctt-theme-table,#ebeffb)!important;color:var(--cl-text)!important;font-weight:700!important}
+#page-consignas .con-reference-subtabs{order:3!important;margin:0!important;min-height:61px!important;border:0!important;background:var(--cl-bg)!important;box-shadow:0 2px 8px #00000008!important;gap:24px!important;padding:6px 18px!important}
+#page-consignas .con-reference-subtabs button{padding:14px 5px!important;font-size:14px!important;font-weight:650!important}#page-consignas .con-reference-subtabs button.active{color:var(--cl-accent)!important;border-bottom-color:var(--cl-accent)!important}
+#page-consignas #conCommandItems{order:4!important;display:grid!important;gap:14px!important}
+#page-consignas .con-command-item{position:relative!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:auto auto!important;column-gap:14px!important;align-items:center!important;min-height:133px!important;border:0!important;border-left:8px solid #f79426!important;border-radius:13px!important;background:var(--cl-bg)!important;padding:19px 21px!important;box-shadow:0 3px 15px #0000000b!important;overflow:hidden!important}
+#page-consignas .con-command-item[data-con-urgency="overdue"]{border-left-color:#c41c29!important}#page-consignas .con-command-item[data-con-urgency="upcoming"]{border-left-color:#2e518f!important}#page-consignas .con-command-item[data-con-urgency="closed"]{border-left-color:#00805a!important}
+#page-consignas .con-command-item .con-ref-labels{grid-column:1;grid-row:1;align-self:end!important;margin:0 0 6px!important;gap:7px!important}
+#page-consignas .con-ref-labels span{border-radius:100px!important;font-size:11px!important;padding:5px 10px!important;letter-spacing:.01em}
+#page-consignas .con-command-item-header{grid-column:1;grid-row:2;display:block!important;min-width:0!important}
+#page-consignas .con-command-item-header strong{font-size:18px!important;font-weight:800!important;line-height:1.35!important;color:var(--cl-text)!important}
+#page-consignas .con-command-item-header .muted{display:none!important}#page-consignas .con-command-item-header>.pill,#page-consignas .con-command-item-header .pill{display:none!important}
+#page-consignas .con-command-item-foot{grid-column:2;grid-row:1 / span 2;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;flex-wrap:wrap!important;color:var(--cl-muted)!important;font-size:13px!important}
+#page-consignas .con-command-item-foot span{display:none!important}#page-consignas .con-command-item-foot [data-con-open]{display:inline-flex!important;background:transparent!important;border:0!important;box-shadow:none!important;color:var(--cl-accent)!important;font-weight:750!important;padding:11px!important;white-space:nowrap!important}
+#page-consignas .con-reference-facts{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--cl-muted);padding-top:8px}#page-consignas .con-reference-facts span{display:inline-flex;align-items:center;gap:6px}
+#page-consignas .con-reference-facts .con-reference-avatar{display:inline-grid;place-items:center;background:#22418e;color:white;width:25px;height:25px;border-radius:100%;font-weight:800;font-size:10px}
+#page-consignas .con-quick-done{color:#0d684f!important;background:#e4effe!important;padding:10px 13px!important;font-size:12px!important;border-radius:9px!important;white-space:nowrap!important;box-shadow:none!important}
+#page-consignas .con-command-filters #conCommandStatus,#page-consignas .con-command-filters #conCommandPriority{display:none!important}
+#page-consignas .con-reference-options{position:relative;margin-left:3px}#page-consignas .con-reference-options summary{cursor:pointer;background:var(--cl-bg);border:1px solid var(--cl-line);border-radius:9px;padding:11px;color:var(--cl-text);font-weight:700;font-size:12px}#page-consignas .con-reference-options[open] .con-reference-options-inner{display:grid;gap:8px;position:absolute;right:0;top:44px;width:190px;padding:10px;border:1px solid var(--cl-line);border-radius:10px;background:var(--cl-bg);z-index:9;box-shadow:0 8px 24px #0003}#page-consignas .con-reference-options-inner select{width:100%;display:block!important;max-width:none!important}
+#page-consignas .con-reference-info{order:5!important;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--cl-muted);margin:4px 0}
+@media(max-width:1180px){#page-consignas .con-reference-toolbar{position:static!important;margin:0!important;height:auto!important;max-width:none!important;justify-content:flex-start!important;flex-wrap:wrap!important}#page-consignas .con-command-filters:before{top:8px}}
+@media(max-width:700px){#page-consignas .con-command-header{flex-wrap:wrap!important;gap:8px!important}#page-consignas .con-command-tabs{display:flex!important;flex-wrap:wrap!important}#page-consignas .con-command-item{grid-template-columns:1fr!important}#page-consignas .con-command-item-foot{grid-column:1;grid-row:3;justify-content:flex-start!important;margin-top:10px}#page-consignas .con-reference-subtabs{gap:7px!important;overflow-x:auto!important}#page-consignas .con-reference-subtabs small{display:none!important}#page-consignas .con-reference-toolbar{width:100%!important}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -5003,6 +5040,46 @@ by('conCommandStatus').addEventListener('change',()=>setTimeout(decorate,0));by(
 const tabButtons=by('conCommandTabs');tabButtons.addEventListener('click',()=>setTimeout(()=>{const active=tabButtons.querySelector('[aria-pressed="true"]');page.dataset.conScreen=active?.dataset.conView||'list';if(page.dataset.conScreen==='list')decorate()},0));
 page.addEventListener('click',e=>{if(e.target.closest('#conNewFast'))page.dataset.conScreen='new';if(e.target.closest('#conBackToList')){page.dataset.conScreen='list';setTimeout(decorate,0)}if(e.target.closest('[data-con-open]'))page.dataset.conScreen='detail'});
 setTimeout(decorate,150);
+})();
+</script>
+<!-- NUEVO: datos reales en tarjetas de la lista, filtros desplegables y acción de atendida enlazada con el procedimiento existente. -->
+<script id="ccttConsignasListaFiel20261018">
+(function(){
+ const run=()=>{
+  const page=document.getElementById('page-consignas');if(!page)return;
+  const list=document.getElementById('conCommandList'),filters=list?.querySelector('.con-command-filters'),items=document.getElementById('conCommandItems');if(!list||!filters||!items)return;
+  if(!document.getElementById('conReferenceOptions')){
+   const details=document.createElement('details');details.id='conReferenceOptions';details.className='con-reference-options';details.innerHTML='<summary>Filtros ▾</summary><div class="con-reference-options-inner"></div>';
+   const inner=details.querySelector('.con-reference-options-inner');['conCommandStatus','conCommandPriority'].forEach(id=>{const el=document.getElementById(id);if(el)inner.appendChild(el)});filters.appendChild(details);
+   const foot=document.createElement('div');foot.id='conReferenceInfo';foot.className='con-reference-info';foot.innerHTML='<span id="conReferenceVisible">Mostrando consignas disponibles</span><span>● Seguimiento operativo</span>';list.appendChild(foot);
+  }
+  function adorn(){
+   const cards=[...items.querySelectorAll('.con-command-item')];for(const card of cards){
+    if(card.dataset.conFaithful==='1')continue;card.dataset.conFaithful='1';
+    const heading=card.querySelector('.con-command-item-header'),footer=card.querySelector('.con-command-item-foot');if(!heading||!footer)continue;
+    const title=heading.querySelector('strong'),responsible=(footer.children[0]?.textContent||'Sin responsable').trim(),deadline=(footer.children[1]?.textContent||'').trim(),links=(footer.children[2]?.textContent||'').trim();
+    let label=card.querySelector('.con-ref-labels');if(!label){label=document.createElement('div');label.className='con-ref-labels';card.prepend(label)}
+    if(!label.querySelector('.con-ref-repeat')){const span=document.createElement('span');span.className='con-ref-repeat';span.textContent='↻ Seguimiento operativo';label.appendChild(span)}
+    const facts=document.createElement('div');facts.className='con-reference-facts';
+    const initials=responsible.split(/\s+/).map(x=>x[0]||'').slice(0,2).join('').toUpperCase();
+    const fact1=document.createElement('span');const avatar=document.createElement('span');avatar.className='con-reference-avatar';avatar.textContent=initials||'C';fact1.appendChild(avatar);fact1.appendChild(document.createTextNode(responsible));facts.appendChild(fact1);
+    const fact2=document.createElement('span');fact2.textContent='▣ '+(deadline||'Fecha indefinida');facts.appendChild(fact2);
+    if(links&&links!=='0 vínculos'){const fact3=document.createElement('span');fact3.textContent='⌁ '+links;facts.appendChild(fact3)}
+    heading.appendChild(facts);
+    const open=footer.querySelector('[data-con-open]');if(open){open.textContent='Ver detalle ❯';
+     if(card.dataset.conUrgency!=='closed'){
+      const done=document.createElement('button');done.type='button';done.className='btn con-quick-done';done.textContent='✓ Atendida';done.title='Abrir el procedimiento existente para marcar como atendida';done.dataset.conQuickDone='1';done.dataset.conOpen=open.dataset.conOpen;footer.insertBefore(done,open);
+     }
+    }
+   }
+   const info=document.getElementById('conReferenceVisible');if(info)info.textContent='Mostrando '+cards.filter(a=>!a.hidden).length+' de '+cards.length+' consignas filtradas';
+  }
+  const observer=new MutationObserver(()=>{if(items.querySelector('.con-command-item:not([data-con-faithful])'))adorn()});observer.observe(items,{childList:true});
+  list.addEventListener('click',e=>{const b=e.target.closest('[data-con-quick-done]');if(!b)return;queueMicrotask(()=>{const btn=document.getElementById('conDone');if(btn&&document.getElementById('conDetails')?.style.display!=='none')btn.click()})});
+  document.getElementById('conReferenceSubtabs')?.addEventListener('click',()=>setTimeout(adorn,0));
+  adorn();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run);else run();
 })();
 </script>
 </body></html>
