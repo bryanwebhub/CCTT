@@ -733,6 +733,43 @@ html[data-cctt-scheme="dark"] #page-consignas{--con-ref-fill:#283950;--con-ref-p
 @media(max-width:1180px){#page-consignas .con-reference-toolbar{position:static!important;margin:0!important;height:auto!important;max-width:none!important;justify-content:flex-start!important;flex-wrap:wrap!important}#page-consignas .con-command-filters:before{top:8px}}
 @media(max-width:700px){#page-consignas .con-command-header{flex-wrap:wrap!important;gap:8px!important}#page-consignas .con-command-tabs{display:flex!important;flex-wrap:wrap!important}#page-consignas .con-command-item{grid-template-columns:1fr!important}#page-consignas .con-command-item-foot{grid-column:1;grid-row:3;justify-content:flex-start!important;margin-top:10px}#page-consignas .con-reference-subtabs{gap:7px!important;overflow-x:auto!important}#page-consignas .con-reference-subtabs small{display:none!important}#page-consignas .con-reference-toolbar{width:100%!important}}
 </style>
+
+<!-- NUEVO: fidelidad visual del listado de Consignas; corrección de alineación sin modificar el resto del proyecto. -->
+<style id="ccttConsignasListaFielV4">
+/* NUEVO: navegación en una sola franja, sin la cabecera extra vacía. */
+#page-consignas .con-page-heading{display:none!important}
+#page-consignas .con-command-header{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;gap:18px!important;width:100%!important;padding:11px 16px!important;margin:0 0 21px!important;min-height:66px!important;background:var(--cctt-theme-card,var(--card))!important;border-radius:10px!important}
+#page-consignas .con-command-brand{white-space:nowrap!important;min-width:0!important;gap:10px!important}
+#page-consignas .con-command-brand .muted{display:block;font-size:10px!important;letter-spacing:.08em;text-transform:uppercase}
+#page-consignas .con-brand-badge{width:35px!important;height:35px!important;border-radius:6px!important;display:grid!important;place-items:center!important}
+#page-consignas .con-command-tabs{justify-self:start!important;align-self:center!important;min-width:0!important;display:flex!important;flex-wrap:wrap!important;gap:4px!important;padding:4px!important}
+#page-consignas .con-command-tabs .btn{min-width:0!important;white-space:nowrap!important;font-size:12px!important;padding:9px 11px!important}
+#page-consignas .con-reference-create{justify-self:end!important;align-self:center!important;margin:0!important;white-space:nowrap!important;font-size:12px!important;padding:10px 13px!important}
+/* NUEVO: barra de aviso, buscador y métricas distribuidos sin superposiciones. */
+#page-consignas #conCommandList{display:grid!important;grid-template-columns:minmax(280px,1fr) auto!important;align-items:center!important;gap:13px!important;padding:0!important}
+#page-consignas .con-reference-alert{grid-column:1/-1!important;grid-row:auto!important;order:unset!important;position:static!important;min-height:43px!important;padding:10px 13px!important;border-radius:10px!important}
+#page-consignas .con-command-filters{grid-column:1!important;grid-row:auto!important;order:unset!important;min-width:0!important;display:flex!important;flex-wrap:nowrap!important;position:relative!important;min-height:46px!important}
+#page-consignas .con-command-filters #conCommandSearch{flex:1!important;width:100%!important;min-width:0!important;height:45px!important}
+#page-consignas .con-command-filters:before{top:6px!important}
+#page-consignas .con-reference-toolbar{grid-column:2!important;grid-row:auto!important;order:unset!important;position:static!important;margin:0!important;max-width:none!important;height:auto!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:9px!important;pointer-events:auto!important;z-index:auto!important}
+#page-consignas .con-reference-date{height:45px!important;border-radius:10px!important;display:flex!important;align-items:center!important;gap:6px!important}
+#page-consignas .con-reference-chips{display:flex!important;flex-wrap:wrap!important;gap:5px!important}
+#page-consignas .con-reference-subtabs{grid-column:1/-1!important;grid-row:auto!important;order:unset!important;min-height:55px!important;padding:4px 14px!important;border-radius:10px!important}
+#page-consignas #conCommandItems{grid-column:1/-1!important;grid-row:auto!important;order:unset!important;display:grid!important;gap:14px!important}
+#page-consignas #conReferenceInfo{grid-column:1/-1!important;order:unset!important;margin:0!important}
+/* NUEVO: tarjetas con distinción visual entre títulos, metadatos y acciones. */
+#page-consignas .con-command-item{grid-template-columns:minmax(0,1fr) auto!important;grid-template-rows:auto auto!important;min-height:119px!important;padding:16px 20px!important;row-gap:5px!important;border-radius:12px!important}
+#page-consignas .con-command-item .con-ref-labels{grid-column:1!important;grid-row:1!important;align-self:end!important}
+#page-consignas .con-command-item-header{grid-column:1!important;grid-row:2!important;align-self:start!important}
+#page-consignas .con-command-item-header strong{font-size:17px!important}
+#page-consignas .con-command-item-foot{grid-column:2!important;grid-row:1/span 2!important;align-self:center!important;justify-self:end!important;display:flex!important;gap:7px!important}
+#page-consignas .con-command-item-foot .con-quick-done{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:90px!important;max-width:none!important;color:#086544!important;background:#e0ecfc!important}
+#page-consignas .con-command-item-foot [data-con-open]{display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important}
+#page-consignas .con-reference-facts{align-items:center!important;gap:9px 17px!important}
+/* NUEVO: adaptación para espacios reducidos, sin modificar el tema global. */
+@media(max-width:1250px){#page-consignas .con-command-header{grid-template-columns:auto minmax(0,1fr)!important}#page-consignas .con-reference-create{grid-column:2!important;justify-self:end!important}#page-consignas #conCommandList{grid-template-columns:1fr!important}#page-consignas .con-command-filters,#page-consignas .con-reference-toolbar{grid-column:1!important}#page-consignas .con-reference-toolbar{justify-content:flex-start!important;flex-wrap:wrap!important}}
+@media(max-width:800px){#page-consignas .con-command-header{grid-template-columns:1fr!important}#page-consignas .con-command-tabs,#page-consignas .con-reference-create{grid-column:1!important;justify-self:stretch!important}#page-consignas .con-command-item{grid-template-columns:minmax(0,1fr)!important}#page-consignas .con-command-item-foot{grid-column:1!important;grid-row:3!important;justify-self:start!important;flex-wrap:wrap!important}#page-consignas .con-reference-subtabs{gap:10px!important;overflow-x:auto!important}}
+</style>
 </head>
 <body>
 <div class="app">
