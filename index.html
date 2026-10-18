@@ -1025,6 +1025,36 @@ html:not(.cctt-icons-only) .app #ccttSidebarReveal{display:inline-flex!important
 @media(max-width:700px){#page-recuerdo .section-title{align-items:flex-start}#page-recuerdo .re-filter{padding:13px}#page-recuerdo #ccttRecuerdoCollage{grid-template-columns:repeat(2,minmax(0,1fr))}#page-recuerdo #ccttRecuerdoCollage button:first-child{grid-column:span 2;min-height:260px}#page-recuerdo .re-gallery-hint{float:none;margin:8px 0 0}#page-recuerdo #ccttRecuerdoViewport{min-height:235px}#page-recuerdo .cctt-recuerdo-photo{width:155px!important;flex-basis:155px!important}}
 @media(prefers-reduced-motion:reduce){#page-recuerdo .cctt-recuerdo-photo,#page-recuerdo #ccttRecuerdoCollage button{transition:none}}
 </style>
+
+<!-- NUEVO: correcciones de contraste limitadas a controles interactivos con fondos incompatibles en modo oscuro. -->
+<style id="ccttDarkReadableControls20261018">
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas [data-con-shortcut],
+html[data-cctt-scheme="dark"] body.cctt-authenticated #conReferenceSiteChips button,
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas .con-reference-site-actions button {background:#344760!important;color:#f1f5ff!important;border:1px solid #617895!important}
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas .con-command-form input[type="checkbox"],
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas input[type="checkbox"]{accent-color:#89a9ff}
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas #conReferenceRelated,
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas .con-reference-related,
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas [class*="related-choices"]{background:#25354c!important;color:#f5f7ff!important;border-color:#617895!important}
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas #conReferenceRelated label,
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas .con-reference-related label,
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas [class*="related-choices"] label{color:#f5f7ff!important}
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas .con-ref-shortcuts button,
+html[data-cctt-scheme="dark"] body.cctt-authenticated #page-consignas .con-reference-site-chips button{color:#f0f4ff!important}
+/* NUEVO: seguridad de contraste para entradas y etiquetas reutilizadas en los otros módulos; no afecta vistas previas ni formatos exportables. */
+html[data-cctt-scheme="dark"] body.cctt-authenticated .page:not(#page-reporte):not(#page-inc35copoma) .field label{color:#dce5f5}
+html[data-cctt-scheme="dark"] body.cctt-authenticated .page:not(#page-reporte):not(#page-inc35copoma) .field input:not([type="color"]):not([type="checkbox"]):not([type="radio"]),
+html[data-cctt-scheme="dark"] body.cctt-authenticated .page:not(#page-reporte):not(#page-inc35copoma) .field select,
+html[data-cctt-scheme="dark"] body.cctt-authenticated .page:not(#page-reporte):not(#page-inc35copoma) .field textarea{background:var(--cctt-theme-input,#162338);color:var(--cctt-theme-inputtext,#fff);border-color:var(--cctt-theme-line,#51617a)}
+html[data-cctt-scheme="dark"] body.cctt-authenticated .page:not(#page-reporte):not(#page-inc35copoma) .field input::placeholder,
+html[data-cctt-scheme="dark"] body.cctt-authenticated .page:not(#page-reporte):not(#page-inc35copoma) .field textarea::placeholder{color:#aebdd3;opacity:1}
+#page-consignas .con-reference-site-row{display:inline-flex;gap:4px;align-items:center;flex-wrap:nowrap;margin:3px 4px 3px 0}
+#page-consignas .con-reference-site-row>button{border-radius:7px;cursor:pointer}
+#page-consignas .con-reference-site-actions{display:inline-flex;gap:3px}
+#page-consignas .con-reference-site-actions button{padding:5px 7px;font-size:12px;background:var(--cctt-theme-card,var(--card));border:1px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-text,var(--text));border-radius:7px;cursor:pointer}
+#page-consignas .con-reference-site-edit{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}
+#page-consignas .con-reference-site-edit input{max-width:230px;padding:7px 8px;border-radius:7px;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text))}
+</style>
 </head>
 <body>
 <div class="app">
@@ -5619,4 +5649,43 @@ setTimeout(sync,100);
 </script>
 <!-- NUEVO: corrección puntual de la navegación de Consignas; se conservan IDs y eventos. -->
 <style id="ccttConsignasUnicoAcceso">#page-consignas #conCommandTabs [data-con-view="new"]{display:none!important}#page-recuerdo #ccttRecuerdoTrack .cctt-recuerdo-photo{width:150px!important;flex-basis:150px!important;min-height:203px}#page-recuerdo .cctt-recuerdo-photo .cctt-recuerdo-frame{height:168px}#ccttRecuerdoLightbox .cctt-recuerdo-light-frame{max-height:65vh}#ccttRecuerdoLightbox .cctt-recuerdo-light-frame img{max-height:58vh;max-width:75vw;object-fit:contain}#ccttRecuerdoAlbumsDialog[hidden]{display:none!important}#ccttRecuerdoAlbumsDialog{position:fixed;inset:0;z-index:280000;display:grid;place-items:center;background:#000b;padding:16px}#ccttRecuerdoAlbumsDialog .rec-album-panel{background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-radius:18px;padding:20px;width:min(720px,96vw);max-height:88vh;overflow:auto}#ccttRecuerdoAlbumsDialog .rec-album-row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding:10px 0;border-bottom:1px solid var(--cctt-theme-line,var(--line))}#ccttRecuerdoAlbumsDialog .rec-album-row strong{flex:1;min-width:160px}#ccttRecuerdoAlbumsDialog .rec-album-create{align-items:end;gap:8px;flex-wrap:wrap}#ccttRecuerdoAlbumsDialog input{max-width:220px;background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));padding:8px;border-radius:8px}#page-recuerdo #reYears{display:flex;flex-wrap:wrap;gap:6px}</style>
+
+<!-- NUEVO: edición y eliminación de sitios en Área operativa sin reemplazar la lógica de creación de consignas. -->
+<script id="ccttConsignaSiteManager20261018">
+(function(){
+'use strict';
+const panel=document.getElementById('page-consignas'),chips=document.getElementById('conReferenceSiteChips'),select=document.getElementById('conReferenceSavedSites'),input=document.getElementById('conReferenceSite'),save=document.getElementById('conReferenceSaveSite');
+if(!panel||!chips||!select||!input||!save)return;
+const primary='cctt-con-signas-sitios',removedKey='cctt-con-signas-sitios-excluidos';
+const defaults=['Zona Sur · Garitas','Zona Norte · Patios','Muelle Fiscal 4-B','Torre CCTT · Radar','Acceso Pez Vela'];
+const arr=k=>{try{const x=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(x)?x.filter(v=>typeof v==='string'&&v.trim()):[]}catch(_){return []}};
+const unique=a=>[...new Set(a)];
+const visible=()=>unique([...defaults,...arr(primary)]).filter(v=>!arr(removedKey).includes(v));
+const persist=(names)=>{localStorage.setItem(primary,JSON.stringify(names.filter(v=>!defaults.includes(v))));localStorage.setItem(removedKey,JSON.stringify(defaults.filter(v=>!names.includes(v))))};
+const make=(label,action,title)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.title=title;b.setAttribute('aria-label',title);b.addEventListener('click',action);return b};
+function render(){
+ const chosen=select.value;select.replaceChildren(new Option('Sitios guardados...',''));chips.replaceChildren();
+ for(const name of visible()){
+  select.add(new Option(name,name));
+  const item=document.createElement('span');item.className='con-reference-site-row';
+  item.append(make(name,()=>{input.value=name;input.dispatchEvent(new Event('input',{bubbles:true}))},'Seleccionar '+name));
+  const actions=document.createElement('span');actions.className='con-reference-site-actions';
+  actions.append(make('✎',()=>{
+   item.replaceChildren();const wrap=document.createElement('span');wrap.className='con-reference-site-edit';const edit=document.createElement('input');edit.type='text';edit.maxLength=100;edit.value=name;edit.setAttribute('aria-label','Editar nombre de sitio');
+   wrap.append(edit,make('Guardar',()=>{
+    const target=edit.value.trim();if(!target){edit.focus();return}
+    const names=visible().map(v=>v===name?target:v);persist(unique(names));if(input.value===name)input.value=target;render();
+   },'Guardar nombre'),make('Cancelar',render,'Cancelar edición'));item.append(wrap);edit.focus();edit.select();
+  },'Editar '+name),make('✕',async()=>{
+   const yes=typeof window.ccttSiteConfirm==='function'?await window.ccttSiteConfirm('¿Eliminar el sitio guardado «'+name+'»? No se eliminarán las consignas existentes.'):confirm('¿Eliminar el sitio «'+name+'»?');
+   if(!yes)return;persist(visible().filter(v=>v!==name));if(input.value===name)input.value='';render();
+  },'Eliminar '+name));item.append(actions);chips.append(item);
+ }
+ if(visible().includes(chosen))select.value=chosen;
+}
+// NUEVO: el guardado preexistente mantiene su función; se sincroniza únicamente la lista visible.
+save.addEventListener('click',()=>{const name=input.value.trim();if(!name)return;const names=unique([...visible(),name]);persist(names);queueMicrotask(render)});
+render();
+})();
+</script>
 </body></html>
