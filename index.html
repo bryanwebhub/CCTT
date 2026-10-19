@@ -1161,7 +1161,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
   <div class="card" style="margin-top:16px" id="balScenarioTotalsCard"><h3>Totales diarios y semanales por escenario</h3><p class="muted">Los datos de Antes y Después se muestran por separado, incluso cuando todavía no se ha capturado el otro escenario.</p><div id="balScenarioTotals"></div></div>
  <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Balance por terminal</h3><span class="pill">Resumen antes / después</span><!-- NUEVO --><button type="button" class="btn bad" id="balClearSummary">Limpiar balance</button></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Terminal</th><th>Escenario</th><th>Indicador</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th><th>Total</th></tr></thead><tbody id="balTable"></tbody></table></div></div>
  <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Variables con incremento por hora y día</h3><span class="pill" id="balCmpCount">0 hallazgos</span><!-- NUEVO --><button type="button" class="btn bad" id="balClearHourly">Limpiar variables</button></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Terminal</th><th>Día</th><th>Hora</th><th>Antes</th><th>Incremento</th><th>Después</th><th>Detalle</th></tr></thead><tbody id="balCmpTable"></tbody></table></div></div>
- <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Semanas comparadas con aumento detectado</h3><span class="pill">Antes / Después / Aumentadas</span><!-- NUEVO: descarga de las tres tablas semanales en un libro Excel con tres hojas. --><button type="button" class="btn" id="balDownloadThreeXlsx">Descargar 3 tablas .xlsx</button><!-- NUEVO --><button type="button" class="btn bad" id="balClearWeekly">Limpiar semanas comparadas</button></div><div id="balWeeklyTables" class="bal-weekly-shell" style="margin-top:12px"><div class="empty">Procese las cuadrículas para generar las semanas completas por cesionario.</div></div></div><!-- NUEVO -->
+ <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Semanas comparadas con aumento detectado</h3><span class="pill">Antes / Después / Aumentadas</span><!-- MODIFICADO: cada tabla semanal dispone de su propio botón Excel dentro de su sección. --><!-- NUEVO --><button type="button" class="btn bad" id="balClearWeekly">Limpiar semanas comparadas</button></div><div id="balWeeklyTables" class="bal-weekly-shell" style="margin-top:12px"><div class="empty">Procese las cuadrículas para generar las semanas completas por cesionario.</div></div></div><!-- NUEVO -->
 </section>
 <!-- NUEVO: Módulo Expedientes -->
 <section class="page" id="page-expedientes">
@@ -5808,47 +5808,62 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 
-<!-- NUEVO: exportación exclusiva de las tres cuadrículas de semanas comparadas, sin bibliotecas adicionales. -->
+<!-- MODIFICADO: tres descargas Excel independientes, una por cada tabla del Balance de citas. -->
 <script>
-// NUEVO: reutiliza el generador XLSX ya incluido y conserva las tres tablas tal como están en pantalla.
+// NUEVO: los botones se insertan en la sección visible correspondiente sin alterar sus datos ni el renderizado original.
 (function(){
-  const titles=['Antes del incremento','Después del incremento','Citas aumentadas'];
   const names=['Antes','Después','Aumentadas'];
-  async function downloadThreeBalanceTables(){
-    const sections=Array.from(document.querySelectorAll('#balWeeklyTables > .bal-week-section'));
-    if(sections.length!==3 || sections.some(section=>!section.querySelector('table.bal-week-table'))){
-      if(typeof toast==='function')toast('Primero procese las cuadrículas para generar las tres tablas.',true);
-      else alert('Primero procese las cuadrículas para generar las tres tablas.');
+  const fileNames=['Balance_citas_antes.xlsx','Balance_citas_despues.xlsx','Balance_citas_aumentadas.xlsx'];
+  const labels=['Descargar Antes .xlsx','Descargar Después .xlsx','Descargar Aumentadas .xlsx'];
+  async function downloadSection(index){
+    const sections=document.querySelectorAll('#balWeeklyTables > .bal-week-section');
+    const section=sections[index];
+    if(!section || !section.querySelector('table.bal-week-table')){
+      if(typeof toast==='function')toast('Primero procese las cuadrículas para generar esta tabla.',true);
       return;
     }
-    const sheets=sections.map((section,index)=>{
-      const rows=[[titles[index]]];
-      section.querySelectorAll('table.bal-week-table').forEach(table=>{
-        table.querySelectorAll('tr').forEach(tr=>{
-          rows.push(Array.from(tr.children).map(cell=>{
-            const value=cell.textContent.trim();
-            const plain=value.replace(/[\s,]/g,'');
-            return /^-?\d+(?:\.\d+)?$/.test(plain)?Number(plain):value;
-          }));
-        });
-        rows.push([]);
+    const rows=[];
+    section.querySelectorAll('table.bal-week-table').forEach(table=>{
+      table.querySelectorAll('tr').forEach(tr=>{
+        rows.push(Array.from(tr.children).map(cell=>{
+          const value=cell.textContent.trim();
+          const plain=value.replace(/[\s,]/g,'');
+          return /^-?\d+(?:\.\d+)?$/.test(plain)?Number(plain):value;
+        }));
       });
-      return {name:names[index],rows};
+      rows.push([]);
     });
     try{
       if(typeof exportSimpleXlsx!=='function')throw Error('Exportador Excel no disponible');
-      await exportSimpleXlsx(sheets,'Balance_de_citas_3_tablas.xlsx');
+      await exportSimpleXlsx([{name:names[index],rows}],fileNames[index]);
     }catch(error){
       if(typeof toast==='function')toast('No se pudo descargar Excel: '+error.message,true);
-      else alert('No se pudo descargar Excel: '+error.message);
     }
   }
-  function bind(){
-    const button=document.getElementById('balDownloadThreeXlsx');
-    if(button)button.addEventListener('click',downloadThreeBalanceTables);
+  function addButtons(){
+    const sections=document.querySelectorAll('#balWeeklyTables > .bal-week-section');
+    sections.forEach((section,index)=>{
+      if(index>2 || section.querySelector('.bal-week-download'))return;
+      const banner=section.querySelector('.bal-week-banner');
+      if(!banner)return;
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='btn bal-week-download';
+      button.textContent=labels[index];
+      button.style.cssText='margin:8px 0;align-self:flex-end';
+      button.addEventListener('click',()=>downloadSection(index));
+      banner.insertAdjacentElement('afterend',button);
+    });
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
-  else bind();
+  function init(){
+    const host=document.getElementById('balWeeklyTables');
+    if(!host)return;
+    addButtons();
+    const observer=new MutationObserver(addButtons);
+    observer.observe(host,{childList:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
 })();
 </script>
 </body></html>
