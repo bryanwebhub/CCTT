@@ -1101,6 +1101,17 @@ html[data-cctt-scheme="dark"] body.cctt-authenticated .page:not(#page-reporte):n
 @media(prefers-reduced-motion:reduce){#page-mapaUbicaciones .mu-load-spinner{animation:none}}
 </style>
 <style id="muBasemapNoKeyStyles">#muMap .leaflet-tile-layer.mu-dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.74) contrast(1.14) saturate(.75)}</style>
+
+<!-- NUEVO: contraste exclusivo de las tablas de semanas comparadas en tema oscuro; no altera colores globales. -->
+<style id="balWeeklyDarkContrast20261020">
+html[data-cctt-scheme="dark"] #page-balance #balWeeklyTables .bal-week-table,
+html[data-cctt-scheme="dark"] #page-balance #balWeeklyTables .bal-week-table th,
+html[data-cctt-scheme="dark"] #page-balance #balWeeklyTables .bal-week-table td{background:#fff!important;color:#111!important;border-color:#111!important;}
+html[data-cctt-scheme="dark"] #page-balance #balWeeklyTables .bal-week-table td.bal-week-highlight{background:#fff200!important;color:#111!important;}
+html[data-cctt-scheme="dark"] #page-balance #balWeeklyTables .bal-week-banner{background:#0db24b!important;color:#111!important;}
+#page-balance #balWeeklyExportPanel{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#page-balance #balWeeklyExportPanel .bal-week-export-svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1212,7 +1223,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
   <div class="card" style="margin-top:16px" id="balScenarioTotalsCard"><h3>Totales diarios y semanales por escenario</h3><p class="muted">Los datos de Antes y Después se muestran por separado, incluso cuando todavía no se ha capturado el otro escenario.</p><div id="balScenarioTotals"></div></div>
  <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Balance por terminal</h3><span class="pill">Resumen antes / después</span><!-- NUEVO --><button type="button" class="btn bad" id="balClearSummary">Limpiar balance</button></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Terminal</th><th>Escenario</th><th>Indicador</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th><th>Total</th></tr></thead><tbody id="balTable"></tbody></table></div></div>
  <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Variables con incremento por hora y día</h3><span class="pill" id="balCmpCount">0 hallazgos</span><!-- NUEVO --><button type="button" class="btn bad" id="balClearHourly">Limpiar variables</button></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Terminal</th><th>Día</th><th>Hora</th><th>Antes</th><th>Incremento</th><th>Después</th><th>Detalle</th></tr></thead><tbody id="balCmpTable"></tbody></table></div></div>
- <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Semanas comparadas con aumento detectado</h3><span class="pill">Antes / Después / Aumentadas</span><!-- MODIFICADO: cada tabla semanal dispone de su propio botón Excel dentro de su sección. --><!-- NUEVO --><button type="button" class="btn bad" id="balClearWeekly">Limpiar semanas comparadas</button></div><div id="balWeeklyTables" class="bal-weekly-shell" style="margin-top:12px"><div class="empty">Procese las cuadrículas para generar las semanas completas por cesionario.</div></div></div><!-- NUEVO -->
+ <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Semanas comparadas con aumento detectado</h3><span class="pill">Antes / Después / Aumentadas</span><!-- MODIFICADO: cada tabla semanal dispone de su propio botón Excel dentro de su sección. --><!-- NUEVO --><button type="button" class="btn bad" id="balClearWeekly">Limpiar semanas comparadas</button></div><!-- NUEVO: panel independiente de exportación consolidada de la comparación semanal. --><div id="balWeeklyExportPanel"><button type="button" class="btn" id="balExportConsolidatedXlsx"><svg class="bal-week-export-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l4 4v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h3Z"/><path d="M16 3v5h4M8 12l8 6m0-6-8 6"/></svg>Descargar comparación completa .xlsx</button><span class="muted small">Una sola hoja con Antes, Después y Aumentadas; formato y bordes conservados.</span></div><div id="balWeeklyTables" class="bal-weekly-shell" style="margin-top:12px"><div class="empty">Procese las cuadrículas para generar las semanas completas por cesionario.</div></div></div><!-- NUEVO -->
 </section>
 <!-- NUEVO: Módulo Expedientes -->
 <section class="page" id="page-expedientes">
@@ -6026,5 +6037,65 @@ $('muRefresh').onclick=refreshMap;$('muOwnList').onclick=async e=>{const edit=e.
 let checked=false;function observe(){const bp=$('page-bibliotecaOperativa').classList.contains('active'),mp=$('page-mapaUbicaciones').classList.contains('active');if((bp||mp)&&!checked){checked=true;reloadLibrary();}if(mp){auth().then(muRefreshAdminUi);if(!map)initialMap();else setTimeout(()=>map.invalidateSize(),60);if(!observe.cartoReady){observe.cartoReady=true;muLoadCartoSettings()}else if(!muCartoSettings){muLoadCartoSettings()}if(!observe.mapReady){observe.mapReady=true;refreshMap()}}}const obs=new MutationObserver(observe);obs.observe($('page-bibliotecaOperativa'),{attributes:true,attributeFilter:['class']});obs.observe($('page-mapaUbicaciones'),{attributes:true,attributeFilter:['class']});observe();
 })();
 
+</script>
+
+<!-- NUEVO: exportación XLSX de la comparación semanal completa en una sola hoja, con estilos OOXML y sin bibliotecas adicionales. -->
+<script id="balWeeklyConsolidatedExport20261020">
+(function(){
+ 'use strict';
+ const button=document.getElementById('balExportConsolidatedXlsx');
+ if(!button)return;
+ const xml=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+ const num=v=>{const cleaned=v.replace(/[\s,]/g,'');return /^-?\d+(?:\.\d+)?$/.test(cleaned)?Number(cleaned):null;};
+ const a1=(column,row)=>{let col='';for(let n=column;n;n=Math.floor((n-1)/26))col=String.fromCharCode(65+(n-1)%26)+col;return col+row;};
+ async function download(){
+  const sections=Array.from(document.querySelectorAll('#balWeeklyTables > .bal-week-section'));
+  if(sections.length!==3||sections.some(s=>!s.querySelector('.bal-week-table'))){if(typeof toast==='function')toast('Genere primero la comparación semanal completa.',true);return;}
+  if(typeof JSZip==='undefined'||typeof downloadBlob!=='function'){if(typeof toast==='function')toast('No está disponible el generador Excel.',true);return;}
+  const rows=[],merges=[];
+  function add(values,type='normal',merge=false,flags=[]){const r=rows.length+1;rows.push({values,type,flags});if(merge)merges.push('A'+r+':H'+r);}
+  sections.forEach((section,index)=>{
+   const title=section.querySelector('.bal-week-banner')?.textContent.trim()||['CITAS ANTES DEL INCREMENTO','CITAS DESPUÉS DEL INCREMENTO','CANTIDAD DE CITAS AUMENTADAS'][index];
+   add([title],'banner',true);
+   section.querySelectorAll('table.bal-week-table').forEach(table=>{
+    const trs=Array.from(table.querySelectorAll('tr'));
+    trs.forEach((tr,i)=>{
+     const cells=Array.from(tr.children);
+     const values=cells.map(c=>c.textContent.trim());
+     if(i===0)add([values[0]],'terminal',true);
+     else if(i===1)add(values,'head');
+     else add(values,'normal',false,cells.map(c=>c.classList.contains('bal-week-highlight')));
+    });
+    add([],'gap');
+   });
+   if(index<sections.length-1)add([],'gap');
+  });
+  const styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Arial"/><color rgb="FF111111"/></font><font><b/><sz val="12"/><name val="Arial"/><color rgb="FF000000"/></font><font><sz val="11"/><name val="Arial"/><color rgb="FF000000"/></font></fonts><fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0DB24B"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFFFFF"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFFF00"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border/><border><left style="thin"><color rgb="FF111111"/></left><right style="thin"><color rgb="FF111111"/></right><top style="thin"><color rgb="FF111111"/></top><bottom style="thin"><color rgb="FF111111"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="6"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="3" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="3" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="4" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="1" fillId="3" borderId="1" xfId="0" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  const sheets=rows.map((row,index)=>{
+   const r=index+1;
+   if(row.type==='gap')return `<row r="${r}" ht="9" customHeight="1"/>`;
+   const width=row.type==='banner'||row.type==='terminal'?8:row.values.length;
+   const cells=Array.from({length:width},(_,i)=>{
+    const v=row.values[i]??'';const isHighlighted=row.flags[i];
+    const st=row.type==='banner'?1:row.type==='terminal'?2:row.type==='head'?5:isHighlighted?4:3;
+    const ref=a1(i+1,r);const number=num(String(v));
+    return number!==null&&row.type==='normal'?`<c r="${ref}" s="${st}"><v>${number}</v></c>`:`<c r="${ref}" s="${st}" t="inlineStr"><is><t>${xml(v)}</t></is></c>`;
+   }).join('');
+   return `<row r="${r}" ht="${row.type==='banner'?28:row.type==='terminal'?23:21}" customHeight="1">${cells}</row>`;
+  }).join('');
+  const worksheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:H'+rows.length+'"/><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="20"/><cols><col min="1" max="1" width="24" customWidth="1"/><col min="2" max="8" width="17" customWidth="1"/></cols><sheetData>'+sheets+'</sheetData><mergeCells count="'+merges.length+'">'+merges.map(ref=>'<mergeCell ref="'+ref+'"/>').join('')+'</mergeCells><pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/></worksheet>';
+  const zip=new JSZip();
+  zip.file('[Content_Types].xml','<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>');
+  zip.file('_rels/.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
+  zip.file('xl/workbook.xml','<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Comparación semanal" sheetId="1" r:id="rId1"/></sheets></workbook>');
+  zip.file('xl/_rels/workbook.xml.rels','<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>');
+  zip.file('xl/styles.xml',styles);zip.file('xl/worksheets/sheet1.xml',worksheet);
+  const old=button.innerHTML;button.disabled=true;button.textContent='Generando comparación…';
+  try{downloadBlob(await zip.generateAsync({type:'blob',compression:'DEFLATE'}),'Balance_semanas_comparadas_completo.xlsx');}
+  catch(error){if(typeof toast==='function')toast('No se pudo generar el Excel: '+error.message,true);}
+  finally{button.disabled=false;button.innerHTML=old;}
+ }
+ button.addEventListener('click',download);
+})();
 </script>
 </body></html>
