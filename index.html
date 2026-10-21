@@ -1132,6 +1132,38 @@ html:has(#ccttLoginGate.show),html:has(#ccttLoginGate.show) body{overflow:hidden
 #ccttLoginGate.show{overflow:hidden!important;max-width:100vw!important}
 /* MODIFICADO: el fondo de acceso mantiene toda la imagen visible en cada tamaño de pantalla. */
 #ccttLoginGate::before{background-size:contain!important;background-position:center center!important;background-repeat:no-repeat!important}
+
+/* NUEVO: presentación y visor exclusivos de Documentación; reutilizan los colores de los temas existentes. */
+#page-documentacion .cctt-doc-tool{min-height:138px;position:relative;overflow:hidden;gap:12px;transition:transform .17s ease,box-shadow .17s ease,border-color .17s ease}
+#page-documentacion .cctt-doc-tool:hover{transform:translateY(-3px);box-shadow:0 10px 26px #0002;border-color:var(--cctt-theme-accent,var(--blue))}
+#page-documentacion .cctt-doc-tool:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:3px}
+#page-documentacion .cctt-doc-tool svg{width:37px;height:37px}
+#page-documentacion .cctt-doc-tool .cctt-doc-tool-format{font-size:11px;font-weight:600;color:var(--cctt-theme-muted,var(--muted));letter-spacing:.2px}
+#page-documentacion .cctt-doc-workspace{border-radius:18px;padding:clamp(14px,2vw,24px);background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#page-documentacion .cctt-doc-stage{display:grid;grid-template-columns:minmax(240px,.85fr) minmax(290px,1.15fr);gap:15px;margin:15px 0}
+#page-documentacion .cctt-doc-stage-panel{min-width:0;border:1px solid var(--cctt-theme-line,var(--line));border-radius:15px;padding:14px;background:var(--cctt-theme-card,var(--card))}
+#page-documentacion .cctt-doc-stage-title{font-size:13px;font-weight:800;margin:0 0 10px;display:flex;align-items:center;gap:7px}
+#page-documentacion .cctt-doc-summary{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}
+#page-documentacion .cctt-doc-chip{border:1px solid var(--cctt-theme-line,var(--line));border-radius:20px;padding:5px 9px;font-size:11px;color:var(--cctt-theme-text,var(--text))}
+#page-documentacion .cctt-doc-filelist{max-height:232px;overflow:auto;display:grid;gap:6px}
+#page-documentacion .cctt-doc-fileitem{width:100%;text-align:left;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));padding:9px 11px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:9px;min-width:0}
+#page-documentacion .cctt-doc-fileitem[aria-pressed=true]{outline:2px solid var(--cctt-theme-accent,var(--blue));outline-offset:-2px}
+#page-documentacion .cctt-doc-filename{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+#page-documentacion .cctt-doc-previewbox{min-height:270px;max-height:490px;overflow:auto;display:grid;place-items:center;border:1px dashed var(--cctt-theme-line,var(--line));border-radius:12px;padding:12px;color:var(--cctt-theme-text,var(--text));background:var(--cctt-theme-card,var(--card))}
+#page-documentacion .cctt-doc-previewbox img,#page-documentacion .cctt-doc-previewbox canvas{display:block;max-width:100%;max-height:450px;object-fit:contain;margin:auto}
+#page-documentacion .cctt-doc-previewbox iframe{width:100%;height:440px;border:0;background:#fff;border-radius:7px}
+#page-documentacion .cctt-doc-previewbox pre{width:100%;font:12px/1.65 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+#page-documentacion .cctt-doc-preview-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#page-documentacion .cctt-doc-preview-actions button{padding:8px 11px;border-radius:9px;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));font-weight:700;cursor:pointer}
+#page-documentacion .cctt-doc-output{display:flex;flex-wrap:wrap;align-items:center;gap:11px;border:1px solid var(--cctt-theme-line,var(--line));padding:10px;border-radius:12px;margin-top:8px;min-width:0}
+#page-documentacion .cctt-doc-output-name{min-width:120px;flex:1;overflow-wrap:anywhere;font-size:12px}
+#page-documentacion #ccttDocResults .cctt-doc-download{display:inline-flex;align-items:center;gap:7px;text-decoration:none;background:var(--cctt-theme-accent,var(--blue));color:var(--cctt-theme-onaccent,#fff);border-radius:9px;font-weight:750;padding:9px 12px;margin:0}
+#page-documentacion #ccttDocResults .cctt-doc-output-preview{background:var(--cctt-theme-card,var(--card));border:1px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-text,var(--text));border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:750}
+#page-documentacion .cctt-doc-progress{height:7px;overflow:hidden;border-radius:99px;background:var(--cctt-theme-line,var(--line));margin-top:10px}
+#page-documentacion .cctt-doc-progress>span{display:block;height:100%;width:0;background:var(--cctt-theme-accent,var(--blue));transition:width .2s}
+#page-documentacion .cctt-doc-download svg,#page-documentacion .cctt-doc-output-preview svg,#page-documentacion .cctt-doc-stage svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+@media(max-width:900px){#page-documentacion .cctt-doc-stage{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#page-documentacion .cctt-doc-tool,#page-documentacion .cctt-doc-progress>span{transition:none}}
 @media(max-width:750px){#page-documentacion .cctt-doc-tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
@@ -1186,6 +1218,13 @@ html:has(#ccttLoginGate.show),html:has(#ccttLoginGate.show) body{overflow:hidden
 <h3 id="ccttDocTitle">Conversión</h3><p id="ccttDocDescription" class="muted"></p>
 <label class="field"><span>Archivos de origen (máximo 100)</span><input type="file" id="ccttDocFiles" multiple></label>
 <div class="row" style="margin:12px 0"><button class="btn primary" type="button" id="ccttDocConvert"></button><button class="btn" type="button" id="ccttDocClear"></button></div>
+
+<!-- NUEVO: explorador de archivos y vista previa dedicada a cada herramienta. -->
+<div class="cctt-doc-stage" id="ccttDocStage">
+ <div class="cctt-doc-stage-panel"><p class="cctt-doc-stage-title">Archivos seleccionados</p><div class="cctt-doc-summary" id="ccttDocSummary"><span class="cctt-doc-chip">0 de 100 archivos</span></div><div class="cctt-doc-filelist" id="ccttDocFileList"><span class="muted">Selecciona archivos para explorar sus vistas previas.</span></div></div>
+ <div class="cctt-doc-stage-panel"><p class="cctt-doc-stage-title" id="ccttDocPreviewTitle">Vista previa</p><div class="cctt-doc-previewbox" id="ccttDocPreviewBox"><span class="muted">Aquí se mostrará el documento seleccionado o el resultado de conversión.</span></div><div class="cctt-doc-preview-actions" id="ccttDocPreviewActions"></div></div>
+</div>
+<div class="cctt-doc-progress" aria-hidden="true"><span id="ccttDocProgressBar"></span></div>
 <p id="ccttDocStatus" role="status" aria-live="polite"></p><div id="ccttDocResults"></div>
 </div></div></section>
 <section class="page active" id="page-inicio">
@@ -6258,6 +6297,40 @@ if(kind==='wordPdf'){if(!window.mammoth)throw Error('Mammoth no disponible');con
 if(kind==='excelPdf'||kind==='pptPdf'){const d=pdf(),text=await zipTexts(f,kind==='excelPdf'?'xl/worksheets/sheet':'ppt/slides/slide');if(!text.length)throw Error('No se encontró texto recuperable');text.forEach((t,i)=>{if(i)d.addPage();writeLines(d,['Documento '+f.name+' — '+(kind==='excelPdf'?'Hoja ':'Diapositiva ')+(i+1),'',t])});return [[base(f)+'.pdf',d.output('blob')]]}
 throw Error('No disponible sin un motor de conversión adicional')}
 $('ccttDocConvert').onclick=async()=>{if(busy||!selected)return;const files=[...$('ccttDocFiles').files];if(!files.length||files.length>100){$('ccttDocStatus').textContent='Selecciona entre 1 y 100 archivos.';return}busy=true;$('ccttDocConvert').disabled=true;const results=$('ccttDocResults');results.replaceChildren();const all=[];let failed=0;for(let i=0;i<files.length;i++){const f=files[i];$('ccttDocStatus').textContent='Procesando '+(i+1)+' de '+files.length+': '+f.name;try{for(const [name,blob] of await convert(f)){all.push([name,blob]);results.appendChild(save(blob,name))}}catch(e){failed++;const p=document.createElement('p');p.textContent='Error en '+f.name+': '+e.message;results.append(p)}}if(all.length>1){const z=new JSZip();for(const [name,blob] of all){let target=name,n=2;while(z.file(target))target=name.replace(/(\.[^.]+)$/,'_'+n+++'$1');z.file(target,blob)}const blob=await z.generateAsync({type:'blob'});results.prepend(save(blob,'Documentacion_conversiones.zip'))}$('ccttDocStatus').textContent=all.length+' archivos generados; '+failed+' documentos con error.';busy=false;$('ccttDocConvert').disabled=false};
+})();
+</script>
+
+<!-- NUEVO: interfaz enriquecida del módulo Documentación, sin reemplazar las funciones de conversión existentes. -->
+<script id="ccttDocumentationPreviewScript">
+(()=>{'use strict';
+const root=document.getElementById('page-documentacion');if(!root)return;
+const get=id=>document.getElementById(id),picker=get('ccttDocFiles'),list=get('ccttDocFileList'),summary=get('ccttDocSummary'),box=get('ccttDocPreviewBox'),title=get('ccttDocPreviewTitle'),actions=get('ccttDocPreviewActions'),results=get('ccttDocResults'),bar=get('ccttDocProgressBar');
+const paths={eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 19h16"/>',archive:'<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v11h14V9M10 13h4"/>',file:'<path d="M5 2h10l5 5v15H5zM15 2v5h5M8 12h8M8 16h7"/>',image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1"/><path d="m3 17 6-6 4 4 3-3 5 5"/>',magnify:'<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>'};
+const svg=k=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+paths[k]+'</svg>';
+let generation=0,previewUrl='';
+function clean(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=''}}
+function placeholder(message){clean();box.replaceChildren();const p=document.createElement('p');p.className='muted';p.textContent=message;box.appendChild(p);actions.replaceChildren()}
+function action(text,handler){const b=document.createElement('button');b.type='button';b.innerHTML=svg('magnify')+' '+text;b.onclick=handler;actions.appendChild(b)}
+function readName(v){return v.name||v.download||'Documento'}
+async function preview(file,name){const token=++generation;clean();box.replaceChildren();actions.replaceChildren();title.textContent='Vista previa · '+name;const type=file.type||'',ext=name.split('.').pop().toLowerCase();
+try{
+ if(type.startsWith('image/')||['jpg','jpeg','png','webp','gif'].includes(ext)){previewUrl=URL.createObjectURL(file);const img=document.createElement('img');img.alt='Vista previa de '+name;img.src=previewUrl;box.appendChild(img);return}
+ if(ext==='pdf'||type==='application/pdf'){if(!window.pdfjsLib)throw Error('Visor PDF no disponible');const doc=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;if(token!==generation)return;let pageNo=1;const canvas=document.createElement('canvas');box.appendChild(canvas);const show=async n=>{const page=await doc.getPage(n);if(token!==generation)return;const v=page.getViewport({scale:1});const scale=Math.min(1.5,Math.max(.5,(box.clientWidth-28)/v.width));const vp=page.getViewport({scale});canvas.width=Math.floor(vp.width);canvas.height=Math.floor(vp.height);await page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise};await show(1);if(token!==generation)return;const controls=document.createElement('span');controls.className='muted';controls.textContent='Página 1 de '+doc.numPages;actions.appendChild(controls);if(doc.numPages>1){const prev=document.createElement('button'),next=document.createElement('button');prev.textContent='← Anterior';next.textContent='Siguiente →';prev.disabled=true;prev.onclick=async()=>{if(pageNo>1){pageNo--;await show(pageNo);controls.textContent='Página '+pageNo+' de '+doc.numPages;prev.disabled=pageNo===1;next.disabled=false}};next.onclick=async()=>{if(pageNo<doc.numPages){pageNo++;await show(pageNo);controls.textContent='Página '+pageNo+' de '+doc.numPages;next.disabled=pageNo===doc.numPages;prev.disabled=false}};actions.append(prev,next)}return}
+ if(ext==='docx'&&window.mammoth){const r=await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()});if(token!==generation)return;const pre=document.createElement('pre');pre.textContent=(r.value||'Sin texto extraíble').slice(0,25000);box.appendChild(pre);return}
+ if(['xlsx','pptx'].includes(ext)&&window.JSZip){const zip=await JSZip.loadAsync(await file.arrayBuffer());const prefix=ext==='xlsx'?'xl/worksheets/':'ppt/slides/';const keys=Object.keys(zip.files).filter(n=>n.startsWith(prefix)&&n.endsWith('.xml')).sort();let texts=[];for(const key of keys.slice(0,8)){const xml=new DOMParser().parseFromString(await zip.files[key].async('text'),'text/xml');const entries=[...xml.getElementsByTagName('*')].filter(n=>['t','v'].includes(n.localName)).map(n=>n.textContent).filter(Boolean);texts.push((ext==='xlsx'?'Hoja: ':'Diapositiva: ')+key.split('/').pop()+'\n'+entries.join(' · '))}if(token!==generation)return;const pre=document.createElement('pre');pre.textContent=texts.join('\n\n').slice(0,24000)||'No se encontró contenido extraíble para vista previa.';box.appendChild(pre);return}
+ placeholder('Vista previa directa no disponible para este formato. Puedes convertirlo o descargarlo.');
+}catch(err){if(token===generation)placeholder('No fue posible mostrar la vista previa: '+err.message)}
+}
+function selected(){const files=[...(picker.files||[])];list.replaceChildren();summary.replaceChildren();const chip=document.createElement('span');chip.className='cctt-doc-chip';chip.textContent=files.length+' de 100 archivos';summary.appendChild(chip);if(!files.length){placeholder('Selecciona un documento para visualizarlo.');list.innerHTML='<span class="muted">No hay archivos seleccionados.</span>';return}const size=document.createElement('span');size.className='cctt-doc-chip';size.textContent=(files.reduce((n,f)=>n+f.size,0)/1048576).toFixed(1)+' MB';summary.appendChild(size);files.slice(0,100).forEach((file,i)=>{const b=document.createElement('button');b.type='button';b.className='cctt-doc-fileitem';b.innerHTML=svg('file');const txt=document.createElement('span');txt.className='cctt-doc-filename';txt.textContent=file.name;b.append(txt);b.onclick=()=>{list.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));preview(file,file.name)};list.appendChild(b);if(i===0)b.click()});if(files.length>100)placeholder('Máximo permitido: 100 documentos. Reduce la selección.')}
+picker.addEventListener('change',selected);
+const clear=get('ccttDocClear');clear.addEventListener('click',()=>{generation++;selected();bar.style.width='0%'});
+const tools=get('ccttDocTools');tools.addEventListener('click',event=>{if(!event.target.closest('.cctt-doc-tool'))return;generation++;setTimeout(()=>{selected();bar.style.width='0%'},0)});
+const subtitles={'pdfJpg':'PDF · Imágenes por página','jpgPdf':'Imágenes · Documento PDF','wordPdf':'Word · Archivo PDF','excelPdf':'Excel · Archivo PDF','pptPdf':'Presentación · Documento PDF','pdfWord':'PDF · Documento editable','pdfPpt':'PDF · Presentación'};
+tools.querySelectorAll('.cctt-doc-tool').forEach((b,i)=>{const key=['pdfJpg','jpgPdf','wordPdf','excelPdf','pptPdf','pdfWord','pdfPpt'][i];if(!key)return;const span=document.createElement('span');span.className='cctt-doc-tool-format';span.textContent=subtitles[key];b.appendChild(span)});
+const btn=get('ccttDocConvert');btn.addEventListener('click',()=>{bar.style.width='7%'},true);
+const status=get('ccttDocStatus');const watchStatus=new MutationObserver(()=>{const txt=status.textContent||'';const m=txt.match(/Procesando\s+(\d+)\s+de\s+(\d+)/i);if(m){bar.style.width=Math.min(96,Math.round(100*Number(m[1])/Number(m[2])))+'%'}else if(/archivos generados|documentos con error/i.test(txt))bar.style.width='100%'});watchStatus.observe(status,{childList:true,subtree:true,characterData:true});
+function enhance(){[...results.children].forEach(el=>{if(el.tagName!=='A'||el.dataset.ccttPreviewEnhanced)return;el.dataset.ccttPreviewEnhanced='1';const name=el.download||el.textContent.replace(/^Descargar\s+/,'');const href=el.href;const wrap=document.createElement('div');wrap.className='cctt-doc-output';const label=document.createElement('span');label.className='cctt-doc-output-name';label.textContent=name;el.className='cctt-doc-download';el.innerHTML=svg(name.endsWith('.zip')?'archive':'download')+' Descargar';const view=document.createElement('button');view.type='button';view.className='cctt-doc-output-preview';view.innerHTML=svg('eye')+' Vista previa';view.onclick=async()=>{try{const blob=await(await fetch(href)).blob();await preview(blob,name);get('ccttDocPreviewBox').scrollIntoView({behavior:'smooth',block:'nearest'})}catch(e){placeholder('No se pudo abrir el resultado: '+e.message)}};el.before(wrap);wrap.append(label,view,el);});}
+const observer=new MutationObserver(enhance);observer.observe(results,{childList:true});enhance();selected();
 })();
 </script>
 </body></html>
