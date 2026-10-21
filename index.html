@@ -157,6 +157,13 @@ html.cctt-icons-only .app{grid-template-columns:minmax(0,1fr)!important}html.cct
 #ccttRecuerdoLightbox #ccttRecuerdoDetails{max-width:min(900px,95vw);text-align:center;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
 @media(max-width:720px){#page-recuerdo .cctt-recuerdo-photo[data-orientation="vertical"]{width:155px;flex-basis:155px}#page-recuerdo .cctt-recuerdo-photo[data-orientation="horizontal"]{width:195px;flex-basis:195px}}
 
+/* NUEVO: alineación exclusiva de Panel con título y subtítulo a su derecha al activar el panel de iconos. */
+html.cctt-icons-only .topbar > div:has(> #pageTitle){display:grid;grid-template-columns:max-content minmax(0,1fr);grid-template-rows:auto auto;align-items:center;column-gap:14px;min-width:0}
+html.cctt-icons-only #ccttPanelBack{grid-column:1;grid-row:1 / 3;align-self:center;background:var(--cctt-theme-accent,var(--blue));color:var(--cctt-theme-onaccent,#fff);border:1px solid var(--cctt-theme-accent,var(--blue));white-space:nowrap}
+html.cctt-icons-only #pageTitle{grid-column:2;grid-row:1;min-width:0}
+html.cctt-icons-only #pageSub{grid-column:2;grid-row:2;min-width:0;margin-top:2px}
+html.cctt-icons-only #ccttPanelBack svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:720px){html.cctt-icons-only .topbar > div:has(> #pageTitle){column-gap:8px}html.cctt-icons-only #ccttPanelBack{padding:7px 9px}html.cctt-icons-only #pageTitle{font-size:clamp(12px,3vw,17px)}}
 </style>
 
 <!-- NUEVO: visor ampliable, collage revista y gestión de fotografías; sin cambios a las variables de temas. -->
@@ -5204,7 +5211,8 @@ const profile=document.querySelector('.profile-mini');
 // MODIFICADO: reutilizar el motor de apariencia existente, sin crear un segundo tema.
 const quick=$('ccttQuickAppearance');if(quick){const host=quick.closest('.cctt-quick-theme');if(host){const b=document.createElement('button');b.id='ccttQuickModeButton';b.type='button';b.setAttribute('aria-label','Cambiar modo de apariencia');b.title='Cambiar entre modo oscuro y predeterminado';host.replaceChildren(b);const sync=()=>{const dark=document.documentElement.dataset.ccttScheme==='dark';b.innerHTML=dark?sun:moon;b.setAttribute('aria-pressed',String(dark));};b.onclick=()=>{const dark=document.documentElement.dataset.ccttScheme==='dark';window.ccttSetExistingVisualMode?.(dark?'default':'dark');sync()};window.addEventListener('cctt:appearance-changed',sync);sync();}}
 // NUEVO: botón Panel disponible incluso cuando la barra lateral está oculta.
-const topTitle=$('pageTitle')?.parentElement;if(topTitle&&!$('ccttPanelBack')){const back=document.createElement('button');back.id='ccttPanelBack';back.className='btn';back.type='button';back.innerHTML=homeIcon+'<span>Panel</span>';back.onclick=()=>{if(typeof go==='function')go('inicio')};topTitle.prepend(back)}
+const topTitle=$('pageTitle')?.parentElement;if(topTitle&&!$('ccttPanelBack')){const back=document.createElement('button');back.id='ccttPanelBack';back.className='btn';back.type='button';// MODIFICADO: icono SVG de panel y botón como hermano del título para situar título y subtítulo a la derecha.
+back.innerHTML='<svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M9 9h12"/></svg><span>Panel</span>';back.onclick=()=>{if(typeof go==='function')go('inicio')};topTitle.prepend(back);topTitle.parentElement.insertBefore(back,topTitle)}
 let userId='guest';const prefKey=()=>`cctt-navigation-view-${userId}`;
 function preference(){try{return localStorage.getItem(prefKey())==='icons'?'icons':'sidebar'}catch{return 'sidebar'}}
 function applyPref(){const icons=preference()==='icons';document.documentElement.classList.toggle('cctt-icons-only',icons);const c=$('ccttHomeCardsMode'),i=$('ccttHomeIconsMode');if(icons&&i?.getAttribute('aria-pressed')!=='true')i.click();if(!icons&&c?.getAttribute('aria-pressed')!=='true')c.click();document.querySelectorAll('input[name="ccttNavView"]').forEach(r=>r.checked=r.value===(icons?'icons':'sidebar'));}
