@@ -1,0 +1,5425 @@
+{
+ "claves": [
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 1",
+   "tipo": "alfanumérica",
+   "significado": "ACCIDENTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A1",
+   "eq": [
+    "10-02",
+    "10-64"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 2",
+   "tipo": "alfanumérica",
+   "significado": "ACUDIR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A2",
+   "eq": [
+    "10-03"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 3",
+   "tipo": "alfanumérica",
+   "significado": "ADELANTE/AUTORIZADO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A3",
+   "eq": [
+    "10-04"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 4",
+   "tipo": "alfanumérica",
+   "significado": "AFIRMATIVO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A4",
+   "eq": [
+    "10-05"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 5",
+   "tipo": "alfanumérica",
+   "significado": "ALIMENTOS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A5",
+   "eq": [
+    "10-06"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 6",
+   "tipo": "alfanumérica",
+   "significado": "AMPF",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A6"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 7",
+   "tipo": "alfanumérica",
+   "significado": "APOYO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A7",
+   "eq": [
+    "10-07"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 8",
+   "tipo": "alfanumérica",
+   "significado": "ARMA DE FUEGO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A8",
+   "eq": [
+    "10-08"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 9",
+   "tipo": "alfanumérica",
+   "significado": "ARMADA DE MÉXICO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A9"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "A",
+   "clave": "ALFA 10",
+   "tipo": "alfanumérica",
+   "significado": "ATRAQUE/ARRIBO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A10"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "B",
+   "clave": "BRAVO 1",
+   "tipo": "alfanumérica",
+   "significado": "BAÑO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A12",
+   "eq": [
+    "10-09"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "B",
+   "clave": "BRAVO 2",
+   "tipo": "alfanumérica",
+   "significado": "BOMBERO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A13"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "B",
+   "clave": "BRAVO 3",
+   "tipo": "alfanumérica",
+   "significado": "BUQUE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A14"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "C",
+   "clave": "CARLOS 1",
+   "tipo": "alfanumérica",
+   "significado": "COMBUSTIBLE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A16"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "C",
+   "clave": "CARLOS 2",
+   "tipo": "alfanumérica",
+   "significado": "CÓMO SE ESCUCHA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A17"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "C",
+   "clave": "CARLOS 3",
+   "tipo": "alfanumérica",
+   "significado": "CONTENEDOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A18"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "C",
+   "clave": "CARLOS 4",
+   "tipo": "alfanumérica",
+   "significado": "CUARTEL DE BOMBEROS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A19"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "D",
+   "clave": "DELTA 1",
+   "tipo": "alfanumérica",
+   "significado": "DEFECTUOSO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A22",
+   "eq": [
+    "10-10"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "D",
+   "clave": "DELTA 2",
+   "tipo": "alfanumérica",
+   "significado": "DINERO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A23",
+   "eq": [
+    "10-11"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "D",
+   "clave": "DELTA 3",
+   "tipo": "alfanumérica",
+   "significado": "DOCUMENTOS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A24",
+   "eq": [
+    "10-12"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "D",
+   "clave": "DELTA 4",
+   "tipo": "alfanumérica",
+   "significado": "DOMICILIO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A25",
+   "eq": [
+    "10-13"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "D",
+   "clave": "DELTA 5",
+   "tipo": "alfanumérica",
+   "significado": "DROGADICT@",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A26",
+   "eq": [
+    "10-14"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "E",
+   "clave": "ECO 1",
+   "tipo": "alfanumérica",
+   "significado": "EJÉRCITO MEXICANO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A28"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "E",
+   "clave": "ECO 2",
+   "tipo": "alfanumérica",
+   "significado": "ELEMENTO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A29"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "E",
+   "clave": "ECO 3",
+   "tipo": "alfanumérica",
+   "significado": "ENTERADO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A30",
+   "eq": [
+    "10-15"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "E",
+   "clave": "ECO 4",
+   "tipo": "alfanumérica",
+   "significado": "ENVIAR/MANDAR/DIRIGIR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A31",
+   "eq": [
+    "10-16"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "E",
+   "clave": "ECO 5",
+   "tipo": "alfanumérica",
+   "significado": "EXTINTOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A32",
+   "eq": [
+    "10-17"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "F",
+   "clave": "FOX 1",
+   "tipo": "alfanumérica",
+   "significado": "FALTA UN ELEMENTO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A34",
+   "eq": [
+    "10-18"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "F",
+   "clave": "FOX 2",
+   "tipo": "alfanumérica",
+   "significado": "FUERTE Y CLARO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A35",
+   "eq": [
+    "10-19"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "G",
+   "clave": "GOLFO 1",
+   "tipo": "alfanumérica",
+   "significado": "GOBIERNO DEL ESTADO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A37"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "H",
+   "clave": "HOTEL 1",
+   "tipo": "alfanumérica",
+   "significado": "HOMBRE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A48",
+   "eq": [
+    "10-28"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 1",
+   "tipo": "alfanumérica",
+   "significado": "INCENDIO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A39",
+   "eq": [
+    "10-20"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 2",
+   "tipo": "alfanumérica",
+   "significado": "INFORMACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A40",
+   "eq": [
+    "10-21"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 3",
+   "tipo": "alfanumérica",
+   "significado": "INFRACCIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A41",
+   "eq": [
+    "10-22"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 4",
+   "tipo": "alfanumérica",
+   "significado": "INGRESAR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A42",
+   "eq": [
+    "10-23"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 5",
+   "tipo": "alfanumérica",
+   "significado": "INSPECTOR FISCAL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A43"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 6",
+   "tipo": "alfanumérica",
+   "significado": "INSTRUCCIONES",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A44",
+   "eq": [
+    "10-24"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 7",
+   "tipo": "alfanumérica",
+   "significado": "INTENTAR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A45",
+   "eq": [
+    "10-25"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 8",
+   "tipo": "alfanumérica",
+   "significado": "INTRUS@",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A46",
+   "eq": [
+    "10-26"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "I",
+   "clave": "INDIO 9",
+   "tipo": "alfanumérica",
+   "significado": "INVESTIGAR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A47",
+   "eq": [
+    "10-27"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "M",
+   "clave": "MIGUEL 1",
+   "tipo": "alfanumérica",
+   "significado": "MAQUINA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A50",
+   "eq": [
+    "10-29"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "M",
+   "clave": "MIGUEL 2",
+   "tipo": "alfanumérica",
+   "significado": "MENSAJE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A51",
+   "eq": [
+    "10-30"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "M",
+   "clave": "MIGUEL 3",
+   "tipo": "alfanumérica",
+   "significado": "MOTOBOMBA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A52",
+   "eq": [
+    "10-31"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "M",
+   "clave": "MIGUEL 4",
+   "tipo": "alfanumérica",
+   "significado": "MUERTO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A53",
+   "eq": [
+    "10-32"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "M",
+   "clave": "MIGUEL 5",
+   "tipo": "alfanumérica",
+   "significado": "MUJER",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A54",
+   "eq": [
+    "10-33"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "M",
+   "clave": "MIGUEL 6",
+   "tipo": "alfanumérica",
+   "significado": "MUY ALERTA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A55",
+   "eq": [
+    "10-34"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "O",
+   "clave": "ÓSCAR 1",
+   "tipo": "alfanumérica",
+   "significado": "ÓRDENES SUPERIORES",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A56",
+   "eq": [
+    "10-35"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "P",
+   "clave": "PAPA 1",
+   "tipo": "alfanumérica",
+   "significado": "PENDIENTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A58",
+   "eq": [
+    "10-36"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "P",
+   "clave": "PAPA 2",
+   "tipo": "alfanumérica",
+   "significado": "PLACAS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A59",
+   "eq": [
+    "10-37"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "P",
+   "clave": "PAPA 3",
+   "tipo": "alfanumérica",
+   "significado": "POLICÍA FEDERAL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A60"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "P",
+   "clave": "PAPA 4",
+   "tipo": "alfanumérica",
+   "significado": "POLICÍA JUDICIAL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A61"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "P",
+   "clave": "PAPA 5",
+   "tipo": "alfanumérica",
+   "significado": "PROBLEMA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A62",
+   "eq": [
+    "10-38"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "P",
+   "clave": "PAPA 6",
+   "tipo": "alfanumérica",
+   "significado": "PROCEDER",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A63",
+   "eq": [
+    "10-39"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "P",
+   "clave": "PAPA 7",
+   "tipo": "alfanumérica",
+   "significado": "PROSTITUTA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A64",
+   "eq": [
+    "10-40"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 1",
+   "tipo": "alfanumérica",
+   "significado": "RADIO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G1",
+   "eq": [
+    "10-41"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 2",
+   "tipo": "alfanumérica",
+   "significado": "RADIO DESCARGADO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G2",
+   "eq": [
+    "10-42"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 3",
+   "tipo": "alfanumérica",
+   "significado": "RECARGAR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G3",
+   "eq": [
+    "10-43"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 4",
+   "tipo": "alfanumérica",
+   "significado": "RECORRIDO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G4",
+   "eq": [
+    "10-44"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 5",
+   "tipo": "alfanumérica",
+   "significado": "REFUERZO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G5",
+   "eq": [
+    "10-45"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 6",
+   "tipo": "alfanumérica",
+   "significado": "RELEVO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G6",
+   "eq": [
+    "10-46"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 7",
+   "tipo": "alfanumérica",
+   "significado": "REPETIR EL MENSAJE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G7",
+   "eq": [
+    "10-47"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 8",
+   "tipo": "alfanumérica",
+   "significado": "RETIRARSE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G8",
+   "eq": [
+    "10-48"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 9",
+   "tipo": "alfanumérica",
+   "significado": "RIÑA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G9",
+   "eq": [
+    "10-49"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "R",
+   "clave": "ROMEO 10",
+   "tipo": "alfanumérica",
+   "significado": "ROBO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G10",
+   "eq": [
+    "10-50"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 1",
+   "tipo": "alfanumérica",
+   "significado": "SALIR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G12",
+   "eq": [
+    "10-51"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 2",
+   "tipo": "alfanumérica",
+   "significado": "SANCIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G13",
+   "eq": [
+    "10-52"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 3",
+   "tipo": "alfanumérica",
+   "significado": "SEGURIDAD PUBLICA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G14"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 4",
+   "tipo": "alfanumérica",
+   "significado": "SEMEFO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G15"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 5",
+   "tipo": "alfanumérica",
+   "significado": "SERVICIO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G16",
+   "eq": [
+    "10-53"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 6",
+   "tipo": "alfanumérica",
+   "significado": "SITUACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G17",
+   "eq": [
+    "10-54"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 7",
+   "tipo": "alfanumérica",
+   "significado": "SIN NOVEDAD",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G18",
+   "eq": [
+    "10-55"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 8",
+   "tipo": "alfanumérica",
+   "significado": "SOLICITO/REQUIERO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G19",
+   "eq": [
+    "10-56"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "S",
+   "clave": "SIERRA 9",
+   "tipo": "alfanumérica",
+   "significado": "SOSPECHOS@",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G20",
+   "eq": [
+    "10-57"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "T",
+   "clave": "TANGO 1",
+   "tipo": "alfanumérica",
+   "significado": "TAXI",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G22"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "T",
+   "clave": "TANGO 2",
+   "tipo": "alfanumérica",
+   "significado": "TELÉFONO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G23",
+   "eq": [
+    "10-58"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "T",
+   "clave": "TANGO 3",
+   "tipo": "alfanumérica",
+   "significado": "TRÁILER/TORTON",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G24"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "U",
+   "clave": "ÚNICO 1",
+   "tipo": "alfanumérica",
+   "significado": "UBICACIÓN/ÁREA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G26",
+   "eq": [
+    "10-59"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "U",
+   "clave": "ÚNICO 2",
+   "tipo": "alfanumérica",
+   "significado": "URGENTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G27",
+   "eq": [
+    "10-60"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "V",
+   "clave": "VÍCTOR 1",
+   "tipo": "alfanumérica",
+   "significado": "VERIFICAR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G28",
+   "eq": [
+    "10-61"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "V",
+   "clave": "VÍCTOR 2",
+   "tipo": "alfanumérica",
+   "significado": "VEHÍCULO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G29",
+   "eq": [
+    "10-62"
+   ]
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "vocabulario",
+   "grupo": "Z",
+   "clave": "ZULÚ 1",
+   "tipo": "alfanumérica",
+   "significado": "ZARPE/DESATRAQUE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!G32"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "A",
+   "tipo": "letra",
+   "significado": "ALFA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P72"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "B",
+   "tipo": "letra",
+   "significado": "BRAVO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P73"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "C",
+   "tipo": "letra",
+   "significado": "CARLOS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P74"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "D",
+   "tipo": "letra",
+   "significado": "DELTA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P75"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "E",
+   "tipo": "letra",
+   "significado": "ECO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P76"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "F",
+   "tipo": "letra",
+   "significado": "FOX",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P77"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "G",
+   "tipo": "letra",
+   "significado": "GOLFO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P78"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "H",
+   "tipo": "letra",
+   "significado": "HOTEL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P79"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "I",
+   "tipo": "letra",
+   "significado": "INDIO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P80"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "J",
+   "tipo": "letra",
+   "significado": "JULIETA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P81"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "K",
+   "tipo": "letra",
+   "significado": "KILO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P82"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "L",
+   "tipo": "letra",
+   "significado": "LIMA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P83"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "M",
+   "tipo": "letra",
+   "significado": "MIGUEL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P84"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "N",
+   "tipo": "letra",
+   "significado": "NOE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P85"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "O",
+   "tipo": "letra",
+   "significado": "OSCAR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P86"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "P",
+   "tipo": "letra",
+   "significado": "PAPA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P87"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "Q",
+   "tipo": "letra",
+   "significado": "QUEBEC",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P88"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "R",
+   "tipo": "letra",
+   "significado": "ROMEO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P89"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "S",
+   "tipo": "letra",
+   "significado": "SIERRA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P90"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "T",
+   "tipo": "letra",
+   "significado": "TANGO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P91"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "U",
+   "tipo": "letra",
+   "significado": "UNICO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P92"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "V",
+   "tipo": "letra",
+   "significado": "VICTOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P93"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "W",
+   "tipo": "letra",
+   "significado": "WHISKY",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P94"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "X",
+   "tipo": "letra",
+   "significado": "XOCHITL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P95"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "Y",
+   "tipo": "letra",
+   "significado": "YANKEE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P96"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "alfabeto",
+   "grupo": "",
+   "clave": "Z",
+   "tipo": "letra",
+   "significado": "ZULU",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!P97"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Bandas y tramos",
+   "clave": "ATUN",
+   "tipo": "nominal",
+   "significado": "ELEMENTO BANDA \"A\" TRAMOS 2 Y 3",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T1"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Bandas y tramos",
+   "clave": "BAGRE",
+   "tipo": "nominal",
+   "significado": "ELEMENTO BANDA \"B\" TRAMOS 4, 5 Y 6",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T2"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Bandas y tramos",
+   "clave": "CURVINA",
+   "tipo": "nominal",
+   "significado": "ELEMENTO BANDA \"C\" TRAMOS 7, 8 Y 9",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T3"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Bandas y tramos",
+   "clave": "CALAMAR",
+   "tipo": "nominal",
+   "significado": "ELEMENTO BANDA \"C/D\" TRAMOS 13, 14 Y 15",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T4"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Accesos Pez Vela y carriles",
+   "clave": "ARRECIFE",
+   "tipo": "nominal",
+   "significado": "ENCARGADO ACCESO PESADO PEZ VELA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T6"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Accesos Pez Vela y carriles",
+   "clave": "PEZ ESPADA",
+   "tipo": "nominal",
+   "significado": "ENCARGADO ACCESO CARRIL 5 EXPORTACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T7"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Accesos Pez Vela y carriles",
+   "clave": "PEZ SIERRA",
+   "tipo": "nominal",
+   "significado": "ENCARGADO ACCESO CARRIL 6 IMPORTACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T8"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Accesos Pez Vela y carriles",
+   "clave": "PEZ ANGEL",
+   "tipo": "nominal",
+   "significado": "ENCARGADO ACCESO CARRIL 7 IMPORTACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T9"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Accesos Pez Vela y carriles",
+   "clave": "PEZ MARTILLO",
+   "tipo": "nominal",
+   "significado": "ENCARGADO ACCESO CARRIL 8 EXPORTACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T10"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Módulo de aduana y Puerta 15",
+   "clave": "GOLFO",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DE MÓDULO DE ADUANA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T12"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Módulo de aduana y Puerta 15",
+   "clave": "PARGO",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DE RUTA CONFINADA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T13"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Módulo de aduana y Puerta 15",
+   "clave": "CORAL",
+   "tipo": "nominal",
+   "significado": "ENCARGADO DE ACCESO RAYOS GAMA IMPO PUERTA 15",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T14"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Módulo de aduana y Puerta 15",
+   "clave": "LANGOSTA 1",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DE VALIDACION IMPO PUERTA 15",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T15"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Módulo de aduana y Puerta 15",
+   "clave": "LANGOSTA 2",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DE REVISION IMPO PUERTA 15",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T16"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Módulo de aduana y Puerta 15",
+   "clave": "LANGOSTA 3",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DE VALIDACION EXPO PUERTA 15",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T17"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Módulo de aduana y Puerta 15",
+   "clave": "LANGOSTA 4",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DE REVISION DE UNIDADES DE EXPO PUERTA 15",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T18"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Muelle pesquero",
+   "clave": "MARLIN",
+   "tipo": "nominal",
+   "significado": "ENCARGADO DE ACCESO VEHICULAR MUELLE PESQUERO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T20"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Muelle pesquero",
+   "clave": "MANTARRAYA",
+   "tipo": "nominal",
+   "significado": "ACCESO PEATONAL MUELLE PESQUERO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T22"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Zona norte",
+   "clave": "ROBALO",
+   "tipo": "nominal",
+   "significado": "ENCARGADO ACCESO PESADO ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T23"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Zona norte",
+   "clave": "CAMARÓN",
+   "tipo": "nominal",
+   "significado": "ACCESO VEHICULAR Y PEATONAL ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T24"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Zona norte",
+   "clave": "CANGREJO",
+   "tipo": "nominal",
+   "significado": "ACCESO PEATONAL ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T25"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Zona norte",
+   "clave": "FUREL",
+   "tipo": "nominal",
+   "significado": "ACCESO PESADO IMPO Y EXPO ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T26"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "puestos",
+   "grupo": "Zona norte",
+   "clave": "Mero",
+   "tipo": "nominal",
+   "significado": "ACCESO PEATONAL ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T27"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Autoridades civiles",
+   "clave": "ZEUS",
+   "tipo": "nominal",
+   "significado": "PRESIDENTE DE LA REPUBLICA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T34"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Autoridades civiles",
+   "clave": "VULCANO",
+   "tipo": "nominal",
+   "significado": "SECRETARIO DE MARINA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T35"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Autoridades civiles",
+   "clave": "CRONOS",
+   "tipo": "nominal",
+   "significado": "GOBERNADOR DEL ESTADO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T36"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Autoridades civiles",
+   "clave": "CICLOPE",
+   "tipo": "nominal",
+   "significado": "PRESIDENTE MUNICIPAL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T37"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Dirección y operaciones",
+   "clave": "APOLO",
+   "tipo": "nominal",
+   "significado": "DIR. GRAL. DE FOMENTO Y ADMINISTRACIÓN PORTUARIA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T39"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Dirección y operaciones",
+   "clave": "PLATINO",
+   "tipo": "nominal",
+   "significado": "DIRECTOR DE ASIPONA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T40"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Dirección y operaciones",
+   "clave": "PLATA",
+   "tipo": "nominal",
+   "significado": "GERENTE DE OPERACIONES",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T41"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Dirección y operaciones",
+   "clave": "PLOMO",
+   "tipo": "nominal",
+   "significado": "SUBGERENTE DE OPERACIONES",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T42"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Dirección y operaciones",
+   "clave": "ADAMANTIUM",
+   "tipo": "nominal",
+   "significado": "COORDINADOR DE TRÁFICO TERRESTRE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T43"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Protección y vigilancia",
+   "clave": "HIERRO",
+   "tipo": "nominal",
+   "significado": "SUBGERENTE DE PROTECCIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T45"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Protección y vigilancia",
+   "clave": "ACERO",
+   "tipo": "nominal",
+   "significado": "JEFE DE PROTECCIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T46"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Protección y vigilancia",
+   "clave": "ZINC",
+   "tipo": "nominal",
+   "significado": "AUXILIAR DE SEGURIDAD",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T47"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Protección y vigilancia",
+   "clave": "COBRE",
+   "tipo": "nominal",
+   "significado": "COORDINADOR DE VIGILANCIA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T48"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Protección y vigilancia",
+   "clave": "TIBURON",
+   "tipo": "nominal",
+   "significado": "SUPERVISOR DE VIGILANCIA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T49"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Comercialización",
+   "clave": "FOSFORO",
+   "tipo": "nominal",
+   "significado": "GERENTE DE COMERCIALIZACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T51"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Comercialización",
+   "clave": "SELENIO",
+   "tipo": "nominal",
+   "significado": "SUBGERENTE DE COMERCIALIZACIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T52"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Seguridad y emergencias",
+   "clave": "CROMO",
+   "tipo": "nominal",
+   "significado": "JEFE DE SEGURIDAD E HIGIENE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T54"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Seguridad y emergencias",
+   "clave": "NIQUEL",
+   "tipo": "nominal",
+   "significado": "COMANDANTE CENTRO DE EMERGENCIAS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T55"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Marina y UNAPROP",
+   "clave": "NEPTUNO",
+   "tipo": "nominal",
+   "significado": "COMANDANTE REGIÓN NAVAL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T57"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Marina y UNAPROP",
+   "clave": "THOR",
+   "tipo": "nominal",
+   "significado": "UNAPROP",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T58"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Capitanía y control de tráfico",
+   "clave": "URANIO",
+   "tipo": "nominal",
+   "significado": "CAPITAN DE PUERTO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T60"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "autoridades",
+   "grupo": "Capitanía y control de tráfico",
+   "clave": "VANADIO",
+   "tipo": "nominal",
+   "significado": "CONTROL DE TRAFICO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!T61"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Supervisión",
+   "clave": "TRUCHA 1",
+   "tipo": "nominal",
+   "significado": "UNIDAD ASIPONA DE SUPERVISOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A72"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Supervisión",
+   "clave": "TRUCHA 2",
+   "tipo": "nominal",
+   "significado": "UNIDAD ASIPONA 02 DE AUXILIAR DE SUPERVISOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A73"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Supervisión",
+   "clave": "TRUCHA 3",
+   "tipo": "nominal",
+   "significado": "UNIDAD ASIPONA 03 DE AUXILIAR DE SUPERVISOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A74"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Supervisión",
+   "clave": "TRUCHA 4",
+   "tipo": "nominal",
+   "significado": "UNIDAD ASIPONA 04 DE AUXILIAR DE SUPERVISOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A75"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Supervisión",
+   "clave": "TRUCHA 5",
+   "tipo": "nominal",
+   "significado": "UNIDAD ASIPONA 05 DE AUXILIAR DE SUPERVISOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A76"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Cuatrimotos",
+   "clave": "CABALLITO 7",
+   "tipo": "nominal",
+   "significado": "CUATRIMOTO ASIPONA 07 DE VIALIDADES",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A78"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Cuatrimotos",
+   "clave": "CABALLITO 8",
+   "tipo": "nominal",
+   "significado": "CUATRIMOTO ASIPONA 08 DE PATIO REGULADOR",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A79"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Cuatrimotos",
+   "clave": "CABALLITO 9",
+   "tipo": "nominal",
+   "significado": "CUATRIMOTO ASIPONA 09 DE MUELLE PESQUERO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A80"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Cuatrimotos",
+   "clave": "CABALLITO 10",
+   "tipo": "nominal",
+   "significado": "CUATRIMOTO ASIPONA 010 DE ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A81"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "PACIFICO",
+   "tipo": "nominal",
+   "significado": "EDIFICIO DE PROTECCIÓN",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A83"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "ATLANTICO",
+   "tipo": "nominal",
+   "significado": "EDIFICIO DE OPERACIONES",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A84"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "INDICO",
+   "tipo": "nominal",
+   "significado": "EDIFICIO DE PROTECCIÓN PORTUARIA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A85"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "PEREGRINO",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DEL ACCESO DEL EDIFICIO DE PROTECCIÓN PORTUARIA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A86"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "CEP",
+   "tipo": "nominal",
+   "significado": "CENTRO DE EMERGENCIAS PORTUARIAS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A87"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "DONCELLA",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DE RECEPCIÓN DEL EDIFICIO DE PROTECCIÓN PORTUARIA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A88"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "ESTURION",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DEL FARO DE CAMPOS",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A89"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "GALLO",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DEL CERRO DEL VIGIA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A90"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "SARDINA",
+   "tipo": "nominal",
+   "significado": "ELEMENTO DEL ESTACIONAMIENTO DE ASIPONA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A91"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "CARPA",
+   "tipo": "nominal",
+   "significado": "ELEMENTO CASA ASIPONA",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A92"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "ERIZO",
+   "tipo": "nominal",
+   "significado": "ELEMENTO EMBARCACIÓN (LANCHA PATRULLA)",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A93"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "ALMEJA",
+   "tipo": "nominal",
+   "significado": "ELEMENTO RECINTO FISCAL",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A94"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "TINTORERA",
+   "tipo": "nominal",
+   "significado": "ENCARGADO ACCESO VEHICULAR SAN PEDRITO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A95"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "TILAPIA",
+   "tipo": "nominal",
+   "significado": "ACCESO PEATONAL SAN PEDRITO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A96"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "PULPO",
+   "tipo": "nominal",
+   "significado": "ACCESO MOTOCICLETAS SAN PEDRITO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A97"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "ANGUILA",
+   "tipo": "nominal",
+   "significado": "ACCESO FERROVIARIO SAN PEDRITO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A98"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "TORTUGA",
+   "tipo": "nominal",
+   "significado": "RAYOS GAMA SAN PEDRITO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A99"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "DORADO 1",
+   "tipo": "nominal",
+   "significado": "VIALIDAD AVENIDA PELICANO",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A100"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "DORADO 2",
+   "tipo": "nominal",
+   "significado": "VIALIDAD 3 Y 4",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A101"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "DORADO 3",
+   "tipo": "nominal",
+   "significado": "VIALIDAD 5",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A102"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "DORADO 4",
+   "tipo": "nominal",
+   "significado": "VIALIDAD 7",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A103"
+  },
+  {
+   "sistema": "asipona",
+   "categoria": "unidades",
+   "grupo": "Edificios, elementos y accesos",
+   "clave": "DORADO 5",
+   "tipo": "nominal",
+   "significado": "VIALIDAD 8",
+   "nota": "",
+   "origen": "CLAVES ASIPONA!A104"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Mando",
+   "clave": "10-01",
+   "tipo": "numérica",
+   "significado": "DIRECTOR DE ASIPONA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A6"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-02",
+   "tipo": "numérica",
+   "significado": "ACCIDENTE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A9",
+   "eq": [
+    "ALFA 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-03",
+   "tipo": "numérica",
+   "significado": "ACUDIR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A10",
+   "eq": [
+    "ALFA 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-04",
+   "tipo": "numérica",
+   "significado": "ADELANTE/AUTORIZADO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A11",
+   "eq": [
+    "ALFA 3"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-05",
+   "tipo": "numérica",
+   "significado": "AFIRMATIVO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A12",
+   "eq": [
+    "ALFA 4"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-06",
+   "tipo": "numérica",
+   "significado": "ALIMENTOS",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A13",
+   "eq": [
+    "ALFA 5"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-07",
+   "tipo": "numérica",
+   "significado": "APOYO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A14",
+   "eq": [
+    "ALFA 7"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-08",
+   "tipo": "numérica",
+   "significado": "ARMA DE FUEGO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A15",
+   "eq": [
+    "ALFA 8"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-09",
+   "tipo": "numérica",
+   "significado": "BAÑO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A16",
+   "eq": [
+    "BRAVO 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-10",
+   "tipo": "numérica",
+   "significado": "DEFECTUOSO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A17",
+   "eq": [
+    "DELTA 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-11",
+   "tipo": "numérica",
+   "significado": "DINERO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A18",
+   "eq": [
+    "DELTA 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-12",
+   "tipo": "numérica",
+   "significado": "DOCUMENTOS",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A19",
+   "eq": [
+    "DELTA 3"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-13",
+   "tipo": "numérica",
+   "significado": "DOMICILIO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A20",
+   "eq": [
+    "DELTA 4"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-14",
+   "tipo": "numérica",
+   "significado": "DROGADICT@",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A21",
+   "eq": [
+    "DELTA 5"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-15",
+   "tipo": "numérica",
+   "significado": "ENTERADO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A22",
+   "eq": [
+    "ECO 3"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-16",
+   "tipo": "numérica",
+   "significado": "ENVIAR/MANDAR/DIRIGIR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A23",
+   "eq": [
+    "ECO 4"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-17",
+   "tipo": "numérica",
+   "significado": "EXTINTOR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A24",
+   "eq": [
+    "ECO 5"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-18",
+   "tipo": "numérica",
+   "significado": "FALTA UN ELEMENTO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A25",
+   "eq": [
+    "FOX 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-19",
+   "tipo": "numérica",
+   "significado": "FUERTE Y CLARO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A26",
+   "eq": [
+    "FOX 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-20",
+   "tipo": "numérica",
+   "significado": "INCENDIO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A27",
+   "eq": [
+    "INDIO 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-21",
+   "tipo": "numérica",
+   "significado": "INFORMACIÓN",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A28",
+   "eq": [
+    "INDIO 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-22",
+   "tipo": "numérica",
+   "significado": "INFRACCIÓN",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A29",
+   "eq": [
+    "INDIO 3"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-23",
+   "tipo": "numérica",
+   "significado": "INGRESAR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A30",
+   "eq": [
+    "INDIO 4"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-24",
+   "tipo": "numérica",
+   "significado": "INSTRUCCIONES",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A31",
+   "eq": [
+    "INDIO 6"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-25",
+   "tipo": "numérica",
+   "significado": "INTENTAR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A32",
+   "eq": [
+    "INDIO 7"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-26",
+   "tipo": "numérica",
+   "significado": "INTRUS@",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A33",
+   "eq": [
+    "INDIO 8"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-27",
+   "tipo": "numérica",
+   "significado": "INVESTIGAR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A34",
+   "eq": [
+    "INDIO 9"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-28",
+   "tipo": "numérica",
+   "significado": "HOMBRE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A35",
+   "eq": [
+    "HOTEL 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-29",
+   "tipo": "numérica",
+   "significado": "MÁQUINA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A36",
+   "eq": [
+    "MIGUEL 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-30",
+   "tipo": "numérica",
+   "significado": "MENSAJE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A37",
+   "eq": [
+    "MIGUEL 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-31",
+   "tipo": "numérica",
+   "significado": "MOTOBOMBA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A38",
+   "eq": [
+    "MIGUEL 3"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-32",
+   "tipo": "numérica",
+   "significado": "MUERTO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A39",
+   "eq": [
+    "MIGUEL 4"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-33",
+   "tipo": "numérica",
+   "significado": "MUJER",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A40",
+   "eq": [
+    "MIGUEL 5"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-34",
+   "tipo": "numérica",
+   "significado": "MUY ALERTA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A41",
+   "eq": [
+    "MIGUEL 6"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-35",
+   "tipo": "numérica",
+   "significado": "ÓRDENES SUPERIORES",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A42",
+   "eq": [
+    "ÓSCAR 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-36",
+   "tipo": "numérica",
+   "significado": "PENDIENTE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A43",
+   "eq": [
+    "PAPA 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-37",
+   "tipo": "numérica",
+   "significado": "PLACAS",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A44",
+   "eq": [
+    "PAPA 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-38",
+   "tipo": "numérica",
+   "significado": "PROBLEMA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A45",
+   "eq": [
+    "PAPA 5"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-39",
+   "tipo": "numérica",
+   "significado": "PROCEDER",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A46",
+   "eq": [
+    "PAPA 6"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-40",
+   "tipo": "numérica",
+   "significado": "PROSTITUTA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A47",
+   "eq": [
+    "PAPA 7"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-41",
+   "tipo": "numérica",
+   "significado": "RADIO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A48",
+   "eq": [
+    "ROMEO 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-42",
+   "tipo": "numérica",
+   "significado": "RADIO DESCARGADO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A49",
+   "eq": [
+    "ROMEO 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-43",
+   "tipo": "numérica",
+   "significado": "RECARGAR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A50",
+   "eq": [
+    "ROMEO 3"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-44",
+   "tipo": "numérica",
+   "significado": "RECORRIDO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A51",
+   "eq": [
+    "ROMEO 4"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-45",
+   "tipo": "numérica",
+   "significado": "REFUERZO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A52",
+   "eq": [
+    "ROMEO 5"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-46",
+   "tipo": "numérica",
+   "significado": "RELEVO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A53",
+   "eq": [
+    "ROMEO 6"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-47",
+   "tipo": "numérica",
+   "significado": "REPETIR EL MENSAJE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A54",
+   "eq": [
+    "ROMEO 7"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-48",
+   "tipo": "numérica",
+   "significado": "RETIRARSE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A55",
+   "eq": [
+    "ROMEO 8"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-49",
+   "tipo": "numérica",
+   "significado": "RIÑA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A56",
+   "eq": [
+    "ROMEO 9"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-50",
+   "tipo": "numérica",
+   "significado": "ROBO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A57",
+   "eq": [
+    "ROMEO 10"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-51",
+   "tipo": "numérica",
+   "significado": "SALIR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A58",
+   "eq": [
+    "SIERRA 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-52",
+   "tipo": "numérica",
+   "significado": "SANCIÓN",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A59",
+   "eq": [
+    "SIERRA 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-53",
+   "tipo": "numérica",
+   "significado": "SERVICIO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A60",
+   "eq": [
+    "SIERRA 5"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-54",
+   "tipo": "numérica",
+   "significado": "SITUACIÓN",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A61",
+   "eq": [
+    "SIERRA 6"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-55",
+   "tipo": "numérica",
+   "significado": "SIN NOVEDAD",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A62",
+   "eq": [
+    "SIERRA 7"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-56",
+   "tipo": "numérica",
+   "significado": "SOLICITO/REQUIERO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A63",
+   "eq": [
+    "SIERRA 8"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-57",
+   "tipo": "numérica",
+   "significado": "SOSPECHOS@",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A64",
+   "eq": [
+    "SIERRA 9"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-58",
+   "tipo": "numérica",
+   "significado": "TELÉFONO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A65",
+   "eq": [
+    "TANGO 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-59",
+   "tipo": "numérica",
+   "significado": "UBICACIÓN/ÁREA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A66",
+   "eq": [
+    "ÚNICO 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-60",
+   "tipo": "numérica",
+   "significado": "URGENTE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A67",
+   "eq": [
+    "ÚNICO 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-61",
+   "tipo": "numérica",
+   "significado": "VERIFICAR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A68",
+   "eq": [
+    "VÍCTOR 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Vocabulario operativo",
+   "clave": "10-62",
+   "tipo": "numérica",
+   "significado": "VEHÍCULO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A69",
+   "eq": [
+    "VÍCTOR 2"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-63",
+   "tipo": "numérica",
+   "significado": "CHOQUE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A70"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-64",
+   "tipo": "numérica",
+   "significado": "ACCIDENTE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A71",
+   "eq": [
+    "ALFA 1"
+   ]
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-65",
+   "tipo": "numérica",
+   "significado": "ACCIDENTE CON LESIONADOS",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A72"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-66",
+   "tipo": "numérica",
+   "significado": "DAÑOS MATERIALES",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A73"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-67",
+   "tipo": "numérica",
+   "significado": "LESIONADO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A74"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-68",
+   "tipo": "numérica",
+   "significado": "ATROPELLADO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A75"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-69",
+   "tipo": "numérica",
+   "significado": "SEMAFOROS APAGADOS",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A76"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-70",
+   "tipo": "numérica",
+   "significado": "ACUDIR AL CEP",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A77"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-71",
+   "tipo": "numérica",
+   "significado": "YA PAGARON",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A78"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-72",
+   "tipo": "numérica",
+   "significado": "CAJERO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A79"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-73",
+   "tipo": "numérica",
+   "significado": "BANCO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A80"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-74",
+   "tipo": "numérica",
+   "significado": "FALLA TEMPORAL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A81"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-75",
+   "tipo": "numérica",
+   "significado": "PATIO PROBLEMÁTICO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A82"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-76",
+   "tipo": "numérica",
+   "significado": "CARRUSEL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A83"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-77",
+   "tipo": "numérica",
+   "significado": "CORTE DE CALLE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A84"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-78",
+   "tipo": "numérica",
+   "significado": "RETORNO DE UNIDAD/ES",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A85"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-79",
+   "tipo": "numérica",
+   "significado": "COLOCAR BARRERAS",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A86"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-80",
+   "tipo": "numérica",
+   "significado": "DETENER SALIDA REGULADOR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A87"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-81",
+   "tipo": "numérica",
+   "significado": "DETENER SALIDA PEZ VELA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A88"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-82",
+   "tipo": "numérica",
+   "significado": "DETENER SALIDA ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A89"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "acciones",
+   "grupo": "Accidentes y operación vial",
+   "clave": "10-83",
+   "tipo": "numérica",
+   "significado": "PROTECCION ENVIANDO UNIDADES SALIDA POR CONFINADA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!A90"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-84",
+   "tipo": "numérica",
+   "significado": "EJÉRCITO MEXICANO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E9"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-85",
+   "tipo": "numérica",
+   "significado": "BOMBERO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E10"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-86",
+   "tipo": "numérica",
+   "significado": "ARMADA DE MÉXICO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E11"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-87",
+   "tipo": "numérica",
+   "significado": "POLICÍA FEDERAL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E12"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-88",
+   "tipo": "numérica",
+   "significado": "POLICÍA JUDICIAL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E13"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-89",
+   "tipo": "numérica",
+   "significado": "SEMEFO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E14"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-90",
+   "tipo": "numérica",
+   "significado": "GRÚA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E15"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-91",
+   "tipo": "numérica",
+   "significado": "AMBULANCIA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E16"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-92",
+   "tipo": "numérica",
+   "significado": "PROTECCIÓN CIVIL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E17"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-93",
+   "tipo": "numérica",
+   "significado": "GOBERNADOR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E18"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-94",
+   "tipo": "numérica",
+   "significado": "PRESIDENTA MUNICIPAL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E19"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "entidades",
+   "grupo": "",
+   "clave": "10-95",
+   "tipo": "numérica",
+   "significado": "GUARDIA NACIONAL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E20"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-105",
+   "tipo": "numérica",
+   "significado": "TRAMO 2",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J9"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-106",
+   "tipo": "numérica",
+   "significado": "TRAMO 3",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J10"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-107",
+   "tipo": "numérica",
+   "significado": "TRAMO 4",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J11"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-108",
+   "tipo": "numérica",
+   "significado": "TRAMO 5",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J12"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-109",
+   "tipo": "numérica",
+   "significado": "TRAMO 6",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J13"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-110",
+   "tipo": "numérica",
+   "significado": "TRAMO 7",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J14"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-111",
+   "tipo": "numérica",
+   "significado": "TRAMO 8",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J15"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-112",
+   "tipo": "numérica",
+   "significado": "TRAMO 9",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J16"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-113",
+   "tipo": "numérica",
+   "significado": "TRAMO 10",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J17"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-114",
+   "tipo": "numérica",
+   "significado": "TRAMO 11",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J18"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-115",
+   "tipo": "numérica",
+   "significado": "TRAMO 12",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J19"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-116",
+   "tipo": "numérica",
+   "significado": "TRAMO 13",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J20"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-117",
+   "tipo": "numérica",
+   "significado": "TRAMO 14",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J21"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "muelles",
+   "grupo": "",
+   "clave": "10-118",
+   "tipo": "numérica",
+   "significado": "TRAMO 15",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J22"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-96",
+   "tipo": "numérica",
+   "significado": "VIALIDAD PELICANOS",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E71"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-97",
+   "tipo": "numérica",
+   "significado": "VIALIDAD 3",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E72"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-98",
+   "tipo": "numérica",
+   "significado": "VIALIDAD 4",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E73"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-99",
+   "tipo": "numérica",
+   "significado": "VIALIDAD 5",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E74"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-100",
+   "tipo": "numérica",
+   "significado": "VIALIDAD 6",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E75"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-101",
+   "tipo": "numérica",
+   "significado": "VIALIDAD 7",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E76"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-102",
+   "tipo": "numérica",
+   "significado": "VIALIDAD 8",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E77"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-103",
+   "tipo": "numérica",
+   "significado": "VIALIDAD CONTECON",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E78"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "internas",
+   "grupo": "",
+   "clave": "10-104",
+   "tipo": "numérica",
+   "significado": "VIALIDAD HAZESA",
+   "nota": "también pueden nombrarse por su nombre",
+   "origen": "CLAVES DE MOVILIDAD!E79"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "PUENTE",
+   "tipo": "nominal",
+   "significado": "PUENTE PUERTA 15",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E38"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "CONFINADA",
+   "tipo": "nominal",
+   "significado": "CONFINADA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E39"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "ROBALO",
+   "tipo": "nominal",
+   "significado": "PESADO ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E40"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "MERO",
+   "tipo": "nominal",
+   "significado": "LIGEROS ZONA NORTE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E41"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "ARRECIFE",
+   "tipo": "nominal",
+   "significado": "PEZ VELA INGRESO/EGRESO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E42"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "MEILLON",
+   "tipo": "nominal",
+   "significado": "CARRETERA MANZANILLO-COLIMA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E43"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "",
+   "tipo": "nominal",
+   "significado": "CARRETERA COLIMA-MANZANILLO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E44"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "RETORNO",
+   "tipo": "nominal",
+   "significado": "RETORNO GLORIETA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E45"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "ANGUILA",
+   "tipo": "nominal",
+   "significado": "C. ANGUILA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E46"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "BALLENA",
+   "tipo": "nominal",
+   "significado": "C. BALLENA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E47"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "CALAMAR",
+   "tipo": "nominal",
+   "significado": "C. CALAMAR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E48"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "NUTRIAS",
+   "tipo": "nominal",
+   "significado": "C. NUTRIA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E49"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "ALGODONES",
+   "tipo": "nominal",
+   "significado": "C. ALGODONES",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E50"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "ISLA",
+   "tipo": "nominal",
+   "significado": "PATIO REGULADOR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E51"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "TUNY",
+   "tipo": "nominal",
+   "significado": "ANTONIO SUAREZ",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E52"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "NORTE 1",
+   "tipo": "nominal",
+   "significado": "NORTE 1",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E53"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "NEYNO",
+   "tipo": "nominal",
+   "significado": "C.ALGODONES ESQ. CIRCUITO TAPEIXTLES",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E54"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "ACUARIO",
+   "tipo": "nominal",
+   "significado": "C. ALGODONES ESQ. INICIO NUEVO ACCESO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E55"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "CAPRICORNIO",
+   "tipo": "nominal",
+   "significado": "NUEVO ACCESO ESQ. C. CORREOS DE MÉXICO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E56"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "CIRCUITO",
+   "tipo": "nominal",
+   "significado": "CIRCUITO TAPEIXTLES ESQ. C. CALAMAR",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E57"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "HUAMÚCHIL",
+   "tipo": "nominal",
+   "significado": "EXPLANADA ZONA NORTE ESQ. C. ANTONIO SUAREZ",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E58"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "externas",
+   "grupo": "",
+   "clave": "BRECHA",
+   "tipo": "nominal",
+   "significado": "JOSE MESINA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E59"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "ATENEA",
+   "tipo": "nominal",
+   "significado": "JEFA DE TRÁFICO TERRESTRE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E24"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "MORFEO",
+   "tipo": "nominal",
+   "significado": "COORDINADOR DE TRAFICO TERRESTRE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E25"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "HADES",
+   "tipo": "nominal",
+   "significado": "SUPERVISOR FIJO DE TRAFICO TERRESTRE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E26"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "ARGÓN",
+   "tipo": "nominal",
+   "significado": "TRAFICO TERRESTRE",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E27"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "SAGITARIO",
+   "tipo": "nominal",
+   "significado": "COORDINADOR DE MOVILIDAD",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E28"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "ORIÓN",
+   "tipo": "nominal",
+   "significado": "SUPERVISOR DE MOVILIDAD",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E29"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "LIBRA",
+   "tipo": "nominal",
+   "significado": "APOYO DE SUPERVISOR MOVILIDAD",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E30"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "PEGASO 1",
+   "tipo": "nominal",
+   "significado": "ELEMENTO CABALLO 1",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E31"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "trafico",
+   "grupo": "",
+   "clave": "PEGASO 2",
+   "tipo": "nominal",
+   "significado": "ELEMENTO CABALLO 2",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!E32"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "MANDRAGORA",
+   "tipo": "nominal",
+   "significado": "PERSONAL DE PROTECCIÓN",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J26"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "POLILLA",
+   "tipo": "nominal",
+   "significado": "CENTRO DE MANDO",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J27"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "",
+   "tipo": "nominal",
+   "significado": "PROBLEMAS CON INTERNET",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J28"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "",
+   "tipo": "nominal",
+   "significado": "PROBLEMAS CON HYTERAS",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J29"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "",
+   "tipo": "nominal",
+   "significado": "APLICANDO PLAN C",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J30"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "",
+   "tipo": "nominal",
+   "significado": "PROBLEMA DE ADUANA",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J31"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "",
+   "tipo": "nominal",
+   "significado": "PROBLEMA DE TERMINAL",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J32"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "adicionales",
+   "grupo": "",
+   "clave": "",
+   "tipo": "nominal",
+   "significado": "PROBLEMA DE FERROMEX",
+   "nota": "",
+   "origen": "CLAVES DE MOVILIDAD!J33"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "patio",
+   "grupo": "",
+   "clave": "ANDROMEDA",
+   "tipo": "nominal",
+   "significado": "PATIO REGULADOR",
+   "nota": "emparejamiento por confirmar",
+   "origen": "CLAVES DE MOVILIDAD!J38:L38"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "patio",
+   "grupo": "",
+   "clave": "SAGITARIO",
+   "tipo": "nominal",
+   "significado": "SUPERVISOR",
+   "nota": "emparejamiento por confirmar",
+   "origen": "CLAVES DE MOVILIDAD!J39:L39"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "patio",
+   "grupo": "",
+   "clave": "SUPERVISORA",
+   "tipo": "nominal",
+   "significado": "HIPOLITA",
+   "nota": "emparejamiento por confirmar",
+   "origen": "CLAVES DE MOVILIDAD!J40:L40"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "patio",
+   "grupo": "",
+   "clave": "MOTORIZADO",
+   "tipo": "nominal",
+   "significado": "CENTAURO",
+   "nota": "emparejamiento por confirmar",
+   "origen": "CLAVES DE MOVILIDAD!J41:L41"
+  },
+  {
+   "sistema": "movilidad",
+   "categoria": "patio",
+   "grupo": "",
+   "clave": "MORFEO",
+   "tipo": "nominal",
+   "significado": "COORDINADOR",
+   "nota": "emparejamiento por confirmar",
+   "origen": "CLAVES DE MOVILIDAD!J42:L42"
+  }
+ ],
+ "incidentes": [
+  {
+   "codigo": 10101,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente acuático con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10102,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de aeronave con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10103,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de motocicleta con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10104,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de vehículo automotor con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10105,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente ferroviario con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10106,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente ferroviario con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10107,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente múltiple con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10108,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente múltiple con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10109,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de vehículo de pasajeros con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10110,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de vehículo de pasajeros con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10111,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de motocicleta con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10112,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de vehículo automotor con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10113,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de aeronave con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10114,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de embarcaciones con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10115,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente de embarcaciones con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10117,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidente acuático con fallecido",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10118,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidentes con materiales peligrosos",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10119,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidentes con materiales radioactivos",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10120,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Accidentes con riesgos biológicos infecto-contagioso",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10121,
+   "tipo": "Médico",
+   "subtipo": "Accidentes",
+   "incidente": "Otros accidentes con lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 10201,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Ahogamiento",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10202,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Amputación",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10203,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Asfixia",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10204,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Caída",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10205,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Electrocutado/lesión por corriente eléctrica",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10206,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Fracturado/traumatismo de extremidades",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10207,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Hemorragia",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10208,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Lesionado por arma blanca",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10209,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Lesionado por proyectil de arma de fuego",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10211,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Quemaduras",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10212,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Traumatismos múltiples",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10213,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Traumatismo de cráneo",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10214,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Traumatismo de tórax (pecho y/o espalda)",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10215,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Traumatismo abdominal",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10218,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Hipotermia",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10219,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Fallecido de causa traumático",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10220,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Otros incidentes médicos traumáticos",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10303,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Urgencia en paciente embarazada",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10304,
+   "tipo": "Médico",
+   "subtipo": "Traumaticos",
+   "incidente": "Infarto cerebral",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10305,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Dificultad respiratoria/urgencia respiratoria",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10307,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Convulsiones",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10308,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Persona inconsciente/urgencia neurológica",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10310,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Urgencia por enfermedad general",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10311,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Dolor abdominal/urgencia abdominal",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10312,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Descompensación de la diabetes/deshidratación",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10313,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Paro cardiorrespiratorio",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10314,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Infarto/urgencia cardiológica",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10315,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Intoxicación/sobredosis/envenenamiento por sustancias",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10316,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Otros incidentes médicos clínicos",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10317,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "fallecido de causa natural",
+   "prioridad": "Baja",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 10319,
+   "tipo": "Médico",
+   "subtipo": "Clinicos",
+   "incidente": "Epidemia",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20101,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Accidente ferroviario sin lesionados",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 20102,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Almacenamiento de sustancias peligrosas",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20107,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Explosión",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20108,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Fugas y derrames de sustancias químicas",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 20109,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Hundimientos / agrietamientos/ inestabilidad de ladera",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20110,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Gases tóxicos",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20111,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Olores fétidos",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20112,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Materiales peligrosos o radioactivos (exposición)",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 20113,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Caída de anuncio o espectacular",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20114,
+   "tipo": "Protección civil",
+   "subtipo": "Auxilio",
+   "incidente": "Transporte de sustancias peligrosas",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20201,
+   "tipo": "Protección civil",
+   "subtipo": "Medio amb.",
+   "incidente": "Contaminación de suelo, aire y agua",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20203,
+   "tipo": "Protección civil",
+   "subtipo": "Medio amb.",
+   "incidente": "Enjambre de abejas",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20206,
+   "tipo": "Protección civil",
+   "subtipo": "Medio amb.",
+   "incidente": "Huracanes",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20207,
+   "tipo": "Protección civil",
+   "subtipo": "Medio amb.",
+   "incidente": "Inundaciones",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20209,
+   "tipo": "Protección civil",
+   "subtipo": "Medio amb.",
+   "incidente": "Sismo",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20213,
+   "tipo": "Protección civil",
+   "subtipo": "Medio amb.",
+   "incidente": "Tsunami",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20214,
+   "tipo": "Protección civil",
+   "subtipo": "Medio amb.",
+   "incidente": "Viento/tormenta de polvo",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20303,
+   "tipo": "Protección civil",
+   "subtipo": "Incendio",
+   "incidente": "Incendio de Vehículo",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 20305,
+   "tipo": "Protección civil",
+   "subtipo": "Incendio",
+   "incidente": "Incendio de Edificio",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20306,
+   "tipo": "Protección civil",
+   "subtipo": "Incendio",
+   "incidente": "Incendio a bordo de una embarcación",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20311,
+   "tipo": "Protección civil",
+   "subtipo": "Incendio",
+   "incidente": "Otros incendios",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 20401,
+   "tipo": "Protección civil",
+   "subtipo": "Rescate",
+   "incidente": "Naufragio/hundimiento/varadura de embarcación",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20402,
+   "tipo": "Protección civil",
+   "subtipo": "Rescate",
+   "incidente": "Persona atrapada",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 20404,
+   "tipo": "Protección civil",
+   "subtipo": "Rescate",
+   "incidente": "Otros rescates",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30101,
+   "tipo": "Protección civil",
+   "subtipo": "Abandono",
+   "incidente": "Vehículo abandonado",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 30102,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relac. con armas / explosivos",
+   "incidente": "Objeto sospechoso o Peligroso",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30201,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relac. con armas / explosivos",
+   "incidente": "Detonación de explosivos",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30202,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relac. con armas / explosivos",
+   "incidente": "Detonación de arma de fuego",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30204,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relac. con armas / explosivos",
+   "incidente": "Portación de armas o cartuchos",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30205,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relac. con armas / explosivos",
+   "incidente": "Detonación de cohetes o fuegos artificiales",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30207,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relac. con armas / explosivos",
+   "incidente": "Tráfico de armas",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30301,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Aeronave sospechosa",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30303,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Bloqueo o corte de vías de comunicación",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 30304,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Circular en sentido contrario",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 30305,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Vehículo a exceso de velocidad",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 30306,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Vehículo en huida",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30307,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Vehículo sospechoso",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30308,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Vehículo descompuesto",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 30309,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Accidente de tránsito sin lesionados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 30310,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacion a las vias de comunicación",
+   "incidente": "Otras faltas a reglamento de tránsito",
+   "prioridad": "Baja",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 30401,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Otras alarmas de emergencia activadas",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30404,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Daño a propiedad ajena",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30406,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Extorsión",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30407,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Extorsión telefónica",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30408,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Robo de combustible o toma clandestina de ductos",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30421,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Robo a transeúnte con violencia",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30427,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Robo a transportista con violencia",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30428,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Robo a transportista sin violencia",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30443,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Robo a embarcaciones y piratería",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30444,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con el patrimonio",
+   "incidente": "Transporte ilegal de combustible",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30602,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Persona no localizada",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30603,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Privación de la libertad",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30604,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Rehenes",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30606,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Persona detenida",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30610,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Tentativa de privación de la libertad",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30611,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Notificación de ciber incidente",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30702,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Acoso u hostigamiento sexual",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30709,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Trata de personas",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30710,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la libertad personal",
+   "incidente": "Tráfico de personas/indocumentadas",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30803,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Enfrentamiento de grupos armados",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30804,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Terrorismo o atentado",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30805,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Amenaza de bomba",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30809,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Venta ilegal de combustible",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30904,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Persona sospechosa",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30905,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Amenaza de suicidio",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30906,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Homicidio",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30907,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Persona agresiva",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 30908,
+   "tipo": "Seguridad",
+   "subtipo": "Actos relacionados con la seguridad colectiva",
+   "incidente": "Suicidio",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31002,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Amenaza",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31008,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Toma de edificio público",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31011,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Tráfico de madera",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31012,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Trafico y/o venta clandestina de animales",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31013,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Tráfico de drogas y estupefacientes en la mar",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31014,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Tráfico de drogas y estupefacientes en vía pública",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31101,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Alteración del orden público por persona alcoholizada",
+   "prioridad": "Baja",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 31109,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Manifestación con disturbios o bloqueos",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 31114,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Otros tipos de alteración al orden público",
+   "prioridad": "Baja",
+   "nuevo": false,
+   "pisrep": true
+  },
+  {
+   "codigo": 31115,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Transporte de vehículo con carga sobredimensionada",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 31116,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Avituallamiento",
+   "prioridad": "Media",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 31117,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Inspección a buque",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 31118,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Ingreso de autoridades al recinto portuario",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 31119,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Ingreso de embarcaciones menores a muelle pesquero.",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41120,
+   "tipo": "Seguridad",
+   "subtipo": "Disturbios y alteracion del orden publico",
+   "incidente": "Sobre vuelo de dron",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 40101,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Caída de barda",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40102,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Caída de poste",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40103,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Falla de alumbrado público",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40104,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Fallas de semáforo",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40105,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Alcantarilla sin tapa",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40106,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Cables colgando",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40107,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Corto circuito",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40108,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Grava suelta",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40109,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Afectación de los servicios básicos o de infraestructura estratégica",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 40110,
+   "tipo": "Servicios públicos",
+   "subtipo": "Infraestructura",
+   "incidente": "Vialidad en mal estado",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 50106,
+   "tipo": "Asistencia",
+   "subtipo": "Proteccion",
+   "incidente": "Usurpación de identidad",
+   "prioridad": "Baja",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 50107,
+   "tipo": "Asistencia",
+   "subtipo": "Proteccion",
+   "incidente": "Abuso de confianza",
+   "prioridad": "Baja",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 50108,
+   "tipo": "Asistencia",
+   "subtipo": "Proteccion",
+   "incidente": "Abuso de autoridad",
+   "prioridad": "Media",
+   "nuevo": false,
+   "pisrep": false
+  },
+  {
+   "codigo": 50109,
+   "tipo": "Asistencia",
+   "subtipo": "Proteccion",
+   "incidente": "Daños a las instalaciones",
+   "prioridad": "Media",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 50110,
+   "tipo": "Auxilio",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Soporte técnico de RNI",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 101031,
+   "tipo": "Médico",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Percance entre motociclista y vehiculo",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41121,
+   "tipo": "Servicios públicos",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Visitas guiadas",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41122,
+   "tipo": "Seguridad",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Cabo reventado en muelle.",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 20115,
+   "tipo": "Auxilio",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Incidente en vialidades externos con o sin lesionados.",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41123,
+   "tipo": "Medioambiente",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Pronostico meteorologico general",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41124,
+   "tipo": "Servicios públicos",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Visita a Centros de Tecnológicos",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41125,
+   "tipo": "Seguridad",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Reporte de conteos",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41126,
+   "tipo": "Auxilio",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Obstrucción de ferrocarril",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41127,
+   "tipo": "Auxilio",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Ingreso de persona no autorizada",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41128,
+   "tipo": "Auxilio",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Caída de contenedor",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41129,
+   "tipo": "Seguridad",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Eventos externos",
+   "prioridad": "Media",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41130,
+   "tipo": "Auxilio",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Ingreso de unidades con puertas abiertas",
+   "prioridad": "Media",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41131,
+   "tipo": "Seguridad",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Intermitencia de sistema ADUANA",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41132,
+   "tipo": "Seguridad",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Trabajos sin autorización",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41133,
+   "tipo": "Servicios públicos",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Acondicionamiento y extensión del recinto portuario.",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41134,
+   "tipo": "Servicios públicos",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Perdida de energía eléctrica",
+   "prioridad": "Alta",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41135,
+   "tipo": "Médico",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Campaña de donacion de sangre",
+   "prioridad": "Media",
+   "nuevo": true,
+   "pisrep": false
+  },
+  {
+   "codigo": 41136,
+   "tipo": "Informe fotográfico",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Reportes Diversos/Vialidades/Terminales",
+   "prioridad": "Baja",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41137,
+   "tipo": "Servicios públicos",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Mantenimiento a instalaciones",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 41138,
+   "tipo": "",
+   "subtipo": "Códigos nuevos PIS",
+   "incidente": "Reporte de condiciones climáticas",
+   "prioridad": "",
+   "nuevo": true,
+   "pisrep": true
+  },
+  {
+   "codigo": 10116,
+   "tipo": "Sin clasificar",
+   "subtipo": "Solo en PIS-REP",
+   "incidente": "Atropellamiento",
+   "prioridad": "Alta",
+   "nuevo": false,
+   "pisrep": true
+  }
+ ],
+ "terminales": {
+  "url": "https://pis-web-citas-prod.azurewebsites.net/espaciosterminal.php?idt=",
+  "items": [
+   {
+    "clave": "6",
+    "nombre": "FRIGORIFICO DE MANZANILLO, S.A. DE C.V."
+   },
+   {
+    "clave": "154",
+    "nombre": "CORPORACION MULTIMODAL"
+   },
+   {
+    "clave": "160",
+    "nombre": "CEMEX S.A.B. DE C.V."
+   },
+   {
+    "clave": "161",
+    "nombre": "GRANELERA MANZANILLO S. A. DE C. V."
+   },
+   {
+    "clave": "163",
+    "nombre": "HOLCIM MEXICO OPERACIONES, S.A. DE C.V."
+   },
+   {
+    "clave": "423",
+    "nombre": "MARFRIGO, S.A. DE C.V."
+   },
+   {
+    "clave": "480",
+    "nombre": "CONTECON MANZANILLO"
+   },
+   {
+    "clave": "2164",
+    "nombre": "TERMINAL MARITIMA HAZESA S.A DE C.V."
+   },
+   {
+    "clave": "3914",
+    "nombre": "TERMINAL KMS DE GNL S. DE R.L. DE C.V."
+   },
+   {
+    "clave": "4747",
+    "nombre": "OPERADORA DE LA CUENCA DEL PACIFICO SA DE CV"
+   },
+   {
+    "clave": "6374",
+    "nombre": "COMPAÑIA TERMINAL DE MANZANILLO S A DE C V"
+   },
+   {
+    "clave": "6381",
+    "nombre": "SSA MEXICO S.A. DE C.V."
+   },
+   {
+    "clave": "6382",
+    "nombre": "TERMINAL INTERNACIONAL DE MANZANILLO SA DE CV"
+   },
+   {
+    "clave": "6383",
+    "nombre": "COMERCIALIZADORA LA JUNTA, S.A. DE C.V."
+   },
+   {
+    "clave": "6828",
+    "nombre": "PEMEX LOGISTICA"
+   },
+   {
+    "clave": "85",
+    "nombre": "ADMINISTRACION DEL SISTEMA PORTUARIO NACIONAL MANZANILLO S.A. DE C.V."
+   }
+  ]
+ }
+}
