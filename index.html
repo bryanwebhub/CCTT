@@ -1112,6 +1112,12 @@ html[data-cctt-scheme="dark"] #page-balance #balWeeklyTables .bal-week-banner{ba
 #page-balance #balWeeklyExportPanel{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 #page-balance #balWeeklyExportPanel .bal-week-export-svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 </style>
+
+<!-- NUEVO: presentación aislada de la consulta de claves con variables del tema CCTT; corrección de contraste del selector anual. -->
+<style id="ccttClavesASIPONAStyles">
+#boAsiponaPanel{margin-bottom:16px}#boAsiponaPanel .bo-asipona-tabs,#boAsiponaPanel .bo-asipona-chips,#boAsiponaPanel .bo-asipona-fields{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}#boAsiponaPanel button[aria-selected="true"],#boAsiponaPanel button[aria-pressed="true"]{background:var(--navy);color:white}#boAsiponaPanel .bo-asipona-fields label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:700;min-width:150px;flex:1}#boAsiponaPanel select,#boAsiponaPanel input{background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-radius:9px;padding:10px;max-width:100%;min-width:0}#boAsiponaPanel .bo-asipona-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:9px}#boAsiponaPanel .bo-asipona-entry{border:1px solid var(--cctt-theme-line,var(--line));padding:11px;border-radius:10px;background:var(--cctt-theme-card,var(--card));overflow-wrap:anywhere}#boAsiponaPanel .bo-asipona-key{font-weight:800;display:inline-block;margin-right:8px}#boAsiponaPanel .bo-asipona-eq{font-size:12px;color:var(--cctt-theme-accent,var(--blue));margin-top:5px}#boAsiponaPanel .bo-asipona-pending{font-size:11px;font-weight:800;border:1px solid currentColor;border-radius:8px;padding:2px 5px;margin-left:6px}#boAsiponaPanel .bo-asipona-table{overflow-x:auto}#boAsiponaPanel .bo-asipona-table table{width:100%;border-collapse:collapse;min-width:550px}#boAsiponaPanel .bo-asipona-table td,#boAsiponaPanel .bo-asipona-table th{border-bottom:1px solid var(--cctt-theme-line,var(--line));padding:9px;text-align:left;vertical-align:top}#boAsiponaPanel .bo-asipona-table th{font-size:12px}#boAsiponaPanel .bo-asipona-calc{border:1px solid var(--cctt-theme-line,var(--line));border-radius:10px;padding:12px;margin:12px 0}#boAsiponaPanel :focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}#boAsiponaPanel svg,.cctt-unique-control-icon{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}#page-controlCitas .ctl-year-select{color:#182b45;background:#fff}html[data-cctt-scheme="dark"] #page-controlCitas .ctl-year-select{color:#fff;background:var(--cctt-theme-input,var(--card));border-color:var(--cctt-theme-line,var(--line))}html[data-cctt-scheme="dark"] #page-controlCitas .ctl-year-select option{background:#202f43;color:#fff}
+@media(max-width:700px){#boAsiponaPanel .bo-asipona-fields{display:grid;grid-template-columns:1fr}#boAsiponaPanel .bo-asipona-list{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1296,7 +1302,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 </section>
 
 <section class="page" id="page-turnos"><div class="section-title"><h2>Calendario de turnos</h2></div>
-<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:14px"><div><h3 style="margin:0">Rol de turnos · 8 horas</h3><p class="muted" style="margin:6px 0 0">Grupos A, B, C y D · Rotación de 24 días basada en el calendario 2026 proporcionado.</p></div><div class="row"><button class="btn" id="shiftPrev">← Anterior</button><select class="ctl-year-select" id="shiftMonth" aria-label="Mes"></select><input id="shiftYear" type="number" min="2026" max="2100" value="2026" style="max-width:100px;padding:9px;border:1px solid var(--line);border-radius:9px" aria-label="Año"><button class="btn" id="shiftNext">Siguiente →</button></div></div>
+<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:14px"><div><h3 style="margin:0">Rol de turnos · 8 horas</h3><p class="muted" style="margin:6px 0 0">Grupos A, B, C y D · Rotación de 24 días basada en el calendario 2026 proporcionado.</p></div><div class="row"><button class="btn" <!-- MODIFICADO: una sola flecha SVG. -->id="shiftPrev">Anterior</button><select class="ctl-year-select" id="shiftMonth" aria-label="Mes"></select><input id="shiftYear" type="number" min="2026" max="2100" value="2026" style="max-width:100px;padding:9px;border:1px solid var(--line);border-radius:9px" aria-label="Año"><button class="btn" <!-- MODIFICADO: una sola flecha SVG. -->id="shiftNext">Siguiente</button></div></div>
 <div class="row" style="margin:0 0 14px"><span class="pill">M = Mañana</span><span class="pill">T = Tarde</span><span class="pill">N = Noche</span><span class="pill">D = Descanso</span><button class="btn primary right" id="shiftExport">Descargar calendario anual .xlsm</button></div><div class="table-wrap" id="shiftCalendar"></div><p class="muted" style="margin-top:12px">Los años posteriores a 2026 son proyecciones automáticas de la rotación observada; valida el rol oficial si existen cambios extraordinarios. El archivo .xlsm conserva el contenedor de macros del modelo original, pero sus macros no se modifican ni verifican.</p></div></section>
 <section class="page" id="page-inc35macro">
  <div class="section-title"><h2>Generador de incidentes</h2></div>
@@ -1341,6 +1347,15 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 
 <!-- NUEVO: biblioteca con el contenido de las hojas suministradas -->
 <section class="page" id="page-bibliotecaOperativa"><div class="section-title"><h2>Biblioteca operativa</h2><span class="module-tag">Información de consulta institucional</span></div>
+<!-- NUEVO: consulta ASIPONA / movilidad / incidentes / terminales alimentada exclusivamente por claves_data.json. -->
+<div class="card" id="boAsiponaPanel" aria-label="Consulta de claves ASIPONA Manzanillo">
+ <h3>Claves operativas · ASIPONA Manzanillo</h3><p class="muted">Consulta por clave, significado, incidentes y terminales.</p>
+ <div class="bo-asipona-tabs" id="boAsiponaTabs" role="tablist" aria-label="Sistema o tema"></div>
+ <div class="field" style="margin:12px 0"><label for="boAsiponaSearch">Buscar clave, significado o incidente</label><input type="search" id="boAsiponaSearch" autocomplete="off" placeholder="Ej. ALFA 1, accidente, 10-02"></div>
+ <div id="boAsiponaFilters"></div><p class="muted" id="boAsiponaCount" role="status" aria-live="polite"></p>
+ <div id="boAsiponaResults"></div>
+</div>
+
 <div class="card"><div class="row" style="justify-content:space-between"><div class="field" style="flex:1;min-width:220px"><label>Buscar claves, conceptos o referencias</label><input id="boSearch" placeholder="Buscar en la sección seleccionada…"></div><div class="row"><button type="button" class="btn" id="boReload">Actualizar contenido</button><button type="button" class="btn primary" id="boAdd" hidden>Añadir registro</button></div></div><!-- NUEVO: navegación temática del Excel correcto. --><div id="boTopics" class="bo-topic-tabs" role="group" aria-label="Áreas de consulta"></div><div id="boSourceNote" class="muted" style="margin-bottom:9px"></div><div class="ctl-sheet-tabs" id="boTabs" role="tablist" style="margin-top:14px"></div><div class="row" style="justify-content:space-between;margin-bottom:12px"><h3 id="boHeading" style="margin:0"></h3><div class="row"><span class="muted" id="boCount"></span><label class="small" id="boHiddenLabel" hidden><input type="checkbox" id="boShowHidden"> Mostrar ocultos</label></div></div><div id="boGallery" class="bo-gallery"></div><div id="boRows" class="bo-rows"></div></div></section>
 <!-- NUEVO: mapa geográfico por grupos KML y herramientas de edición -->
 <!-- MODIFICADO: interfaz cartográfica compacta basada en la referencia entregada; se conservan todos los IDs originales. -->
@@ -6129,6 +6144,55 @@ let checked=false;function observe(){const bp=$('page-bibliotecaOperativa').clas
   finally{button.disabled=false;button.innerHTML=old;}
  }
  button.addEventListener('click',download);
+})();
+</script>
+
+<!-- NUEVO: buscador ASIPONA independiente del catálogo anterior. Los registros proceden solo del archivo JSON. -->
+<script id="ccttAsiponaConsulta20261021">
+(()=>{'use strict';
+const root=document.getElementById('boAsiponaPanel');if(!root)return;
+const $=id=>document.getElementById(id), safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es').trim();
+const icon=shape=>'<svg aria-hidden="true" viewBox="0 0 24 24">'+shape+'</svg>';
+const glyph={asipona:'<path d="M4 19V5h16v14zM8 9h8m-8 4h8m-8 3h5"/>',movilidad:'<path d="m3 17 5-10h8l5 10M5 13h14M8 17v2m8-2v2"/>',incidentes:'<path d="M12 3 2 21h20L12 3zm0 7v5m0 3h.01"/>',terminales:'<path d="M3 21V8l9-5 9 5v13M8 21v-8h8v8M3 9l9 5 9-5"/>'};
+let data=null,tab='asipona',cat='',query='';const tabs=[['asipona','Claves ASIPONA'],['movilidad','Claves de movilidad'],['incidentes','Incidentes (PIS-REP)'],['terminales','Terminales']];
+function option(vals,title){return '<option value="">'+safe(title)+'</option>'+vals.map(x=>'<option value="'+safe(x)+'">'+safe(x)+'</option>').join('')}
+function sel(arr,title,id){return '<label>'+safe(title)+'<select id="'+id+'">'+option(arr,title+': todos')+'</select></label>'}
+function listUnique(arr,key){return [...new Set(arr.map(x=>x[key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'es'))}
+function initTabs(){ $('boAsiponaTabs').innerHTML=tabs.map(([id,name])=>'<button type="button" class="btn" role="tab" aria-selected="'+(id===tab)+'" data-bo-as-tab="'+id+'">'+icon(glyph[id])+safe(name)+'</button>').join('')}
+function render(){if(!data)return;initTabs();const f=$('boAsiponaFilters'),out=$('boAsiponaResults');let rows=[],html='';const q=norm(query);
+if(tab==='asipona'||tab==='movilidad'){
+ const all=data.claves.filter(x=>x.sistema===tab),categories=listUnique(all,'categoria');if(cat&&!categories.includes(cat))cat='';
+ f.innerHTML='<div class="bo-asipona-chips" role="group" aria-label="Categoría"><button type="button" class="btn" data-bo-as-cat="" aria-pressed="'+(!cat)+'">Todas</button>'+categories.map(c=>'<button type="button" class="btn" data-bo-as-cat="'+safe(c)+'" aria-pressed="'+(cat===c)+'">'+safe(c)+'</button>').join('')+'</div>';
+ rows=all.filter(x=>(!cat||x.categoria===cat)&&(!q||norm([x.clave,x.significado,x.tipo,x.grupo,x.nota,...(x.eq||[])].join(' ')).includes(q)));
+ html='<div class="bo-asipona-list">'+rows.map(x=>'<article class="bo-asipona-entry"><span class="bo-asipona-key">'+safe(x.clave||'—')+'</span>'+safe(x.significado)+'<div class="muted">'+safe(x.grupo||'')+' · '+safe(x.tipo||'')+'</div>'+(x.eq?.length?'<div class="bo-asipona-eq">Equivalencias: '+x.eq.map(safe).join(', ')+'</div>':'')+(x.nota?'<div class="muted">'+safe(x.nota)+(norm(x.nota).includes('emparejamiento por confirmar')?'<span class="bo-asipona-pending">Pendiente de confirmar</span>':'')+'</div>':'')+'</article>').join('')+'</div>';
+}else if(tab==='incidentes'){
+ const all=data.incidentes;
+ const old={tipo:$('boAsTipo')?.value||'',prioridad:$('boAsPrioridad')?.value||'',solo:$('boAsPis')?.checked||false,from:$('boAsInicio')?.value||'',to:$('boAsFin')?.value||''};
+ f.innerHTML='<div class="bo-asipona-fields">'+sel(listUnique(all,'tipo'),'Tipo','boAsTipo')+sel(listUnique(all,'prioridad'),'Prioridad','boAsPrioridad')+'<label><span>Solo PIS-REP</span><span><input type="checkbox" id="boAsPis"> Solo registros PIS-REP</span></label></div><details class="bo-asipona-calc" open><summary>Calculadora de tiempo de respuesta</summary><div class="bo-asipona-fields"><label>Inicio<input type="datetime-local" id="boAsInicio"></label><label>Fin<input type="datetime-local" id="boAsFin"></label></div><strong id="boAsDuracion" role="status" aria-live="polite">—</strong></details>';
+ $('boAsTipo').value=old.tipo;$('boAsPrioridad').value=old.prioridad;$('boAsPis').checked=old.solo;$('boAsInicio').value=old.from;$('boAsFin').value=old.to;
+ rows=all.filter(x=>(!old.tipo||x.tipo===old.tipo)&&(!old.prioridad||x.prioridad===old.prioridad)&&(!old.solo||!!x.pisrep)&&(!q||norm([x.codigo,x.tipo,x.subtipo,x.incidente,x.prioridad].join(' ')).includes(q)));
+ html='<div class="bo-asipona-table"><table><thead><tr><th>Código</th><th>Tipo / subtipo</th><th>Incidente</th><th>Prioridad</th><th>Indicadores</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+safe(x.codigo||'—')+'</td><td>'+safe(x.tipo||'—')+' / '+safe(x.subtipo||'—')+'</td><td>'+safe(x.incidente||'—')+'</td><td>'+safe(x.prioridad||'—')+'</td><td>'+[x.pisrep?'PIS-REP':'',x.nuevo?'Nuevo':''].filter(Boolean).join(' · ')+'</td></tr>').join('')+'</tbody></table></div>';duration();
+}else{
+ f.innerHTML='';rows=data.terminales.items.filter(x=>!q||norm(x.clave+' '+x.nombre).includes(q));const base=data.terminales.url;
+ html='<div class="bo-asipona-list">'+rows.map(x=>'<article class="bo-asipona-entry"><strong>'+safe(x.clave||'—')+'</strong> · '+safe(x.nombre||'—')+'<div><a target="_blank" rel="noopener noreferrer" href="'+safe(base+x.clave)+'">Abrir terminal ↗</a></div></article>').join('')+'</div>';
+}
+ $('boAsiponaCount').textContent=rows.length+' registros';out.innerHTML=html||'<p class="muted">No se encontraron registros.</p>';
+}
+function duration(){const a=$('boAsInicio'),b=$('boAsFin'),out=$('boAsDuracion');if(!a||!b||!out)return;if(!a.value||!b.value){out.textContent='—';return;}const diff=Math.round((new Date(b.value)-new Date(a.value))/60000);out.textContent=diff<0?'La fecha final es anterior a la inicial':Math.floor(diff/1440)+' días, '+Math.floor(diff%1440/60)+' horas, '+diff%60+' minutos';}
+root.addEventListener('click',e=>{const t=e.target.closest('[data-bo-as-tab]');if(t){tab=t.dataset.boAsTab;cat='';render();return;}const c=e.target.closest('[data-bo-as-cat]');if(c){cat=c.dataset.boAsCat;render();}});
+$('boAsiponaSearch').addEventListener('input',e=>{query=e.target.value;render()});root.addEventListener('change',e=>{if(['boAsInicio','boAsFin'].includes(e.target.id))duration();else if(['boAsTipo','boAsPrioridad','boAsPis'].includes(e.target.id))render()});
+$('boAsiponaCount').textContent='Cargando claves_data.json…';fetch('claves_data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()}).then(d=>{if(!Array.isArray(d.claves)||!Array.isArray(d.incidentes)||!d.terminales||!Array.isArray(d.terminales.items)||typeof d.terminales.url!=='string')throw Error('estructura JSON incompleta');data=d;render()}).catch(err=>{$('boAsiponaCount').textContent='No fue posible cargar claves_data.json ('+err.message+'). Publique el JSON junto al HTML en un servidor web.'});
+})();
+</script>
+<!-- MODIFICADO: iconos SVG exclusivos en controles autorizados, sin intervenir en el sistema de temas. -->
+<script id="ccttIconosPuntuales20261021">
+(()=>{'use strict';
+const glyphs={ccttHomeCardsMode:'<rect x="3" y="4" width="8" height="7" rx="1"/><rect x="13" y="4" width="8" height="7" rx="1"/><rect x="3" y="13" width="8" height="7" rx="1"/><rect x="13" y="13" width="8" height="7" rx="1"/>',ccttHomeIconsMode:'<circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',shiftPrev:'<path d="m14 5-7 7 7 7"/>',shiftNext:'<path d="m10 5 7 7-7 7"/>',ctlPrevYear:'<path d="M20 12H4m0 0 6-6m-6 6 6 6"/>',ctlNextYear:'<path d="M4 12h16m0 0-6-6m6 6-6 6"/>',ctlCreateYear:'<path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/>',vialMarked:'<path d="M6 3v18m12-18v18M3 8h18M3 16h18"/>',vialPlain:'<path d="M4 6h16M4 12h16M4 18h10"/>'};
+function apply(){for(const [id,paths] of Object.entries(glyphs)){if(id.startsWith('vial'))continue;const b=document.getElementById(id);if(!b)continue;let svg=b.querySelector(':scope > svg.cctt-unique-control-icon');if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('cctt-unique-control-icon');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');b.prepend(svg)}if(svg.dataset.shape!==id){svg.innerHTML=paths;svg.dataset.shape=id}for(const existing of b.querySelectorAll(':scope > svg:not(.cctt-unique-control-icon),:scope > .icon'))existing.style.display='none';}
+ const buttons=[...document.querySelectorAll('#page-inc35vial .cctt-vial-mode button')];buttons.forEach((b,i)=>{const name=i===0?'vialMarked':'vialPlain';let svg=b.querySelector(':scope > svg.cctt-unique-control-icon');if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('cctt-unique-control-icon');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');b.prepend(svg)}if(svg.dataset.shape!==name){svg.innerHTML=glyphs[name];svg.dataset.shape=name}for(const extra of b.querySelectorAll(':scope > svg:not(.cctt-unique-control-icon),:scope > .icon'))extra.style.display='none'});
+}
+apply();document.addEventListener('click',()=>queueMicrotask(apply));const v=document.getElementById('page-inc35vial');if(v)new MutationObserver(()=>{if(v.querySelector('.cctt-vial-mode button:not(:has(.cctt-unique-control-icon))'))apply()}).observe(v,{childList:true,subtree:true});
 })();
 </script>
 </body></html>
