@@ -1197,6 +1197,16 @@ html:has(#ccttLoginGate.show),html:has(#ccttLoginGate.show) body{overflow:hidden
 <style id="ccttPdfEditStyle">.cctt-pdf-edit-backdrop{position:fixed;inset:0;z-index:270000;display:grid;place-items:center;padding:15px;background:#0009}.cctt-pdf-edit-card{width:min(520px,100%);max-height:90vh;overflow:auto;border-radius:16px;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));padding:20px;display:grid;gap:13px}.cctt-pdf-edit-card h3{margin:0}.cctt-pdf-edit-card label{display:grid;gap:5px;font-weight:700;font-size:12px}.cctt-pdf-edit-card input{width:100%;padding:10px;border-radius:9px;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text))}#ccttSharedPdfBody td:last-child{white-space:nowrap}</style>
 <!-- NUEVO: iconos exclusivos de las herramientas, sin sustitución por palomitas. -->
 <style id="ccttCountsOwnIcons">#ccttCountsChoose #ccttCountsLanes .icon,#ccttCountsChoose #ccttCountsTerminals .icon{display:none!important}#ccttCountsChoose #ccttCountsLanes>svg,#ccttCountsChoose #ccttCountsTerminals>svg{display:inline-block!important;visibility:visible!important;flex:0 0 19px}#page-conteos [hidden]{display:none!important}</style>
+
+<!-- NUEVO: contrastes exclusivos de Expedientes en los temas existentes. -->
+<style id="ccttExpContrastSurgical">
+#page-expedientes,#page-expedientes .card,#page-expedientes .field label,#page-expedientes .muted,#page-expedientes .tbl{color:var(--cctt-theme-text,var(--text))}
+#page-expedientes .card,#page-expedientes .table-wrap{background:var(--cctt-theme-card,var(--card));border-color:var(--cctt-theme-line,var(--line))}
+#page-expedientes input,#page-expedientes select{background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+#page-expedientes .tbl th{background:var(--cctt-theme-table,var(--card));color:var(--cctt-theme-text,var(--text))}
+#page-expedientes .tbl td{color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+#page-expedientes #expCount,#page-expedientes #expEditNote,#page-expedientes #expImportResult{color:var(--cctt-theme-muted,var(--muted))}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1400,7 +1410,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <div class="grid g2"><div class="card"><h3>Nuevo proceso</h3><div class="grid g2"><div class="field"><label>Entidad</label><input id="pdfEntity" value="COPOMA"></div><div class="field"><label>Nombre de quien realiza</label><input id="pdfUser"></div><div class="field"><label>Fecha</label><input id="pdfDate" type="date"></div><div class="field"><label>Archivo(s)</label><input id="pdfFiles" type="file" multiple accept=".pdf,image/*"></div></div><div class="notice" style="margin-top:10px">Como en la macro: seleccione un único PDF, o varias imágenes. No se mezclan PDF e imágenes en el mismo proceso.</div><div class="row" style="margin-top:10px"><button class="btn primary" id="pdfProcess">Procesar imagen / PDF</button><button class="btn" id="pdfUndo">Deshacer último cambio</button></div></div><div class="card"><h3>Conversor PDF → imagen</h3><p class="muted">El libro original generaba una vista JPEG. En navegador, un PDF cargado se abre/descarga directamente; las imágenes seleccionadas sí se combinan en un PDF generado por este sitio.</p><div id="pdfLatest" class="empty">Sin proceso reciente.</div></div></div>
  <!-- MODIFICADO: ocultar historial privado; los registros nuevos aparecen en Comunicados compartidos. --><div class="card" style="display:none" aria-hidden="true"><h3>Historial de datos</h3><div class="table-wrap"><table class="tbl"><thead><tr><th>ID proceso</th><th>Fecha registro</th><th>Entidad</th><th>Usuario</th><th>Archivo PDF</th></tr></thead><tbody id="pdfTable"></tbody></table></div></div>
 <!-- NUEVO: historial global de documentos publicados. -->
-<div class="card" style="margin-top:16px" id="ccttSharedPdfPanel"><div class="row"><h3 style="margin:0">Comunicados compartidos</h3><button class="btn" type="button" id="ccttRefreshPdfs">Actualizar</button></div><p class="muted" id="ccttSharedPdfStatus">Consultando documentos.</p><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Entidad</th><th>Usuario</th><th>Documento</th><th>Archivo</th><!-- NUEVO: acciones para documentos publicados. --><th>Acciones</th></tr></thead><tbody id="ccttSharedPdfBody"></tbody></table></div></div>
+<div class="card" style="margin-top:16px" id="ccttSharedPdfPanel"><div class="row"><h3 style="margin:0">Comunicados compartidos</h3><button class="btn" type="button" id="ccttRefreshPdfs">Actualizar</button><!-- NUEVO: exportación de relación de comunicados y respaldos originales. --><button class="btn" type="button" id="ccttExportPdfs">Exportar Excel y archivos</button></div><p class="muted" id="ccttSharedPdfStatus">Consultando documentos.</p><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Entidad</th><th>Usuario</th><th>Documento</th><th>Archivo</th><!-- NUEVO: acciones para documentos publicados. --><th>Acciones</th></tr></thead><tbody id="ccttSharedPdfBody"></tbody></table></div></div>
 </section>
 <section class="page" id="page-mensajes">
  <div class="section-title"><h2>Registro de mensajes y comunicados</h2><!-- NUEVO --><span class="cctt-msg-product-tag">CCTT Sistema Central</span></div>
@@ -1426,7 +1436,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 </section>
 
 <section class="page" id="page-turnos"><div class="section-title"><h2>Calendario de turnos</h2></div>
-<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:14px"><div><h3 style="margin:0">Rol de turnos · 8 horas</h3><p class="muted" style="margin:6px 0 0">Grupos A, B, C y D · Rotación de 24 días basada en el calendario 2026 proporcionado.</p></div><div class="row"><button class="btn" <!-- MODIFICADO: una sola flecha SVG. -->id="shiftPrev">Anterior</button><select class="ctl-year-select" id="shiftMonth" aria-label="Mes"></select><input id="shiftYear" type="number" min="2026" max="2100" value="2026" style="max-width:100px;padding:9px;border:1px solid var(--line);border-radius:9px" aria-label="Año"><button class="btn" <!-- MODIFICADO: una sola flecha SVG. -->id="shiftNext">Siguiente</button></div></div>
+<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:14px"><div><h3 style="margin:0">Rol de turnos · 8 horas</h3><p class="muted" style="margin:6px 0 0">Grupos A, B, C y D · Rotación de 24 días basada en el calendario 2026 proporcionado.</p></div><div class="row"><!-- MODIFICADO: restaurar atributo id del control Turnos; comentario fuera de la etiqueta. --><button class="btn" id="shiftPrev">Anterior</button><select class="ctl-year-select" id="shiftMonth" aria-label="Mes"></select><input id="shiftYear" type="number" min="2026" max="2100" value="2026" style="max-width:100px;padding:9px;border:1px solid var(--line);border-radius:9px" aria-label="Año"><!-- MODIFICADO: restaurar atributo id del control Turnos; comentario fuera de la etiqueta. --><button class="btn" id="shiftNext">Siguiente</button></div></div>
 <div class="row" style="margin:0 0 14px"><span class="pill">M = Mañana</span><span class="pill">T = Tarde</span><span class="pill">N = Noche</span><span class="pill">D = Descanso</span><button class="btn primary right" id="shiftExport">Descargar calendario anual .xlsm</button></div><div class="table-wrap" id="shiftCalendar"></div><p class="muted" style="margin-top:12px">Los años posteriores a 2026 son proyecciones automáticas de la rotación observada; valida el rol oficial si existen cambios extraordinarios. El archivo .xlsm conserva el contenedor de macros del modelo original, pero sus macros no se modifican ni verifican.</p></div></section>
 <section class="page" id="page-inc35macro">
  <div class="section-title"><h2>Generador de incidentes</h2></div>
@@ -1550,7 +1560,7 @@ ICON_PATHS.profileIdentityUnique='<circle cx="9" cy="8" r="3"/><path d="M3 20v-2
 function iconSvg(name){return `<span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24">${ICON_PATHS[name]||ICON_PATHS.file}</svg></span>`}
 function decorateNavIcons(){document.querySelectorAll('[data-nav-icon]').forEach(e=>e.innerHTML=`<svg viewBox="0 0 24 24">${ICON_PATHS[e.dataset.navIcon]||ICON_PATHS.file}</svg>`);document.querySelectorAll('[data-brand-icon]').forEach(e=>e.innerHTML=`<svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8">${ICON_PATHS.traffic}</svg>`)}
 function decorateButtons(root=document){root.querySelectorAll('button.btn').forEach(b=>{if(b.dataset.iconized)return;let t=b.textContent.replace(/[✓⇄▤▧≋▣✉⌂◉]/g,'').trim(),x=t.toLowerCase(),ico=x.includes('descarg')||x.includes('export')||x.includes('guardar png')?'download':x.includes('proces')||x.includes('cargar')||x.includes('adjunt')?'upload':x.includes('copiar')?'copy':x.includes('borrar')||x.includes('limpiar')||x.includes('restablecer')?'trash':x.includes('deshacer')?'refresh':x.includes('vista')||x.includes('ver hoja')?'eye':x.includes('imprimir')?'print':x.includes('generar')?'edit':x.includes('guardar')||x.includes('registrar')?'save':'check';// MODIFICADO: iconos específicos de los cinco apartados, sin cambiar el texto ni el evento de los botones.
-const ccttRequestedIcons={muAll:'showAllUnique',muNone:'hideUnique',muNewGroup:'groupUnique',muPoint:'pinUnique',muLine:'routeUnique',muPolygon:'polygonUnique',muFinish:'finishUnique',muCancel:'cancelUnique',muFit:'fitUnique',boReload:'reloadUnique',boAdd:'addUnique',ccttVialFillAll:'fillUnique',ccttVialTemplatesOpen:'templateUnique',ccttVialSimulate:'simulateUnique',shiftPrev:'prevUnique',shiftNext:'nextUnique',shiftExport:'calendarDownloadUnique'};
+const ccttRequestedIcons={repAddRowTop:'addUnique',muAll:'showAllUnique',muNone:'hideUnique',muNewGroup:'groupUnique',muPoint:'pinUnique',muLine:'routeUnique',muPolygon:'polygonUnique',muFinish:'finishUnique',muCancel:'cancelUnique',muFit:'fitUnique',boReload:'reloadUnique',boAdd:'addUnique',ccttVialFillAll:'fillUnique',ccttVialTemplatesOpen:'templateUnique',ccttVialSimulate:'simulateUnique',shiftPrev:'prevUnique',shiftNext:'nextUnique',shiftExport:'calendarDownloadUnique'};
 if(ccttRequestedIcons[b.id])ico=ccttRequestedIcons[b.id];
 // MODIFICADO: dos acciones con símbolos propios, evitando la palomita genérica.
 if(b.id==='ccttPanelBack')ico='panelDashboardUnique';else if(b.id==='ccttOpenProfile')ico='profileIdentityUnique';
@@ -6589,6 +6599,51 @@ const pending=(queues[id]||Promise.resolve()).then(save).catch(e=>{console.warn(
 // Pre-carga solo cuando se accede al apartado; sin consultas durante el login.
 const watcher=new MutationObserver(()=>{if(!page.classList.contains('active'))return;if(!active){open('conteos')} });watcher.observe(page,{attributes:true,attributeFilter:['class']});
 if(page.classList.contains('active'))open('conteos');
+})();
+</script>
+
+<!-- NUEVO: exportación de todos los comunicados en XLSX con documentos originales adjuntos en un ZIP. No se alteran los registros. -->
+<script id="ccttSharedPdfsXlsxExport">
+(()=>{
+ const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+ const col=n=>{let z='';for(n++;n;n=Math.floor((n-1)/26))z=String.fromCharCode(65+(n-1)%26)+z;return z};
+ function cell(ref,value){return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${esc(value)}</t></is></c>`}
+ function buildWorkbook(entries){
+  const headers=['Fecha','Entidad','Usuario','Documento','Tipo','Abrir archivo','Estado'];
+  const rows=[headers,...entries.map(e=>[e.row.document_date,e.row.entity,e.row.author,e.row.filename,e.type,e.link,e.row.note?.toLowerCase().includes('emparejamiento por confirmar')?'Pendiente':''])];
+  const xmlRows=rows.map((arr,i)=>`<row r="${i+1}">${arr.map((v,j)=>cell(`${col(j)}${i+1}`,v)).join('')}</row>`).join('');
+  const links=entries.map((e,i)=>`<hyperlink ref="F${i+2}" r:id="rId${i+1}"/>`).join('');
+  const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><cols><col min="1" max="1" width="17" customWidth="1"/><col min="2" max="3" width="25" customWidth="1"/><col min="4" max="4" width="38" customWidth="1"/><col min="5" max="5" width="15" customWidth="1"/><col min="6" max="6" width="42" customWidth="1"/><col min="7" max="7" width="18" customWidth="1"/></cols><sheetData>${xmlRows}</sheetData><hyperlinks>${links}</hyperlinks></worksheet>`;
+  const rels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${entries.map((e,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="${esc(e.link)}" TargetMode="External"/>`).join('')}</Relationships>`;
+  const z=new JSZip();z.file('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`);
+  z.file('_rels/.rels',`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`);
+  z.file('xl/workbook.xml',`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Comunicados" sheetId="1" r:id="rId1"/></sheets></workbook>`);
+  z.file('xl/_rels/workbook.xml.rels',`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`);
+  z.file('xl/worksheets/sheet1.xml',sheet);z.file('xl/worksheets/_rels/sheet1.xml.rels',rels);
+  return z.generateAsync({type:'blob',compression:'DEFLATE'});
+ }
+ function save(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},5000)}
+ async function run(){const b=document.getElementById('ccttExportPdfs');if(!b||b.disabled)return;b.disabled=true;const original=b.textContent;b.textContent='Preparando exportación…';
+  try{if(typeof JSZip==='undefined'||typeof window.ccttSupabaseClient==='undefined')throw Error('El servicio de archivos no está disponible.');
+   const sb=window.ccttSupabaseClient;
+   const {data:rows,error}=await sb.from('cctt_shared_documents').select('*').order('created_at',{ascending:false});if(error)throw error;
+   if(!rows?.length)throw Error('No hay comunicados para exportar.');
+   const zip=new JSZip(),entries=[];
+   for(let i=0;i<rows.length;i++){
+    const r=rows[i],name=String(r.filename||`comunicado-${i+1}`).replace(/[\\/:*?"<>|\x00-\x1f]/g,'_');
+    const ext=(name.split('.').pop()||'').toLowerCase(),type=ext==='pdf'?'PDF':(['jpg','jpeg','png','gif','webp'].includes(ext)?'Imagen':'Archivo');
+    const path=`Archivos/${String(i+1).padStart(4,'0')}_${name}`;
+    const {data:file,error:fileError}=await sb.storage.from('cctt-comunicados').download(r.file_path);
+    if(fileError||!file){entries.push({row:r,type,link:'No disponible'});continue}
+    zip.file(path,file);entries.push({row:r,type,link:path});
+   }
+   zip.file('Comunicados.xlsx',await buildWorkbook(entries));
+   save(await zip.generateAsync({type:'blob',compression:'DEFLATE'}),'CCTT_Comunicados_Expediente.zip');
+   if(entries.some(e=>e.link==='No disponible')){if(typeof ccttSiteNotice==='function')ccttSiteNotice('Algunos archivos no pudieron recuperarse. Revisa la columna Abrir archivo.');}
+  }catch(e){console.error('Exportación comunicados',e);if(typeof ccttSiteNotice==='function')ccttSiteNotice('No se pudo exportar: '+e.message)}finally{b.disabled=false;b.textContent=original}
+ }
+ function bind(){document.getElementById('ccttExportPdfs')?.addEventListener('click',run)}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
 </script>
 </body></html>
