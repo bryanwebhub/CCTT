@@ -6588,12 +6588,34 @@ function allowed(module){const a=window.__ccttGrantedModules;if(Array.isArray(a)
 function rawSource(base64Text){return decodeURIComponent(escape(atob(base64Text)))}
 function setTheme(module){const d=definitions[module];if(!d?.frame)return;d.frame.dispatchEvent(new Event('load'))}
 function notify(module,kind,message){const f=definitions[module]?.frame;if(f?.contentWindow)f.contentWindow.postMessage({scope:'cctt-counts-state',module,kind,message},location.origin)}
+/* NUEVO: refresco de configuraciones globales y jornadas con control de revisiones.
+   Nunca descartar cambios locales pendientes ni borrar historiales previos. */
+async function ccttRefreshSharedCounts(module){
+ const sb=getClient(),item=definitions[module];if(!sb||!item||!loaded[module])return false;
+ if(pendingFor(module).length){show('Cambios locales pendientes; no se reemplaza la vista hasta sincronizarlos.');return false}
+ try{
+  const {data,error}=await sb.from('cctt_counts_state').select('storage_key,value_text,revision').eq('module',module);
+  if(error)throw error;
+  const next={},nextRevs={};for(const r of data||[]){if(r.value_text!==null)next[r.storage_key]=r.value_text;nextRevs[r.storage_key]=r.revision}
+  const previous=revisions[module]||{};
+  const changed=Object.keys({...previous,...nextRevs}).some(k=>String(previous[k]??'')!==String(nextRevs[k]??''));
+  if(!changed){show('Información compartida actualizada.');return true}
+  revisions[module]=nextRevs;cacheSnapshot(module,next,nextRevs);
+  const boot=btoa(unescape(encodeURIComponent(JSON.stringify(next))));
+  item.frame.srcdoc=rawSource(item.source).replace('__BOOTSTRAP__',boot);
+  item.frame.style.display='block';setTheme(module);
+  show('Configuración y jornadas compartidas actualizadas.');return true
+ }catch(err){show('No se pudo actualizar la vista compartida; se conserva la información actual.');console.warn('Actualización de Conteos:',err);return false}
+}
+/* NUEVO: revalidar al regresar a la pestaña sin alterar capturas en edición. */
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&active&&page.classList.contains('active'))void ccttRefreshSharedCounts(active)});
 async function open(module){const item=definitions[module],sb=getClient();if(!item)return;
 if(!sb){show('Inicia sesión para acceder a esta herramienta.');return}
 // Ocultar submódulo anterior para mantener una sola herramienta visible.
 for(const [id,d]of Object.entries(definitions)){d.frame.style.display=id===module?'block':'none';d.button.setAttribute('aria-pressed',String(id===module))}
 active=module;
-if(loaded[module]){show('Datos de '+(module==='conteos'?'Conteos':'Control terminales')+' disponibles.');setTheme(module);void syncPending(module);return}
+/* MODIFICADO: al cambiar de submódulo, consultar la revisión compartida antes de reutilizar una vista en memoria. */
+if(loaded[module]){show('Verificando configuración compartida…');setTheme(module);await syncPending(module);if(await ccttRefreshSharedCounts(module))return;show('Datos disponibles · sincronización pendiente');return}
 show('Cargando información compartida…');item.frame.style.display='none';
 try{// MODIFICADO: usar la sesión vigente si el dispositivo no puede consultar Auth; los guardados remotos siguen protegidos por RLS.
 let user=null;
