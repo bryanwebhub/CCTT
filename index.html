@@ -1207,6 +1207,31 @@ html:has(#ccttLoginGate.show),html:has(#ccttLoginGate.show) body{overflow:hidden
 #page-expedientes .tbl td{color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))}
 #page-expedientes #expCount,#page-expedientes #expEditNote,#page-expedientes #expImportResult{color:var(--cctt-theme-muted,var(--muted))}
 </style>
+
+<!-- NUEVO: auditoría de contraste visual localizada; utiliza los colores ya resueltos por los modos existentes y respeta superficies documentales impresas. -->
+<style id="ccttAuditContrast20261022">
+/* MODIFICADO: campos y controles de las páginas operativas, sin cambiar las variables ni la paleta del sitio. */
+body.cctt-authenticated .page .field :is(input:not([type="color"]):not([type="checkbox"]):not([type="radio"]),select,textarea),
+body.cctt-authenticated .page :is(.ctl-year-select,.rep-status-control select,.rep-status-control input,.rep-status-manager input){background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line));}
+body.cctt-authenticated .page .field label{color:var(--cctt-theme-text,var(--text));}
+body.cctt-authenticated .page :is(input,textarea)::placeholder{color:var(--cctt-theme-muted,var(--muted));opacity:1}
+body.cctt-authenticated .page :is(input,select,textarea,button):focus-visible{outline:2px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
+/* NUEVO: ventanas y editores que antes dependían de blanco fijo. */
+body.cctt-authenticated :is(.location-panel,.cctt-profile-menu,.rep-status-manager,.company-suggest){background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line));}
+body.cctt-authenticated :is(.location-panel,.cctt-profile-menu,.rep-status-manager,.company-suggest) :is(input,select,textarea){background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line));}
+body.cctt-authenticated .page :is(.ctl-tab,.mini-btn,.tab):not(.active){background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line));}
+/* NUEVO: conservar legibles los estados informativos sin ocultar alertas o registros pendientes. */
+body.cctt-authenticated .page .muted,body.cctt-authenticated .page .footer-note{color:var(--cctt-theme-muted,var(--muted));}
+/* MODIFICADO: COPOMA, redistribución estable del cuerpo sin cambiar el diseño o la posición elegida. */
+#page-inc35copoma #copTemplatePreview :is(#copPreview,.cop-insert){white-space:normal;overflow-wrap:break-word;word-break:normal;line-height:1.5;letter-spacing:normal;word-spacing:normal;min-width:0;box-sizing:border-box;}
+#page-inc35copoma #copTemplatePreview :is(#copPreview,.cop-insert) p{margin:.65em 0;line-height:inherit;white-space:normal;}
+#page-inc35copoma #copTemplatePreview :is(#copPreview,.cop-insert) img{max-width:100%;height:auto;}
+/* MODIFICADO: collage de recuerdos contenido en mosaicos proporcionados, manteniendo el visor ampliable independiente. */
+#page-recuerdo #ccttRecuerdoCollage{grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:10px;max-width:1050px;margin-inline:auto;}
+#page-recuerdo #ccttRecuerdoCollage button{grid-column:auto!important;grid-row:auto!important;aspect-ratio:4/3;min-height:0;max-height:190px;}
+#page-recuerdo #ccttRecuerdoCollage button img{width:100%;height:100%;object-fit:cover;}
+@media(max-width:600px){#page-recuerdo #ccttRecuerdoCollage{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}#page-recuerdo #ccttRecuerdoCollage button{max-height:155px;}}
+</style>
 </head>
 <body>
 <div class="app">
