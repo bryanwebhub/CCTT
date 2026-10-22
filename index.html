@@ -6612,7 +6612,9 @@ const draftKey=(module,key)=>draftPrefix()+module+':'+key;
 function readDraft(module,key){try{return JSON.parse(localStorage.getItem(draftKey(module,key))||'null')}catch{return null}}
 function storeDraft(module,key,value){const existing=readDraft(module,key);const expected=existing?existing.expected:(revisions[module]?.[key]??0);try{localStorage.setItem(draftKey(module,key),JSON.stringify({value,expected,updated:Date.now()}));return true}catch(e){console.error('No se pudo guardar el borrador',e);return false}}
 function pendingFor(module){const pref=draftPrefix()+module+':';const result=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith(pref)){const d=readDraft(module,k.slice(pref.length));if(d)result.push({key:k.slice(pref.length),...d})}}return result}
-async function syncPending(module){if(!navigator.onLine)return;const sb=getClient();if(!sb||!currentUserId)return;for(const d of pendingFor(module)){const id=module+':'+d.key;if(queues[id])continue;try{const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:d.key,p_value:d.value,p_expected_revision:d.expected});if(error)throw Error(error.message);revisions[module][d.key]=data;const latest=readDraft(module,d.key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,d.key));notify(module,'saved')}catch(e){console.warn('Sincronización pendiente ('+id+')',e);notify(module,'pending');break}}}
+async function syncPending(module){if(!navigator.onLine)return;const sb=getClient();if(!sb||!currentUserId)return;for(const d of pendingFor(module)){const id=module+':'+d.key;if(queues[id])continue;try{const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:d.key,p_value:d.value,p_expected_revision:d.expected});if(error)throw Error(error.message);revisions[module][d.key]=data;const latest=readDraft(module,d.key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,d.key));notify(module,'saved');
+/* NUEVO: después de confirmar en Supabase, comprobar también las revisiones compartidas. */
+if(!pendingFor(module).length&&loaded[module]&&active===module)void ccttRefreshSharedCounts(module)}catch(e){console.warn('Sincronización pendiente ('+id+')',e);show('Cambios pendientes en este dispositivo: no se han compartido. Comprueba la conexión o un conflicto de versión.');notify(module,'pending');break}}}
 window.addEventListener('online',()=>Object.keys(definitions).forEach(syncPending));
 
 function show(message){status.textContent=message}
@@ -6642,6 +6644,8 @@ async function ccttRefreshSharedCounts(module){
 }
 /* NUEVO: revalidar al regresar a la pestaña sin alterar capturas en edición. */
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&active&&page.classList.contains('active'))void ccttRefreshSharedCounts(active)});
+/* NUEVO: verificar revisiones remotas mientras una sesión sigue abierta; no reemplazar capturas pendientes. */
+setInterval(()=>{if(!document.hidden&&active&&page.classList.contains('active')&&navigator.onLine){if(pendingFor(active).length)void syncPending(active);else void ccttRefreshSharedCounts(active)}},20000);
 async function open(module){const item=definitions[module],sb=getClient();if(!item)return;
 if(!sb){show('Inicia sesión para acceder a esta herramienta.');return}
 // Ocultar submódulo anterior para mantener una sola herramienta visible.
@@ -6695,8 +6699,10 @@ notify(module,'pending');
 /* El servidor conserva su control de versión y rechaza conflictos concurrentes. */
 const save=async()=>{if(!navigator.onLine)return;const sb=getClient();if(!sb)return;const d=readDraft(module,key);if(!d)return;
 const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:key,p_value:d.value,p_expected_revision:d.expected});
-if(error)throw Error(error.message);revisions[module][key]=data;const latest=readDraft(module,key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,key));notify(module,'saved')};
-const pending=(queues[id]||Promise.resolve()).then(save).catch(e=>{console.warn('Cambios conservados para sincronizar ('+id+'):',e);notify(module,'pending')});queues[id]=pending;pending.finally(()=>{if(queues[id]===pending)delete queues[id]});
+if(error)throw Error(error.message);revisions[module][key]=data;const latest=readDraft(module,key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,key));notify(module,'saved');
+/* NUEVO: refresco tras guardar la estructura o las jornadas, únicamente sin borradores pendientes. */
+if(!pendingFor(module).length&&loaded[module]&&active===module)void ccttRefreshSharedCounts(module)};
+const pending=(queues[id]||Promise.resolve()).then(save).catch(e=>{console.warn('Cambios conservados para sincronizar ('+id+'):',e);show('Cambios locales no confirmados por Supabase; la configuración de otros usuarios puede ser diferente.');notify(module,'pending')});queues[id]=pending;pending.finally(()=>{if(queues[id]===pending)delete queues[id]});
 });
 // Pre-carga solo cuando se accede al apartado; sin consultas durante el login.
 const watcher=new MutationObserver(()=>{if(!page.classList.contains('active'))return;if(!active){open('conteos')} });watcher.observe(page,{attributes:true,attributeFilter:['class']});
