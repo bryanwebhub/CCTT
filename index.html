@@ -6661,19 +6661,26 @@ function notify(module,kind,message){const f=definitions[module]?.frame;if(f?.co
    Nunca descartar cambios locales pendientes ni borrar historiales previos. */
 async function ccttRefreshSharedCounts(module){
  const sb=getClient(),item=definitions[module];if(!sb||!item||!loaded[module])return false;
- if(pendingFor(module).length){show('Cambios locales pendientes; no se reemplaza la vista hasta sincronizarlos.');return false}
+ /* MODIFICADO: consultar primero la revisión remota para distinguir una edición realmente pendiente de una estructura obsoleta. */
  try{
   const {data,error}=await sb.from('cctt_counts_state').select('storage_key,value_text,revision').eq('module',module);
   if(error)throw error;
   const next={},nextRevs={};for(const r of data||[]){if(r.value_text!==null)next[r.storage_key]=r.value_text;nextRevs[r.storage_key]=r.revision}
+  /* NUEVO: solo se permite actualizar automáticamente con borradores en conflicto si afectan exclusivamente a la estructura antigua de Terminales. Las jornadas pendientes nunca se sustituyen. */
+  const pending=pendingFor(module);
+  if(pending.length){
+   const obsoleteLayout=module==='controlTerminales'&&pending.every(d=>d.key==='terminales_layout_v1'&&Object.prototype.hasOwnProperty.call(nextRevs,d.key)&&String(d.expected)!==String(nextRevs[d.key]));
+   if(!obsoleteLayout){show('Cambios locales pendientes: la vista se conserva hasta confirmar el guardado.');return false}
+   show('Configuración global recuperada; existe un borrador local en conflicto que se conserva sin aplicar.');
+  }
   const previous=revisions[module]||{};
   const changed=Object.keys({...previous,...nextRevs}).some(k=>String(previous[k]??'')!==String(nextRevs[k]??''));
-  if(!changed){show('Información compartida actualizada.');return true}
+  if(!changed){if(!pending.length)show('Información compartida actualizada.');return true}
   revisions[module]=nextRevs;cacheSnapshot(module,next,nextRevs);
   const boot=btoa(unescape(encodeURIComponent(JSON.stringify(next))));
   item.frame.srcdoc=rawSource(item.source).replace('__BOOTSTRAP__',boot);
   item.frame.style.display='block';setTheme(module);
-  show('Configuración y jornadas compartidas actualizadas.');return true
+  show(pending.length?'Configuración de Supabase mostrada. Borrador local en conflicto conservado.':'Configuración y jornadas compartidas actualizadas.');return true
  }catch(err){show('No se pudo actualizar la vista compartida; se conserva la información actual.');console.warn('Actualización de Conteos:',err);return false}
 }
 /* NUEVO: revalidar al regresar a la pestaña sin alterar capturas en edición. */
@@ -6712,7 +6719,15 @@ revisions[module]=rev;
 // NUEVO: mantener una instantánea válida para futuras aperturas sin conexión.
 if(!offline)cacheSnapshot(module,init,rev);
 /* NUEVO: las capturas locales pendientes prevalecen visualmente y se reenvían solo si su versión base coincide. */
-for(const draft of pendingFor(module)){init[draft.key]=draft.value}
+/* MODIFICADO: no imponer sobre la configuración global un borrador de estructura creado contra una revisión anterior. Se conserva el borrador local para resolver el conflicto sin perderlo. */
+for(const draft of pendingFor(module)){
+ const structureKey=module==='controlTerminales'?'terminales_layout_v1':null;
+ if(draft.key===structureKey&&Object.prototype.hasOwnProperty.call(rev,draft.key)&&String(draft.expected)!==String(rev[draft.key])){
+  show('Existe una configuración local de Terminales pendiente y distinta de la revisión compartida. Se muestra la configuración de Supabase; el borrador local se conserva sin aplicarse.');
+  continue;
+ }
+ init[draft.key]=draft.value;
+}
 const boot=btoa(unescape(encodeURIComponent(JSON.stringify(init))));const original=rawSource(item.source);
 item.frame.srcdoc=original.replace('__BOOTSTRAP__',boot);item.frame.style.display='block';loaded[module]=true;
 /* NUEVO: permisos del usuario autenticado, no del perfil editable. */
