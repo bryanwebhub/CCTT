@@ -1285,6 +1285,9 @@ html[data-cctt-scheme="dark"] body.cctt-authenticated .page :is(select,input,tex
 #page-inc35bolet .cctt-bol-format .btn.primary{background:var(--cctt-theme-accent,var(--blue));color:var(--cctt-theme-onaccent,#fff);border-color:var(--cctt-theme-accent,var(--blue))}
 #page-inc35bolet .cctt-bol-format .btn:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
 </style>
+<!-- NUEVO: estabiliza la barra lateral durante la inicialización de temas y navegación. -->
+<style id="ccttSidebarReloadGuard">html:not(.cctt-sidebar-settled) .sidebar{visibility:hidden!important}html.cctt-sidebar-settled .sidebar{visibility:visible}</style>
+<script id="ccttSidebarReloadGuardLogic">(()=>{const settle=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add('cctt-sidebar-settled')));if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',settle,{once:true});else settle()})();</script>
 </head>
 <body>
 <div class="app">
@@ -6691,7 +6694,8 @@ function setTheme(module){const d=definitions[module];if(!d?.frame)return;d.fram
 function notify(module,kind,message){const f=definitions[module]?.frame;if(f?.contentWindow)f.contentWindow.postMessage({scope:'cctt-counts-state',module,kind,message},location.origin)}
 /* NUEVO: refresco de configuraciones globales y jornadas con control de revisiones.
    Nunca descartar cambios locales pendientes ni borrar historiales previos. */
-async function ccttRefreshSharedCounts(module){
+/* MODIFICADO: la sincronización manual reconstruye desde Supabase incluso con revisión sin cambios. */
+async function ccttRefreshSharedCounts(module,force=false){
  const sb=getClient(),item=definitions[module];if(!sb||!item||!loaded[module])return false;
  /* MODIFICADO: consultar primero la revisión remota para distinguir una edición realmente pendiente de una estructura obsoleta. */
  try{
@@ -6707,7 +6711,7 @@ async function ccttRefreshSharedCounts(module){
   }
   const previous=revisions[module]||{};
   const changed=Object.keys({...previous,...nextRevs}).some(k=>String(previous[k]??'')!==String(nextRevs[k]??''));
-  if(!changed){if(!pending.length)show('Información compartida actualizada.');return true}
+  if(!changed&&!force){if(!pending.length)show('Información compartida actualizada.');return true}
   revisions[module]=nextRevs;cacheSnapshot(module,next,nextRevs);
   const boot=btoa(unescape(encodeURIComponent(JSON.stringify(next))));
   item.frame.srcdoc=rawSource(item.source).replace('__BOOTSTRAP__',boot);
@@ -6765,6 +6769,22 @@ item.frame.srcdoc=original.replace('__BOOTSTRAP__',boot);item.frame.style.displa
 /* NUEVO: permisos del usuario autenticado, no del perfil editable. */
 item.frame.addEventListener('load',async()=>{try{const {data,error}=await sb.auth.getUser();if(error)throw error;const role=String(data?.user?.app_metadata?.role||'').toLowerCase();item.frame.contentWindow?.postMessage({scope:'cctt-counts-auth-role',module,canEdit:role==='admin'||role==='creator'||role==='creador'},location.origin)}catch(e){console.warn('No se validó el rol para editar umbrales',e)}},{once:true});show(offline?'Modo sin conexión: utiliza la última jornada disponible; los cambios se enviarán al recuperar internet.':pendingFor(module).length?'Cambios locales pendientes de sincronización.':'Información de la jornada disponible.');void syncPending(module);
 }catch(e){item.frame.style.display='none';show('No se pudo cargar la información: '+(e?.message||'error')+'. Comprueba que ejecutaste el SQL y los permisos.');console.error('Conteos:',e)}}
+/* NUEVO: control manual de sincronización compartida, con borradores protegidos. */
+const syncButton=document.createElement('button');syncButton.type='button';syncButton.className='btn';syncButton.id='ccttCountsSyncNow';syncButton.setAttribute('aria-label','Sincronizar configuración y datos de Conteos desde Supabase');
+syncButton.innerHTML='<svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 12-2l2.4 5M4 12l2.4 5a7 7 0 0 0 12-2"/></svg><span>Sincronizar ahora</span>';
+const syncContainer=document.createElement('div');syncContainer.className='row';syncContainer.style.margin='8px 0';syncContainer.append(syncButton);status.parentNode.insertBefore(syncContainer,status);
+syncButton.addEventListener('click',async()=>{
+ if(syncButton.disabled)return;syncButton.disabled=true;
+ try{
+  if(!navigator.onLine){show('Sin conexión: no se puede consultar la configuración compartida.');return}
+  const target=active||'controlTerminales';
+  if(!loaded[target]){await open(target);return}
+  if(pendingFor(target).length){show('Sincronización detenida: hay cambios locales sin publicar. No se reemplazaron. Resuelve el conflicto de versión antes de continuar.');return}
+  show('Consultando configuración compartida de Supabase…');
+  const ok=await ccttRefreshSharedCounts(target,true);
+  if(ok)show('Sincronización manual completada desde Supabase. La configuración compartida se ha vuelto a cargar.');
+ }finally{syncButton.disabled=false}
+});
 for(const [id,item]of Object.entries(definitions))item.button.addEventListener('click',()=>open(id));
 /* MODIFICADO: descargas desde el documento principal y escritura local antes de guardar en red. */
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const msg=event.data;if(!msg||msg.scope!=='cctt-counts-state')return;
@@ -7001,4 +7021,21 @@ function init(){const root=document.getElementById('ccttSharedPdfBody');if(!root
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
+<!-- NUEVO: aviso de nueva versión publicada; se compara contra el HTML servido, sin añadir servicios externos. -->
+<style id="ccttVersionNoticeStyles">#ccttVersionNotice[hidden]{display:none!important}#ccttVersionNotice{position:fixed;inset:0;z-index:290000;background:rgba(8,16,31,.78);display:grid;place-items:center;padding:18px}#ccttVersionNotice .cctt-version-panel{width:min(530px,100%);max-height:88vh;overflow:auto;background:var(--cctt-theme-card,var(--card,#fff));color:var(--cctt-theme-text,var(--text,#152238));border:1px solid var(--cctt-theme-line,var(--line,#aaa));border-radius:17px;padding:22px;box-shadow:0 20px 70px #0006}#ccttVersionNotice .cctt-version-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}#ccttVersionNotice button{border-radius:9px;border:1px solid var(--cctt-theme-line,var(--line));padding:10px 14px;font-weight:750;cursor:pointer;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}#ccttVersionNotice button.cctt-version-accept{background:var(--cctt-theme-accent,#722447);color:var(--cctt-theme-onaccent,#fff)}#ccttVersionNotice svg{width:21px;height:21px;vertical-align:middle;margin-right:7px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}#ccttCountsSyncNow>svg{display:inline-block!important;width:19px!important;height:19px!important;flex-shrink:0}#ccttCountsSyncNow>.icon{display:none!important}</style>
+<script id="ccttVersionNoticeLogic">(()=>{'use strict';
+// NUEVO: etiqueta integrada en cada despliegue; un archivo idéntico no genera notificaciones repetidas.
+const currentVersion='cctt-20261023-revision-avisos-terminales-01';
+const marker=/const currentVersion='([^']+)'/;
+let announced='';
+const panel=document.createElement('div');panel.id='ccttVersionNotice';panel.hidden=true;
+panel.innerHTML='<div class="cctt-version-panel" role="dialog" aria-modal="true" aria-labelledby="ccttVersionTitle"><h3 id="ccttVersionTitle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 18v3h14v-3"/></svg>Nueva versión disponible</h3><p>Hay una actualización publicada de CCTT. Puedes aceptarla para cargar el sitio actualizado.</p><p id="ccttVersionLocalWarning" hidden>Hay cambios de Conteos pendientes en este dispositivo. Recargar podría interrumpir la captura: comprueba y resuelve la sincronización antes de actualizar.</p><div class="cctt-version-actions"><button type="button" id="ccttVersionLater">Más tarde</button><button type="button" id="ccttVersionAccept" class="cctt-version-accept"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 18v3h14v-3"/></svg>Actualizar sitio</button></div></div>';
+document.body.appendChild(panel);
+const hasDrafts=()=>{try{return Object.keys(localStorage).some(k=>k.startsWith('cctt-counts-pending-v1:'));}catch{return false}};
+function openNotice(version){if(!version||version===currentVersion||version===announced)return;announced=version;panel.hidden=false;panel.querySelector('#ccttVersionLocalWarning').hidden=!hasDrafts();}
+panel.querySelector('#ccttVersionLater').onclick=()=>{panel.hidden=true;};
+panel.querySelector('#ccttVersionAccept').onclick=()=>{if(hasDrafts()){panel.querySelector('#ccttVersionLocalWarning').hidden=false;return}const u=new URL(location.href);u.searchParams.set('cctt_version',String(Date.now()));location.replace(u.href);};
+async function check(){if(document.hidden||!/^https?:$/.test(location.protocol))return;try{const u=new URL(location.href);u.searchParams.set('cctt_check',String(Date.now()));const r=await fetch(u.href,{cache:'no-store',credentials:'same-origin'});if(!r.ok)return;const html=await r.text();const found=html.match(marker);if(found&&found[1]!==currentVersion)openNotice(found[1]);}catch(e){console.warn('No se pudo revisar la versión publicada',e)}}
+setInterval(check,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)void check()});void check();
+})();</script>
 </body></html>
