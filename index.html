@@ -1249,6 +1249,14 @@ html[data-cctt-scheme="dark"] body.cctt-authenticated .page :is(select,input,tex
 @media(max-width:650px){#page-conteos #ccttCountsChoose{width:100%!important;flex-direction:column}#page-conteos #ccttCountsChoose .btn{width:100%}}
 </style>
 <!-- NUEVO: contraste de Sobrevuelo de dron en modos predeterminado y oscuro. -->
+
+<!-- NUEVO: iconos SVG distintos en los controles de formato, con contraste del tema vigente. -->
+<style id="ccttTextFormatIconContrast">
+#page-atencionAmbulancia .cctt-copy-format svg,#page-sobrevueloDron .cctt-copy-format svg,#page-atencionAmbulancia #ambFormatoA svg,#page-atencionAmbulancia #ambFormatoP svg{width:17px;height:17px;flex:0 0 17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#page-atencionAmbulancia #ambFormatoA,#page-atencionAmbulancia #ambFormatoP,#page-sobrevueloDron .cctt-copy-format .btn{display:inline-flex;gap:8px;align-items:center;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line))}
+#page-atencionAmbulancia #ambFormatoA[aria-pressed="true"],#page-atencionAmbulancia #ambFormatoP[aria-pressed="true"],#page-sobrevueloDron .cctt-copy-format .btn[aria-pressed="true"]{background:var(--cctt-theme-accent,var(--blue));color:var(--cctt-theme-onaccent,#fff);border-color:var(--cctt-theme-accent,var(--blue))}
+#page-atencionAmbulancia #ambFormatoA:focus-visible,#page-atencionAmbulancia #ambFormatoP:focus-visible,#page-sobrevueloDron .cctt-copy-format .btn:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:3px}
+</style>
 <style id="ccttDroneStyles">
 #page-sobrevueloDron .field input,#page-sobrevueloDron .field select{background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line));min-width:0}
 #page-sobrevueloDron .field label{color:var(--cctt-theme-text,var(--text))}
@@ -1545,7 +1553,11 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
    <div id="droneSuggestionsManager" hidden><h3>Sugerencias guardadas</h3><div id="droneSuggestionsList"></div></div>
    <datalist id="droneSuggestionsReason"></datalist><datalist id="droneSuggestionsLocation"></datalist><datalist id="droneSuggestionsOperator"></datalist><datalist id="droneSuggestionsArea"></datalist><datalist id="droneSuggestionsModel"></datalist>
   </div>
-  <div class="card"><h3>Vista previa para copiar</h3><p class="muted">Revisa la redacción antes de copiar. Los nombres propios y las siglas se conservan cuando están reconocidos.</p><pre id="dronePreview" class="notice" aria-live="polite"></pre><div class="row" style="margin-top:12px"><button class="btn primary" type="button" id="droneCopyBottom">Copiar</button></div></div>
+  <div class="card"><h3>Vista previa WhatsApp</h3>
+<!-- NUEVO: selección de formato sin cambiar el selector original ni su ID. -->
+<div class="row cctt-copy-format" role="group" aria-label="Formato de copia del sobrevuelo">
+<button class="btn primary" type="button" id="droneFormatStars" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/></svg>Con asteriscos</button>
+<button class="btn" type="button" id="droneFormatPlain" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h12M4 18h9"/></svg>Texto plano</button></div><p class="muted">Revisa la redacción antes de copiar. Los nombres propios y las siglas se conservan cuando están reconocidos.</p><pre id="dronePreview" class="notice" aria-live="polite"></pre><div class="row" style="margin-top:12px"><button class="btn primary" type="button" id="droneCopyBottom">Copiar</button></div></div>
  </div>
 </section>
 
@@ -1566,7 +1578,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 <datalist id="ambSugUbicacion"></datalist><datalist id="ambSugMotivo"></datalist><datalist id="ambSugEmpresa"></datalist>
 <div class="row" style="margin-top:14px"><button class="btn" type="button" id="ambGuardarSug">Guardar sugerencias</button><button class="btn" type="button" id="ambGestionSug">Administrar sugerencias</button></div>
 <div id="ambGestor" hidden><h3>Sugerencias existentes</h3><div id="ambListaSug"></div></div>
-</div><div class="card"><h3>Vista previa WhatsApp</h3><div class="row" role="group" aria-label="Formato de copia"><button id="ambFormatoA" class="btn primary" type="button" aria-pressed="true">Con asteriscos</button><button id="ambFormatoP" class="btn" type="button" aria-pressed="false">Texto plano</button></div>
+</div><div class="card"><h3>Vista previa WhatsApp</h3><div class="row" role="group" aria-label="Formato de copia"><button id="ambFormatoA" class="btn primary" type="button" aria-pressed="true"><!-- MODIFICADO: SVG de formato sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8zM19 17v5M16.5 19.5h5"/></svg>Con asteriscos</button><button id="ambFormatoP" class="btn" type="button" aria-pressed="false"><!-- MODIFICADO: SVG de formato sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 10h16M4 15h12M4 20h8"/></svg>Texto plano</button></div>
 <p class="muted">La vista previa no se envía automáticamente a WhatsApp.</p><pre id="ambPreview" aria-live="polite"></pre><div class="row"><button id="ambCopiar" class="btn primary" type="button">Copiar reporte</button></div><p class="muted" id="ambEstado" aria-live="polite"></p></div></div>
 </section>
 
@@ -6810,18 +6822,38 @@ if(page.classList.contains('active'))open('conteos');
 const keys={Reason:'Motivo',Location:'Ubicación',Operator:'Operador de DRON',Area:'Área encargada',Model:'Modelo de DRON'};
 const prefix='cctt_drone_suggestions_v1_';
 const get=id=>document.getElementById('drone'+id);
+// NUEVO: reutilizar el tratamiento de redacción de Vialidades sin alterar los valores de los campos.
+function correctPreview(value,kind){
+ const raw=String(value||'').trim();if(!raw)return '';
+ try{
+  if(kind==='company'&&typeof smartCompanyCase==='function')return smartCompanyCase(raw);
+  if(kind==='person'&&typeof proper35==='function')return proper35(raw);
+  if(typeof ccttSentenceMX==='function')return ccttSentenceMX(raw);
+ }catch(e){console.warn('No se pudo aplicar la revisión de vista previa',e)}
+ return raw.replace(/[ \t]+/g,' ');
+}
+
 function userKey(){return String(window.ccttCurrentNavUser||'local')}
 function safeRead(){try{const v=JSON.parse(localStorage.getItem(prefix+userKey())||'{}');return v&&typeof v==='object'?v:{}}catch(e){return {}}}
 function safeWrite(v){try{localStorage.setItem(prefix+userKey(),JSON.stringify(v));return true}catch(e){alert('No se pudieron guardar las sugerencias en este dispositivo.');return false}}
-function tidy(value,id){const raw=String(value||'').replace(/\s+/g,' ').trim();if(!raw)return '';
- // MODIFICADO: se reutilizan las reglas de nombres y empresas ya presentes, conservando el valor introducido si no están disponibles.
- try{if(id==='Operator'&&typeof proper35==='function')return proper35(raw);if((id==='Area'||id==='Model')&&typeof smartCompanyCase==='function')return smartCompanyCase(raw)}catch(e){}
- const upper=/^(CCTT|SSA|DJI|CONTECON|DRON)$/i;return raw.split(' ').map(w=>upper.test(w)?w.toUpperCase():w).join(' ');
+// MODIFICADO: corrección equivalente a la vista previa de Vialidades, con siglas técnicas preservadas.
+function tidy(value,id){
+ const raw=String(value||'').replace(/\s+/g,' ').trim();if(!raw)return '';
+ if(id==='Area'&&/^CCTT$/i.test(raw))return 'CCTT';
+ if(id==='Model'&&/^DJI\s+MINI\s+3$/i.test(raw))return 'DJI Mini 3';
+ if(id==='Model')return raw.replace(/\b(DJI|DRON|CCTT)\b/gi,m=>m.toUpperCase());
+ if(id==='Operator')return correctPreview(raw,'person');
+ if(id==='Area')return correctPreview(raw,'company');
+ return correctPreview(raw,'sentence');
 }
-function render(){const f=id=>tidy(get(id)?.value,id);const star=get('Format')?.value==='asteriscos';const mark=t=>star?'*'+t+'*':t;const date=get('Date')?.value||'';const output=[['Fecha',date?date.split('-').reverse().join('/'):''],['Hora',get('Time')?.value||''],...Object.entries(keys).map(([k,label])=>[label,f(k)])].map(([k,v])=>mark(k)+': '+v).join('\n');const preview=get('Preview');if(preview)preview.textContent=output;return output}
+function render(){const f=id=>tidy(get(id)?.value,id);const star=get('Format')?.value==='asteriscos';const mark=t=>star?'*'+t+'*':t;const date=get('Date')?.value||'';const output=[['Fecha',date?date.split('-').reverse().join('/'):''],['Hora',get('Time')?.value||''],...Object.entries(keys).map(([k,label])=>[label,f(k)])].map(([k,v])=>mark(k)+': '+v).join('\n');const preview=get('Preview');if(preview)preview.textContent=output;
+ // NUEVO: mantener sincronizados los botones de la vista WhatsApp y el selector existente.
+ for(const [id,active] of [['droneFormatStars',star],['droneFormatPlain',!star]]){const el=document.getElementById(id);if(el){el.setAttribute('aria-pressed',String(active));el.classList.toggle('primary',active)}}return output}
 function lists(){const all=safeRead();for(const id of Object.keys(keys)){const d=document.getElementById('droneSuggestions'+id);if(!d)continue;d.replaceChildren();const defaults=id==='Area'?['CCTT']:id==='Model'?['DJI Mini 3']:[];for(const value of [...new Set([...defaults,...(Array.isArray(all[id])?all[id]:[])])]){const op=document.createElement('option');op.value=value;d.appendChild(op)}}}
 function showManage(){const box=document.getElementById('droneSuggestionsManager'),target=document.getElementById('droneSuggestionsList');if(!box||!target)return;box.hidden=!box.hidden;if(box.hidden)return;target.replaceChildren();const all=safeRead();for(const [id,label] of Object.entries(keys)){for(const value of (Array.isArray(all[id])?all[id]:[])){const r=document.createElement('div');r.className='row';const name=document.createElement('span');name.textContent=label+': '+value;const del=document.createElement('button');del.className='btn bad';del.type='button';del.textContent='Eliminar';del.onclick=()=>{const v=safeRead();v[id]=(v[id]||[]).filter(x=>x!==value);if(safeWrite(v)){lists();box.hidden=true;showManage()}};r.append(name,del);target.append(r)}}if(!target.childNodes.length)target.textContent='Sin sugerencias personalizadas.'}
 function init(){if(!get('Preview'))return;for(const id of ['Date','Time','Format',...Object.keys(keys)])get(id)?.addEventListener('input',render);get('Format')?.addEventListener('change',render);
+// NUEVO: botones accesibles que conservan como origen el selector existente.
+for(const [button,value] of [['droneFormatStars','asteriscos'],['droneFormatPlain','plano']])document.getElementById(button)?.addEventListener('click',()=>{if(get('Format'))get('Format').value=value;render()});
 for(const suffix of ['Copy','CopyBottom'])get(suffix)?.addEventListener('click',async()=>{const value=render();try{await navigator.clipboard.writeText(value)}catch(e){const temp=document.createElement('textarea');temp.value=value;document.body.append(temp);temp.select();document.execCommand('copy');temp.remove()}});
 get('SaveSuggestions')?.addEventListener('click',()=>{const all=safeRead();for(const id of Object.keys(keys)){const val=tidy(get(id)?.value,id);if(!val)continue;const a=Array.isArray(all[id])?all[id]:[];all[id]=[...new Set([...a,val])]}if(safeWrite(all)){lists();alert('Sugerencias guardadas en este dispositivo.')}});
 get('ManageSuggestions')?.addEventListener('click',showManage);lists();render()}
@@ -6837,8 +6869,11 @@ const suggestions={ambUbicacion:[],ambMotivo:[],ambEmpresa:['GRUPO ESPECIALIZADO
 const key='cctt_ambulancia_sugerencias_v1';
 try{const saved=JSON.parse(localStorage.getItem(key)||'{}');for(const k of Object.keys(suggestions))if(Array.isArray(saved[k]))suggestions[k]=[...new Set([...suggestions[k],...saved[k].filter(x=>typeof x==='string'&&x.length<=200)])]}catch(e){console.warn('Sugerencias de ambulancia no disponibles',e)}
 let starred=true;const clean=s=>String(s||'').trim().replace(/\s+/g,' ');
+// NUEVO: aplicar la normalización existente de Vialidades solo a la salida, sin alterar la captura.
+function formatPreview(value,kind){const raw=clean(value);if(!raw)return '';try{if(kind==='company'&&typeof smartCompanyCase==='function')return smartCompanyCase(raw);if(kind==='person'&&typeof proper35==='function')return proper35(raw);if(typeof ccttSentenceMX==='function')return ccttSentenceMX(raw)}catch(e){console.warn('Revisión de texto no disponible',e)}return raw}
 function formatLabel(label){return starred?'*'+label+'*':label}
-function preview(){let entries=[['Nombre completo',clean($('ambNombre').value)],['DEI',clean($('ambDei').value)],['NSS (opcional)',clean($('ambNss').value)],['CURP',clean($('ambCurp').value).toUpperCase()],['Ubicación',clean($('ambUbicacion').value)],['Motivo',clean($('ambMotivo').value)],['Empresa',clean($('ambEmpresa').value)]];return (starred?'*REPORTE DE INCIDENTE / ACCIDENTE · ATENCIÓN POR AMBULANCIA*':'REPORTE DE INCIDENTE / ACCIDENTE · ATENCIÓN POR AMBULANCIA')+'\n\n'+entries.filter(([k,v])=>v||k!=='NSS (opcional)').map(([k,v])=>formatLabel(k)+': '+v).join('\n')}
+function preview(){// MODIFICADO: mismas reglas de redacción que Vialidades para los campos narrativos.
+let entries=[['Nombre completo',formatPreview($('ambNombre').value,'person')],['DEI',clean($('ambDei').value)],['NSS (opcional)',clean($('ambNss').value)],['CURP',clean($('ambCurp').value).toUpperCase()],['Ubicación',formatPreview($('ambUbicacion').value,'sentence')],['Motivo',formatPreview($('ambMotivo').value,'sentence')],['Empresa',formatPreview($('ambEmpresa').value,'company')]];return (starred?'*REPORTE DE INCIDENTE / ACCIDENTE · ATENCIÓN POR AMBULANCIA*':'REPORTE DE INCIDENTE / ACCIDENTE · ATENCIÓN POR AMBULANCIA')+'\n\n'+entries.filter(([k,v])=>v||k!=='NSS (opcional)').map(([k,v])=>formatLabel(k)+': '+v).join('\n')}
 function refresh(){ $('ambPreview').textContent=preview();$('ambFormatoA').setAttribute('aria-pressed',String(starred));$('ambFormatoP').setAttribute('aria-pressed',String(!starred));$('ambFormatoA').classList.toggle('primary',starred);$('ambFormatoP').classList.toggle('primary',!starred)}
 fields.forEach(k=>$(k).addEventListener('input',refresh));$('ambFormatoA').onclick=()=>{starred=true;refresh()};$('ambFormatoP').onclick=()=>{starred=false;refresh()};
 $('ambCopiar').onclick=async()=>{try{await navigator.clipboard.writeText(preview());$('ambEstado').textContent='Reporte copiado al portapapeles.'}catch(e){$('ambEstado').textContent='No se pudo copiar automáticamente; selecciona el texto de la vista previa.'}};
