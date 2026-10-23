@@ -3982,6 +3982,7 @@ body.cctt-authenticated .cctt-topbar-tools{background:#fffaf5;border-color:#ecdc
       wrap.hidden=!isCreator;wrap.style.display=isCreator?'flex':'none';
     };
     window.addEventListener('cctt:session',e=>ccttUpdateFontPermission(e.detail?.session)); // NUEVO
+    window.addEventListener('cctt:logout',()=>ccttUpdateFontPermission(null)); // NUEVO: ocultar al cerrar sesión.
     /* MODIFICADO: verificar la sesión actual en caso de que el evento de autenticación ya haya ocurrido. */
     Promise.resolve(window.ccttSupabaseClient?.auth?.getSession?.()).then(result=>ccttUpdateFontPermission(result?.data?.session)).catch(()=>ccttUpdateFontPermission(null));
     pm.prepend(wrap); document.getElementById('ccttWriterFont').addEventListener('change',e=>setWriterFont(e.target.value)); setWriterFont(DEFAULT_FONT);
@@ -7084,89 +7085,11 @@ function init(){const root=document.getElementById('ccttSharedPdfBody');if(!root
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
-<!-- NUEVO: aviso de nueva versión publicada; se compara contra el HTML servido, sin añadir servicios externos. -->
-<style id="ccttVersionNoticeStyles">#ccttVersionNotice[hidden]{display:none!important}#ccttVersionNotice{position:fixed;inset:0;z-index:290000;background:rgba(8,16,31,.78);display:grid;place-items:center;padding:18px}#ccttVersionNotice .cctt-version-panel{width:min(530px,100%);max-height:88vh;overflow:auto;background:var(--cctt-theme-card,var(--card,#fff));color:var(--cctt-theme-text,var(--text,#152238));border:1px solid var(--cctt-theme-line,var(--line,#aaa));border-radius:17px;padding:22px;box-shadow:0 20px 70px #0006}#ccttVersionNotice .cctt-version-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}#ccttVersionNotice button{border-radius:9px;border:1px solid var(--cctt-theme-line,var(--line));padding:10px 14px;font-weight:750;cursor:pointer;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}#ccttVersionNotice button.cctt-version-accept{background:var(--cctt-theme-accent,#722447);color:var(--cctt-theme-onaccent,#fff)}#ccttVersionNotice svg{width:21px;height:21px;vertical-align:middle;margin-right:7px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}#ccttCountsSyncNow>svg{display:inline-block!important;width:19px!important;height:19px!important;flex-shrink:0}#ccttCountsSyncNow>.icon{display:none!important}</style>
+<!-- MODIFICADO: retirado el aviso y el detector automático de versiones. Se conservan los estilos ajenos de sincronización de Conteos. -->
+<style id="ccttVersionNoticeStyles">#ccttCountsSyncNow>svg{display:inline-block!important;width:19px!important;height:19px!important;flex-shrink:0}#ccttCountsSyncNow>.icon{display:none!important}</style>
 <script id="ccttVersionNoticeLogic">(()=>{'use strict';
-// MODIFICADO: huella del HTML desplegado, calculada al generar este archivo; no requiere cambiar manualmente la versión en GitHub.
-// MODIFICADO: huella de esta compilación; no exige actualizar manualmente etiquetas en GitHub.
-const currentVersion='c72a4b6ee7c0fe89608ba1ee69394fa0b4272e624db835fd6c98da0da1318cf4';
-const marker=/const currentVersion='([^']+)'/;
-async function deployedFingerprint(html){const normalized=String(html).replace(marker,"const currentVersion='CCTT_BUILD_HASH_PLACEHOLDER'");const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(normalized));return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('')}
-// NUEVO: estado de navegación temporal; los borradores locales de Conteos se dejan intactos.
-const prefix='cctt-version-v3:';
-const acceptedKey=prefix+'accepted';
-const deferKey=prefix+'deferred';
-const reminderMinutes=30;
-let announced='',availableVersion='',checking=false,confirmedPendingReload=false;
-const panel=document.createElement('div');panel.id='ccttVersionNotice';panel.hidden=true;
-panel.innerHTML='<div class="cctt-version-panel" role="dialog" aria-modal="true" aria-labelledby="ccttVersionTitle"><h3 id="ccttVersionTitle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 18v3h14v-3"/></svg>Nueva versión disponible</h3><p>Hay una actualización publicada de CCTT. Puedes aceptarla para cargar el sitio actualizado.</p><p id="ccttVersionLocalWarning" hidden>Hay cambios de Conteos pendientes en este dispositivo. Recargar podría interrumpir la captura: comprueba y resuelve la sincronización antes de actualizar.</p><div class="cctt-version-actions"><button type="button" id="ccttVersionLater">Más tarde</button><button type="button" id="ccttVersionAccept" class="cctt-version-accept"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 18v3h14v-3"/></svg>Actualizar sitio</button></div></div>';
-document.body.appendChild(panel);
-const hasDrafts=()=>{try{return Object.keys(localStorage).some(k=>k.startsWith('cctt-counts-pending-v1:'));}catch{return false}};
-// NUEVO: el aplazamiento es individual para cada versión y vence 30 minutos después de pulsar «Más tarde».
-function getDefer(){try{return JSON.parse(sessionStorage.getItem(deferKey)||'null')}catch{return null}}
-function getAccepted(){try{return sessionStorage.getItem(acceptedKey)||''}catch{return ''}}
-function openNotice(version){
- if(!version||version===currentVersion||version===getAccepted())return;
- const postpone=getDefer();
- if(postpone&&postpone.version===version&&Date.now()<postpone.until)return;
- if(!panel.hidden&&announced===version)return;
- announced=version;availableVersion=version;confirmedPendingReload=false;
- panel.querySelector('#ccttVersionAccept').lastChild.textContent='Actualizar sitio';
- const warning=panel.querySelector('#ccttVersionLocalWarning');
- warning.hidden=!hasDrafts();
- warning.textContent='Hay cambios de Conteos pendientes en este dispositivo. Recargar podría interrumpir la captura: comprueba y resuelve la sincronización antes de actualizar.';
- panel.hidden=false;
-}
-// MODIFICADO: «Más tarde» inicia un plazo real de 30 minutos; nuevas publicaciones no heredan el aplazamiento.
-panel.querySelector('#ccttVersionLater').onclick=()=>{
- try{sessionStorage.setItem(deferKey,JSON.stringify({version:availableVersion,until:Date.now()+reminderMinutes*60*1000}))}catch{}
- panel.hidden=true;confirmedPendingReload=false;
- panel.querySelector('#ccttVersionAccept').lastChild.textContent='Actualizar sitio';
-};
-// MODIFICADO: conserva los borradores; la aceptación de una versión concreta impide repetir el aviso tras navegar.
-panel.querySelector('#ccttVersionAccept').onclick=()=>{
- const pending=hasDrafts(),accept=panel.querySelector('#ccttVersionAccept');
- if(pending&&!confirmedPendingReload){
-   confirmedPendingReload=true;
-   const warning=panel.querySelector('#ccttVersionLocalWarning');warning.hidden=false;
-   warning.textContent='Hay borradores de Conteos guardados en este dispositivo. Se conservarán en este navegador, pero los cambios aún no guardados en pantalla podrían perderse. Pulsa otra vez para confirmar o Más tarde para cancelar.';
-   accept.lastChild.textContent=' Confirmar actualización';return;
- }
- if(!availableVersion)return;
- try{sessionStorage.setItem(acceptedKey,availableVersion);sessionStorage.removeItem(deferKey)}catch{}
- const u=new URL(location.href);u.searchParams.delete('cctt_check');u.searchParams.set('cctt_version',String(Date.now()));
- location.replace(u.href);
-};
-// NUEVO: comprobar el mismo HTML publicado dos veces con URLs sin caché antes de ofrecer actualización.
-async function fetchPublished(){
- const u=new URL(location.href);u.searchParams.delete('cctt_version');u.searchParams.delete('cctt_check');u.searchParams.set('cctt_check',String(Date.now())+'-'+Math.random().toString(36).slice(2));
- const response=await fetch(u.href,{cache:'no-store',credentials:'same-origin',redirect:'follow'});
- if(!response.ok||!String(response.headers.get('content-type')||'').toLowerCase().includes('text/html'))return null;
- const html=await response.text();
- if(!html.includes('id="ccttVersionNoticeLogic"')||!html.includes('Centro de Control de Tráfico Terrestre'))return null;
- return deployedFingerprint(html);
-}
-async function check(){
- if(checking||document.hidden||!/^https?:$/.test(location.protocol))return;
- checking=true;
- try{
-   const first=await fetchPublished();
-   if(!first)return;
-   // MODIFICADO: si el recurso ya es el mismo, cerrar un aviso antiguo, sin generar otro.
-   if(first===currentVersion){panel.hidden=true;availableVersion='';return}
-   if(first===getAccepted())return;
-   const deferred=getDefer();
-   if(deferred&&deferred.version===first&&Date.now()<deferred.until)return;
-   await new Promise(resolve=>setTimeout(resolve,4000));
-   const second=await fetchPublished();
-   if(first!==second||!second)return; // Publicación/caché cambiante: esperar a otra revisión.
-   openNotice(second);
- }catch(e){console.warn('No se pudo comprobar la publicación de CCTT',e)}
- finally{checking=false}
-}
-// NUEVO: comprobación periódica para usuarios que mantienen el sitio abierto.
-setInterval(check,60000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)void check()});
-void check();
+// MODIFICADO: sin detector de actualizaciones, sin avisos, sin recargas automáticas.
+// NUEVO: limpiar exclusivamente los parámetros creados por el detector anterior, conservando los demás y sin recargar.
+try{const u=new URL(location.href);if(u.searchParams.has('cctt_version')||u.searchParams.has('cctt_check')){u.searchParams.delete('cctt_version');u.searchParams.delete('cctt_check');history.replaceState(history.state,'',u.href)}}catch(_e){}
 })();</script>
 </body></html>
