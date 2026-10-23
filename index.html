@@ -5309,7 +5309,7 @@ async function copy(t){try{await navigator.clipboard.writeText(t);msg('Texto cop
 function copyButton(text){const b=document.createElement('button');b.className='btn';b.type='button';/* MODIFICADO: icono SVG y etiqueta corta sin partir palabras. */b.classList.add('cctt-copy-compact');b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg><span>Copiar</span>';b.title='Copiar texto completo';b.setAttribute('aria-label','Copiar texto');b.onclick=()=>copy(text);return b}
 // NUEVO: permite copiar cada registro local sin cambiar su guardado original.
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-cctt-copy-msg]');if(!b)return;const record=(window.state?.messages||[]).find(x=>String(x.id)===b.dataset.ccttCopyMsg);if(record)copy(record.text||'');else{const tr=b.closest('tr');copy(tr?.children?.[4]?.textContent||'')}});
-async function loadMessages(){if(!permitted('mensajes'))return;try{const rows=await query('cctt_shared_messages'),body=$('ccttSharedMessagesBody');body.replaceChildren();rows.forEach(x=>{const tr=document.createElement('tr');[x.entity,x.message_date,x.tag,x.author,x.body].forEach(v=>{const td=document.createElement('td');td.textContent=v??'';if(v===x.body){td.style.whiteSpace='normal';/* MODIFICADO: texto plegable sin alterar el valor almacenado. */const details=document.createElement('details');details.className='cctt-message-details';const summary=document.createElement('summary');summary.textContent='Ver / plegar texto';const preview=document.createElement('div');preview.className='cctt-message-preview';preview.textContent=v??'';details.append(summary,preview);td.replaceChildren(details)}tr.append(td)});const td=document.createElement('td');td.append(copyButton(x.body||''));tr.append(td);/* NUEVO: edición y eliminación por propietario con validación adicional de permisos en servidor. */const actions=document.createElement('td');if(sess?.user?.id===x.owner_id||sess?.user?.app_metadata?.role==='admin'){for(const action of ['Editar','Eliminar']){const b=document.createElement('button');b.type='button';b.className='btn'+(action==='Eliminar'?' bad':'');b.style.margin='2px';b.textContent=action;b.addEventListener('click',()=>manageSharedMessage(action,x));actions.append(b)}}tr.append(actions);body.append(tr)});report('ccttSharedMessagesStatus',rows.length+' mensajes compartidos.')}catch(err){report('ccttSharedMessagesStatus','No fue posible consultar mensajes compartidos: '+err.message)}}
+async function loadMessages(){if(!permitted('mensajes'))return;try{const rows=await query('cctt_shared_messages'),body=$('ccttSharedMessagesBody');body.replaceChildren();rows.forEach(x=>{const tr=document.createElement('tr');[x.entity,x.message_date,x.tag,x.author,x.body].forEach(v=>{const td=document.createElement('td');td.textContent=v??'';if(v===x.body){td.style.whiteSpace='normal';/* MODIFICADO: texto plegable sin alterar el valor almacenado. */const details=document.createElement('details');details.className='cctt-message-details';const summary=document.createElement('summary');summary.textContent='Ver / plegar texto';const preview=document.createElement('div');preview.className='cctt-message-preview';preview.textContent=v??'';details.append(summary,preview);td.replaceChildren(details)}tr.append(td)});const td=document.createElement('td');td.append(copyButton(x.body||''));tr.append(td);/* NUEVO: edición y eliminación por propietario con validación adicional de permisos en servidor. */const actions=document.createElement('td');if(sess?.user?.id===x.owner_id||sess?.user?.app_metadata?.role==='admin'){for(const action of ['Editar','Eliminar']){const b=document.createElement('button');b.type='button';b.className='btn'+(action==='Eliminar'?' bad':'');b.style.margin='2px';b.textContent=action;b.addEventListener('click',()=>manageSharedMessage(action,x));actions.append(b)}}tr.append(actions);fragment.append(tr)});report('ccttSharedMessagesStatus',rows.length+' mensajes compartidos.')}catch(err){report('ccttSharedMessagesStatus','No fue posible consultar mensajes compartidos: '+err.message)}}
 // NUEVO: diálogo interno para editar un comunicado sin ventanas del navegador.
 async function manageSharedMessage(action,x){
  const owner=sess?.user?.id===x.owner_id;
@@ -5331,19 +5331,42 @@ async function manageSharedMessage(action,x){
 async function loadDocs(){
  if(!permitted('comunicadosPdf'))return;
  try{
-  const rows=await query('cctt_shared_documents'),body=$('ccttSharedPdfBody');body.replaceChildren();
+  const rows=await query('cctt_shared_documents'),body=$('ccttSharedPdfBody'); // MODIFICADO: preparar los resultados antes de tocar la tabla visible.
   const loggedId=sess?.user?.id||'';
   // MODIFICADO: mostrar controles sin depender de la coincidencia de owner_id; la autorización real permanece en RLS.
   /* MODIFICADO: mostrar acciones únicamente al propietario, administrador o delegado. */const {data:mayManageAll,error:managerError}=await client().rpc('cctt_can_manage_documents');if(managerError)throw managerError;const canManage=x=>x.owner_id===loggedId||mayManageAll===true;
+  // NUEVO: no reconstruir filas idénticas; evita el parpadeo al actualizar.
+  const signature=JSON.stringify([loggedId,mayManageAll,rows.map(x=>[x.id,x.document_date,x.entity,x.author,x.filename,x.file_path,x.owner_id,x.updated_at,x.note])]);
+  if(body.dataset.ccttRowsSignature===signature){report('ccttSharedPdfStatus',rows.length+' comunicados compartidos.');return}
+  const fragment=document.createDocumentFragment();
   for(const x of rows){
    const tr=document.createElement('tr');
    [x.document_date,x.entity,x.author,x.filename].forEach(v=>{const td=document.createElement('td');td.textContent=v??'';tr.append(td)});
    const td=document.createElement('td'),b=document.createElement('button');b.className='btn';b.textContent='Descargar';
-   b.onclick=async()=>{const r=await client().storage.from('cctt-comunicados').createSignedUrl(x.file_path,90);if(r.error){msg('No se pudo abrir el archivo: '+r.error.message,true);return}window.open(r.data.signedUrl,'_blank','noopener')};td.append(b);tr.append(td);
+   // NUEVO: visor de adjuntos existentes, sin alterar sus archivos ni permisos de almacenamiento.
+   const view=document.createElement('button');view.type='button';view.className='btn';view.textContent='Vista previa';
+   view.onclick=async()=>{
+    const overlay=document.createElement('div');overlay.className='cctt-site-dialog';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','Vista previa del comunicado');
+    const panel=document.createElement('div');panel.className='cctt-site-dialog-panel';panel.style.width='min(980px,100%)';panel.style.maxHeight='92vh';
+    const title=document.createElement('h3');title.textContent=x.filename||'Documento';
+    const close=document.createElement('button');close.className='btn';close.type='button';close.textContent='Cerrar';
+    const content=document.createElement('div');content.textContent='Cargando archivo…';content.style.cssText='min-height:150px;max-height:70vh;overflow:auto;display:grid;place-items:center';
+    const dismiss=()=>{if(overlay.dataset.objectUrl)URL.revokeObjectURL(overlay.dataset.objectUrl);overlay.remove()};close.onclick=dismiss;overlay.addEventListener('click',ev=>{if(ev.target===overlay)dismiss()});
+    panel.append(title,content,close);overlay.append(panel);document.body.append(overlay);
+    try{const {data,error}=await client().storage.from('cctt-comunicados').download(x.file_path);if(error)throw error;if(!overlay.isConnected)return;
+      const ext=String(x.filename||'').split('.').pop().toLowerCase();const mime=ext==='pdf'?'application/pdf':ext==='png'?'image/png':ext==='jpg'||ext==='jpeg'?'image/jpeg':ext==='webp'?'image/webp':ext==='gif'?'image/gif':'';
+      const blob=new Blob([await data.arrayBuffer()],{type:mime||data.type||'application/octet-stream'}),url=URL.createObjectURL(blob);overlay.dataset.objectUrl=url;content.replaceChildren();
+      if(mime.startsWith('image/')){const img=document.createElement('img');img.src=url;img.alt=x.filename||'Imagen';img.style.cssText='max-width:100%;max-height:68vh;object-fit:contain';content.append(img)}
+      else if(mime==='application/pdf'){const frame=document.createElement('iframe');frame.title=x.filename||'PDF';frame.src=url;frame.style.cssText='width:100%;height:65vh;border:0;background:white';content.append(frame)}
+      else {const notice=document.createElement('p');notice.textContent='Este formato no tiene vista previa integrada.';content.append(notice)}
+      const link=document.createElement('a');link.href=url;link.download=x.filename||'archivo';link.textContent='Descargar archivo';link.style.margin='12px';content.append(link)
+    }catch(error){if(overlay.isConnected)content.textContent='No fue posible visualizar el archivo: '+(error?.message||error)}
+   };
+   b.onclick=async()=>{const r=await client().storage.from('cctt-comunicados').createSignedUrl(x.file_path,90);if(r.error){msg('No se pudo abrir el archivo: '+r.error.message,true);return}window.open(r.data.signedUrl,'_blank','noopener')};td.append(view,document.createTextNode(' '),b);tr.append(td);
    // NUEVO: solo el propietario ve acciones de edición y eliminación; RLS debe autorizarlas también.
    const actions=document.createElement('td');
    if(canManage(x)){
-    const edit=document.createElement('button');edit.className='btn';edit.textContent='Editar';/* MODIFICADO: SVG propio de edición en lugar de palomita. */edit.insertAdjacentHTML('afterbegin','<svg viewBox="0 0 24 24" aria-hidden="true" class="cctt-local-action-svg"><path d="M4 20h4l11-11-4-4L4 16v4zM13 7l4 4"/></svg>');edit.type='button';edit.onclick=()=>{
+    const edit=document.createElement('button');edit.className='btn';edit.dataset.iconized='1';edit.textContent='Editar';/* MODIFICADO: no añadir un segundo SVG; SVG propio de edición en lugar de palomita. */edit.insertAdjacentHTML('afterbegin','<svg viewBox="0 0 24 24" aria-hidden="true" class="cctt-local-action-svg"><path d="M4 20h4l11-11-4-4L4 16v4zM13 7l4 4"/></svg>');edit.type='button';edit.onclick=()=>{
      const dialog=document.createElement('div');dialog.className='cctt-pdf-edit-backdrop';
      dialog.innerHTML='<div class="cctt-pdf-edit-card" role="dialog" aria-modal="true" aria-label="Editar comunicado"><h3>Editar comunicado</h3><label>Fecha<input type="date" data-name="document_date"></label><label>Entidad<input data-name="entity" maxlength="160"></label><label>Usuario<input data-name="author" maxlength="160"></label><label>Nombre del documento<input data-name="filename" maxlength="240"></label><div class="row"><button type="button" class="btn" data-cancel>Cancelar</button><button type="button" class="btn primary" data-apply>Guardar cambios</button></div></div>';
      for(const k of ['document_date','entity','author','filename'])dialog.querySelector('[data-name="'+k+'"]').value=x[k]||'';
@@ -5352,8 +5375,10 @@ async function loadDocs(){
      document.body.append(dialog)
     };
     const del=document.createElement('button');del.className='btn bad';del.type='button';del.textContent='Eliminar';del.onclick=()=>removeSharedDocument(x);actions.append(edit,document.createTextNode(' '),del)
-   }else{actions.textContent='—'}tr.append(actions);body.append(tr)
+   }else{actions.textContent='—'}tr.append(actions);fragment.append(tr)
   }
+  // MODIFICADO: reemplazo atómico después de preparar todas las filas.
+  body.replaceChildren(fragment);body.dataset.ccttRowsSignature=signature;
   report('ccttSharedPdfStatus',rows.length+' comunicados compartidos.');
  }catch(err){report('ccttSharedPdfStatus','No fue posible consultar documentos: '+err.message)}
 }
@@ -6757,6 +6782,21 @@ async function ccttRefreshSharedCounts(module,force=false){
   show(pending.length?'Configuración de Supabase mostrada. Borrador local en conflicto conservado.':'Configuración y jornadas compartidas actualizadas.');return true
  }catch(err){show('No se pudo actualizar la vista compartida; se conserva la información actual.');console.warn('Actualización de Conteos:',err);return false}
 }
+/* NUEVO: recibir cambios confirmados en Supabase en cuanto se publican, conservando los borradores de cada dispositivo. */
+let ccttLiveCountChannel=null;
+function ccttJoinLiveCounts(){
+ const sb=getClient();if(!sb?.channel||ccttLiveCountChannel)return;
+ try{ccttLiveCountChannel=sb.channel('cctt-counts-state-live')
+   .on('postgres_changes',{event:'*',schema:'public',table:'cctt_counts_state'},payload=>{
+     const module=payload.new?.module||payload.old?.module;
+     if(module&&module===active&&loaded[module]&&page.classList.contains('active')){
+       if(pendingFor(module).length){show('Hay cambios compartidos nuevos. Borrador local conservado; revisa la sincronización.');return}
+       void ccttRefreshSharedCounts(module);
+     }
+   }).subscribe();
+ }catch(error){console.warn('Actualización en tiempo real no disponible; continúa la comprobación periódica.',error)}
+}
+window.addEventListener('cctt:session',()=>{if(ccttLiveCountChannel&&getClient()){void getClient().removeChannel(ccttLiveCountChannel);ccttLiveCountChannel=null}ccttJoinLiveCounts()});
 /* NUEVO: revalidar al regresar a la pestaña sin alterar capturas en edición. */
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&active&&page.classList.contains('active'))void ccttRefreshSharedCounts(active)});
 /* NUEVO: verificar revisiones remotas mientras una sesión sigue abierta; no reemplazar capturas pendientes. */
@@ -6765,7 +6805,7 @@ async function open(module){const item=definitions[module],sb=getClient();if(!it
 if(!sb){show('Inicia sesión para acceder a esta herramienta.');return}
 // Ocultar submódulo anterior para mantener una sola herramienta visible.
 for(const [id,d]of Object.entries(definitions)){d.frame.style.display=id===module?'block':'none';d.button.setAttribute('aria-pressed',String(id===module))}
-active=module;
+active=module;ccttJoinLiveCounts();
 /* MODIFICADO: al cambiar de submódulo, consultar la revisión compartida antes de reutilizar una vista en memoria. */
 if(loaded[module]){show('Verificando configuración compartida…');setTheme(module);await syncPending(module);if(await ccttRefreshSharedCounts(module))return;show('Datos disponibles · sincronización pendiente');return}
 show('Cargando información compartida…');item.frame.style.display='none';
