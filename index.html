@@ -6681,7 +6681,34 @@ const draftKey=(module,key)=>draftPrefix()+module+':'+key;
 function readDraft(module,key){try{return JSON.parse(localStorage.getItem(draftKey(module,key))||'null')}catch{return null}}
 function storeDraft(module,key,value){const existing=readDraft(module,key);const expected=existing?existing.expected:(revisions[module]?.[key]??0);try{localStorage.setItem(draftKey(module,key),JSON.stringify({value,expected,updated:Date.now()}));return true}catch(e){console.error('No se pudo guardar el borrador',e);return false}}
 function pendingFor(module){const pref=draftPrefix()+module+':';const result=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith(pref)){const d=readDraft(module,k.slice(pref.length));if(d)result.push({key:k.slice(pref.length),...d})}}return result}
-async function syncPending(module){if(!navigator.onLine)return;const sb=getClient();if(!sb||!currentUserId)return;for(const d of pendingFor(module)){const id=module+':'+d.key;if(queues[id])continue;try{const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:d.key,p_value:d.value,p_expected_revision:d.expected});if(error)throw Error(error.message);revisions[module][d.key]=data;const latest=readDraft(module,d.key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,d.key));notify(module,'saved');
+/* NUEVO: comparar borradores con el contenido remoto sin interpretar ceros como ausencia de cambios. */
+function ccttCountsEqualValue(a,b){
+ const normalize=v=>{if(typeof v==='string'){try{return JSON.parse(v)}catch{return v}}return v};
+ const ordered=v=>Array.isArray(v)?v.map(ordered):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,ordered(v[k])])):v;
+ return JSON.stringify(ordered(normalize(a)))===JSON.stringify(ordered(normalize(b)));
+}
+/* NUEVO: solo retirar un borrador idéntico al servidor y no modificado durante la consulta. */
+async function ccttReconcileCountsDrafts(module,remoteRows){
+ const sb=getClient();if(!sb||!currentUserId)return {ok:false,remaining:pendingFor(module)};
+ let rows=remoteRows;
+ if(!rows){const response=await sb.from('cctt_counts_state').select('storage_key,value_text,revision').eq('module',module);if(response.error)throw response.error;rows=response.data||[]}
+ const byKey=new Map(rows.map(r=>[r.storage_key,r]));const pending=pendingFor(module);let settled=0;
+ for(const d of pending){
+  const remote=byKey.get(d.key);if(!remote)continue;
+  if(!ccttCountsEqualValue(d.value,remote.value_text))continue;
+  const latest=readDraft(module,d.key);
+  if(latest&&latest.updated===d.updated&&latest.expected===d.expected&&ccttCountsEqualValue(latest.value,d.value)){
+   localStorage.removeItem(draftKey(module,d.key));settled++;
+   revisions[module][d.key]=remote.revision;
+  }
+ }
+ const remaining=pendingFor(module);
+ return {ok:true,settled,remaining,conflicts:remaining.map(d=>({key:d.key,expected:d.expected,remote:byKey.get(d.key)?.revision??null}))};
+}
+async function syncPending(module){if(!navigator.onLine)return;const sb=getClient();if(!sb||!currentUserId)return;
+/* MODIFICADO: conciliar primero borradores ya idénticos a Supabase, sin sobrescribir revisiones. */
+try{await ccttReconcileCountsDrafts(module)}catch(e){console.warn('No se pudo comparar la cola con Supabase:',e);return}
+for(const d of pendingFor(module)){const id=module+':'+d.key;if(queues[id])continue;try{const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:d.key,p_value:d.value,p_expected_revision:d.expected});if(error)throw Error(error.message);revisions[module][d.key]=data;const latest=readDraft(module,d.key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,d.key));notify(module,'saved');
 /* NUEVO: después de confirmar en Supabase, comprobar también las revisiones compartidas. */
 if(!pendingFor(module).length&&loaded[module]&&active===module)void ccttRefreshSharedCounts(module)}catch(e){console.warn('Sincronización pendiente ('+id+')',e);show('Cambios pendientes en este dispositivo: no se han compartido. Comprueba la conexión o un conflicto de versión.');notify(module,'pending');break}}}
 window.addEventListener('online',()=>Object.keys(definitions).forEach(syncPending));
@@ -6702,12 +6729,12 @@ async function ccttRefreshSharedCounts(module,force=false){
   const {data,error}=await sb.from('cctt_counts_state').select('storage_key,value_text,revision').eq('module',module);
   if(error)throw error;
   const next={},nextRevs={};for(const r of data||[]){if(r.value_text!==null)next[r.storage_key]=r.value_text;nextRevs[r.storage_key]=r.revision}
-  /* NUEVO: solo se permite actualizar automáticamente con borradores en conflicto si afectan exclusivamente a la estructura antigua de Terminales. Las jornadas pendientes nunca se sustituyen. */
-  const pending=pendingFor(module);
+  /* MODIFICADO: resolver exclusivamente borradores iguales al servidor; conservar los demás. */
+  const reconciliation=await ccttReconcileCountsDrafts(module,data||[]);
+  const pending=reconciliation.remaining;
   if(pending.length){
-   const obsoleteLayout=module==='controlTerminales'&&pending.every(d=>d.key==='terminales_layout_v1'&&Object.prototype.hasOwnProperty.call(nextRevs,d.key)&&String(d.expected)!==String(nextRevs[d.key]));
-   if(!obsoleteLayout){/* MODIFICADO: avisar sobre conflicto sin imponer ni descartar el borrador; no sustituir capturas no confirmadas. */show('Cambios pendientes: la vista puede diferir de Supabase. Conserva la captura y revisa el conflicto de revisión.');return false}
-   show('Configuración global recuperada; existe un borrador local en conflicto que se conserva sin aplicar.');
+   const detail=reconciliation.conflicts.map(d=>d.key+' (local '+d.expected+', servidor '+(d.remote??'sin registro')+')').join('; ');
+   show('Cambios locales distintos de Supabase en '+module+': '+detail+'. No se reemplazaron.');return false;
   }
   const previous=revisions[module]||{};
   const changed=Object.keys({...previous,...nextRevs}).some(k=>String(previous[k]??'')!==String(nextRevs[k]??''));
@@ -6779,7 +6806,12 @@ syncButton.addEventListener('click',async()=>{
   if(!navigator.onLine){show('Sin conexión: no se puede consultar la configuración compartida.');return}
   const target=active||'controlTerminales';
   if(!loaded[target]){await open(target);return}
-  if(pendingFor(target).length){show('Sincronización detenida: hay cambios locales sin publicar. No se reemplazaron. Resuelve el conflicto de versión antes de continuar.');return}
+  /* MODIFICADO: comparar valores reales contra Supabase antes de bloquear por un borrador local. */
+  let result;try{result=await ccttReconcileCountsDrafts(target)}catch(e){show('No se pudo comparar la captura con Supabase. Se conserva el borrador local.');return}
+  if(result.remaining.length){
+   const detail=result.conflicts.map(d=>d.key+' (local '+d.expected+', servidor '+(d.remote??'sin registro')+')').join('; ');
+   show('Sincronización detenida: diferencias reales en '+target+': '+detail+'. No se reemplazaron.');return;
+  }
   show('Consultando configuración compartida de Supabase…');
   const ok=await ccttRefreshSharedCounts(target,true);
   if(ok)show('Sincronización manual completada desde Supabase. La configuración compartida se ha vuelto a cargar.');
