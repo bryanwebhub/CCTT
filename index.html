@@ -3975,6 +3975,15 @@ body.cctt-authenticated .cctt-topbar-tools{background:#fffaf5;border-color:#ecdc
     if(!pm || document.getElementById('ccttTopbarTools')) return;
     const wrap=document.createElement('div'); wrap.id='ccttTopbarTools'; wrap.className='cctt-topbar-tools';
     wrap.innerHTML=`<label for="ccttWriterFont">Fuente:</label><select id="ccttWriterFont">${FONT_OPTIONS.map(f=>`<option value="${f}">${f}</option>`).join('')}</select>`;
+    /* MODIFICADO: el selector se oculta por defecto y se habilita únicamente para el rol admin confirmado por la sesión. */
+    wrap.hidden=true;wrap.style.display='none';
+    const ccttUpdateFontPermission=(session)=>{
+      const isCreator=!!session?.user&&session.user.app_metadata?.role==='admin';
+      wrap.hidden=!isCreator;wrap.style.display=isCreator?'flex':'none';
+    };
+    window.addEventListener('cctt:session',e=>ccttUpdateFontPermission(e.detail?.session)); // NUEVO
+    /* MODIFICADO: verificar la sesión actual en caso de que el evento de autenticación ya haya ocurrido. */
+    Promise.resolve(window.ccttSupabaseClient?.auth?.getSession?.()).then(result=>ccttUpdateFontPermission(result?.data?.session)).catch(()=>ccttUpdateFontPermission(null));
     pm.prepend(wrap); document.getElementById('ccttWriterFont').addEventListener('change',e=>setWriterFont(e.target.value)); setWriterFont(DEFAULT_FONT);
   }
   function ensureDependenciesCatalog(){
