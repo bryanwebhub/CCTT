@@ -1607,7 +1607,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 </section>
 <section class="page" id="page-inc35pisrep">
  <div class="section-title"><h2>PIS-REP · clasificación y tiempos de respuesta</h2></div>
- <div class="split"><div class="card"><h3>Nuevo registro PIS-REP</h3><div class="field"><label>Código / evento</label><select id="prEvent"></select></div><div class="grid g2"><div class="field"><label>Prioridad</label><input id="prPriority" readonly></div><div class="field"><label>Ubicación / referencia</label><input id="prLocation"></div><div class="field"><label>Inicio</label><input type="datetime-local" id="prStart"></div><div class="field"><label>Fin</label><input type="datetime-local" id="prEnd"></div></div><div class="field"><label>Descripción / seguimiento</label><textarea id="prNotes"></textarea></div><div class="row"><button class="btn primary" id="prSave">Guardar</button><button class="btn" id="prCopy">Copiar ficha</button><button class="btn bad" id="prUndo">Deshacer último</button></div></div><div class="card"><h3>Resultado</h3><div id="prKpis" class="grid g3"></div><div id="prPreview" class="notice" style="white-space:pre-wrap;margin-top:12px;min-height:210px"></div></div></div>
+ <div class="split"><div class="card"><h3>Nuevo registro PIS-REP</h3><div class="field"><label>Código / evento</label><select id="prEvent"></select></div><div class="grid g2"><div class="field"><label>Prioridad</label><input id="prPriority" readonly></div><div class="field"><label>Ubicación / referencia</label><input id="prLocation"></div><div class="field"><label>Inicio</label><input type="datetime-local" id="prStart"></div><div class="field"><label>Fin</label><input type="datetime-local" id="prEnd"></div></div><!-- NUEVO: calculadora independiente de tiempos PIS-REP, sin modificar los valores del registro. --><div class="card" id="ccttPisrepTimeCalculator" style="margin:12px 0;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))"><h3>Calculadora de tiempo transcurrido</h3><div class="grid g2"><div class="field"><label for="ccttPisrepCalcStart">Hora de inicio</label><input type="time" id="ccttPisrepCalcStart" style="color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))"></div><div class="field"><label for="ccttPisrepCalcEnd">Hora de fin</label><input type="time" id="ccttPisrepCalcEnd" style="color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))"></div></div><div class="row" style="margin-top:10px"><button class="btn" type="button" id="ccttPisrepCalcButton">Calcular tiempo</button><output id="ccttPisrepCalcResult" role="status" aria-live="polite" style="color:var(--cctt-theme-text,var(--text));font-weight:800"></output></div><p class="muted" style="margin:8px 0 0">Si la hora final es anterior a la inicial, se interpreta como el día siguiente.</p></div><div class="field"><label>Descripción / seguimiento</label><textarea id="prNotes"></textarea></div><div class="row"><button class="btn primary" id="prSave">Guardar</button><button class="btn" id="prCopy">Copiar ficha</button><button class="btn bad" id="prUndo">Deshacer último</button></div></div><div class="card"><h3>Resultado</h3><div id="prKpis" class="grid g3"></div><div id="prPreview" class="notice" style="white-space:pre-wrap;margin-top:12px;min-height:210px"></div></div></div>
  <div class="card" style="margin-top:16px"><h3>Historial PIS-REP</h3><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Código</th><th>Evento</th><th>Prioridad</th><th>Respuesta</th><th>Ubicación</th></tr></thead><tbody id="prHistory"></tbody></table></div></div>
 </section>
 
@@ -5359,7 +5359,7 @@ async function loadDocs(){
       if(mime.startsWith('image/')){const img=document.createElement('img');img.src=url;img.alt=x.filename||'Imagen';img.style.cssText='max-width:100%;max-height:68vh;object-fit:contain';content.append(img)}
       else if(mime==='application/pdf'){const frame=document.createElement('iframe');frame.title=x.filename||'PDF';frame.src=url;frame.style.cssText='width:100%;height:65vh;border:0;background:white';content.append(frame)}
       else {const notice=document.createElement('p');notice.textContent='Este formato no tiene vista previa integrada.';content.append(notice)}
-      const link=document.createElement('a');link.href=url;link.download=x.filename||'archivo';link.textContent='Descargar archivo';link.style.margin='12px';content.append(link)
+      /* MODIFICADO: el visor no añade el enlace de descarga de CCTT; se conserva la vista previa. */
     }catch(error){if(overlay.isConnected)content.textContent='No fue posible visualizar el archivo: '+(error?.message||error)}
    };
    b.onclick=async()=>{const r=await client().storage.from('cctt-comunicados').createSignedUrl(x.file_path,90);if(r.error){msg('No se pudo abrir el archivo: '+r.error.message,true);return}window.open(r.data.signedUrl,'_blank','noopener')};td.append(view,document.createTextNode(' '),b);tr.append(td);
@@ -6835,9 +6835,12 @@ if(!offline)cacheSnapshot(module,init,rev);
 /* NUEVO: las capturas locales pendientes prevalecen visualmente y se reenvían solo si su versión base coincide. */
 /* MODIFICADO: no imponer sobre la configuración global un borrador de estructura creado contra una revisión anterior. Se conserva el borrador local para resolver el conflicto sin perderlo. */
 for(const draft of pendingFor(module)){
- const structureKey=module==='controlTerminales'?'terminales_layout_v1':null;
- if(draft.key===structureKey&&Object.prototype.hasOwnProperty.call(rev,draft.key)&&String(draft.expected)!==String(rev[draft.key])){
-  show('Existe una configuración local de Terminales pendiente y distinta de la revisión compartida. Se muestra la configuración de Supabase; el borrador local se conserva sin aplicarse.');
+ /* MODIFICADO: las configuraciones visuales publicadas prevalecen para todos los usuarios;
+    sus borradores de estructura permanecen en este dispositivo sin aplicarse a la vista global. */
+ const sharedViewKey=(module==='controlTerminales'&&draft.key==='terminales_layout_v1')||
+   (module==='conteos'&&/layout|config|visible|carril/i.test(draft.key));
+ if(sharedViewKey&&Object.prototype.hasOwnProperty.call(rev,draft.key)){
+  show('Se muestra la distribución compartida de Supabase. La configuración local pendiente se conserva para conciliación.');
   continue;
  }
  init[draft.key]=draft.value;
@@ -7132,4 +7135,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 // NUEVO: limpiar exclusivamente los parámetros creados por el detector anterior, conservando los demás y sin recargar.
 try{const u=new URL(location.href);if(u.searchParams.has('cctt_version')||u.searchParams.has('cctt_check')){u.searchParams.delete('cctt_version');u.searchParams.delete('cctt_check');history.replaceState(history.state,'',u.href)}}catch(_e){}
 })();</script>
+<!-- NUEVO: cálculo local de duración PIS-REP; no escribe datos ni cambia los campos Inicio/Fin existentes. -->
+<script id="ccttPisrepTimeCalculatorLogic">(()=>{'use strict';const a=document.getElementById('ccttPisrepCalcStart'),b=document.getElementById('ccttPisrepCalcEnd'),button=document.getElementById('ccttPisrepCalcButton'),result=document.getElementById('ccttPisrepCalcResult');if(!a||!b||!button||!result)return;const calculate=()=>{if(!a.value||!b.value){result.textContent='Indica ambas horas.';return}const parse=value=>{const [h,m]=value.split(':').map(Number);return h*60+m};const minutes=(parse(b.value)-parse(a.value)+1440)%1440;result.textContent=Math.floor(minutes/60)+' h '+String(minutes%60).padStart(2,'0')+' min'};button.addEventListener('click',calculate);a.addEventListener('input',()=>result.textContent='');b.addEventListener('input',()=>result.textContent='')})();</script>
 </body></html>
