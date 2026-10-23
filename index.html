@@ -1482,7 +1482,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <div class="grid g2"><div class="card"><h3>Nuevo proceso</h3><div class="grid g2"><div class="field"><label>Entidad</label><input id="pdfEntity" value="COPOMA"></div><div class="field"><label>Nombre de quien realiza</label><input id="pdfUser"></div><div class="field"><label>Fecha</label><input id="pdfDate" type="date"></div><div class="field"><label>Archivo(s)</label><input id="pdfFiles" type="file" multiple accept=".pdf,image/*"></div></div><div class="notice" style="margin-top:10px">Como en la macro: seleccione un único PDF, o varias imágenes. No se mezclan PDF e imágenes en el mismo proceso.</div><div class="row" style="margin-top:10px"><button class="btn primary" id="pdfProcess">Procesar imagen / PDF</button><button class="btn" id="pdfUndo">Deshacer último cambio</button></div></div><div class="card"><h3>Conversor PDF → imagen</h3><p class="muted">El libro original generaba una vista JPEG. En navegador, un PDF cargado se abre/descarga directamente; las imágenes seleccionadas sí se combinan en un PDF generado por este sitio.</p><div id="pdfLatest" class="empty">Sin proceso reciente.</div></div></div>
  <!-- MODIFICADO: ocultar historial privado; los registros nuevos aparecen en Comunicados compartidos. --><div class="card" style="display:none" aria-hidden="true"><h3>Historial de datos</h3><div class="table-wrap"><table class="tbl"><thead><tr><th>ID proceso</th><th>Fecha registro</th><th>Entidad</th><th>Usuario</th><th>Archivo PDF</th></tr></thead><tbody id="pdfTable"></tbody></table></div></div>
 <!-- NUEVO: historial global de documentos publicados. -->
-<div class="card" style="margin-top:16px" id="ccttSharedPdfPanel"><div class="row"><h3 style="margin:0">Comunicados compartidos</h3><button class="btn" type="button" id="ccttRefreshPdfs">Actualizar</button><!-- NUEVO: exportación de relación de comunicados y respaldos originales. --><button class="btn" type="button" id="ccttExportPdfs">Exportar Excel y archivos</button></div><p class="muted" id="ccttSharedPdfStatus">Consultando documentos.</p><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Entidad</th><th>Usuario</th><th>Documento</th><th>Archivo</th><!-- NUEVO: acciones para documentos publicados. --><th>Acciones</th></tr></thead><tbody id="ccttSharedPdfBody"></tbody></table></div></div>
+<div class="card" style="margin-top:16px" id="ccttSharedPdfPanel"><div class="row"><h3 style="margin:0">Comunicados compartidos</h3><button class="btn" type="button" id="ccttRefreshPdfs"><!-- MODIFICADO --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.4 6M20 4v7h-7"/></svg> Actualizar</button><!-- NUEVO: exportación de relación de comunicados y respaldos originales. --><button class="btn" type="button" id="ccttExportPdfs">Exportar Excel y archivos</button></div><p class="muted" id="ccttSharedPdfStatus">Consultando documentos.</p><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Entidad</th><th>Usuario</th><th>Documento</th><th>Archivo</th><!-- NUEVO: acciones para documentos publicados. --><th>Acciones</th></tr></thead><tbody id="ccttSharedPdfBody"></tbody></table></div></div>
 </section>
 <section class="page" id="page-mensajes">
  <div class="section-title"><h2>Registro de mensajes y comunicados</h2><!-- NUEVO --><span class="cctt-msg-product-tag">CCTT Sistema Central</span></div>
@@ -1556,8 +1556,8 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
   <div class="card"><h3>Vista previa WhatsApp</h3>
 <!-- NUEVO: selección de formato sin cambiar el selector original ni su ID. -->
 <div class="row cctt-copy-format" role="group" aria-label="Formato de copia del sobrevuelo">
-<button class="btn primary" type="button" id="droneFormatStars" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/></svg>Con asteriscos</button>
-<button class="btn" type="button" id="droneFormatPlain" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h12M4 18h9"/></svg>Texto plano</button></div><p class="muted">Revisa la redacción antes de copiar. Los nombres propios y las siglas se conservan cuando están reconocidos.</p><pre id="dronePreview" class="notice" aria-live="polite"></pre><div class="row" style="margin-top:12px"><button class="btn primary" type="button" id="droneCopyBottom">Copiar</button></div></div>
+<button class="btn primary" type="button" id="droneFormatStars" aria-pressed="true"><!-- MODIFICADO: símbolo SVG específico, sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/><circle cx="12" cy="12" r="2"/></svg>Con asteriscos</button>
+<button class="btn" type="button" id="droneFormatPlain" aria-pressed="false"><!-- MODIFICADO: símbolo SVG específico, sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M3 9h18M3 13h11M3 17h18M3 21h11"/></svg>Texto plano</button></div><p class="muted">Revisa la redacción antes de copiar. Los nombres propios y las siglas se conservan cuando están reconocidos.</p><pre id="dronePreview" class="notice" aria-live="polite"></pre><div class="row" style="margin-top:12px"><button class="btn primary" type="button" id="droneCopyBottom">Copiar</button></div></div>
  </div>
 </section>
 
@@ -1578,7 +1578,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 <datalist id="ambSugUbicacion"></datalist><datalist id="ambSugMotivo"></datalist><datalist id="ambSugEmpresa"></datalist>
 <div class="row" style="margin-top:14px"><button class="btn" type="button" id="ambGuardarSug">Guardar sugerencias</button><button class="btn" type="button" id="ambGestionSug">Administrar sugerencias</button></div>
 <div id="ambGestor" hidden><h3>Sugerencias existentes</h3><div id="ambListaSug"></div></div>
-</div><div class="card"><h3>Vista previa WhatsApp</h3><div class="row" role="group" aria-label="Formato de copia"><button id="ambFormatoA" class="btn primary" type="button" aria-pressed="true"><!-- MODIFICADO: SVG de formato sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8zM19 17v5M16.5 19.5h5"/></svg>Con asteriscos</button><button id="ambFormatoP" class="btn" type="button" aria-pressed="false"><!-- MODIFICADO: SVG de formato sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 10h16M4 15h12M4 20h8"/></svg>Texto plano</button></div>
+</div><div class="card"><h3>Vista previa WhatsApp</h3><div class="row" role="group" aria-label="Formato de copia"><button id="ambFormatoA" class="btn primary" type="button" aria-pressed="true"><!-- MODIFICADO: símbolo SVG específico, sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M3.34 7l17.32 10M3.34 17 20.66 7"/></svg>Con asteriscos</button><button id="ambFormatoP" class="btn" type="button" aria-pressed="false"><!-- MODIFICADO: símbolo SVG específico, sin palomita. --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M4 10h12M4 15h16M4 20h10"/></svg>Texto plano</button></div>
 <p class="muted">La vista previa no se envía automáticamente a WhatsApp.</p><pre id="ambPreview" aria-live="polite"></pre><div class="row"><button id="ambCopiar" class="btn primary" type="button">Copiar reporte</button></div><p class="muted" id="ambEstado" aria-live="polite"></p></div></div>
 </section>
 
@@ -6881,6 +6881,30 @@ function renderSuggestions(){for(const [id,items]of Object.entries(suggestions))
 function save(){try{localStorage.setItem(key,JSON.stringify(suggestions));$('ambEstado').textContent='Sugerencias guardadas en este dispositivo.'}catch(e){$('ambEstado').textContent='No se pudieron guardar las sugerencias.'}renderSuggestions()}
 $('ambGuardarSug').onclick=()=>{for(const id of Object.keys(suggestions)){const v=clean($(id).value);if(v&&v.length<=200&&!suggestions[id].includes(v))suggestions[id].push(v)}save()};$('ambGestionSug').onclick=()=>{$('ambGestor').hidden=!$('ambGestor').hidden;renderSuggestions()};
 refresh();renderSuggestions();
+})();
+</script>
+
+<!-- NUEVO: iconos exclusivos de los controles del registro de comunicados. -->
+<style id="ccttComunicadosActionIcons">
+#ccttSharedPdfPanel #ccttRefreshPdfs,#ccttSharedPdfBody button{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+#ccttSharedPdfPanel #ccttRefreshPdfs svg,#ccttSharedPdfBody button svg{display:inline-block;width:16px;height:16px;flex:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;fill:none}
+#page-atencionAmbulancia #ambFormatoA svg,#page-atencionAmbulancia #ambFormatoP svg,#page-sobrevueloDron #droneFormatStars svg,#page-sobrevueloDron #droneFormatPlain svg{display:inline-block!important;visibility:visible!important;opacity:1!important;width:18px!important;height:18px!important;stroke:currentColor!important;stroke-width:2!important;fill:none!important}
+</style>
+<script id="ccttComunicadosActionSvg">
+(()=>{'use strict';
+// NUEVO: incorporar solo iconos; conservar textos, listeners y permisos actuales.
+const paths={editar:'<path d="M4 20h4l11-11-4-4L4 16v4zM13 7l4 4"/>',eliminar:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',actualizar:'<path d="M20 11a8 8 0 1 0-2.4 6M20 4v7h-7"/>'};
+function apply(){const root=document.getElementById('ccttSharedPdfBody');if(!root)return;
+ for(const button of root.querySelectorAll('button')){
+  const label=(button.textContent||'').trim().toLowerCase();
+  const type=/editar|modificar/.test(label)?'editar':/eliminar|borrar/.test(label)?'eliminar':/actualizar/.test(label)?'actualizar':null;
+  if(!type||button.querySelector('svg[data-cctt-action-icon]'))continue;
+  const node=document.createElementNS('http://www.w3.org/2000/svg','svg');node.setAttribute('viewBox','0 0 24 24');node.setAttribute('aria-hidden','true');node.setAttribute('data-cctt-action-icon',type);
+  node.innerHTML=paths[type];button.prepend(node);
+ }
+}
+function init(){const root=document.getElementById('ccttSharedPdfBody');if(!root)return;const observer=new MutationObserver(apply);observer.observe(root,{childList:true,subtree:true});apply()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
 </body></html>
