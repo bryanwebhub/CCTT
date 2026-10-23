@@ -1482,7 +1482,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <div class="grid g2"><div class="card"><h3>Nuevo proceso</h3><div class="grid g2"><div class="field"><label>Entidad</label><input id="pdfEntity" value="COPOMA"></div><div class="field"><label>Nombre de quien realiza</label><input id="pdfUser"></div><div class="field"><label>Fecha</label><input id="pdfDate" type="date"></div><div class="field"><label>Archivo(s)</label><input id="pdfFiles" type="file" multiple accept=".pdf,image/*"></div></div><div class="notice" style="margin-top:10px">Como en la macro: seleccione un único PDF, o varias imágenes. No se mezclan PDF e imágenes en el mismo proceso.</div><div class="row" style="margin-top:10px"><button class="btn primary" id="pdfProcess">Procesar imagen / PDF</button><button class="btn" id="pdfUndo">Deshacer último cambio</button></div></div><div class="card"><h3>Conversor PDF → imagen</h3><p class="muted">El libro original generaba una vista JPEG. En navegador, un PDF cargado se abre/descarga directamente; las imágenes seleccionadas sí se combinan en un PDF generado por este sitio.</p><div id="pdfLatest" class="empty">Sin proceso reciente.</div></div></div>
  <!-- MODIFICADO: ocultar historial privado; los registros nuevos aparecen en Comunicados compartidos. --><div class="card" style="display:none" aria-hidden="true"><h3>Historial de datos</h3><div class="table-wrap"><table class="tbl"><thead><tr><th>ID proceso</th><th>Fecha registro</th><th>Entidad</th><th>Usuario</th><th>Archivo PDF</th></tr></thead><tbody id="pdfTable"></tbody></table></div></div>
 <!-- NUEVO: historial global de documentos publicados. -->
-<div class="card" style="margin-top:16px" id="ccttSharedPdfPanel"><div class="row"><h3 style="margin:0">Comunicados compartidos</h3><button class="btn" type="button" id="ccttRefreshPdfs"><!-- MODIFICADO --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.4 6M20 4v7h-7"/></svg> Actualizar</button><!-- NUEVO: exportación de relación de comunicados y respaldos originales. --><button class="btn" type="button" id="ccttExportPdfs">Exportar Excel y archivos</button></div><p class="muted" id="ccttSharedPdfStatus">Consultando documentos.</p><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Entidad</th><th>Usuario</th><th>Documento</th><th>Archivo</th><!-- NUEVO: acciones para documentos publicados. --><th>Acciones</th></tr></thead><tbody id="ccttSharedPdfBody"></tbody></table></div></div>
+<div class="card" style="margin-top:16px" id="ccttSharedPdfPanel"><div class="row"><h3 style="margin:0">Comunicados compartidos</h3><button class="btn" type="button" id="ccttRefreshPdfs"><!-- MODIFICADO --><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.4 6M20 4v7h-7"/></svg> Actualizar</button><!-- NUEVO: exportación de relación de comunicados y respaldos originales. --><button class="btn" type="button" id="ccttExportPdfs"><!-- MODIFICADO -->Exportar Excel con objetos</button></div><p class="muted" id="ccttSharedPdfStatus">Consultando documentos.</p><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Entidad</th><th>Usuario</th><th>Documento</th><th>Archivo</th><!-- NUEVO: acciones para documentos publicados. --><th>Acciones</th></tr></thead><tbody id="ccttSharedPdfBody"></tbody></table></div></div>
 </section>
 <section class="page" id="page-mensajes">
  <div class="section-title"><h2>Registro de mensajes y comunicados</h2><!-- NUEVO --><span class="cctt-msg-product-tag">CCTT Sistema Central</span></div>
@@ -6771,44 +6771,116 @@ if(page.classList.contains('active'))open('conteos');
 })();
 </script>
 
-<!-- NUEVO: exportación de todos los comunicados en XLSX con documentos originales adjuntos en un ZIP. No se alteran los registros. -->
+<!-- MODIFICADO: exportación única XLSX: imágenes visibles y PDF empaquetados en objetos OLE Windows, sin archivos externos. -->
 <script id="ccttSharedPdfsXlsxExport">
 (()=>{
+ 'use strict';
  const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
- const col=n=>{let z='';for(n++;n;n=Math.floor((n-1)/26))z=String.fromCharCode(65+(n-1)%26)+z;return z};
+ const col=n=>{let s='';for(++n;n;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s};
+ const relNS='http://schemas.openxmlformats.org/package/2006/relationships';
+ const rOffice='http://schemas.openxmlformats.org/officeDocument/2006/relationships/';
+ const u8=s=>new TextEncoder().encode(s);
+ const put32=(v,p,x)=>new DataView(v.buffer,v.byteOffset,v.byteLength).setUint32(p,x>>>0,true);
+ const put16=(v,p,x)=>new DataView(v.buffer,v.byteOffset,v.byteLength).setUint16(p,x,true);
+ const concat=(...xs)=>{const out=new Uint8Array(xs.reduce((a,b)=>a+b.length,0));let o=0;for(const x of xs){out.set(x,o);o+=x.length}return out};
+ /* NUEVO: archivo OLE de sectores de 512 bytes, sin biblioteca externa; el PDF permanece en Ole10Native. */
+ function olePackage(fileBytes,filename){
+  const cstr=t=>concat(u8(t),new Uint8Array([0]));
+  const base=filename.replace(/[^a-zA-Z0-9._-]/g,'_').slice(0,115)||'comunicado.pdf';
+  const nativePayload=concat(new Uint8Array([2,0,0,0]),cstr(base),cstr('C:\\'+base),new Uint8Array(4),cstr('C:\\'+base),new Uint8Array(4),fileBytes);
+  put32(nativePayload,nativePayload.length-fileBytes.length-4,fileBytes.length);
+  const native=concat(new Uint8Array(4),nativePayload);put32(native,0,nativePayload.length);
+  const ole=new Uint8Array(20);put32(ole,0,0x02000001);put32(ole,4,2);
+  const comp=concat(new Uint8Array([1,0,254,255,3,10,0,0,255,255,255,255,0,0,0,0]),u8('Package\0'),new Uint8Array(32));
+  const info=new Uint8Array([0,0,3,0,13,0]);
+  const streams=[['\u0001Ole10Native',native],['\u0001Ole',ole],['\u0001CompObj',comp],['\u0003ObjInfo',info]];
+  // Allocate at least 4096 bytes for each stream to avoid MiniFAT (CFB standard cutoff).
+  const blocks=streams.map(([,bytes])=>Math.ceil(Math.max(bytes.length,4096)/512));
+  const dataN=blocks.reduce((a,b)=>a+b,0),dirN=2;
+  let fatN=1, difN=0;
+  while(true){const total=dataN+dirN+fatN+difN;const nf=Math.ceil(total/128),nd=nf>109?Math.ceil((nf-109)/127):0;if(nf===fatN&&nd===difN)break;fatN=nf;difN=nd}
+  const total=dataN+dirN+fatN+difN,all=new Uint8Array((total+1)*512),head=all.subarray(0,512);
+  head.set([208,207,17,224,161,177,26,225]);put16(head,24,0x3e);put16(head,26,3);put16(head,28,0xfffe);put16(head,30,9);put16(head,32,6);put32(head,44,fatN);put32(head,48,dataN);put32(head,56,4096);put32(head,60,0xfffffffe);put32(head,64,0);put32(head,68,difN?dataN+dirN+fatN:0xfffffffe);put32(head,72,difN);
+  const fat=new Uint32Array(fatN*128);fat.fill(0xffffffff);
+  let sector=0;const firsts=[];
+  streams.forEach(([name,bytes],i)=>{firsts.push(sector);const n=blocks[i];all.set(bytes,512*(sector+1));for(let j=0;j<n;j++)fat[sector+j]=j===n-1?0xfffffffe:sector+j+1;sector+=n});
+  const dirSector=sector;fat[sector++]=sector;fat[sector++]=0xfffffffe;
+  const fatStart=sector;for(let i=0;i<fatN;i++)fat[sector++]=0xfffffffd;
+  const difStart=sector;for(let i=0;i<difN;i++)fat[sector++]=0xfffffffc;
+  for(let i=0;i<fatN*128;i++)put32(all,512*(fatStart+1)+i*4,fat[i]);
+  for(let i=0;i<109;i++)put32(head,76+i*4,i<fatN?fatStart+i:0xffffffff);
+  for(let j=0;j<difN;j++){const offset=(difStart+j+1)*512;for(let k=0;k<127;k++){const index=109+j*127+k;put32(all,offset+k*4,index<fatN?fatStart+index:0xffffffff)}put32(all,offset+508,j===difN-1?0xfffffffe:difStart+j+1)}
+  const dir=all.subarray(512*(dirSector+1),512*(dirSector+3));
+  const directory=(idx,name,type,start,size,left=0xffffffff,right=0xffffffff,child=0xffffffff)=>{
+   const off=idx*128,nm=new Uint8Array(64);for(let k=0;k<Math.min(name.length,31);k++)put16(nm,k*2,name.charCodeAt(k));dir.set(nm,off);put16(dir,off+64,Math.min(name.length+1,32)*2);dir[off+66]=type;dir[off+67]=1;put32(dir,off+68,left);put32(dir,off+72,right);put32(dir,off+76,child);put32(dir,off+116,start);put32(dir,off+120,size);put32(dir,off+124,0)
+  };
+  directory(0,'Root Entry',5,0xfffffffe,0,0xffffffff,0xffffffff,1);
+  // Directory sibling binary search tree of four streams.
+  directory(1,streams[0][0],2,firsts[0],blocks[0]*512,2,3);
+  directory(2,streams[1][0],2,firsts[1],blocks[1]*512);
+  directory(3,streams[2][0],2,firsts[2],blocks[2]*512,0xffffffff,4);
+  directory(4,streams[3][0],2,firsts[3],blocks[3]*512);
+  return all;
+ }
  function cell(ref,value){return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${esc(value)}</t></is></c>`}
- function buildWorkbook(entries){
-  const headers=['Fecha','Entidad','Usuario','Documento','Tipo','Abrir archivo','Estado'];
-  const rows=[headers,...entries.map(e=>[e.row.document_date,e.row.entity,e.row.author,e.row.filename,e.type,e.link,e.row.note?.toLowerCase().includes('emparejamiento por confirmar')?'Pendiente':''])];
-  const xmlRows=rows.map((arr,i)=>`<row r="${i+1}">${arr.map((v,j)=>cell(`${col(j)}${i+1}`,v)).join('')}</row>`).join('');
-  const links=entries.map((e,i)=>`<hyperlink ref="F${i+2}" r:id="rId${i+1}"/>`).join('');
-  const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><cols><col min="1" max="1" width="17" customWidth="1"/><col min="2" max="3" width="25" customWidth="1"/><col min="4" max="4" width="38" customWidth="1"/><col min="5" max="5" width="15" customWidth="1"/><col min="6" max="6" width="42" customWidth="1"/><col min="7" max="7" width="18" customWidth="1"/></cols><sheetData>${xmlRows}</sheetData><hyperlinks>${links}</hyperlinks></worksheet>`;
-  const rels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${entries.map((e,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="${esc(e.link)}" TargetMode="External"/>`).join('')}</Relationships>`;
-  const z=new JSZip();z.file('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`);
-  z.file('_rels/.rels',`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`);
-  z.file('xl/workbook.xml',`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Comunicados" sheetId="1" r:id="rId1"/></sheets></workbook>`);
-  z.file('xl/_rels/workbook.xml.rels',`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`);
-  z.file('xl/worksheets/sheet1.xml',sheet);z.file('xl/worksheets/_rels/sheet1.xml.rels',rels);
+ const anchor=(row,colIndex,width=1,height=1)=>`<xdr:from><xdr:col>${colIndex}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${row}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from><xdr:to><xdr:col>${colIndex+width}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${row+height}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>`;
+ async function buildWorkbook(entries){
+  const z=new JSZip(),images=[],pdfs=[];
+  const headers=['Fecha','Entidad','Usuario','Documento','Tipo','Adjunto incrustado','Estado'];
+  const rows=[headers,...entries.map(e=>[e.row.document_date,e.row.entity,e.row.author,e.row.filename,e.type,e.bytes?'Ver objeto incrustado':'Archivo no disponible',e.row.note?.toLowerCase().includes('emparejamiento por confirmar')?'Pendiente':''])];
+  const xmlRows=rows.map((a,i)=>`<row r="${i+1}"${i?' ht="92" customHeight="1"':''}>${a.map((v,j)=>cell(`${col(j)}${i+1}`,v)).join('')}</row>`).join('');
+  const sheetRels=[],drawingRels=[],drawParts=[],oleParts=[];
+  let pictureId=0,objectId=1025;
+  for(let i=0;i<entries.length;i++){
+   const e=entries[i];if(!e.bytes)continue;
+   const ri=i+1; // zero-based anchor row; first data row is Excel row 2
+   if(e.type==='Imagen'){
+    let bytes=e.bytes,mime=e.mime;
+    if(!['image/png','image/jpeg'].includes(mime)){
+     // Browser conversion for WEBP/GIF. Preserve original bytes of stored records.
+     const bitmap=await createImageBitmap(new Blob([bytes],{type:mime}));const c=document.createElement('canvas');c.width=bitmap.width;c.height=bitmap.height;c.getContext('2d').drawImage(bitmap,0,0);bytes=new Uint8Array(await (await new Promise(resolve=>c.toBlob(resolve,'image/png'))).arrayBuffer());mime='image/png';bitmap.close?.();
+    }
+    const n=++pictureId,ext=mime==='image/png'?'png':'jpeg';z.file(`xl/media/image${n}.${ext}`,bytes);
+    drawingRels.push(`<Relationship Id="rId${n}" Type="${rOffice}image" Target="../media/image${n}.${ext}"/>`);
+    drawParts.push(`<xdr:twoCellAnchor editAs="oneCell">${anchor(ri,5,1,1)}<xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${n}" name="Imagen ${n}"/><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId${n}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor>`);
+   }else if(e.type==='PDF'){
+    const n=pdfs.length+1,shape=++objectId,objectRel=`rIdOle${n}`;
+    z.file(`xl/embeddings/oleObject${n}.bin`,olePackage(e.bytes,e.row.filename||`Comunicado_${n}.pdf`));
+    pdfs.push({n,shape,row:ri,objectRel});
+    sheetRels.push(`<Relationship Id="${objectRel}" Type="${rOffice}oleObject" Target="../embeddings/oleObject${n}.bin"/>`);
+    drawParts.push(`<xdr:twoCellAnchor editAs="oneCell">${anchor(ri,5,1,1)}<xdr:sp><xdr:nvSpPr><xdr:cNvPr id="${shape}" name="PDF ${n}"/><xdr:cNvSpPr/></xdr:nvSpPr><xdr:spPr><a:prstGeom prst="roundRect"><a:avLst/></a:prstGeom><a:solidFill><a:srgbClr val="E8EDF6"/></a:solidFill><a:ln><a:solidFill><a:srgbClr val="A32B40"/></a:solidFill></a:ln></xdr:spPr><xdr:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="es-MX"/><a:t>PDF · Abrir objeto</a:t></a:r></a:p></xdr:txBody></xdr:sp><xdr:clientData/></xdr:twoCellAnchor>`);
+    oleParts.push(`<oleObject progId="Package" shapeId="${shape}" r:id="${objectRel}"/>`);
+   }
+  }
+  const hasDrawing=drawParts.length>0;
+  if(hasDrawing){sheetRels.push(`<Relationship Id="rIdDrawing" Type="${rOffice}drawing" Target="../drawings/drawing1.xml"/>`);
+   z.file('xl/drawings/drawing1.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">${drawParts.join('')}</xdr:wsDr>`);
+   if(drawingRels.length)z.file('xl/drawings/_rels/drawing1.xml.rels',`<?xml version="1.0"?><Relationships xmlns="${relNS}">${drawingRels.join('')}</Relationships>`);
+  }
+  const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="${rOffice}" xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"><cols><col min="1" max="1" width="18" customWidth="1"/><col min="2" max="3" width="25" customWidth="1"/><col min="4" max="4" width="35" customWidth="1"/><col min="5" max="5" width="15" customWidth="1"/><col min="6" max="6" width="30" customWidth="1"/><col min="7" max="7" width="20" customWidth="1"/></cols><sheetData>${xmlRows}</sheetData>${hasDrawing?'<drawing r:id="rIdDrawing"/>':''}${oleParts.length?`<oleObjects>${oleParts.join('')}</oleObjects>`:''}</worksheet>`;
+  z.file('[Content_Types].xml',`<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>${hasDrawing?'<Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>':''}${pdfs.map(p=>`<Override PartName="/xl/embeddings/oleObject${p.n}.bin" ContentType="application/vnd.openxmlformats-officedocument.oleObject"/>`).join('')}</Types>`);
+  z.file('_rels/.rels',`<?xml version="1.0"?><Relationships xmlns="${relNS}"><Relationship Id="rId1" Type="${rOffice}officeDocument" Target="xl/workbook.xml"/></Relationships>`);
+  z.file('xl/workbook.xml',`<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="${rOffice}"><sheets><sheet name="Comunicados" sheetId="1" r:id="rId1"/></sheets></workbook>`);
+  z.file('xl/_rels/workbook.xml.rels',`<?xml version="1.0"?><Relationships xmlns="${relNS}"><Relationship Id="rId1" Type="${rOffice}worksheet" Target="worksheets/sheet1.xml"/></Relationships>`);
+  z.file('xl/worksheets/sheet1.xml',sheet);
+  if(sheetRels.length)z.file('xl/worksheets/_rels/sheet1.xml.rels',`<?xml version="1.0"?><Relationships xmlns="${relNS}">${sheetRels.join('')}</Relationships>`);
   return z.generateAsync({type:'blob',compression:'DEFLATE'});
  }
  function save(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},5000)}
  async function run(){const b=document.getElementById('ccttExportPdfs');if(!b||b.disabled)return;b.disabled=true;const original=b.textContent;b.textContent='Preparando exportación…';
-  try{if(typeof JSZip==='undefined'||typeof window.ccttSupabaseClient==='undefined')throw Error('El servicio de archivos no está disponible.');
-   const sb=window.ccttSupabaseClient;
-   const {data:rows,error}=await sb.from('cctt_shared_documents').select('*').order('created_at',{ascending:false});if(error)throw error;
-   if(!rows?.length)throw Error('No hay comunicados para exportar.');
-   const zip=new JSZip(),entries=[];
-   for(let i=0;i<rows.length;i++){
-    const r=rows[i],name=String(r.filename||`comunicado-${i+1}`).replace(/[\\/:*?"<>|\x00-\x1f]/g,'_');
-    const ext=(name.split('.').pop()||'').toLowerCase(),type=ext==='pdf'?'PDF':(['jpg','jpeg','png','gif','webp'].includes(ext)?'Imagen':'Archivo');
-    const path=`Archivos/${String(i+1).padStart(4,'0')}_${name}`;
-    const {data:file,error:fileError}=await sb.storage.from('cctt-comunicados').download(r.file_path);
-    if(fileError||!file){entries.push({row:r,type,link:'No disponible'});continue}
-    zip.file(path,file);entries.push({row:r,type,link:path});
+  try{if(typeof JSZip==='undefined'||!window.ccttSupabaseClient)throw Error('El servicio de archivos no está disponible.');
+   const sb=window.ccttSupabaseClient,entries=[];let from=0;const batch=500;
+   while(true){const {data,error}=await sb.from('cctt_shared_documents').select('*').order('created_at',{ascending:false}).range(from,from+batch-1);if(error)throw error;if(!data?.length)break;entries.push(...data.map(row=>({row})));if(data.length<batch)break;from+=batch}
+   if(!entries.length)throw Error('No hay comunicados para exportar.');
+   for(let i=0;i<entries.length;i++){
+    const e=entries[i],name=String(e.row.filename||`comunicado-${i+1}`),ext=name.split('.').pop().toLowerCase();e.type=ext==='pdf'?'PDF':(['jpg','jpeg','png','gif','webp'].includes(ext)?'Imagen':'Archivo');
+    if(!['PDF','Imagen'].includes(e.type))continue;
+    const {data,error}=await sb.storage.from('cctt-comunicados').download(e.row.file_path);
+    if(error||!data){e.error=true;continue}
+    e.bytes=new Uint8Array(await data.arrayBuffer());e.mime=ext==='jpg'?'image/jpeg':`image/${ext}`;
    }
-   zip.file('Comunicados.xlsx',await buildWorkbook(entries));
-   save(await zip.generateAsync({type:'blob',compression:'DEFLATE'}),'CCTT_Comunicados_Expediente.zip');
-   if(entries.some(e=>e.link==='No disponible')){if(typeof ccttSiteNotice==='function')ccttSiteNotice('Algunos archivos no pudieron recuperarse. Revisa la columna Abrir archivo.');}
+   if(entries.some(e=>e.error))throw Error('Hay adjuntos que no se pudieron recuperar. No se generó una exportación incompleta.');
+   const workbook=await buildWorkbook(entries);save(workbook,'CCTT_Comunicados_Objetos.xlsx');
   }catch(e){console.error('Exportación comunicados',e);if(typeof ccttSiteNotice==='function')ccttSiteNotice('No se pudo exportar: '+e.message)}finally{b.disabled=false;b.textContent=original}
  }
  function bind(){document.getElementById('ccttExportPdfs')?.addEventListener('click',run)}
