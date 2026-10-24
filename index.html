@@ -6728,6 +6728,20 @@ const draftPrefix=()=> 'cctt-counts-pending-v1:'+currentUserId+':';
 const snapshotKey=module=>'cctt-counts-snapshot-v1:'+currentUserId+':'+module;
 function cacheSnapshot(module,init,rev){try{localStorage.setItem(snapshotKey(module),JSON.stringify({values:init,revisions:rev}))}catch(e){console.warn('No se pudo conservar la copia de la jornada',e)}}
 function readSnapshot(module){try{return JSON.parse(localStorage.getItem(snapshotKey(module))||'null')}catch{return null}}
+/* NUEVO: migración única por cuenta: retirar solamente borradores de prueba antiguos de Carriles y Terminales. No afecta datos compartidos, otras cuentas ni capturas creadas después de esta migración. */
+function ccttResetOldCountDraftsOnce(){
+ if(!currentUserId)return;
+ const marker='cctt-counts-old-drafts-cleared-v1:'+currentUserId;
+ try{
+  if(localStorage.getItem(marker)==='1')return;
+  const prefixes=[draftPrefix()+'conteos:',draftPrefix()+'controlTerminales:'];
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&prefixes.some(prefix=>key.startsWith(prefix)))keys.push(key)}
+  for(const key of keys)localStorage.removeItem(key);
+  localStorage.setItem(marker,'1');
+  if(keys.length)show('Se descartaron '+keys.length+' borrador(es) de pruebas anteriores de Conteos. Se consultará la vista compartida.');
+ }catch(error){console.warn('No se pudo terminar la limpieza de borradores antiguos de Conteos:',error);show('No se pudo completar la limpieza local de Conteos. Se conservarán las capturas existentes.')}
+}
 const draftKey=(module,key)=>draftPrefix()+module+':'+key;
 function readDraft(module,key){try{return JSON.parse(localStorage.getItem(draftKey(module,key))||'null')}catch{return null}}
 function storeDraft(module,key,value){const existing=readDraft(module,key);const expected=existing?existing.expected:(revisions[module]?.[key]??0);try{localStorage.setItem(draftKey(module,key),JSON.stringify({value,expected,updated:Date.now()}));return true}catch(e){console.error('No se pudo guardar el borrador',e);return false}}
@@ -6835,7 +6849,7 @@ try{// MODIFICADO: usar la sesión vigente si el dispositivo no puede consultar 
 let user=null;
 if(navigator.onLine){try{const auth=await sb.auth.getUser();if(!auth.error)user=auth.data?.user||null;}catch(e){console.warn('No se pudo consultar la sesión',e)}}
 if(!user){const cachedSession=await sb.auth.getSession();user=cachedSession.data?.session?.user||null;}
-if(!user)throw Error('Debes iniciar sesión para usar el módulo');currentUserId=user.id;
+if(!user)throw Error('Debes iniciar sesión para usar el módulo');currentUserId=user.id;ccttResetOldCountDraftsOnce(); // NUEVO: migración controlada antes de cargar la cuadrícula.
 // MODIFICADO: declarar el modo sin conexión y recuperar la copia previa solo ante fallos de red.
 let offline=false;let data=[];let cached=null;
 try{
