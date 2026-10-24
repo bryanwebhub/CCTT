@@ -6759,8 +6759,14 @@ async function ccttReconcileCountsDrafts(module,remoteRows){
 async function syncPending(module){if(!navigator.onLine)return;const sb=getClient();if(!sb||!currentUserId)return;
 /* MODIFICADO: conciliar primero borradores ya idénticos a Supabase, sin sobrescribir revisiones. */
 /* MODIFICADO: detectar fallos de lectura sin ocultarlos al operador. */
-try{await ccttReconcileCountsDrafts(module)}catch(e){console.warn('No se pudo comparar la cola con Supabase:',e);show('Supabase no pudo consultar '+module+': '+String(e?.message||e).slice(0,230)+'. Los borradores siguen guardados.');return}
-for(const d of pendingFor(module)){const id=module+':'+d.key;if(queues[id])continue;try{const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:d.key,p_value:d.value,p_expected_revision:d.expected});if(error)throw Error(error.message);revisions[module][d.key]=data;const latest=readDraft(module,d.key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,d.key));notify(module,'saved');
+/* MODIFICADO: obtener la revisión vigente una sola vez y evitar reintentos automáticos de borradores en conflicto. */
+let remoteRows;
+try{const response=await sb.from('cctt_counts_state').select('storage_key,value_text,revision').eq('module',module);if(response.error)throw response.error;remoteRows=response.data||[];await ccttReconcileCountsDrafts(module,remoteRows)}catch(e){console.warn('No se pudo comparar la cola compartida:',e);show('No fue posible verificar los cambios compartidos. Tus borradores permanecen guardados.');return}
+const serverRevisions=new Map(remoteRows.map(r=>[r.storage_key,r.revision]));
+const incompatible=pendingFor(module).filter(d=>Number(d.expected)!==Number(serverRevisions.get(d.key)??0));
+if(incompatible.length){const keys=incompatible.map(d=>d.key).join(', ');show('Hay '+incompatible.length+' captura(s) con revisión distinta en '+module+' ('+keys+'). Se conservan sin sobrescribir la información compartida. Revisa las diferencias antes de volver a publicar.');}
+
+for(const d of pendingFor(module)){/* NUEVO: no intentar publicar un dato basado en una revisión obsoleta. */if(Number(d.expected)!==Number(serverRevisions.get(d.key)??0))continue;const id=module+':'+d.key;if(queues[id])continue;try{const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:d.key,p_value:d.value,p_expected_revision:d.expected});if(error)throw Error(error.message);revisions[module][d.key]=data;const latest=readDraft(module,d.key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,d.key));notify(module,'saved');
 /* NUEVO: después de confirmar en Supabase, comprobar también las revisiones compartidas. */
 if(!pendingFor(module).length&&loaded[module]&&active===module)void ccttRefreshSharedCounts(module)}catch(e){console.warn('Sincronización pendiente ('+id+')',e);/* MODIFICADO: identificar registro y error de Supabase sin perder el borrador. */show('Pendiente en '+module+' / '+d.key+' (revisión local '+d.expected+'): '+String(e?.message||e).slice(0,230)+'. Borrador conservado.');notify(module,'pending');break}}}
 window.addEventListener('online',()=>Object.keys(definitions).forEach(syncPending));
@@ -6907,6 +6913,12 @@ if(!storeDraft(module,key,msg.value??null)){notify(module,'error','Sin espacio p
 notify(module,'pending');
 /* El servidor conserva su control de versión y rechaza conflictos concurrentes. */
 const save=async()=>{if(!navigator.onLine)return;const sb=getClient();if(!sb)return;const d=readDraft(module,key);if(!d)return;
+/* NUEVO: comprobar la revisión antes de escribir; si otra sesión publicó cambios, mantener el borrador y no enviar una escritura conflictiva. */
+const check=await sb.from('cctt_counts_state').select('revision,value_text').eq('module',module).eq('storage_key',key).maybeSingle();
+if(check.error)throw check.error;
+if(ccttCountsEqualValue(d.value,check.data?.value_text)){const latest=readDraft(module,key);if(latest&&latest.updated===d.updated){localStorage.removeItem(draftKey(module,key));revisions[module][key]=check.data?.revision??0;notify(module,'saved')}return;}
+if(Number(d.expected)!==Number(check.data?.revision??0)){show('La captura de '+key+' fue conservada: otra sesión modificó esa información. No se ha sobrescrito.');return;}
+
 const {data,error}=await sb.rpc('cctt_save_count_state',{p_module:module,p_key:key,p_value:d.value,p_expected_revision:d.expected});
 if(error)throw Error(error.message);revisions[module][key]=data;const latest=readDraft(module,key);if(latest&&latest.updated===d.updated)localStorage.removeItem(draftKey(module,key));notify(module,'saved');
 /* NUEVO: refresco tras guardar la estructura o las jornadas, únicamente sin borradores pendientes. */
