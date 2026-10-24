@@ -1290,6 +1290,40 @@ html[data-cctt-scheme="dark"] body.cctt-authenticated .page :is(select,input,tex
 <!-- NUEVO: estabiliza la barra lateral durante la inicialización de temas y navegación. -->
 <style id="ccttSidebarReloadGuard">html:not(.cctt-sidebar-settled) .sidebar{visibility:hidden!important}html.cctt-sidebar-settled .sidebar{visibility:visible}</style>
 <script id="ccttSidebarReloadGuardLogic">(()=>{const settle=()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add('cctt-sidebar-settled')));if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',settle,{once:true});else settle()})();</script>
+
+<!-- NUEVO: ajustes exclusivos de cabecera/perfil, menú móvil e Inicio; colores del tema activo. -->
+<style id="ccttSurgicalNavigationVisualFixes">
+/* NUEVO: dimensiones uniformes de perfil y logotipo sin deformar los originales. */
+.topbar .profile-mini{flex:0 0 auto;min-width:0;align-items:center;gap:8px}
+.topbar #ccttProfileTrigger{flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;max-width:44px;max-height:44px;padding:2px;overflow:hidden}
+.topbar #miniAvatar{width:38px!important;height:38px!important;min-width:38px;min-height:38px;max-width:38px;max-height:38px;flex:0 0 38px;display:grid;place-items:center;overflow:hidden}
+.topbar #miniAvatar img{width:100%!important;height:100%!important;object-fit:cover!important;display:block}
+.topbar #ccttSidebarReveal{max-width:min(210px,25vw);min-width:0;align-items:center}
+.topbar #ccttSidebarReveal .cctt-reveal-logo{width:42px;height:42px;flex:0 0 42px;overflow:hidden}
+.topbar #ccttSidebarReveal .cctt-reveal-logo img{width:100%;height:100%;object-fit:contain}
+.topbar #ccttSidebarReveal .cctt-reveal-copy strong{font-size:17px;line-height:1.15}
+.sidebar .brand-logo{width:46px;height:46px;flex:0 0 46px;overflow:hidden}
+.sidebar .brand-logo img{width:100%;height:100%;object-fit:contain}
+/* NUEVO: tarjetas más compactas y acción con chevrón integrado en lugar de flecha de texto. */
+#page-inicio #moduleCards>.card{min-height:142px!important;padding:14px 16px 12px!important;gap:0}
+#page-inicio #moduleCards>.card .cctt-home-card-icon{width:40px!important;height:40px!important;flex:0 0 40px!important;margin-bottom:8px!important}
+#page-inicio #moduleCards>.card .cctt-home-card-icon svg{width:24px!important;height:24px!important}
+#page-inicio #moduleCards>.card h3{margin-bottom:4px!important}
+#page-inicio #moduleCards>.card p{margin-bottom:8px!important;line-height:1.35!important}
+#page-inicio #moduleCards>.card button{display:inline-flex;justify-content:space-between;align-items:center;align-self:stretch;padding:8px 2px 2px!important;border-top:1px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-text,var(--text))!important}
+#page-inicio #moduleCards>.card button::after{content:""!important;display:block;width:10px;height:10px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);margin:0 7px 0 5px;flex:0 0 10px}
+#page-inicio #moduleCards>.card button:focus-visible{outline:2px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
+/* NUEVO: menú superpuesto y accionable en móvil incluso si la barra de escritorio está replegada. */
+@media(max-width:720px){
+ .topbar{gap:6px;min-width:0}
+ .topbar .profile-mini{margin-left:auto;gap:4px}
+ .topbar #ccttMobileMenuButton{position:relative;z-index:1001;flex:0 0 auto;touch-action:manipulation;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+ html:not(.cctt-icons-only) body .app .sidebar.cctt-mobile-open{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;transform:none!important;z-index:10003!important}
+ html:not(.cctt-icons-only) body .cctt-mobile-backdrop.cctt-mobile-open{display:block!important;z-index:10002!important}
+ #page-inicio #moduleCards>.card{min-height:130px!important}
+ .topbar #ccttSidebarReveal{display:none!important}
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -3822,7 +3856,7 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
     if(document.getElementById('ccttLoginGate'))return;
     const gate=document.createElement('div');gate.id='ccttLoginGate';gate.innerHTML=`<div class="cctt-login-card">
       <div class="cctt-login-brand"><div class="cctt-login-mark">CCTT</div><div><div class="cctt-login-title">Centro de Control de Tráfico Terrestre</div><div class="cctt-login-sub">Acceso al panel operativo</div></div></div>
-      <form id="ccttLoginForm" autocomplete="on"><div class="field"><label>Correo electrónico</label><input id="ccttLoginEmail" type="email" autocomplete="username" required></div><div class="field"><label>Contraseña</label><input id="ccttLoginPassword" type="password" autocomplete="current-password" required></div><button class="btn primary cctt-login-btn" type="submit">Iniciar sesión</button><div id="ccttAuthMsg" class="cctt-auth-msg"></div></form>
+      <form id="ccttLoginForm" autocomplete="on"><div class="field"><label>Correo electrónico</label><input id="ccttLoginEmail" type="email" autocomplete="username" required></div><div class="field"><label>Contraseña</label><input id="ccttLoginPassword" type="password" autocomplete="current-password" required></div><!-- MODIFICADO: icono de ingreso mediante puerta y flecha, sin documento ni palomita. --><button class="btn primary cctt-login-btn" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="m14 8 4 4-4 4M8 12h10"/></svg>Iniciar sesión</button><div id="ccttAuthMsg" class="cctt-auth-msg"></div></form>
     </div>`;document.body.appendChild(gate);
     document.getElementById('ccttLoginForm').onsubmit=async ev=>{ev.preventDefault();const msg=document.getElementById('ccttAuthMsg');msg.textContent='Validando acceso...';if(!sb){msg.textContent='El servicio de acceso no está disponible. Contacta a administración.';return}const email=document.getElementById('ccttLoginEmail').value.trim(),password=document.getElementById('ccttLoginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error){msg.textContent='No fue posible iniciar sesión. Verifica tus datos o contacta a administración.';return}currentSession=data.session;msg.textContent='';/* MODIFICADO: activar transición solo al autenticarse correctamente. */document.documentElement.classList.add('cctt-login-entering');showApp(data.session)};
   }
@@ -5125,6 +5159,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(!document.getElementById('ccttMobileMenuButton')){const btn=document.createElement('button');btn.type='button';btn.id='ccttMobileMenuButton';btn.className='cctt-mobile-hamburger';btn.textContent='☰';btn.setAttribute('aria-label','Abrir menú de módulos');btn.setAttribute('aria-expanded','false');top.prepend(btn);
    const cover=document.createElement('div');cover.className='cctt-mobile-backdrop';document.body.append(cover);
    const close=()=>{sidebar.classList.remove('cctt-mobile-open');cover.classList.remove('cctt-mobile-open');btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-label','Abrir menú de módulos')};
+   // MODIFICADO: apertura móvil autónoma, sin disparar el repliegue de escritorio.
    btn.onclick=()=>{const open=!sidebar.classList.contains('cctt-mobile-open');sidebar.classList.toggle('cctt-mobile-open',open);cover.classList.toggle('cctt-mobile-open',open);btn.setAttribute('aria-expanded',String(open));btn.setAttribute('aria-label',open?'Cerrar menú de módulos':'Abrir menú de módulos')};
    cover.onclick=close;sidebar.addEventListener('click',e=>{if(e.target.closest('[data-page]'))close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});window.addEventListener('resize',()=>{if(window.innerWidth>720)close()});
   }
@@ -6019,14 +6054,9 @@ setTimeout(decorate,150);
    reveal.setAttribute('aria-expanded',String(open));
    brand.setAttribute('aria-expanded',String(open));
    if(open)resetTimer();
-   if(!open&&window.innerWidth<=720&&sidebar.classList.contains('cctt-mobile-open')){
-    const mobileBtn=document.getElementById('ccttMobileMenuButton');
-    if(mobileBtn)mobileBtn.click();
-   }
-   if(open&&window.innerWidth<=720){
-    const mobileBtn=document.getElementById('ccttMobileMenuButton');
-    if(mobileBtn&&!sidebar.classList.contains('cctt-mobile-open'))mobileBtn.click();
-   }
+   // MODIFICADO: el repliegue automático no acciona el botón móvil ni invierte su estado.
+   // El menú hamburguesa administra su propia apertura independientemente de esta barra.
+   if(window.innerWidth<=720)return;
   }
   brand.addEventListener('click',function(event){
    if(event.target.closest('button,a,input,select'))return;
