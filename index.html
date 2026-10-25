@@ -1480,6 +1480,19 @@ html[data-cctt-scheme="dark"] #page-climaManzanillo .cctt-clima-panel a.btn.prim
 #page-ccttTotp button:focus-visible{outline:3px solid #4da9ef;outline-offset:3px}
 #page-ccttTotp .cctt-totp-status{margin-top:12px;overflow-wrap:anywhere}
 </style>
+<!-- NUEVO: contraste localizado del selector meteorológico, conservando ambos temas. -->
+<style id="ccttWeatherLayersStyles">
+#page-climaManzanillo .cctt-weather-map-extra{margin-top:22px;padding-top:17px;border-top:1px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-text,var(--text))}
+#page-climaManzanillo .cctt-weather-map-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:13px 0}
+#page-climaManzanillo .cctt-weather-map-toolbar label{font-weight:750;color:var(--cctt-theme-text,var(--text))}
+#page-climaManzanillo .cctt-weather-map-toolbar select{min-width:min(100%,220px);max-width:100%;padding:10px;border-radius:10px;background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border:1px solid var(--cctt-theme-line,var(--line))}
+#page-climaManzanillo .cctt-weather-map-extra a{color:var(--cctt-theme-accent,var(--blue));text-decoration:underline;text-underline-offset:3px}
+#page-climaManzanillo .cctt-weather-map-extra iframe{width:100%;height:440px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;background:var(--cctt-theme-card,var(--card))}
+#page-climaManzanillo .cctt-weather-map-toolbar select:focus-visible,#page-climaManzanillo .cctt-weather-map-extra a:focus-visible{outline:3px solid #51a8f9;outline-offset:3px}
+#page-climaManzanillo .cctt-ai-diagnostic{border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));padding:12px;border-radius:10px;margin:8px 0 16px}
+#page-climaManzanillo .cctt-ai-diagnostic[hidden]{display:none!important}
+@media(max-width:650px){#page-climaManzanillo .cctt-weather-map-extra iframe{height:310px}}
+</style>
 </head>
 <body>
 <div class="app">
@@ -1749,6 +1762,30 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 <div class="row"><a class="btn" href="https://smn.conagua.gob.mx/tools/GUI/PortalLaravel/public/WebAviso" target="_blank" rel="noopener noreferrer">Abrir aviso SMN</a><a class="btn" href="https://smn.conagua.gob.mx/es/" target="_blank" rel="noopener noreferrer">Portal SMN: radares, hidroestimador, municipios y avisos</a><a class="btn" href="https://www.nhc.noaa.gov/?epac" target="_blank" rel="noopener noreferrer">NHC Pacífico oriental (inglés)</a></div>
 <label class="cctt-manual-label">Captura manual del aviso SMN (no oficial dentro de CCTT) <input id="ccttManualSMNFile" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="ccttManualSMNResult" role="status">Sin captura de operador cargada.</div><img id="ccttManualSMNImage" alt="Captura aportada por operador; no constituye aviso vigente verificado" hidden>
 <h3>Mapa alternativo Windy</h3><p>Mapa externo orientativo; puede tener restricciones de incrustación o disponibilidad.</p><iframe id="ccttWindyWaves" title="Mapa de oleaje Windy — Manzanillo" loading="lazy" referrerpolicy="no-referrer" src="https://embed.windy.com/embed2.html?lat=19.07&amp;lon=-104.30&amp;zoom=7&amp;level=surface&amp;overlay=waves&amp;product=ecmwfWaves&amp;menu=&amp;message=&amp;marker=true&amp;calendar=&amp;pressure=&amp;type=map&amp;location=coordinates&amp;detail=&amp;detailLat=19.07&amp;detailLon=-104.30"></iframe><p><a target="_blank" rel="noopener noreferrer" href="https://www.windy.com/?waves,19.07,-104.30,7">Abrir oleaje en Windy</a> · <a target="_blank" rel="noopener noreferrer" href="https://www.nhc.noaa.gov/xml/HSFEP2.xml">Pronóstico de alta mar NHC (inglés)</a></p>
+<!-- NUEVO: visor meteorológico independiente; se preserva el iframe original de oleaje. -->
+<section class="cctt-weather-map-extra" id="ccttWeatherLayersPanel" aria-label="Mapa meteorológico con selección de capas">
+  <h3>Mapa meteorológico — Manzanillo y Pacífico oriental</h3>
+  <p>Visualización externa orientativa de Windy. Selecciona la capa que deseas consultar; los ciclones deben confirmarse mediante avisos del SMN y NHC.</p>
+  <div class="cctt-weather-map-toolbar">
+    <label for="ccttWeatherLayerSelect">Capa meteorológica</label>
+    <select id="ccttWeatherLayerSelect">
+      <option value="wind">Viento</option>
+      <option value="rain">Lluvia</option>
+      <option value="thunder">Tormentas eléctricas</option>
+      <option value="clouds">Nubosidad</option>
+      <option value="temp">Temperatura</option>
+      <option value="pressure">Presión atmosférica</option>
+      <option value="satellite">Satélite (Windy)</option>
+      <option value="hurricanes">Ciclones (Windy, orientativo)</option>
+    </select>
+    <a id="ccttWeatherLayerExternal" href="https://www.windy.com/?wind,19.07,-104.30,7" target="_blank" rel="noopener noreferrer">Abrir capa en Windy</a>
+    <a href="https://www.nhc.noaa.gov/?epac" target="_blank" rel="noopener noreferrer">Avisos oficiales NHC</a>
+  </div>
+  <p id="ccttWeatherLayerStatus" role="status" aria-live="polite">Capa: Viento. El proveedor externo puede limitar la visualización incrustada.</p>
+  <iframe id="ccttWeatherLayerFrame" title="Mapa meteorológico Windy: Viento — Manzanillo" loading="lazy" referrerpolicy="no-referrer" src="https://embed.windy.com/embed2.html?lat=19.07&amp;lon=-104.30&amp;zoom=7&amp;level=surface&amp;overlay=wind&amp;menu=&amp;message=&amp;marker=true&amp;calendar=&amp;pressure=&amp;type=map&amp;location=coordinates&amp;detail=&amp;detailLat=19.07&amp;detailLon=-104.30"></iframe>
+  <p>Las capas son estimaciones o productos visuales externos; no constituyen detección ni trayectoria oficial de ciclones. <a href="https://smn.conagua.gob.mx/es/" target="_blank" rel="noopener noreferrer">Consultar SMN</a>.</p>
+</section>
+
 </div>
 <!-- NUEVO: captura manual sin envío al servidor. -->
 <script id="ccttManualSMNClient">(()=>{const file=document.getElementById('ccttManualSMNFile'),img=document.getElementById('ccttManualSMNImage'),label=document.getElementById('ccttManualSMNResult');if(!file)return;file.addEventListener('change',()=>{const f=file.files?.[0];if(!f||!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>3000000){label.textContent='Archivo inválido o mayor a 3 MB. No se guardó.';return}const url=URL.createObjectURL(f);img.onload=()=>URL.revokeObjectURL(url);img.src=url;img.hidden=false;label.textContent='Captura local aportada el '+new Date().toLocaleString('es-MX')+' · usuario: '+String(document.getElementById('miniUserName')?.textContent||'No identificado')+' · NO VERIFICADA. Se perderá al recargar.'})})();</script>
@@ -7685,5 +7722,14 @@ async function update(){if(!allowed||!page.classList.contains('active')||request
 nav.addEventListener('click',async()=>{if(!allowed)return;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));page.classList.add('active');/* MODIFICADO: retirar el display:none establecido antes de confirmar el permiso. */page.style.removeProperty('display');document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b===nav));$('pageTitle').textContent='Autenticador autorizado';window.scrollTo({top:0,behavior:'smooth'});reset();await update()});
 $('ccttTotpRefresh').addEventListener('click',update);$('ccttTotpBack').addEventListener('click',()=>document.querySelector('[data-page="inicio"]')?.click());
 setInterval(()=>{const now=Date.now();if(now-lastCheck>=20000){lastCheck=now;check()}if(page.classList.contains('active')&&allowed){const remaining=30-Math.floor(now/1000)%30;count.textContent='Cambio de código en '+remaining+' s';if(Math.floor(now/30000)!==lastStep)update()}},1000);check();
+})();</script>
+<!-- NUEVO: controlador aislado del mapa meteorológico y aviso de diagnóstico de la función IA. -->
+<script id="ccttWeatherLayersClient">(()=>{'use strict';
+const select=document.getElementById('ccttWeatherLayerSelect'),frame=document.getElementById('ccttWeatherLayerFrame'),link=document.getElementById('ccttWeatherLayerExternal'),status=document.getElementById('ccttWeatherLayerStatus');if(!select||!frame||!link||!status)return;
+const layers={wind:'Viento',rain:'Lluvia',thunder:'Tormentas eléctricas',clouds:'Nubosidad',temp:'Temperatura',pressure:'Presión atmosférica',satellite:'Satélite (Windy)',hurricanes:'Ciclones (Windy, orientativo)'};
+const base='https://embed.windy.com/embed2.html?lat=19.07&lon=-104.30&zoom=7&level=surface&menu=&message=&marker=true&calendar=&pressure=&type=map&location=coordinates&detail=&detailLat=19.07&detailLon=-104.30';
+function update(){const layer=Object.prototype.hasOwnProperty.call(layers,select.value)?select.value:'wind';const url=new URL(base);url.searchParams.set('overlay',layer);if(layer==='hurricanes')url.searchParams.set('product','ecmwf');frame.src=url.href;frame.title='Mapa meteorológico Windy: '+layers[layer]+' — Manzanillo';link.href='https://www.windy.com/?'+layer+',19.07,-104.30,7';status.textContent='Capa: '+layers[layer]+'. Visualización externa orientativa; si no carga, abre la capa en Windy.'}
+select.addEventListener('change',update);
+const aiStatus=document.getElementById('ccttClimaAIStatus'),aiPanel=document.getElementById('ccttClimaAIPanel');if(aiStatus&&aiPanel){const note=document.createElement('p');note.className='cctt-ai-diagnostic';note.hidden=true;note.textContent='Diagnóstico: no se pudo establecer comunicación con cctt-clima-ia. Verifica que exista y esté desplegada en Supabase → Edge Functions; revisa Invocations/Logs, el preflight OPTIONS y CORS, y la sesión JWT. Este error no permite afirmar que el proveedor de IA haya respondido.';aiStatus.insertAdjacentElement('afterend',note);const refresh=()=>{note.hidden=!/Failed to send a request to the Edge Function|No está disponible el cliente Supabase|Tiempo de espera agotado/i.test(aiStatus.textContent||'')};const observer=new MutationObserver(refresh);observer.observe(aiStatus,{childList:true,subtree:true,characterData:true});refresh()}
 })();</script>
 </body></html>
