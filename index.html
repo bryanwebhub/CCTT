@@ -1745,16 +1745,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 <!-- NUEVO: datos orientativos opcionales de oleaje, independientes del pronóstico actual. -->
 <!-- MODIFICADO: retirado exclusivamente el apartado Oleaje marino — Manzanillo. -->
 <!-- NUEVO: panel de respaldo de Clima y enlaces sin extracción del SMN. -->
-<!-- NUEVO: investigación meteorológica con IA, independiente de las fuentes oficiales. -->
-<div class="card cctt-clima-panel cctt-ai-panel" id="ccttClimaAIPanel" aria-label="Investigación meteorológica con inteligencia artificial">
-  <div class="row"><h2>Investigación meteorológica con IA</h2><button class="btn primary" type="button" id="ccttClimaAIReload">Investigar con IA</button><label><input type="checkbox" id="ccttClimaAIAuto" checked> Automática cada 30 minutos, con CCTT abierto</label></div>
-  <p class="muted">Información complementaria generada por IA con búsqueda web. No es un aviso oficial ni sustituye al SMN, CONAGUA, NHC o Protección Civil. Gemini se consulta primero; OpenAI funciona como respaldo si está configurado.</p>
-  <p id="ccttClimaAIStatus" role="status" aria-live="polite">Investigación pendiente. No hay datos de IA verificados.</p>
-  <div id="ccttClimaAIMetadata" class="muted"></div>
-  <div id="ccttClimaAIText" class="cctt-ai-text"></div>
-  <div id="ccttClimaAILinks" class="cctt-ai-links" aria-label="Fuentes web consultadas"></div>
-  <p class="muted">Las referencias son publicaciones de terceros; su presencia no demuestra que un aviso meteorológico siga vigente. Verifica siempre fecha, ubicación y contenido en la fuente original.</p>
-</div>
+<!-- MODIFICADO: retirado el apartado de Investigación meteorológica con IA; el cliente existente queda inactivo al no encontrar el botón de inicio. -->
 <div class="card cctt-clima-panel cctt-resilience" id="ccttResiliencePanel">
 <!-- MODIFICADO: se retira estado de fuentes y respaldos; permanecen los mapas Windy existentes. -->
 <h3>Mapa alternativo Windy</h3><p>Mapa externo orientativo; puede tener restricciones de incrustación o disponibilidad.</p><iframe id="ccttWindyWaves" title="Mapa de oleaje Windy — Manzanillo" loading="lazy" referrerpolicy="no-referrer" src="https://embed.windy.com/embed2.html?lat=19.07&amp;lon=-104.30&amp;zoom=7&amp;level=surface&amp;overlay=waves&amp;product=ecmwfWaves&amp;menu=&amp;message=&amp;marker=true&amp;calendar=&amp;pressure=&amp;type=map&amp;location=coordinates&amp;detail=&amp;detailLat=19.07&amp;detailLon=-104.30"></iframe><p><a target="_blank" rel="noopener noreferrer" href="https://www.windy.com/?waves,19.07,-104.30,7">Abrir oleaje en Windy</a> · <a target="_blank" rel="noopener noreferrer" href="https://www.nhc.noaa.gov/xml/HSFEP2.xml">Pronóstico de alta mar NHC (inglés)</a></p>
