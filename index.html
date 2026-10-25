@@ -1453,6 +1453,11 @@ html[data-cctt-scheme="dark"] #page-climaManzanillo .cctt-clima-panel a.btn.prim
 #page-buquesManzanillo .cctt-visual-result strong{display:block;margin-bottom:5px}
 @media(max-width:700px){#page-buquesManzanillo .cctt-visual-controls{align-items:stretch}#page-buquesManzanillo .cctt-visual-controls label,#page-buquesManzanillo .cctt-visual-controls button{width:100%}}
 </style>
+<!-- NUEVO: se retira únicamente de la vista la interfaz de tramos, AISStream y comparación visual situada debajo del mapa MarineTraffic; no se alteran sus elementos ni scripts originales. -->
+<style id="ccttSoloMapaBuquesStyles">
+/* NUEVO: ocultar el panel inferior en los modos predeterminado y oscuro, sin cambiar el mapa ni sus controles. */
+#page-buquesManzanillo #ccttTramosPanel{display:none!important}
+</style>
 </head>
 <body>
 <div class="app">
