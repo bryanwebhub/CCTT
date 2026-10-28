@@ -1532,6 +1532,14 @@ html[data-cctt-scheme="dark"] #page-climaManzanillo .cctt-clima-panel a.btn.prim
 #vrpPanel .vrp-crops{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}#vrpPanel .vrp-crops label{font-size:12px;font-weight:700;color:var(--cctt-theme-text,var(--text))}#vrpPanel .vrp-crops output{font-variant-numeric:tabular-nums}#vrpPanel .vrp-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}#vrpPanel .vrp-actions .btn{font-size:12px;padding:8px 10px}
 #vrpPanel .vrp-footer{justify-content:flex-start;margin-top:18px}#vrpPanel .vrp-explain{margin:12px 0 0}#vrpPanel button:disabled{opacity:.5}
 @media(max-width:720px){#vrpPanel .vrp-gallery{grid-template-columns:1fr}#vrpPanel .vrp-global .field{min-width:100%}}
+/* NUEVO: secuencia de copiado y señal visual por foto; colores heredados del tema vigente. */
+#vrpPanel .vrp-sequence-tools{justify-content:flex-start;align-items:center}
+#vrpPanel .vrp-copy-next{font-size:16px;min-height:54px;padding:13px 22px}
+#vrpPanel #vrpSequenceCount{color:var(--cctt-theme-text,var(--text));font-variant-numeric:tabular-nums}
+#vrpPanel .vrp-photo.vrp-last-copied{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
+#vrpPanel .vrp-photo.vrp-last-copied .vrp-copied-tag{display:inline-block;margin:0 0 8px;color:var(--cctt-theme-text,var(--text));font-weight:800;font-size:12px}
+#vrpPanel .vrp-copied-tag{display:none}
+@media(max-width:720px){#vrpPanel .vrp-copy-next{width:100%}}
 </style>
 </head>
 <body>
@@ -1898,8 +1906,10 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <div id="vrpGallery" class="vrp-gallery" aria-label="Visor y controles individuales de fotografías"></div>
  <!-- MODIFICADO: entrega de archivos separados sin descarga ni composición única. -->
  <!-- MODIFICADO: solo compartir varios archivos con la función nativa compatible; no arrastre HTML ni texto artificial. -->
- <div class="vrp-footer"><button id="vrpCopyAll" class="btn primary" type="button" disabled>Compartir fotografías por separado</button></div>
- <p class="muted vrp-explain">La opción de compartir varios archivos solo se habilita en navegadores compatibles. Las fotografías se conservan separadas y recortadas. Si no está disponible, utiliza «Copiar esta foto» en cada tarjeta; Ctrl+V de varias imágenes simultáneas no está garantizado en WhatsApp Web.</p>
+ <!-- MODIFICADO: copia secuencial individual, sin compartir archivos ni collage. -->
+ <div class="vrp-footer vrp-sequence-tools"><button id="vrpCopyAll" class="btn primary vrp-copy-next" type="button" disabled>Copiar siguiente foto</button><!-- NUEVO --><button id="vrpResetSequence" class="btn" type="button">Reiniciar</button><strong id="vrpSequenceCount" role="status" aria-live="polite">Copiada 0 de 0</strong></div>
+ <!-- MODIFICADO: WhatsApp Web decide si acumula imágenes en su compositor. -->
+ <p class="muted vrp-explain">Copia una fotografía por clic. Después haz clic en WhatsApp Web y pulsa Ctrl+V; regresa y pulsa «Copiar siguiente foto». Prueba primero con 2 o 3 imágenes: WhatsApp Web puede no acumularlas en una misma vista previa.</p>
 </div>
 </section>
 
@@ -7799,12 +7809,16 @@ $('dpClose').addEventListener('click',clear);$('dpCancel').addEventListener('cli
 <!-- MODIFICADO: recorte verificable y entrega de imágenes independientes a WhatsApp. -->
 <script id="vrpPhotoLogic">(()=>{'use strict';
 const root=document.getElementById('vrpPanel');if(!root)return;
-const get=id=>document.getElementById(id), gallery=get('vrpGallery'),msg=get('vrpMessage');let photos=[],serial=0; // MODIFICADO: sin archivos de arrastre ni texto transferible.
+const get=id=>document.getElementById(id), gallery=get('vrpGallery'),msg=get('vrpMessage');let photos=[],serial=0,sequenceIndex=0,lastCopiedId=null,sequenceBusy=false; // MODIFICADO: contador de copia individual.
 // NUEVO: invalidar archivos preparados cuando cambian recortes o selección.
-function invalidate(){/* MODIFICADO: los PNG se generan al compartir para reflejar los recortes vigentes. */}
+function invalidate(){// MODIFICADO: si cambia selección o recorte, reiniciar secuencia para no omitir imágenes.
+ sequenceIndex=0;lastCopiedId=null;photos.forEach(p=>{if(p.box)p.box.classList.remove('vrp-last-copied')});updateSequence();
+}
+function updateSequence(){const total=photos.length;get('vrpSequenceCount').textContent='Copiada '+sequenceIndex+' de '+total;const button=get('vrpCopyAll');button.disabled=sequenceBusy||!total||sequenceIndex>=total;button.textContent=sequenceIndex>=total&&total?'Todas copiadas':'Copiar siguiente foto'+(total?' ('+(sequenceIndex+1)+' de '+total+')':'')}
+function markLast(photo){photos.forEach(p=>{if(p.box)p.box.classList.toggle('vrp-last-copied',p===photo)});lastCopiedId=photo.id;}
 const svg={copy:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>',remove:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 14h10l1-14M10 11v6m4-6v6"/></svg>'};
 const status=(s,error=false)=>{msg.textContent=s;msg.style.color=error?'var(--bad,#c13d3d)':'var(--cctt-theme-text,var(--text))'};
-const count=()=>{get('vrpCount').textContent=photos.length+' / 20 fotografías';get('vrpCopyAll').disabled=!photos.length||!(typeof navigator.share==='function'&&typeof navigator.canShare==='function')};
+const count=()=>{get('vrpCount').textContent=photos.length+' / 20 fotografías';updateSequence()};
 const clamp=v=>Math.max(0,Math.min(35,Number(v)||0));
 function region(photo){const {width:w,height:h}=photo.img,c=photo.crop;const l=Math.round(w*c.left/100),r=Math.round(w*c.right/100),t=Math.round(h*c.top/100),b=Math.round(h*c.bottom/100);return {x:l,y:t,w:Math.max(1,w-l-r),h:Math.max(1,h-t-b)}}
 function draw(photo,maxWidth=1400){const r=region(photo),scale=Math.min(1,maxWidth/r.w),w=Math.max(1,Math.round(r.w*scale)),h=Math.max(1,Math.round(r.h*scale)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(photo.img,r.x,r.y,r.w,r.h,0,0,w,h);return c}
@@ -7814,39 +7828,24 @@ function copyCanvas(canvas){if(!window.isSecureContext||!navigator.clipboard?.wr
 function download(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000)}
 function card(photo){const box=document.createElement('article');box.className='vrp-photo';const head=document.createElement('div');head.className='vrp-photo-head';const name=document.createElement('div'),title=document.createElement('strong'),meta=document.createElement('small');title.textContent=photo.file.name;name.append(title,meta);head.append(name);const canvas=document.createElement('canvas');canvas.className='vrp-preview';canvas.setAttribute('aria-label','Vista previa de '+photo.file.name);photo.canvas=canvas;photo.details=meta;
 const crops=document.createElement('div');crops.className='vrp-crops';[['top','Superior'],['bottom','Inferior'],['left','Izquierda'],['right','Derecha']].forEach(([key,label])=>{const wrap=document.createElement('label'),output=document.createElement('output'),slider=document.createElement('input');slider.type='range';slider.min='0';slider.max='35';slider.step='1';slider.value=photo.crop[key];output.textContent=slider.value+' %';wrap.textContent=label+' ';wrap.append(output,slider);slider.setAttribute('aria-label','Recorte '+label.toLowerCase()+' de '+photo.file.name);slider.addEventListener('input',()=>{photo.crop[key]=clamp(slider.value);output.textContent=slider.value+' %';refresh(photo)});photo.sliders[key]=slider;crops.append(wrap)});
-const actions=document.createElement('div');actions.className='vrp-actions';const copy=document.createElement('button');copy.type='button';copy.className='btn vrp-action';copy.innerHTML=svg.copy+' Copiar esta foto';copy.addEventListener('click',()=>{const c=draw(photo);copyCanvas(c).then(()=>status('Fotografía copiada. Pégala en WhatsApp.')).catch(e=>status(e.message+' Usa Guardar PNG.',true))});const remove=document.createElement('button');remove.type='button';remove.className='btn vrp-action';remove.innerHTML=svg.remove+' Quitar';remove.addEventListener('click',()=>{photos=photos.filter(p=>p!==photo);invalidate();box.remove();count();status('Fotografía retirada de esta selección.')});actions.append(copy,remove);box.append(head,canvas,crops,actions);photo.box=box;gallery.append(box);refresh(photo)}
+const actions=document.createElement('div');actions.className='vrp-actions';const copy=document.createElement('button');copy.type='button';copy.className='btn vrp-action';copy.innerHTML=svg.copy+' Copiar esta foto';copy.addEventListener('click',()=>{const c=draw(photo);copyCanvas(c).then(()=>status('Fotografía copiada. Pégala en WhatsApp.')).catch(e=>status(e.message+' Usa Guardar PNG.',true))});const remove=document.createElement('button');remove.type='button';remove.className='btn vrp-action';remove.innerHTML=svg.remove+' Quitar';remove.addEventListener('click',()=>{photos=photos.filter(p=>p!==photo);invalidate();box.remove();count();status('Fotografía retirada de esta selección.')});actions.append(copy,remove);const tag=document.createElement('span');tag.className='vrp-copied-tag';tag.textContent='Última foto copiada';box.append(tag,head,canvas,crops,actions);photo.box=box;gallery.append(box);refresh(photo)}
 async function openPhoto(file){const url=URL.createObjectURL(file);try{const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('No se pudo leer '+file.name));i.src=url});if(!img.naturalWidth||!img.naturalHeight)throw Error('Dimensiones inválidas');return {id:++serial,file,img,crop:{top:0,bottom:0,left:0,right:0},sliders:{}}}finally{URL.revokeObjectURL(url)}}
 get('vrpFiles').addEventListener('change',async e=>{const files=Array.from(e.target.files||[]);e.target.value='';const remaining=20-photos.length;if(!remaining){status('Máximo 20 fotografías.',true);return}let added=0;for(const f of files.slice(0,remaining)){if(!/^image\/(jpeg|png|webp|gif)$/i.test(f.type)){status('Formato no admitido: '+f.name,true);continue}try{const p=await openPhoto(f);photos.push(p);card(p);added++}catch(err){status(err.message,true)}}count();if(added)status(added+' fotografía(s) agregada(s). Los originales no se modifican.');if(files.length>remaining)status('Se alcanzó el límite de 20 fotografías. El resto no se añadió.',true)});
 get('vrpGlobalBottom').addEventListener('input',e=>get('vrpGlobalValue').textContent=e.target.value+' %');
 get('vrpApplyGlobal').addEventListener('click',()=>{const v=clamp(get('vrpGlobalBottom').value);photos.forEach(p=>{p.crop.bottom=v;p.sliders.bottom.value=v;p.sliders.bottom.parentElement.querySelector('output').textContent=v+' %';refresh(p)});status('Recorte inferior '+v+' % aplicado a '+photos.length+' fotografía(s).')});
 get('vrpClear').addEventListener('click',()=>{photos=[];invalidate();gallery.replaceChildren();count();status('Selección vaciada. Los archivos originales permanecen intactos.')});
-// MODIFICADO: solo transferencia nativa de archivos independientes; sin arrastre, texto ni composición.
-async function prepareFiles(){
- if(!photos.length)throw Error('Añade fotografías primero.');
- const files=[];
- for(let i=0;i<photos.length;i++){
-  const canvas=draw(photos[i],2400),blob=await toBlob(canvas);
-  files.push(new File([blob],'CCTT_Vialidades_'+String(i+1).padStart(2,'0')+'.png',{type:'image/png',lastModified:Date.now()}));
- }
- return files;
-}
-// MODIFICADO: no se afirma que las fotografías llegaron a WhatsApp; el selector lo gestiona el sistema.
+// MODIFICADO: copiar únicamente el siguiente PNG recortado usando el mecanismo individual que ya funciona.
 get('vrpCopyAll').addEventListener('click',async()=>{
- if(typeof navigator.share!=='function'||typeof navigator.canShare!=='function'){
-  status('Este navegador no permite compartir varios archivos. Utiliza «Copiar esta foto» individualmente.',true);return;
- }
- const button=get('vrpCopyAll');button.disabled=true;
+ if(sequenceBusy||sequenceIndex>=photos.length)return;
+ const photo=photos[sequenceIndex];sequenceBusy=true;updateSequence();
  try{
-  const files=await prepareFiles();
-  if(!navigator.canShare({files})){
-   status('Este navegador no admite compartir las fotografías procesadas como archivos independientes. Utiliza «Copiar esta foto».',true);return;
-  }
-  // MODIFICADO: Web Share requiere una interacción del usuario; algunos navegadores rechazan la generación asíncrona previa.
-  await navigator.share({files});
-  status('Se completó la acción del selector de compartir. Comprueba en la aplicación de destino que se recibieron las fotografías.');
- }catch(e){if(e.name==='AbortError')status('Se canceló la acción de compartir.');else status('No fue posible compartir los archivos: '+e.message,true)}
- finally{count()}
+  await copyCanvas(draw(photo)); // MODIFICADO: nunca copiar texto, HTML, collage o varios elementos ClipboardItem.
+  sequenceIndex++;markLast(photo);status('Copiada '+sequenceIndex+' de '+photos.length+'. Pega esta fotografía en WhatsApp con Ctrl+V y vuelve para copiar la siguiente.');
+ }catch(e){status('No se pudo copiar la fotografía '+(sequenceIndex+1)+': '+e.message+'. La secuencia no avanzó.',true)}
+ finally{sequenceBusy=false;updateSequence()}
 });
+// NUEVO: reiniciar sin borrar fotografías ni recortes.
+get('vrpResetSequence').addEventListener('click',()=>{if(sequenceBusy)return;invalidate();status('Secuencia reiniciada. La próxima copia será la fotografía 1.')});
 count();
 })();</script>
 </body></html>
