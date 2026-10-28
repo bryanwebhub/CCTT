@@ -1897,10 +1897,9 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <p id="vrpMessage" class="vrp-message" role="status" aria-live="polite"></p>
  <div id="vrpGallery" class="vrp-gallery" aria-label="Visor y controles individuales de fotografías"></div>
  <!-- MODIFICADO: entrega de archivos separados sin descarga ni composición única. -->
- <div class="vrp-footer"><button id="vrpCopyAll" class="btn primary" type="button" disabled>Compartir fotografías por separado</button><button id="vrpDownloadAll" class="btn" type="button" disabled>Preparar para arrastrar a WhatsApp</button></div>
- <!-- NUEVO: arrastre de varios archivos procesados como elementos individuales. -->
- <div id="vrpDragArea" class="vrp-drag-area" hidden draggable="false" tabindex="0" role="group" aria-label="Fotografías separadas preparadas para arrastrar a WhatsApp Web"><strong>Fotografías preparadas: arrastra este recuadro hacia la conversación de WhatsApp Web</strong><span id="vrpDragCount"></span><small>Se intentarán transferir como archivos PNG independientes, sin descarga. El arrastre de múltiples archivos entre páginas depende de tu navegador; si WhatsApp no los recibe, utiliza el botón Compartir en un dispositivo compatible.</small></div>
- <p class="muted vrp-explain">Las fotografías se mantienen separadas y con sus recortes. El portapapeles estándar no permite garantizar pegar varias imágenes con Ctrl+V; usa Compartir o arrástralas a WhatsApp Web cuando sea compatible.</p>
+ <!-- MODIFICADO: solo compartir varios archivos con la función nativa compatible; no arrastre HTML ni texto artificial. -->
+ <div class="vrp-footer"><button id="vrpCopyAll" class="btn primary" type="button" disabled>Compartir fotografías por separado</button></div>
+ <p class="muted vrp-explain">La opción de compartir varios archivos solo se habilita en navegadores compatibles. Las fotografías se conservan separadas y recortadas. Si no está disponible, utiliza «Copiar esta foto» en cada tarjeta; Ctrl+V de varias imágenes simultáneas no está garantizado en WhatsApp Web.</p>
 </div>
 </section>
 
@@ -7797,17 +7796,15 @@ $('dpForm').addEventListener('reset',()=>{clear();$('dpAiIdea').value='';});
 $('dpClose').addEventListener('click',clear);$('dpCancel').addEventListener('click',clear);
 })();</script>
 <!-- NUEVO: procesamiento fotográfico autónomo de Reporte de vialidades; no modifica funciones anteriores. -->
-<!-- NUEVO: zona de arrastre accesible; colores heredados de ambos temas. -->
-<style id="vrpSeparateShareStyles">#vrpPanel .vrp-drag-area{margin-top:12px;border:2px dashed var(--cctt-theme-accent,var(--blue));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));padding:18px;border-radius:12px;cursor:grab;display:flex;flex-direction:column;gap:7px}#vrpPanel .vrp-drag-area[hidden]{display:none!important}#vrpPanel .vrp-drag-area:active{cursor:grabbing}#vrpPanel .vrp-drag-area:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:3px}#vrpPanel .vrp-drag-area small{color:var(--cctt-theme-muted,var(--muted));line-height:1.55}</style>
 <!-- MODIFICADO: recorte verificable y entrega de imágenes independientes a WhatsApp. -->
 <script id="vrpPhotoLogic">(()=>{'use strict';
 const root=document.getElementById('vrpPanel');if(!root)return;
-const get=id=>document.getElementById(id), gallery=get('vrpGallery'),msg=get('vrpMessage');let photos=[],serial=0,preparedFiles=[];const dragArea=get('vrpDragArea');
+const get=id=>document.getElementById(id), gallery=get('vrpGallery'),msg=get('vrpMessage');let photos=[],serial=0; // MODIFICADO: sin archivos de arrastre ni texto transferible.
 // NUEVO: invalidar archivos preparados cuando cambian recortes o selección.
-function invalidate(){preparedFiles=[];dragArea.hidden=true;dragArea.draggable=false}
+function invalidate(){/* MODIFICADO: los PNG se generan al compartir para reflejar los recortes vigentes. */}
 const svg={copy:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>',remove:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 14h10l1-14M10 11v6m4-6v6"/></svg>'};
 const status=(s,error=false)=>{msg.textContent=s;msg.style.color=error?'var(--bad,#c13d3d)':'var(--cctt-theme-text,var(--text))'};
-const count=()=>{get('vrpCount').textContent=photos.length+' / 20 fotografías';get('vrpCopyAll').disabled=get('vrpDownloadAll').disabled=!photos.length};
+const count=()=>{get('vrpCount').textContent=photos.length+' / 20 fotografías';get('vrpCopyAll').disabled=!photos.length||!(typeof navigator.share==='function'&&typeof navigator.canShare==='function')};
 const clamp=v=>Math.max(0,Math.min(35,Number(v)||0));
 function region(photo){const {width:w,height:h}=photo.img,c=photo.crop;const l=Math.round(w*c.left/100),r=Math.round(w*c.right/100),t=Math.round(h*c.top/100),b=Math.round(h*c.bottom/100);return {x:l,y:t,w:Math.max(1,w-l-r),h:Math.max(1,h-t-b)}}
 function draw(photo,maxWidth=1400){const r=region(photo),scale=Math.min(1,maxWidth/r.w),w=Math.max(1,Math.round(r.w*scale)),h=Math.max(1,Math.round(r.h*scale)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(photo.img,r.x,r.y,r.w,r.h,0,0,w,h);return c}
@@ -7823,8 +7820,7 @@ get('vrpFiles').addEventListener('change',async e=>{const files=Array.from(e.tar
 get('vrpGlobalBottom').addEventListener('input',e=>get('vrpGlobalValue').textContent=e.target.value+' %');
 get('vrpApplyGlobal').addEventListener('click',()=>{const v=clamp(get('vrpGlobalBottom').value);photos.forEach(p=>{p.crop.bottom=v;p.sliders.bottom.value=v;p.sliders.bottom.parentElement.querySelector('output').textContent=v+' %';refresh(p)});status('Recorte inferior '+v+' % aplicado a '+photos.length+' fotografía(s).')});
 get('vrpClear').addEventListener('click',()=>{photos=[];invalidate();gallery.replaceChildren();count();status('Selección vaciada. Los archivos originales permanecen intactos.')});
-// MODIFICADO: retirada la composición unificada de este módulo.
-// NUEVO: preparar PNG individuales con recortes vigentes, sin guardar en disco.
+// MODIFICADO: solo transferencia nativa de archivos independientes; sin arrastre, texto ni composición.
 async function prepareFiles(){
  if(!photos.length)throw Error('Añade fotografías primero.');
  const files=[];
@@ -7832,35 +7828,24 @@ async function prepareFiles(){
   const canvas=draw(photos[i],2400),blob=await toBlob(canvas);
   files.push(new File([blob],'CCTT_Vialidades_'+String(i+1).padStart(2,'0')+'.png',{type:'image/png',lastModified:Date.now()}));
  }
- preparedFiles=files;get('vrpDragCount').textContent=files.length+' archivos PNG separados y recortados';dragArea.hidden=false;dragArea.draggable=true;
  return files;
 }
-// NUEVO: transferencia nativa de archivos múltiples, sujeta al soporte del dispositivo.
+// MODIFICADO: no se afirma que las fotografías llegaron a WhatsApp; el selector lo gestiona el sistema.
 get('vrpCopyAll').addEventListener('click',async()=>{
+ if(typeof navigator.share!=='function'||typeof navigator.canShare!=='function'){
+  status('Este navegador no permite compartir varios archivos. Utiliza «Copiar esta foto» individualmente.',true);return;
+ }
+ const button=get('vrpCopyAll');button.disabled=true;
  try{
-  // MODIFICADO: el segundo clic comparte de inmediato para conservar el gesto requerido por Web Share.
-  if(preparedFiles.length&&navigator.canShare?.({files:preparedFiles})&&typeof navigator.share==='function'){
-   await navigator.share({files:preparedFiles});status('Se enviaron '+preparedFiles.length+' fotografías individuales al selector de compartir.');return;
+  const files=await prepareFiles();
+  if(!navigator.canShare({files})){
+   status('Este navegador no admite compartir las fotografías procesadas como archivos independientes. Utiliza «Copiar esta foto».',true);return;
   }
-  const files=preparedFiles.length?preparedFiles:await prepareFiles();
-  if(navigator.canShare?.({files})&&typeof navigator.share==='function')status('Fotografías preparadas: vuelve a pulsar Compartir para abrir el selector del dispositivo.');
-  else status('Los '+files.length+' archivos PNG están preparados. El navegador no ofrece compartir varios archivos desde aquí; el arrastre a WhatsApp Web puede no estar admitido. No se ha copiado texto ni una composición única.');
- }catch(e){if(e.name==='AbortError')status('Se canceló el envío. Las fotografías siguen preparadas.');else status(e.message,true)}
-});
-get('vrpDownloadAll').addEventListener('click',async()=>{
- try{const files=await prepareFiles();status('Preparadas '+files.length+' fotografías PNG independientes. Puedes intentar arrastrarlas a WhatsApp Web; la recepción de varios archivos depende del navegador. Si no se admiten, utiliza Compartir en un dispositivo compatible.');}
- catch(e){status(e.message,true)}
-});
-// NUEVO: el arrastre aporta varios File independientes al destino compatible.
-dragArea.addEventListener('dragstart',e=>{
- if(!preparedFiles.length){e.preventDefault();return}
- try{
-  e.dataTransfer.effectAllowed='copy';
-  // MODIFICADO: transferir exclusivamente archivos de imagen; no adjuntar texto ni código.
-  preparedFiles.forEach(file=>e.dataTransfer.items.add(file));
-  // NUEVO: cancelar cuando el navegador rechace la lista de archivos en el arrastre.
-  if(e.dataTransfer.items.length!==preparedFiles.length){e.preventDefault();status('El navegador no permite transferir estas fotografías como archivos independientes mediante arrastre. Usa Compartir en un dispositivo compatible.',true)}
- }catch(err){e.preventDefault();status('Este navegador no permite arrastrar varias fotografías directamente.',true)}
+  // MODIFICADO: Web Share requiere una interacción del usuario; algunos navegadores rechazan la generación asíncrona previa.
+  await navigator.share({files});
+  status('Se completó la acción del selector de compartir. Comprueba en la aplicación de destino que se recibieron las fotografías.');
+ }catch(e){if(e.name==='AbortError')status('Se canceló la acción de compartir.');else status('No fue posible compartir los archivos: '+e.message,true)}
+ finally{count()}
 });
 count();
 })();</script>
