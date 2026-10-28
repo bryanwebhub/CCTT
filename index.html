@@ -7844,11 +7844,11 @@ get('vrpCopyAll').addEventListener('click',async()=>{
   }
   const files=preparedFiles.length?preparedFiles:await prepareFiles();
   if(navigator.canShare?.({files})&&typeof navigator.share==='function')status('Fotografías preparadas: vuelve a pulsar Compartir para abrir el selector del dispositivo.');
-  else status('Los '+files.length+' archivos están preparados. Arrastra el recuadro hacia WhatsApp Web; el arrastre entre páginas depende del navegador.');
+  else status('Los '+files.length+' archivos PNG están preparados. El navegador no ofrece compartir varios archivos desde aquí; el arrastre a WhatsApp Web puede no estar admitido. No se ha copiado texto ni una composición única.');
  }catch(e){if(e.name==='AbortError')status('Se canceló el envío. Las fotografías siguen preparadas.');else status(e.message,true)}
 });
 get('vrpDownloadAll').addEventListener('click',async()=>{
- try{const files=await prepareFiles();status('Preparadas '+files.length+' fotografías independientes. Arrastra el recuadro hacia WhatsApp Web, sin descargarlas.');}
+ try{const files=await prepareFiles();status('Preparadas '+files.length+' fotografías PNG independientes. Puedes intentar arrastrarlas a WhatsApp Web; la recepción de varios archivos depende del navegador. Si no se admiten, utiliza Compartir en un dispositivo compatible.');}
  catch(e){status(e.message,true)}
 });
 // NUEVO: el arrastre aporta varios File independientes al destino compatible.
@@ -7856,8 +7856,10 @@ dragArea.addEventListener('dragstart',e=>{
  if(!preparedFiles.length){e.preventDefault();return}
  try{
   e.dataTransfer.effectAllowed='copy';
+  // MODIFICADO: transferir exclusivamente archivos de imagen; no adjuntar texto ni código.
   preparedFiles.forEach(file=>e.dataTransfer.items.add(file));
-  e.dataTransfer.setData('text/plain','Fotografías de vialidades CCTT');
+  // NUEVO: cancelar cuando el navegador rechace la lista de archivos en el arrastre.
+  if(e.dataTransfer.items.length!==preparedFiles.length){e.preventDefault();status('El navegador no permite transferir estas fotografías como archivos independientes mediante arrastre. Usa Compartir en un dispositivo compatible.',true)}
  }catch(err){e.preventDefault();status('Este navegador no permite arrastrar varias fotografías directamente.',true)}
 });
 count();
