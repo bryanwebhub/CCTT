@@ -1896,8 +1896,11 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <div class="vrp-global"><div class="field"><label for="vrpGlobalBottom">Recorte inferior para todas las fotos: <output id="vrpGlobalValue">0 %</output></label><input id="vrpGlobalBottom" type="range" min="0" max="35" value="0" step="1"></div><button id="vrpApplyGlobal" class="btn" type="button">Aplicar recorte general</button><p class="muted">El ajuste general se aplica a cada foto cargada. El archivo original no se altera.</p></div>
  <p id="vrpMessage" class="vrp-message" role="status" aria-live="polite"></p>
  <div id="vrpGallery" class="vrp-gallery" aria-label="Visor y controles individuales de fotografías"></div>
- <div class="vrp-footer"><button id="vrpCopyAll" class="btn primary" type="button" disabled>Copiar todas para WhatsApp (una imagen)</button><button id="vrpDownloadAll" class="btn" type="button" disabled>Guardar composición PNG</button></div>
- <p class="muted vrp-explain">La función «Copiar todas» combina las fotos en una sola imagen, sin deformarlas. WhatsApp y el navegador determinan si permiten pegarla. Para enviar las fotos como archivos individuales, usa «Copiar esta foto» en cada tarjeta.</p>
+ <!-- MODIFICADO: entrega de archivos separados sin descarga ni composición única. -->
+ <div class="vrp-footer"><button id="vrpCopyAll" class="btn primary" type="button" disabled>Compartir fotografías por separado</button><button id="vrpDownloadAll" class="btn" type="button" disabled>Preparar para arrastrar a WhatsApp</button></div>
+ <!-- NUEVO: arrastre de varios archivos procesados como elementos individuales. -->
+ <div id="vrpDragArea" class="vrp-drag-area" hidden draggable="false" tabindex="0" role="group" aria-label="Fotografías separadas preparadas para arrastrar a WhatsApp Web"><strong>Fotografías preparadas: arrastra este recuadro hacia la conversación de WhatsApp Web</strong><span id="vrpDragCount"></span><small>Se intentarán transferir como archivos PNG independientes, sin descarga. El arrastre de múltiples archivos entre páginas depende de tu navegador; si WhatsApp no los recibe, utiliza el botón Compartir en un dispositivo compatible.</small></div>
+ <p class="muted vrp-explain">Las fotografías se mantienen separadas y con sus recortes. El portapapeles estándar no permite garantizar pegar varias imágenes con Ctrl+V; usa Compartir o arrástralas a WhatsApp Web cuando sea compatible.</p>
 </div>
 </section>
 
@@ -7794,30 +7797,69 @@ $('dpForm').addEventListener('reset',()=>{clear();$('dpAiIdea').value='';});
 $('dpClose').addEventListener('click',clear);$('dpCancel').addEventListener('click',clear);
 })();</script>
 <!-- NUEVO: procesamiento fotográfico autónomo de Reporte de vialidades; no modifica funciones anteriores. -->
+<!-- NUEVO: zona de arrastre accesible; colores heredados de ambos temas. -->
+<style id="vrpSeparateShareStyles">#vrpPanel .vrp-drag-area{margin-top:12px;border:2px dashed var(--cctt-theme-accent,var(--blue));background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));padding:18px;border-radius:12px;cursor:grab;display:flex;flex-direction:column;gap:7px}#vrpPanel .vrp-drag-area[hidden]{display:none!important}#vrpPanel .vrp-drag-area:active{cursor:grabbing}#vrpPanel .vrp-drag-area:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:3px}#vrpPanel .vrp-drag-area small{color:var(--cctt-theme-muted,var(--muted));line-height:1.55}</style>
+<!-- MODIFICADO: recorte verificable y entrega de imágenes independientes a WhatsApp. -->
 <script id="vrpPhotoLogic">(()=>{'use strict';
 const root=document.getElementById('vrpPanel');if(!root)return;
-const get=id=>document.getElementById(id), gallery=get('vrpGallery'),msg=get('vrpMessage');let photos=[],serial=0;
+const get=id=>document.getElementById(id), gallery=get('vrpGallery'),msg=get('vrpMessage');let photos=[],serial=0,preparedFiles=[];const dragArea=get('vrpDragArea');
+// NUEVO: invalidar archivos preparados cuando cambian recortes o selección.
+function invalidate(){preparedFiles=[];dragArea.hidden=true;dragArea.draggable=false}
 const svg={copy:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>',remove:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 14h10l1-14M10 11v6m4-6v6"/></svg>'};
 const status=(s,error=false)=>{msg.textContent=s;msg.style.color=error?'var(--bad,#c13d3d)':'var(--cctt-theme-text,var(--text))'};
 const count=()=>{get('vrpCount').textContent=photos.length+' / 20 fotografías';get('vrpCopyAll').disabled=get('vrpDownloadAll').disabled=!photos.length};
 const clamp=v=>Math.max(0,Math.min(35,Number(v)||0));
 function region(photo){const {width:w,height:h}=photo.img,c=photo.crop;const l=Math.round(w*c.left/100),r=Math.round(w*c.right/100),t=Math.round(h*c.top/100),b=Math.round(h*c.bottom/100);return {x:l,y:t,w:Math.max(1,w-l-r),h:Math.max(1,h-t-b)}}
 function draw(photo,maxWidth=1400){const r=region(photo),scale=Math.min(1,maxWidth/r.w),w=Math.max(1,Math.round(r.w*scale)),h=Math.max(1,Math.round(r.h*scale)),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(photo.img,r.x,r.y,r.w,r.h,0,0,w,h);return c}
-function refresh(photo){if(!photo.canvas)return;const c=draw(photo,800),preview=photo.canvas;preview.width=c.width;preview.height=c.height;preview.getContext('2d').drawImage(c,0,0);if(photo.details)photo.details.textContent=(photo.img.width>photo.img.height?'Horizontal':photo.img.height>photo.img.width?'Vertical':'Cuadrada')+' · '+photo.img.width+' × '+photo.img.height+' px'}
+function refresh(photo){invalidate();if(!photo.canvas)return;const c=draw(photo,800),preview=photo.canvas;preview.width=c.width;preview.height=c.height;preview.getContext('2d').drawImage(c,0,0);if(photo.details)photo.details.textContent=(photo.img.width>photo.img.height?'Horizontal':photo.img.height>photo.img.width?'Vertical':'Cuadrada')+' · '+photo.img.width+' × '+photo.img.height+' px · Recorte inferior '+photo.crop.bottom+' % · Vista '+c.width+' × '+c.height+' px'}
 function toBlob(canvas){return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('No fue posible generar la imagen.')),'image/png'))}
 function copyCanvas(canvas){if(!window.isSecureContext||!navigator.clipboard?.write||typeof ClipboardItem==='undefined')return Promise.reject(Error('El navegador requiere HTTPS y compatibilidad con imágenes en el portapapeles.'));const promisedBlob=toBlob(canvas);return navigator.clipboard.write([new ClipboardItem({'image/png':promisedBlob})])}
 function download(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000)}
 function card(photo){const box=document.createElement('article');box.className='vrp-photo';const head=document.createElement('div');head.className='vrp-photo-head';const name=document.createElement('div'),title=document.createElement('strong'),meta=document.createElement('small');title.textContent=photo.file.name;name.append(title,meta);head.append(name);const canvas=document.createElement('canvas');canvas.className='vrp-preview';canvas.setAttribute('aria-label','Vista previa de '+photo.file.name);photo.canvas=canvas;photo.details=meta;
 const crops=document.createElement('div');crops.className='vrp-crops';[['top','Superior'],['bottom','Inferior'],['left','Izquierda'],['right','Derecha']].forEach(([key,label])=>{const wrap=document.createElement('label'),output=document.createElement('output'),slider=document.createElement('input');slider.type='range';slider.min='0';slider.max='35';slider.step='1';slider.value=photo.crop[key];output.textContent=slider.value+' %';wrap.textContent=label+' ';wrap.append(output,slider);slider.setAttribute('aria-label','Recorte '+label.toLowerCase()+' de '+photo.file.name);slider.addEventListener('input',()=>{photo.crop[key]=clamp(slider.value);output.textContent=slider.value+' %';refresh(photo)});photo.sliders[key]=slider;crops.append(wrap)});
-const actions=document.createElement('div');actions.className='vrp-actions';const copy=document.createElement('button');copy.type='button';copy.className='btn vrp-action';copy.innerHTML=svg.copy+' Copiar esta foto';copy.addEventListener('click',()=>{const c=draw(photo);copyCanvas(c).then(()=>status('Fotografía copiada. Pégala en WhatsApp.')).catch(e=>status(e.message+' Usa Guardar PNG.',true))});const remove=document.createElement('button');remove.type='button';remove.className='btn vrp-action';remove.innerHTML=svg.remove+' Quitar';remove.addEventListener('click',()=>{photos=photos.filter(p=>p!==photo);box.remove();count();status('Fotografía retirada de esta selección.')});actions.append(copy,remove);box.append(head,canvas,crops,actions);photo.box=box;gallery.append(box);refresh(photo)}
+const actions=document.createElement('div');actions.className='vrp-actions';const copy=document.createElement('button');copy.type='button';copy.className='btn vrp-action';copy.innerHTML=svg.copy+' Copiar esta foto';copy.addEventListener('click',()=>{const c=draw(photo);copyCanvas(c).then(()=>status('Fotografía copiada. Pégala en WhatsApp.')).catch(e=>status(e.message+' Usa Guardar PNG.',true))});const remove=document.createElement('button');remove.type='button';remove.className='btn vrp-action';remove.innerHTML=svg.remove+' Quitar';remove.addEventListener('click',()=>{photos=photos.filter(p=>p!==photo);invalidate();box.remove();count();status('Fotografía retirada de esta selección.')});actions.append(copy,remove);box.append(head,canvas,crops,actions);photo.box=box;gallery.append(box);refresh(photo)}
 async function openPhoto(file){const url=URL.createObjectURL(file);try{const img=await new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('No se pudo leer '+file.name));i.src=url});if(!img.naturalWidth||!img.naturalHeight)throw Error('Dimensiones inválidas');return {id:++serial,file,img,crop:{top:0,bottom:0,left:0,right:0},sliders:{}}}finally{URL.revokeObjectURL(url)}}
 get('vrpFiles').addEventListener('change',async e=>{const files=Array.from(e.target.files||[]);e.target.value='';const remaining=20-photos.length;if(!remaining){status('Máximo 20 fotografías.',true);return}let added=0;for(const f of files.slice(0,remaining)){if(!/^image\/(jpeg|png|webp|gif)$/i.test(f.type)){status('Formato no admitido: '+f.name,true);continue}try{const p=await openPhoto(f);photos.push(p);card(p);added++}catch(err){status(err.message,true)}}count();if(added)status(added+' fotografía(s) agregada(s). Los originales no se modifican.');if(files.length>remaining)status('Se alcanzó el límite de 20 fotografías. El resto no se añadió.',true)});
 get('vrpGlobalBottom').addEventListener('input',e=>get('vrpGlobalValue').textContent=e.target.value+' %');
 get('vrpApplyGlobal').addEventListener('click',()=>{const v=clamp(get('vrpGlobalBottom').value);photos.forEach(p=>{p.crop.bottom=v;p.sliders.bottom.value=v;p.sliders.bottom.parentElement.querySelector('output').textContent=v+' %';refresh(p)});status('Recorte inferior '+v+' % aplicado a '+photos.length+' fotografía(s).')});
-get('vrpClear').addEventListener('click',()=>{photos=[];gallery.replaceChildren();count();status('Selección vaciada. Los archivos originales permanecen intactos.')});
-function montage(){if(!photos.length)throw Error('Añade fotografías primero.');const ratios=photos.map(p=>{const r=region(p);return r.h/r.w});const totalRatio=ratios.reduce((a,b)=>a+b,0);const width=Math.floor(Math.min(1200,13500/totalRatio));if(width<80)throw Error('El conjunto es demasiado largo para una sola imagen; copia las fotos individualmente.');const hs=ratios.map(r=>Math.max(1,Math.round(r*width)));const height=hs.reduce((a,b)=>a+b,0);if(height>16000)throw Error('La composición supera el límite de tamaño del navegador.');const c=document.createElement('canvas');c.width=width;c.height=height;const ctx=c.getContext('2d');let y=0;photos.forEach((p,i)=>{const r=region(p);ctx.drawImage(p.img,r.x,r.y,r.w,r.h,0,y,width,hs[i]);y+=hs[i]});return c}
-get('vrpCopyAll').addEventListener('click',()=>{try{const c=montage();copyCanvas(c).then(()=>status('Todas las fotografías se copiaron como una sola imagen. Pégala en WhatsApp.')).catch(e=>status(e.message+' Puedes usar Guardar composición PNG.',true))}catch(e){status(e.message,true)}});
-get('vrpDownloadAll').addEventListener('click',async()=>{try{const blob=await toBlob(montage());download(blob,'Vialidades_fotografias_CCTT.png');status('Composición PNG generada.')}catch(e){status(e.message,true)}});
+get('vrpClear').addEventListener('click',()=>{photos=[];invalidate();gallery.replaceChildren();count();status('Selección vaciada. Los archivos originales permanecen intactos.')});
+// MODIFICADO: retirada la composición unificada de este módulo.
+// NUEVO: preparar PNG individuales con recortes vigentes, sin guardar en disco.
+async function prepareFiles(){
+ if(!photos.length)throw Error('Añade fotografías primero.');
+ const files=[];
+ for(let i=0;i<photos.length;i++){
+  const canvas=draw(photos[i],2400),blob=await toBlob(canvas);
+  files.push(new File([blob],'CCTT_Vialidades_'+String(i+1).padStart(2,'0')+'.png',{type:'image/png',lastModified:Date.now()}));
+ }
+ preparedFiles=files;get('vrpDragCount').textContent=files.length+' archivos PNG separados y recortados';dragArea.hidden=false;dragArea.draggable=true;
+ return files;
+}
+// NUEVO: transferencia nativa de archivos múltiples, sujeta al soporte del dispositivo.
+get('vrpCopyAll').addEventListener('click',async()=>{
+ try{
+  // MODIFICADO: el segundo clic comparte de inmediato para conservar el gesto requerido por Web Share.
+  if(preparedFiles.length&&navigator.canShare?.({files:preparedFiles})&&typeof navigator.share==='function'){
+   await navigator.share({files:preparedFiles});status('Se enviaron '+preparedFiles.length+' fotografías individuales al selector de compartir.');return;
+  }
+  const files=preparedFiles.length?preparedFiles:await prepareFiles();
+  if(navigator.canShare?.({files})&&typeof navigator.share==='function')status('Fotografías preparadas: vuelve a pulsar Compartir para abrir el selector del dispositivo.');
+  else status('Los '+files.length+' archivos están preparados. Arrastra el recuadro hacia WhatsApp Web; el arrastre entre páginas depende del navegador.');
+ }catch(e){if(e.name==='AbortError')status('Se canceló el envío. Las fotografías siguen preparadas.');else status(e.message,true)}
+});
+get('vrpDownloadAll').addEventListener('click',async()=>{
+ try{const files=await prepareFiles();status('Preparadas '+files.length+' fotografías independientes. Arrastra el recuadro hacia WhatsApp Web, sin descargarlas.');}
+ catch(e){status(e.message,true)}
+});
+// NUEVO: el arrastre aporta varios File independientes al destino compatible.
+dragArea.addEventListener('dragstart',e=>{
+ if(!preparedFiles.length){e.preventDefault();return}
+ try{
+  e.dataTransfer.effectAllowed='copy';
+  preparedFiles.forEach(file=>e.dataTransfer.items.add(file));
+  e.dataTransfer.setData('text/plain','Fotografías de vialidades CCTT');
+ }catch(err){e.preventDefault();status('Este navegador no permite arrastrar varias fotografías directamente.',true)}
+});
 count();
 })();</script>
 </body></html>
