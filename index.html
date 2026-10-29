@@ -8031,6 +8031,7 @@ if(tool==='polygon'&&drawing.length&&$('mcSnap').value!=='none'){
 // La plantilla segura existente es única: no se muestra la misma plantilla como dos capas CARTO diferentes.
 let mcCartoRequest=0;
 // MODIFICADO: tres estilos CARTO independientes; la clave permanece exclusivamente en cctt-carto-tiles.
+// MODIFICADO: compatibilidad con el contrato CARTO del panel administrativo y las rutas de tres estilos.
 async function setBase(){
  if(!map)return;
  const requested=$('mcBase').value;
@@ -8039,25 +8040,34 @@ async function setBase(){
  const osm='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
  const osmCredit='© OpenStreetMap contributors';
  const satellite='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
- const styles={light:'light_all',dark:'dark_all'};
+ const cartoStyle={light:'light_all',dark:'dark_all'}[requested];
  let url=requested==='satellite'?satellite:osm;
  let opts={maxZoom:19,crossOrigin:'anonymous',attribution:requested==='satellite'?'Tiles © Esri':osmCredit,updateWhenIdle:true,keepBuffer:2};
  let notice='';
- const cartoStyle=styles[requested];
  if(cartoStyle){
   try{
    const client=sb();
-   if(!client?.functions?.invoke||!client.supabaseUrl)throw Error('Servicio de mapas no disponible');
+   if(!client?.functions?.invoke||!client.supabaseUrl)throw Error('Servicio CARTO no disponible');
    const {data,error}=await client.functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
    if(ticket!==mcCartoRequest)return;
-   if(error||data?.error)throw Error(data?.error||error?.message||'Configuración CARTO no disponible');
-   if(data?.styles?.[cartoStyle]!==true)throw Error('El estilo CARTO no está habilitado en la función desplegada');
-   url=client.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/'+cartoStyle+'/{z}/{x}/{y}.png';
-   opts={maxZoom:19,attribution:osmCredit+' · CARTO',crossOrigin:'anonymous',updateWhenIdle:true,keepBuffer:2};
+   if(error||data?.error)throw Error(data?.error||error?.message||'No se pudo consultar la configuración');
+   const root=client.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/';
+   // MODIFICADO: preferir la ruta específica solo si la función confirma ese estilo.
+   if(data?.styles?.[cartoStyle]===true){
+    url=root+cartoStyle+'/{z}/{x}/{y}.png';
+    opts={maxZoom:19,crossOrigin:'anonymous',attribution:osmCredit+' · CARTO',updateWhenIdle:true,keepBuffer:2};
+   }else if(requested==='dark'&&data?.configured&&data?.tile_url){
+    // MODIFICADO: ruta anterior compartida con Mapa de ubicaciones, sin revelar la clave.
+    url=root+'{z}/{x}/{y}.png';
+    opts={maxZoom:19,crossOrigin:'anonymous',attribution:osmCredit+' · CARTO',updateWhenIdle:true,keepBuffer:2};
+    notice='Se utilizó la configuración CARTO compartida de Mapa de ubicaciones. El estilo depende de la plantilla administrativa.';
+   }else{
+    throw Error(requested==='light'?'La función desplegada no confirma Positron; la configuración anterior contiene una sola plantilla.':'La función no confirma Dark Matter ni dispone de una plantilla compartida.');
+   }
   }catch(error){
    if(ticket!==mcCartoRequest)return;
-   console.warn('CARTO:',error.message);
-   notice='CARTO '+(requested==='dark'?'oscuro':'claro')+' no disponible: '+error.message+'. Se muestra una alternativa.';
+   console.warn('Mapas y croquis · CARTO:',error.message);
+   notice='CARTO '+(requested==='dark'?'oscuro':'claro')+' no disponible: '+error.message+'. Se utiliza una capa alternativa.';
    if(requested==='dark')opts.className='mc-dark-tiles';
   }
  }
@@ -8073,13 +8083,15 @@ async function setBase(){
   base=candidate;candidate.bringToBack();
   if(notice)say(notice);
  };
- const failed=()=>{
+ const failed=(event)=>{
   if(settled||ticket!==mcCartoRequest)return;
   settled=true;cleanup();
   if(map.hasLayer(candidate))map.removeLayer(candidate);
+  const imageUrl=event?.tile?.src||'';
+  console.warn('Mapas y croquis · mosaico no disponible',imageUrl.replace(/([?&]key=)[^&]+/gi,'$1[oculta]'));
   if(previous&&map.hasLayer(previous)){base=previous;previous.bringToBack()}
   else{base=L.tileLayer(osm,{maxZoom:19,attribution:osmCredit,crossOrigin:'anonymous',className:requested==='dark'?'mc-dark-tiles':''}).addTo(map);base.bringToBack()}
-  say('No se pudo cargar la capa solicitada. Verifica la respuesta de cctt-carto-tiles; se conservó la capa disponible.');
+  say('No se pudo cargar la capa seleccionada. Comprueba la versión desplegada de cctt-carto-tiles, las rutas de mosaicos y su autenticación; se conservó la capa disponible.');
  };
  candidate.on('load',loaded);candidate.on('tileerror',failed);
  candidate.addTo(map);candidate.bringToBack();
