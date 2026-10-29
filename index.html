@@ -8025,35 +8025,62 @@ if(tool==='polygon'&&drawing.length&&$('mcSnap').value!=='none'){
  const prev=map.latLngToContainerPoint(drawing[drawing.length-1]),next=map.latLngToContainerPoint(ll),dx=next.x-prev.x,dy=next.y-prev.y,angle=Math.atan2(dy,dx),step=Number($('mcSnap').value)*Math.PI/180,length=Math.hypot(dx,dy),a=Math.round(angle/step)*step,p=map.containerPointToLatLng([prev.x+length*Math.cos(a),prev.y+length*Math.sin(a)]);
  ll[0]=+p.lat.toFixed(7);ll[1]=+p.lng.toFixed(7);
 }drawing.push(ll);drawDraft();say(`${drawing.length} vértices seleccionados. Pulsa Terminar dibujo para guardar.`)});map.on('dblclick',()=>finish());/* MODIFICADO: recalcular flechas georreferenciadas después del zoom para mantener puntas visibles. */map.on('zoomend',()=>render());/* MODIFICADO: notificar posición y zoom sin acceder al mapa desde otros scripts. */const publishMapStatus=()=>{const c=map.getCenter();p.dispatchEvent(new CustomEvent('mc:mapstatus',{detail:{lat:c.lat,lng:c.lng,zoom:map.getZoom()}}))};map.on('moveend',publishMapStatus);map.on('zoomend',publishMapStatus);publishMapStatus();loadList(true)}
-// MODIFICADO: comparte el servicio seguro CARTO del módulo Mapa de ubicaciones, sin pedir claves en el navegador.
+// MODIFICADO: nunca cargar mosaicos CARTO directamente desde cartocdn, pues devuelve imágenes «API KEY REQUIRED».
+// El acceso al secreto sigue exclusivamente en cctt-carto-tiles. Sin proxy válido, la alternativa es OSM, no una imagen de error.
 let mcCartoRequest=0;
 async function setBase(){
  if(!map)return;
  const choiceName=$('mcBase').value;
  $('mcQuickBase').value=choiceName;
- const bases={streets:['https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png','© OpenStreetMap contributors'],light:['https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png','© OpenStreetMap contributors · CARTO'],dark:['https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png','© OpenStreetMap contributors · CARTO'],satellite:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}','Tiles © Esri']};
+ const bases={streets:['https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png','© OpenStreetMap contributors'],satellite:['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}','Tiles © Esri']};
  const ticket=++mcCartoRequest;
+ const carto=choiceName==='dark'||choiceName==='light';
  let choice=bases[choiceName]||bases.streets;
- if(choiceName==='dark'){
+ let proxy=false;
+ if(carto){
+  // MODIFICADO: ambas elecciones consultan el servidor. El servicio disponible expone una sola plantilla XYZ configurada.
+  // La capa clara solo puede solicitarse al proxy si el servidor tiene configurada una plantilla clara.
   try{
-   const client=sb();
-   if(client){
-    const {data:config,error}=await client.functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
-    if(error||config?.error)throw Error(config?.error||error?.message||'Configuración no disponible');
-    if(ticket!==mcCartoRequest)return;
-    /* MODIFICADO: los usuarios no administradores no reciben tile_url. */if(config?.ready===true||(config?.configured&&config?.secret_set===true)){
-     const root=client.supabaseUrl;
-     if(root)choice=[root.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/{z}/{x}/{y}.png','© OpenStreetMap contributors · CARTO'];
+   const service=sb();
+   if(!service?.functions?.invoke)throw Error('No hay sesión para consultar CARTO');
+   const {data:config,error}=await service.functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
+   if(error||config?.error)throw Error(config?.error||error?.message||'Configuración no disponible');
+   if(ticket!==mcCartoRequest)return;
+   if(config?.ready===true&&service.supabaseUrl){
+    // La configuración de CARTO existente es una sola plantilla (habitualmente oscura).
+    // Nunca representar la misma plantilla oscura como si fuera CARTO claro.
+    const template=String(config.tile_url||'');
+    const configuredLight=/\b(light_all|voyager|positron)\b/i.test(template);
+    const configuredDark=/\b(dark_all|dark_matter)\b/i.test(template);
+    if((choiceName==='light'&&configuredLight)||(choiceName==='dark'&&configuredDark)||(!template&&choiceName==='dark')){
+     choice=[service.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/{z}/{x}/{y}.png','© OpenStreetMap contributors · CARTO'];
+     proxy=true;
     }
    }
-  }catch(error){if(ticket!==mcCartoRequest)return;console.warn('CARTO configurado:',error.message);say('No se pudo consultar la capa CARTO compartida. Se intentará la capa pública.');}
+  }catch(error){if(ticket!==mcCartoRequest)return;console.warn('CARTO:',error.message)}
+  if(!proxy){
+   // MODIFICADO: la capa pública produce un aviso en vez de cartografía; nunca usarla como respaldo.
+   choice=bases.streets;
+   say(choiceName==='light'?'CARTO claro requiere una plantilla clara configurada en cctt-carto-tiles. Se muestra OpenStreetMap, sin solicitar claves.':'No hay acceso a la capa CARTO segura. Se muestra OpenStreetMap; revisa cctt-carto-tiles y su acceso a mosaicos.');
+  }
  }
  if(ticket!==mcCartoRequest)return;
- if(base)map.removeLayer(base);
- base=L.tileLayer(choice[0],{attribution:choice[1],crossOrigin:'anonymous',maxZoom:19}).addTo(map);
- base.bringToBack();
- let errors=0;
- if(choiceName==='dark'||choiceName==='light')base.on('tileerror',()=>{if(++errors>=3&&ticket===mcCartoRequest){++mcCartoRequest;$('mcBase').value='streets';$('mcQuickBase').value='streets';setBase();say('No se pudo cargar CARTO; se restauró OpenStreetMap. Comprueba la configuración de cctt-carto-tiles.');}});
+ const previous=base;
+ const layer=L.tileLayer(choice[0],{attribution:choice[1],crossOrigin:'anonymous',maxZoom:19});
+ base=layer;
+ layer.addTo(map);layer.bringToBack();
+ if(previous)map.removeLayer(previous);
+ if(proxy){
+  let errors=0;
+  layer.on('tileerror',()=>{
+   if(++errors>=2&&ticket===mcCartoRequest){
+    // MODIFICADO: sin reintentar una URL pública que muestra API KEY REQUIRED.
+    ++mcCartoRequest;
+    if(base===layer){map.removeLayer(layer);base=L.tileLayer(bases.streets[0],{attribution:bases.streets[1],crossOrigin:'anonymous',maxZoom:19}).addTo(map);base.bringToBack()}
+    say('El servicio cctt-carto-tiles rechazó los mosaicos. Se muestra OpenStreetMap; comprueba que la función desplegada admita GET /tiles y permita acceder a las imágenes.');
+   }
+  });
+ }
 }
 
 // MODIFICADO: el icono personalizado PNG/SVG conserva su canal alfa, sin contenedor blanco.
