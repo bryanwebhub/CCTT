@@ -8046,12 +8046,13 @@ async function setBase(){
  let notice='';
  if(cartoStyle){
   try{
-   const client=sb();
-   if(!client?.functions?.invoke||!client.supabaseUrl)throw Error('Servicio CARTO no disponible');
-   const {data,error}=await client.functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
+   // MODIFICADO: utilizar el cliente Supabase existente de este módulo; sb() no está definido aquí.
+   const cartoClient=client();
+   if(!cartoClient?.functions?.invoke||!cartoClient.supabaseUrl)throw Error('Servicio CARTO no disponible');
+   const {data,error}=await cartoClient.functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
    if(ticket!==mcCartoRequest)return;
    if(error||data?.error)throw Error(data?.error||error?.message||'No se pudo consultar la configuración');
-   const root=client.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/';
+   const root=cartoClient.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/';
    // MODIFICADO: preferir la ruta específica solo si la función confirma ese estilo.
    if(data?.styles?.[cartoStyle]===true){
     url=root+cartoStyle+'/{z}/{x}/{y}.png';
