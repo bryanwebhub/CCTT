@@ -8417,13 +8417,13 @@ function renderPis(raw){
    const st=field('Status',r.status,true);st.classList.add('cctt-dec-access-status');official.append(st);populated+=4;
   }
  }else if(data.accessHeading){official.append(field('Accesos','Se informan accesos, pero no fue posible separar sus datos. Revisa el resultado oficial.',true));populated++}
- // Los dos rótulos pueden representar sistemas de numeración distintos: mostrar diferencia sin afirmar fraude.
- const items=[...document.querySelectorAll('#page-verificacionCitas .cctt-dec-ocr-item')];
- const citaItem=items.find(el=>/^CITA No\.$/i.test(el.querySelector('strong')?.textContent?.trim()||''));
- const documentCita=citaItem?.querySelector('span')?.textContent?.trim()||'';
- if(data.code&&documentCita&&data.code!==documentCita){
-  const warning=field('Revisión prioritaria de identificadores','CITA No. del documento: '+documentCita+' · Código de cita PIS: '+data.code+'. Son rótulos distintos; confirmar su correspondencia antes de concluir una irregularidad.',true);
-  warning.classList.add('cctt-dec-cita-review');official.prepend(warning);
+ // MODIFICADO: DEC se compara exclusivamente con DEC de acceso PIS; CITA No. y Código de cita son identificadores de naturaleza distinta.
+ const documentDec=$('ccttDecNumber')?.value.trim()||'';
+ const mismatchedDecs=data.records.filter(r=>documentDec&&/^\d{5,15}$/.test(documentDec)&&r.dec!==documentDec);
+ if(mismatchedDecs.length){
+  const observed=[...new Set(mismatchedDecs.map(r=>r.dec))].join(', ');
+  const warning=field('Revisión prioritaria: DEC de acceso diferente','DEC del documento consultado: '+documentDec+' · DEC registrado en acceso PIS: '+observed+'. Verifica el registro oficial: esta diferencia requiere revisión prioritaria y no demuestra por sí sola un uso indebido.',true);
+  warning.classList.add('cctt-dec-dec-review');official.prepend(warning);
  }
  if(!populated)official.append(field('Respuesta oficial sin formato estructurado',data.raw,true));
  if(data.terminal){if(!pis.value.trim()||pis.value===sourcePis)pis.value=data.terminal;sourcePis=data.terminal;autoCompare()}
@@ -8543,6 +8543,8 @@ refresh();
 <style id="ccttDecAccessLayoutStyles">
 #page-verificacionCitas #ccttDecOfficial .cctt-dec-access-heading{border-left:4px solid var(--cctt-theme-accent,var(--blue))}
 #page-verificacionCitas #ccttDecOfficial .cctt-dec-cita-review{border-left:4px solid #d5962d;background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 87%,#d5962d 13%)}
+/* NUEVO: alta prioridad solo para DEC distintos, con contraste en ambos temas. */
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-dec-review{border-left:4px solid var(--bad,#c13d3d);background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 84%,var(--bad,#c13d3d) 16%);color:var(--cctt-theme-text,var(--text))}
 #page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field{overflow-wrap:anywhere;line-height:1.5}
 #page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field.cctt-dec-access-status{grid-column:1/-1}
 </style>
