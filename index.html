@@ -8376,21 +8376,22 @@ $('ccttDecExtract').addEventListener('click',async()=>{
  try{
   // MODIFICADO: mejora opcional de una copia de la foto; nunca reemplaza el archivo original.
   const dataUrl=await (window.ccttDecAdaptivePrepare ? window.ccttDecAdaptivePrepare(f) : new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(new Error('No se pudo leer la imagen.'));reader.onload=()=>resolve(String(reader.result||''));reader.readAsDataURL(f)}));
-  // MODIFICADO: tiempo máximo para OCR; no dejar la interfaz bloqueada si el servidor no responde.
+  // MODIFICADO: espera OCR de 55 segundos, coordinada con los límites independientes de autenticación (7 s), permisos (7 s) y Gemini (30 s) en la función; incluye margen de transferencia.
   const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),16000);
+  const timeout=setTimeout(()=>controller.abort(),55000);
   let response;
   try{response=await client.functions.invoke('cctt-dec-ocr',{body:{image:dataUrl},signal:controller.signal})}
   finally{clearTimeout(timeout)}
   const {data,error}=response;
   // MODIFICADO: distinguir timeout 504 de otros errores sin alterar la Edge Function.
-  if(error){const status=Number(error?.context?.status||error?.status||0);if(status===504)throw new Error('El servidor OCR agotó su tiempo de espera (HTTP 504). Revisa cctt-dec-ocr y su conexión con Gemini; no se asignó ningún DEC.');throw new Error('La función de reconocimiento no está disponible o rechazó la solicitud'+(status?' (HTTP '+status+')':'')+'.');}
+  // MODIFICADO: conservar el diagnóstico HTTP del proveedor y el mensaje seguro que devuelve la función, sin mostrar información sensible.
+  if(error){const status=Number(error?.context?.status||error?.status||0);if(status===504)throw new Error('El servidor OCR agotó su tiempo de espera (HTTP 504). Revisa cctt-dec-ocr y su conexión con Gemini.');let reason='';try{const body=error?.context;if(body&&typeof body.clone==='function'){const json=await body.clone().json();if(typeof json?.error==='string')reason=json.error.slice(0,350)}}catch(_){/* MODIFICADO: conservar el diagnóstico HTTP si la respuesta no contiene JSON. */}throw new Error(reason||('La función de reconocimiento no está disponible o rechazó la solicitud'+(status?' (HTTP '+status+')':'')+'.'));}
   if(!data||data.ok!==true)throw new Error(String(data?.error||'La función no devolvió un resultado OCR válido.'));
   const raw=String(data.text||'').slice(0,10000);text.value=raw;
   const proposed=String(data.dec||'');const candidate=/^[0-9]{5,15}$/.test(proposed)?proposed:getDec(raw);
   if(candidate){number.value=candidate;updateLink();imageStatus.textContent='DEC sugerido por OCR: '+candidate+'. Verifícalo visualmente en la imagen antes de consultar PIS.'}
   else imageStatus.textContent='El OCR no pudo identificar un DEC inequívoco. Revisa el texto y confirma manualmente.';
- }catch(e){imageStatus.textContent=(e?.name==='AbortError'||/abort/i.test(String(e?.message||'')))?'No se completó el OCR: tiempo de espera de 16 segundos agotado. Verifica que la función de servidor procese solicitudes POST y tenga configurado un motor OCR. No se asignó ningún DEC.':'No se completó el OCR: '+String(e?.message||'Error de comunicación')+' No se asigna ningún DEC automáticamente.';}
+ }catch(e){/* MODIFICADO: diferenciar la espera del cliente OCR, sin cambiar los estados de PIS. */imageStatus.textContent=(e?.name==='AbortError'||/abort/i.test(String(e?.message||'')))?'No se completó el OCR: tiempo de espera del cliente (55 segundos) agotado. Comprueba el registro POST de cctt-dec-ocr en Supabase. No se asignó ningún DEC.':'No se completó el OCR: '+String(e?.message||'Error de comunicación')+' No se asigna ningún DEC automáticamente.';}
  finally{decOcrBusy=false;btn.disabled=false}
 });
 $('ccttDecCheck').addEventListener('click',async()=>{if(!isAllowed())return;const dec=safeDEC();if(!dec){official.textContent='DEC inválido: introduce de 5 a 15 dígitos tal como aparecen en la imagen.';return}updateLink();official.textContent='Consultando el portal PIS…';const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),12000);try{const res=await fetch(link.href,{method:'GET',mode:'cors',credentials:'omit',signal:ctrl.signal,headers:{Accept:'text/html, text/plain'}});if(!res.ok)throw new Error('HTTP '+res.status);const html=await res.text();const parsed=new DOMParser().parseFromString(html,'text/html');parsed.querySelectorAll('script,style,noscript').forEach(e=>e.remove());const result=(parsed.body?.textContent||'').replace(/\s+/g,' ').trim().slice(0,2500);if(!result)throw new Error('Respuesta vacía');official.textContent='Respuesta recuperada del portal PIS para DEC '+dec+':\n'+result+'\n\nLa ausencia de accesos no equivale a autenticidad confirmada.'}catch(err){official.textContent='No fue posible verificar automáticamente el DEC '+dec+' en PIS ('+(err.name==='AbortError'?'tiempo de espera agotado':'solicitud bloqueada, no disponible o sin acceso CORS')+'). Abre el enlace oficial y revisa su resultado. No se asigna estado de validez.'}finally{clearTimeout(timer)}});
