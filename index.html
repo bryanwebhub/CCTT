@@ -8396,4 +8396,65 @@ const observer=new MutationObserver(()=>{if(status.textContent.startsWith('DEC s
 observer.observe(status,{childList:true,characterData:true,subtree:true});observer.observe(official,{childList:true,characterData:true,subtree:true});
 text.addEventListener('input',applyDoc);doc.addEventListener('input',()=>{sourceDoc=doc.value;autoCompare()});pis.addEventListener('input',()=>{sourcePis=pis.value;autoCompare()});$('ccttDecFile')?.addEventListener('change',()=>{sourceDoc='';sourcePis='';lastOfficial='';doc.value='';pis.value='';result.textContent='Comparación pendiente.';delete result.dataset.review;official.classList.remove('cctt-dec-pis-structured');delete official.dataset.pisStructured},true);
 })();</script>
+<!-- NUEVO: presentación y extracción localizada del OCR DEC; se conserva íntegro el texto OCR original. -->
+<style id="ccttDecOcrOrdenadoStyles">
+#page-verificacionCitas .cctt-dec-ocr-summary{margin:12px 0;padding:12px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:10px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+#page-verificacionCitas .cctt-dec-ocr-summary h4{margin:0 0 10px;font-size:14px;color:var(--cctt-theme-text,var(--text))}
+#page-verificacionCitas .cctt-dec-ocr-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#page-verificacionCitas .cctt-dec-ocr-item{min-width:0;padding:10px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:8px;background:var(--cctt-theme-table,var(--card))}
+#page-verificacionCitas .cctt-dec-ocr-item strong{display:block;font-size:11px;margin-bottom:4px;color:var(--cctt-theme-muted,var(--muted))}
+#page-verificacionCitas .cctt-dec-ocr-item span{display:block;font-size:14px;font-weight:750;overflow-wrap:anywhere}
+#page-verificacionCitas .cctt-dec-ocr-summary-note{font-size:12px;color:var(--cctt-theme-muted,var(--muted));margin:10px 0 0}
+@media(max-width:720px){#page-verificacionCitas .cctt-dec-ocr-summary-grid{grid-template-columns:1fr}}
+</style>
+<script id="ccttDecOcrOrdenadoClient">(()=>{'use strict'; // NUEVO: corrección del OCR multicolumna sin reemplazar funciones existentes.
+const $=id=>document.getElementById(id),page=$('page-verificacionCitas'),ocr=$('ccttDecOcrText'),status=$('ccttDecImageStatus'),terminal=$('ccttDecTerminalDoc'),pis=$('ccttDecTerminalPIS'),compare=$('ccttDecCompare'),result=$('ccttDecCompareResult');
+if(!page||!ocr||!status||!terminal||!pis||!compare||!result)return;
+const summary=document.createElement('section');summary.className='cctt-dec-ocr-summary';summary.hidden=true;summary.setAttribute('aria-label','Datos reconocidos del documento');
+const heading=document.createElement('h4');heading.textContent='Datos extraídos de la imagen';const grid=document.createElement('div');grid.className='cctt-dec-ocr-summary-grid';const note=document.createElement('p');note.className='cctt-dec-ocr-summary-note';note.textContent='Datos preliminares del OCR. Comprueba cada valor en la imagen; no certifican autenticidad.';summary.append(heading,grid,note);ocr.parentNode.insertBefore(summary,ocr);
+const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
+const labelRx=/\b(?:DEC\s*(?:N[o°.]*)?|CITA\s*(?:N[o°.]*)?|ACCESO|TERMINAL|FECHA\s+(?:INICIO|FIN)\s+CITA|HORA\s+(?:INICIO|FIN)\s+CITA|TIPO\s+DE\s+CARGA|AGENCIA\s+ADUANAL|DOCUMENTO\s+ELECTR[ÓO]NICO)\s*:/ig;
+function parse(raw){
+ const lines=String(raw||'').replace(/\r/g,'').split(/\n/).map(clean).filter(Boolean),joined=lines.join('\n');
+ const get=(rx)=>{const m=joined.match(rx);return m?clean(m[1]):''};
+ const dec=get(/\bDEC\s*(?:No?\.?|N[°º])?\s*:?\s*(\d{5,15})\b/i);
+ const cita=get(/\bCITA\s*(?:No?\.?|N[°º])?\s*:?\s*(\d{4,15})\b/i);
+ let access='',term='',uncertain=false;
+ // Caso de columnas paralelas: "ACCESO: TERMINAL:" seguido por "ZONA SUR CEMEX".
+ // Solo dividir si se identifica un acceso separado por etiqueta y un prefijo de zona inequívoco.
+ for(let i=0;i<lines.length;i++){
+  const line=lines[i];
+  if(/\bACCESO\s*:\s*TERMINAL\s*:/i.test(line)||/\bTERMINAL\s*:\s*ACCESO\s*:/i.test(line)){
+    const candidate=clean(lines[i+1]||'');
+    const m=candidate.match(/^(ZONA\s+(?:NORTE|SUR|CENTRO|ORIENTE|PONIENTE))\s+(.+)$/i);
+    if(m&&m[2]&&!/^(?:TIPO\s+DE|AGENCIA|FECHA|HORA|DOCUMENTO|CITA|DEC)\b/i.test(m[2])){access=m[1];term=clean(m[2]);}
+    else uncertain=true;
+    break;
+  }
+ }
+ // Formato normal: "TERMINAL: CEMEX" o etiqueta aislada con el valor en la línea siguiente.
+ if(!term){
+  for(let i=0;i<lines.length;i++){
+   const m=lines[i].match(/\bTERMINAL\s*:\s*(.*)$/i);if(!m)continue;
+   let v=clean(m[1]);if(!v)v=clean(lines[i+1]||'');
+   if(/^(?:ACCESO|TIPO DE CARGA|AGENCIA ADUANAL|FECHA|HORA|DOCUMENTO|CITA|DEC)\s*:/i.test(v))continue;
+   // Si el OCR mezcla etiquetas, no asignar el valor completo como terminal.
+   if(/\b(?:ACCESO|TIPO DE CARGA|AGENCIA ADUANAL|FECHA|HORA)\s*:/i.test(v)){uncertain=true;continue;}
+   if(v && !/^ZONA\s+(?:NORTE|SUR|CENTRO|ORIENTE|PONIENTE)\b/i.test(v)){term=v.slice(0,150);break;}
+  }
+ }
+ if(!access){const m=joined.match(/\bACCESO\s*:\s*(ZONA\s+(?:NORTE|SUR|CENTRO|ORIENTE|PONIENTE))\b/i);if(m)access=clean(m[1]);}
+ return {dec,cita,access,terminal:term,uncertain};
+}
+let filled='',last='';
+function render(){const raw=ocr.value;if(raw===last)return;last=raw;const data=parse(raw);grid.replaceChildren();const entries=[['DEC No.',data.dec],['CITA No.',data.cita],['ACCESO',data.access],['TERMINAL',data.terminal]];for(const [k,v] of entries){if(!v)continue;const item=document.createElement('div');item.className='cctt-dec-ocr-item';const a=document.createElement('strong');a.textContent=k;const b=document.createElement('span');b.textContent=v;item.append(a,b);grid.append(item)}summary.hidden=!grid.childElementCount;if(data.uncertain&&!data.terminal){note.textContent='La distribución del OCR no permite separar la terminal con certeza: verifícala manualmente en la imagen.'}else note.textContent='Datos preliminares del OCR. Comprueba cada valor en la imagen; no certifican autenticidad.';
+ if(data.terminal){const previous=terminal.value.trim();if(!previous||previous===filled){terminal.value=data.terminal;filled=data.terminal;terminal.dispatchEvent(new Event('input',{bubbles:true}));if(pis.value.trim())compare.click();}}
+ else if(terminal.value.trim()===filled&&filled){terminal.value='';filled='';terminal.dispatchEvent(new Event('input',{bubbles:true}));}
+ if(!terminal.value.trim()||!pis.value.trim()){result.textContent='Comparación pendiente: falta identificar una de las terminales.';delete result.dataset.review;}
+}
+// La escritura programática del OCR no emite un evento input: se observa el estado de finalización.
+new MutationObserver(()=>{if(/^(?:DEC sugerido por OCR:|DEC localizado en el texto:|El OCR no pudo identificar)/.test(status.textContent||''))render()}).observe(status,{childList:true,characterData:true,subtree:true});
+ocr.addEventListener('input',render);
+$('ccttDecFile')?.addEventListener('change',()=>{last='';filled='';summary.hidden=true;grid.replaceChildren()},true);
+})();</script>
 </body></html>
