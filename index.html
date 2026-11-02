@@ -8457,4 +8457,47 @@ new MutationObserver(()=>{if(/^(?:DEC sugerido por OCR:|DEC localizado en el tex
 ocr.addEventListener('input',render);
 $('ccttDecFile')?.addEventListener('change',()=>{last='';filled='';summary.hidden=true;grid.replaceChildren()},true);
 })();</script>
+<!-- NUEVO: indicadores visuales exclusivos de estatus PIS, compatibles con modo predeterminado y oscuro. -->
+<style id="ccttDecStatusColorsStyles">
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field.cctt-dec-status--negative{border-left:4px solid #dc555f;background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 89%,#dc555f 11%)}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field.cctt-dec-status--positive{border-left:4px solid #15966d;background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 89%,#15966d 11%)}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field.cctt-dec-status--caution{border-left:4px solid #cf912c;background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 89%,#cf912c 11%)}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field.cctt-dec-status--neutral{border-left:4px solid var(--cctt-theme-line,var(--line))}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field[class*="cctt-dec-status--"] span{color:var(--cctt-theme-text,var(--text));font-weight:800}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field[class*="cctt-dec-status--"] span::before{content:attr(data-status-marker);display:inline-block;margin-right:8px;font-weight:900}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-status--negative span::before{color:#e15b63}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-status--positive span::before{color:#169c72}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-status--caution span::before{color:#dba13c}
+</style>
+<script id="ccttDecStatusColorsClient">(()=>{'use strict'; // NUEVO: presentación, sin alterar el texto ni el análisis del portal.
+const official=document.getElementById('ccttDecOfficial');
+if(!official)return;
+const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+function category(label,value){
+ const txt=normalize(value),title=normalize(label);
+ if(!txt)return 'neutral';
+ // Un "no ingresó" nunca se debe confundir con "sí ingresó".
+ if(/\b(no ingreso|sin ingreso|no autorizado|rechazad\w*|cancelad\w*|finalizad\w*|vencid\w*|cerrad\w*|expirad\w*|denegad\w*)\b/.test(txt))return 'negative';
+ if(/\b(si ingreso|ingreso|cita abierta|abierta|vigente|autorizad\w*|confirmad\w*)\b/.test(txt))return 'positive';
+ if(/\b(pendiente|por confirmar|programad|en proceso|en revision|sin acceso)\b/.test(txt))return 'caution';
+ if(title==='accesos'&&/no presenta ningun acceso/.test(txt))return 'neutral';
+ return 'neutral';
+}
+function refresh(){
+ for(const card of official.querySelectorAll('.cctt-dec-pis-field')){
+  const label=card.querySelector('strong'),value=card.querySelector('span');
+  if(!label||!value)continue;
+  const title=normalize(label.textContent);
+  if(title!=='estatus de la cita'&&title!=='estatus'&&title!=='status'&&title!=='accesos')continue;
+  const type=category(title,value.textContent);
+  card.classList.remove('cctt-dec-status--negative','cctt-dec-status--positive','cctt-dec-status--caution','cctt-dec-status--neutral');
+  card.classList.add('cctt-dec-status--'+type);
+  value.dataset.statusMarker=type==='negative'?'●':type==='positive'?'●':type==='caution'?'◆':'';
+  // El marcador reside en el valor para que siga accesible el texto original.
+ }
+}
+// La extracción PIS sustituye sus tarjetas dinámicamente; observar solo sus hijos evita ciclos por CSS.
+new MutationObserver(refresh).observe(official,{childList:true,subtree:true,characterData:true});
+refresh();
+})();</script>
 </body></html>
