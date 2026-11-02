@@ -8387,9 +8387,47 @@ let sourceDoc='',sourcePis='',lastOfficial='';
 function terminalFromOcr(value){const raw=String(value||'').replace(/\r/g,'');const m=raw.match(/(?:^|\n)\s*TERMINAL\s*:\s*(?:\n\s*)?([^\n]+)/i);if(!m)return '';const candidate=m[1].trim();return /^(?:TIPO DE CARGA|AGENCIA ADUANAL|FECHA|CITA|ACCESO|DEC\b|DEA\b|DEO\b)/i.test(candidate)?'':candidate.slice(0,180)}
 function applyDoc(){const value=terminalFromOcr(text.value);if(value&&value!==sourceDoc){if(!doc.value.trim()||doc.value===sourceDoc)doc.value=value;sourceDoc=value;autoCompare()}}
 // NUEVO: campos oficiales extraídos exclusivamente del texto recibido de PIS; datos desconocidos se dejan sin completar.
-function parsePis(raw){const cut=String(raw||'').replace(/^Respuesta recuperada del portal PIS para DEC\s*\d+\s*:\s*/i,'').split(/La ausencia de accesos no equivale a autenticidad confirmada\./i)[0].trim();const seek=(pattern)=>{const m=cut.match(pattern);return m?m[1].replace(/\s+/g,' ').trim():''};return {code:seek(/C[oó]digo\s+de\s+cita\s*:\s*(.*?)(?=Recinto\s*:|Fecha\s*\/\s*hora|Estatus\s+de\s+la\s+cita|$)/i),terminal:seek(/Recinto\s*:\s*(.*?)(?=Fecha\s*\/\s*hora|Estatus\s+de\s+la\s+cita|$)/i),start:seek(/Fecha\s*\/\s*hora\s+inicio\s*:\s*(.*?)(?=Fecha\s*\/\s*hora\s+Finaliza|Estatus\s+de\s+la\s+cita|$)/i),end:seek(/Fecha\s*\/\s*hora\s+Finaliza\s*:\s*(.*?)(?=Estatus\s+de\s+la\s+cita|$)/i),state:seek(/Estatus\s+de\s+la\s+cita\s*:\s*(.*?)(?=La cita no presenta|$)/i),access:/La cita no presenta ning[uú]n acceso/i.test(cut)?'La cita no presenta ningún acceso':'',raw:cut};}
+// MODIFICADO: separar estatus general de accesos; no concatenar secciones de PIS.
+function parsePis(raw){
+ const cut=String(raw||'').replace(/^Respuesta recuperada del portal PIS para DEC\s*\d+\s*:\s*/i,'').split(/La ausencia de accesos no equivale a autenticidad confirmada\./i)[0].trim();
+ const seek=rx=>{const m=cut.match(rx);return m?m[1].replace(/\s+/g,' ').trim():''};
+ const boundary='(?=C[oó]digo\\s+de\\s+cita\\s*:|Recinto\\s*:|Fecha\\s*\\/\\s*hora\\s+(?:inicio|Finaliza)\\s*:|Estatus\\s+de\\s+la\\s+cita\\s*:|La\\s+cita\\s+presenta|La\\s+cita\\s+no\\s+presenta|No\\.\\s*del\\s+DEC\\s*:|$)';
+ const get=(label)=>seek(new RegExp(label+'\\s*:\\s*(.*?)'+boundary,'i'));
+ const records=[];
+ const rx=/No\.\s*del\s+DEC\s*:\s*(\d{5,15})\s+Fecha\s*\/\s*hora\s*:\s*(\d{2}\/\d{2}\/\d{4})\s+(\d{2}:\d{2})\s*hrs?\.?\s+Status\s*:\s*(.*?)(?=No\.\s*del\s+DEC\s*:|$)/gi;
+ for(const m of cut.matchAll(rx))records.push({dec:m[1],date:m[2],time:m[3],status:m[4].trim().replace(/\s+/g,' ')});
+ return {code:get('C[oó]digo\\s+de\\s+cita'),terminal:get('Recinto'),start:get('Fecha\\s*\\/\\s*hora\\s+inicio'),end:get('Fecha\\s*\\/\\s*hora\\s+Finaliza'),state:get('Estatus\\s+de\\s+la\\s+cita'),access:/La cita no presenta ning[uú]n acceso/i.test(cut)?'La cita no presenta ningun acceso':'',accessHeading:/La\s+cita\s+presenta\s+los\s+siguientes\s+accesos\s+mediante\s+DEC/i.test(cut),records,raw:cut};
+}
 function field(title,value,wide=false){const el=document.createElement('div');el.className='cctt-dec-pis-field'+(wide?' cctt-dec-pis-wide':'');const caption=document.createElement('strong');caption.textContent=title;const val=document.createElement('span');val.textContent=value;el.append(caption,val);return el}
-function renderPis(raw){if(!raw.startsWith('Respuesta recuperada del portal PIS'))return;if(raw===lastOfficial&&official.dataset.pisStructured==='1')return;lastOfficial=raw;const data=parsePis(raw);official.replaceChildren();official.classList.add('cctt-dec-pis-structured');official.dataset.pisStructured='1';const list=[['Código de cita',data.code],['Recinto / terminal',data.terminal],['Inicio de cita',data.start],['Fin de cita',data.end],['Estatus de la cita',data.state],['Accesos',data.access]];let populated=0;for(const [name,value] of list){if(value){official.append(field(name,value,name==='Estatus de la cita'||name==='Accesos'));populated++}}if(!populated)official.append(field('Respuesta oficial sin formato estructurado',data.raw,true));if(data.terminal){if(!pis.value.trim()||pis.value===sourcePis)pis.value=data.terminal;sourcePis=data.terminal;autoCompare()}}
+// MODIFICADO: presentar cada registro y sus fechas de uso por separado, con revisión prioritaria de identificadores.
+function renderPis(raw){
+ if(!raw.startsWith('Respuesta recuperada del portal PIS'))return;
+ if(raw===lastOfficial&&official.dataset.pisStructured==='1')return;
+ lastOfficial=raw;const data=parsePis(raw);official.replaceChildren();official.classList.add('cctt-dec-pis-structured');official.dataset.pisStructured='1';
+ const list=[['Código de cita',data.code],['Recinto / terminal',data.terminal],['Inicio de cita',data.start],['Fin de cita',data.end],['Estatus de la cita',data.state]];
+ let populated=0;
+ for(const [name,value] of list){if(value){official.append(field(name,value,name==='Estatus de la cita'));populated++}}
+ if(data.access){official.append(field('Accesos',data.access,true));populated++}
+ if(data.records.length){
+  const heading=field('Accesos registrados','Información de uso de la cita en PIS',true);heading.classList.add('cctt-dec-access-heading');official.append(heading);
+  for(let i=0;i<data.records.length;i++){
+   const r=data.records[i];
+   const f=field('DEC de acceso'+(data.records.length>1?' '+(i+1):''),r.dec);
+   official.append(f,field('Fecha de uso',r.date),field('Hora de uso',r.time));
+   const st=field('Status',r.status,true);st.classList.add('cctt-dec-access-status');official.append(st);populated+=4;
+  }
+ }else if(data.accessHeading){official.append(field('Accesos','Se informan accesos, pero no fue posible separar sus datos. Revisa el resultado oficial.',true));populated++}
+ // Los dos rótulos pueden representar sistemas de numeración distintos: mostrar diferencia sin afirmar fraude.
+ const items=[...document.querySelectorAll('#page-verificacionCitas .cctt-dec-ocr-item')];
+ const citaItem=items.find(el=>/^CITA No\.$/i.test(el.querySelector('strong')?.textContent?.trim()||''));
+ const documentCita=citaItem?.querySelector('span')?.textContent?.trim()||'';
+ if(data.code&&documentCita&&data.code!==documentCita){
+  const warning=field('Revisión prioritaria de identificadores','CITA No. del documento: '+documentCita+' · Código de cita PIS: '+data.code+'. Son rótulos distintos; confirmar su correspondencia antes de concluir una irregularidad.',true);
+  warning.classList.add('cctt-dec-cita-review');official.prepend(warning);
+ }
+ if(!populated)official.append(field('Respuesta oficial sin formato estructurado',data.raw,true));
+ if(data.terminal){if(!pis.value.trim()||pis.value===sourcePis)pis.value=data.terminal;sourcePis=data.terminal;autoCompare()}
+}
 // NUEVO: conserva el comparador existente y marca pendientes las denominaciones que no coinciden literalmente.
 function autoCompare(){if(!doc.value.trim()||!pis.value.trim())return;compare.click();const normalize=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');const same=normalize(doc.value)===normalize(pis.value);result.dataset.review=same?'matched':'pending';if(!same){result.textContent='Emparejamiento por confirmar: «'+doc.value.trim()+'» frente a «'+pis.value.trim()+'». La abreviatura y la razón social podrían corresponder al mismo recinto, pero requieren confirmación; no se declara anomalía ni coincidencia definitiva.'}}
 const observer=new MutationObserver(()=>{if(status.textContent.startsWith('DEC sugerido por OCR:')||status.textContent.startsWith('DEC localizado en el texto:'))applyDoc();const current=official.textContent||'';if(current.startsWith('Respuesta recuperada del portal PIS'))renderPis(current);else if(official.dataset.pisStructured==='1'&&(current.startsWith('Consultando el portal PIS')||current.startsWith('No fue posible verificar')||current.startsWith('Sin consulta realizada')||current.startsWith('DEC inválido'))){official.classList.remove('cctt-dec-pis-structured');delete official.dataset.pisStructured;lastOfficial=''}});
@@ -8500,4 +8538,12 @@ function refresh(){
 new MutationObserver(refresh).observe(official,{childList:true,subtree:true,characterData:true});
 refresh();
 })();</script>
+
+<!-- NUEVO: tarjetas de accesos y revisión de identificadores limitadas al módulo DEC y adaptadas a ambos temas. -->
+<style id="ccttDecAccessLayoutStyles">
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-access-heading{border-left:4px solid var(--cctt-theme-accent,var(--blue))}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-cita-review{border-left:4px solid #d5962d;background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 87%,#d5962d 13%)}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field{overflow-wrap:anywhere;line-height:1.5}
+#page-verificacionCitas #ccttDecOfficial .cctt-dec-pis-field.cctt-dec-access-status{grid-column:1/-1}
+</style>
 </body></html>
