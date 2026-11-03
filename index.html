@@ -1579,6 +1579,81 @@ html[data-cctt-scheme="dark"] #page-climaManzanillo .cctt-clima-panel a.btn.prim
 <style id="mcExportLayoutFix">#page-mapasCroquis .mc-export-legend-notice{background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-radius:8px;padding:8px}#page-mapasCroquis #mcExportOutline{touch-action:none}</style>
 <!-- NUEVO: colores de errores de sincronización e iconos SVG únicos de Ruleta. -->
 <style id="ccttBirthdaySyncAndRouletteIcons">#page-recordatorioCumpleanos #bcStatus[data-error="true"]{border-left:4px solid var(--bad);padding:9px;color:var(--cctt-theme-text,var(--text));background:var(--cctt-theme-card,var(--card))}#page-ruletaDecisiones .rd-actions .btn svg{width:18px;height:18px;flex:none;vertical-align:middle}#page-ruletaDecisiones .rd-actions .btn{gap:8px}</style>
+<style id="ccttSimuladorStitchStyles">
+/* NUEVO: aspecto del code.html de referencia, íntegramente confinado al simulador y sin dependencias. */
+#page-simuladorTransito{--st-surface:var(--cctt-theme-card,var(--card,#fff));--st-ink:var(--cctt-theme-text,var(--text,#172239));--st-muted:var(--cctt-theme-muted,var(--muted,#64748b));--st-border:var(--cctt-theme-line,var(--line,#d7e0ea));--st-field:var(--cctt-theme-input,var(--card,#fff));--st-field-ink:var(--cctt-theme-inputtext,var(--text,#172239));--st-soft:var(--cctt-theme-table,var(--bg,#f1f5f9));--st-accent:#6f112c;color:var(--st-ink);font-size:13px}
+#page-simuladorTransito *{box-sizing:border-box}
+#page-simuladorTransito .st-svg{width:15px;height:15px;flex-shrink:0;vertical-align:middle;display:inline-block}
+#page-simuladorTransito .st-topline{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 15px;margin-bottom:0;background:var(--st-surface);border:1px solid var(--st-border);border-radius:12px 12px 0 0;color:var(--st-ink);font-size:12px}
+#page-simuladorTransito .st-topline strong{font-size:15px}#page-simuladorTransito .st-topline small{border:1px solid var(--st-border);border-radius:12px;padding:2px 7px;font-size:10px;font-weight:400;color:var(--st-muted)}
+#page-simuladorTransito select,#page-simuladorTransito input:not([type=file]){font:inherit;background:var(--st-field);color:var(--st-field-ink);border:1px solid var(--st-border);border-radius:7px;padding:7px 9px;max-width:100%;min-width:0}
+#page-simuladorTransito button{font:inherit;cursor:pointer;border:1px solid var(--st-border);border-radius:7px;padding:7px 10px;background:var(--st-surface);color:var(--st-ink);display:inline-flex;justify-content:center;align-items:center;gap:6px;transition:filter .15s,box-shadow .15s}
+#page-simuladorTransito button:hover{filter:brightness(.96);box-shadow:0 2px 8px #0001}#page-simuladorTransito button:focus-visible,#page-simuladorTransito input:focus-visible,#page-simuladorTransito select:focus-visible{outline:2px solid var(--cctt-theme-accent,#9364da);outline-offset:2px}
+#page-simuladorTransito .st-ref-shell{display:grid;grid-template-columns:minmax(310px,352px) minmax(0,1fr);height:min(810px,calc(100vh - 155px));min-height:540px;overflow:hidden;border:1px solid var(--st-border);border-top:0;border-radius:0 0 12px 12px;background:var(--st-surface)}
+#page-simuladorTransito #sidebarPanel{display:flex;flex-direction:column;overflow-y:auto;min-height:0;border-right:1px solid var(--st-border);background:var(--st-surface);min-width:0}
+#page-simuladorTransito #sidebarPanel>div{padding:14px;border-bottom:1px solid var(--st-border)}
+#page-simuladorTransito #sidebarPanel>div:first-child{display:flex;flex-direction:column;gap:14px}
+#page-simuladorTransito #sidebarPanel h2{font-size:12px;text-transform:uppercase;letter-spacing:.3px;margin:0;display:flex;align-items:center;gap:7px}
+#page-simuladorTransito #sidebarPanel>div:first-child>div:first-child{display:flex;justify-content:space-between;align-items:center;gap:5px}
+#page-simuladorTransito #sidebarPanel>div:first-child>div:first-child span{font-size:10px;background:var(--st-soft);padding:4px 7px;border-radius:5px}
+#page-simuladorTransito #sidebarPanel label{font-size:11px;display:block;color:var(--st-ink);font-weight:600;margin-bottom:5px}
+#page-simuladorTransito #sidebarPanel input:not([type=file]),#page-simuladorTransito #sidebarPanel select{width:100%;height:33px;font-size:12px}
+#page-simuladorTransito #mapFileInput{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#page-simuladorTransito #mapFileInput+label{border:1px dashed var(--st-border);padding:10px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;flex-wrap:wrap;text-align:center}
+#page-simuladorTransito #mapFileInput+label span:last-child{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400;color:var(--st-muted)}
+#page-simuladorTransito #agentTypeSelector{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--st-soft);padding:4px;gap:4px;border-radius:8px}
+#page-simuladorTransito #agentTypeSelector button{font-size:10px;flex-direction:column;border-color:transparent;background:transparent;gap:2px;min-width:0;padding:6px 2px}
+#page-simuladorTransito #agentTypeSelector button.active{background:var(--st-surface);border:1px solid var(--st-border);box-shadow:0 2px 4px #0001;font-weight:800}
+#page-simuladorTransito #agentTypeSelector button[data-agent=pedestrian]{color:#06996c}#page-simuladorTransito #agentTypeSelector button[data-agent=light]{color:#2563eb}#page-simuladorTransito #agentTypeSelector button[data-agent=heavy]{color:#b77b09}#page-simuladorTransito #agentTypeSelector button[data-agent=special]{color:#8b5cf6}
+#page-simuladorTransito #sidebarPanel>div:first-child>div.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#page-simuladorTransito #sidebarPanel>div:first-child>div.grid>div{min-width:0}#page-simuladorTransito #sidebarPanel>div:first-child>div.grid .relative{position:relative}
+#page-simuladorTransito #sidebarPanel>div:first-child>div.grid .relative>span{position:absolute;right:6px;top:10px;font-size:9px;color:var(--st-muted);pointer-events:none}
+#page-simuladorTransito #sidebarPanel>div:first-child>div.grid input[type=number]{padding-right:35px}
+#page-simuladorTransito #sidebarPanel .space-y-2>div+div{margin-top:9px}
+#page-simuladorTransito .st-advanced{border:1px solid var(--st-border);background:var(--st-soft);border-radius:9px;padding:10px;display:grid;gap:7px}
+#page-simuladorTransito .st-advanced-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#page-simuladorTransito .st-guide-tiny{font-size:10px;color:var(--st-muted);margin:0;line-height:1.5}
+#page-simuladorTransito #sidebarPanel>div:first-child>div:has(#undoPointBtn){padding:11px;background:color-mix(in srgb,var(--st-surface) 82%,#f59e0b 18%);border:1px solid color-mix(in srgb,var(--st-border) 55%,#f59e0b 45%);border-radius:8px}
+#page-simuladorTransito #sidebarPanel>div:first-child>div:has(#undoPointBtn) p{font-size:11px;color:var(--st-ink);line-height:1.55;margin:0 0 9px}
+#page-simuladorTransito #sidebarPanel>div:first-child>div:has(#undoPointBtn) div.flex{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#page-simuladorTransito #sidebarPanel #addFlowBtn,#page-simuladorTransito #playBtn{background:#6f112c;color:white;border-color:#6f112c;font-weight:700}
+#page-simuladorTransito #sidebarPanel #addFlowBtn{width:100%;padding:10px}
+#page-simuladorTransito #sidebarPanel>div:has(#flowItemsList){display:flex;flex-direction:column;gap:10px;min-height:180px}
+#page-simuladorTransito #sidebarPanel>div:has(#flowItemsList)>div:first-child{display:flex;justify-content:space-between;font-weight:700;font-size:11px;text-transform:uppercase;color:var(--st-muted)}
+#page-simuladorTransito #activeFlowsBadge{font-size:10px;background:var(--st-soft);border-radius:15px;padding:4px 8px;color:#2563eb}
+#page-simuladorTransito #flowItemsList{display:grid;gap:7px;max-height:260px;overflow-y:auto}
+#page-simuladorTransito #flowItemsList .st-flow-card{display:flex;gap:8px;align-items:center;padding:9px;border:1px solid var(--st-border);background:var(--st-surface);border-radius:8px;min-width:0}
+#page-simuladorTransito #flowItemsList .st-flow-card>div{flex:1;min-width:0}#page-simuladorTransito #flowItemsList .st-flow-card strong{font-size:11px;display:block;overflow-wrap:anywhere}#page-simuladorTransito #flowItemsList .st-flow-card small{font-size:10px;color:var(--st-muted)}
+#page-simuladorTransito #sidebarPanel>div:last-child{background:var(--st-soft);display:grid;gap:10px}
+#page-simuladorTransito #sidebarPanel>div:last-child>.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#page-simuladorTransito #sidebarPanel>div:last-child>.flex{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#page-simuladorTransito #sidebarPanel>div:last-child #exportCsvBtn{border:0;background:transparent}
+#page-simuladorTransito .st-export-more{display:flex;flex-wrap:wrap;gap:6px}
+#page-simuladorTransito .st-ref-shell>section{min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--st-soft);position:relative}
+#page-simuladorTransito .st-ref-shell>section>div:first-child{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:43px;padding:7px 12px;border-bottom:1px solid var(--st-border);background:var(--st-surface)}
+#page-simuladorTransito .st-ref-shell>section>div:first-child>div{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:11px}
+#page-simuladorTransito .st-ref-shell>section>div:first-child button{font-size:10px;padding:5px 7px}
+#page-simuladorTransito #canvasViewport{position:relative;flex:1;min-height:300px;overflow:hidden;cursor:crosshair;background:var(--st-soft)}
+#page-simuladorTransito #trafficCanvas{width:100%;height:100%;display:block;touch-action:manipulation}
+#page-simuladorTransito #canvasViewport>div{position:absolute;top:12px;display:flex;align-items:center;gap:10px;font-size:10px;padding:8px 10px;background:var(--st-surface);color:var(--st-ink);border:1px solid var(--st-border);border-radius:8px;box-shadow:0 3px 12px #0002;pointer-events:none}
+#page-simuladorTransito #canvasViewport>div:nth-child(2){left:12px}#page-simuladorTransito #canvasViewport>div:nth-child(3){right:12px;display:grid;gap:5px;min-width:200px}
+#page-simuladorTransito #canvasViewport>div:nth-child(3)>div{display:flex;justify-content:space-between;gap:12px}
+#page-simuladorTransito .st-ref-shell>section>div:last-child{border-top:1px solid var(--st-border);background:var(--st-surface);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#page-simuladorTransito .st-ref-shell>section>div:last-child>div{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+#page-simuladorTransito .st-ref-shell>section>div:last-child>div>div{display:flex;align-items:center;gap:5px;font-size:11px}
+#page-simuladorTransito .st-ref-shell>section>div:last-child p{font-size:10px;max-width:420px;line-height:1.5;color:var(--st-muted);margin:0}
+#page-simuladorTransito .st-ref-shell>section>div:last-child span[class*="bg-emerald"]{background:#10b981}#page-simuladorTransito .st-ref-shell>section>div:last-child span[class*="bg-blue"]{background:#2563eb}#page-simuladorTransito .st-ref-shell>section>div:last-child span[class*="bg-amber"]{background:#f59e0b}#page-simuladorTransito .st-ref-shell>section>div:last-child span[class*="bg-purple"]{background:#8b5cf6}
+#page-simuladorTransito .st-ref-shell>section>div:last-child span[class*="bg-"]{display:inline-block;width:12px;height:10px;border-radius:3px}
+#page-simuladorTransito .st-toast{background:var(--st-surface);color:var(--st-ink);border:1px solid var(--st-border);border-radius:8px;margin-top:10px;padding:9px 12px;font-size:12px;min-height:35px}
+#page-simuladorTransito #canvasNoticeBadge{color:#16845f;font-size:10px}
+@media(max-width:1150px){#page-simuladorTransito .st-ref-shell{grid-template-columns:320px minmax(0,1fr)}}
+@media(max-width:800px){#page-simuladorTransito .st-ref-shell{grid-template-columns:1fr;height:auto;overflow:visible}#page-simuladorTransito #sidebarPanel{overflow:visible;max-height:none;border-right:0;border-bottom:1px solid var(--st-border)}#page-simuladorTransito #canvasViewport{height:470px;flex:none}#page-simuladorTransito #canvasViewport>div:nth-child(3){top:auto;bottom:8px;right:8px}#page-simuladorTransito .st-topline{gap:9px}}
+@media(max-width:550px){#page-simuladorTransito #canvasViewport{height:370px}#page-simuladorTransito .st-ref-shell>section>div:first-child{flex-wrap:wrap}#page-simuladorTransito #canvasViewport>div:nth-child(2){max-width:80%;overflow:hidden;white-space:nowrap}#page-simuladorTransito #canvasViewport>div:nth-child(3){font-size:9px;min-width:160px}}
+
+/* NUEVO: los botones de capas reflejan visualmente si están activos. */
+#page-simuladorTransito #toggleHeatmapBtn[aria-pressed="true"],#page-simuladorTransito #toggleWaypointsBtn[aria-pressed="true"]{background:color-mix(in srgb,var(--st-surface) 80%,#8b5cf6 20%);border-color:#a78bfa;font-weight:800}
+
+</style>
 </head>
 <body>
 <div class="app">
@@ -2119,23 +2194,294 @@ Luis
 María
 Carlos
 Sofía</textarea><div class="rd-actions"><button type="button" class="btn" id="rdApply"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"/><path d="M5 20h14"/></svg> Actualizar ruleta</button><button type="button" class="btn" id="rdClear"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13"/></svg> Limpiar</button></div><div id="rdCount" class="muted" role="status">Sin opciones</div><label class="rd-check"><input type="checkbox" id="rdRemoveWinner"> Retirar la opción seleccionada después del giro</label><p class="muted">De 2 a 50 opciones. Las etiquetas se mantienen exactamente como las escribas.</p><p class="muted">Atajo: <kbd>Espacio</kbd> para girar cuando no estás escribiendo en un campo.</p></div></div></section>
-<!-- NUEVO: Simulador de tránsito, aislado de Mapas y croquis. -->
-<section class="page" id="page-simuladorTransito"><div class="section-title"><h2>Simulador de tránsito</h2><span class="muted">Simulación visual sobre croquis o mapas aportados por el operador</span></div>
-<div class="st-layout"><div class="card st-controls">
-<h3>Escenario y movimientos</h3><label class="st-label" for="stFile">Mapa o croquis de base (PNG, JPG, WebP)</label><input id="stFile" type="file" accept="image/png,image/jpeg,image/webp"/><!-- NUEVO: plano esquemático independiente de mapas reales, o cuadrícula técnica. --><label class="st-label" for="stBaseMode">Fondo de trabajo</label><select id="stBaseMode"><option value="vial">Plano vial ilustrativo (no geográfico)</option><option value="grid">Cuadrícula técnica</option></select><p class="muted">Para simular un lugar específico, adjunta su mapa o croquis. El plano ilustrativo no representa calles reales.</p>
-<div class="st-two"><div><label class="st-label" for="stType">Tipo de tránsito</label><select id="stType"><option value="peaton">Peatonal</option><option value="ligero">Vehículos ligeros</option><option value="pesado">Vehículos pesados</option></select></div><div><label class="st-label" for="stQuantity">Cantidad</label><input id="stQuantity" type="number" min="1" max="150" value="12" /></div></div>
-<div class="st-two"><div><label class="st-label" for="stSpeed">Velocidad aproximada (km/h)</label><input id="stSpeed" type="number" min="1" max="100" value="15" /></div><div><label class="st-label" for="stDuration">Duración simulada (min)</label><input id="stDuration" type="number" min="1" max="180" value="10" /></div></div>
-<div class="st-two"><div><label class="st-label" for="stOrigin">Zona de origen</label><input id="stOrigin" maxlength="65" placeholder="Ej. Puerta norte" /></div><div><label class="st-label" for="stDestination">Zona de destino</label><input id="stDestination" maxlength="65" placeholder="Ej. Patio central" /></div></div>
-<label class="st-label" for="stManeuver">Maniobra del recorrido</label><select id="stManeuver"><option value="recto">Adelante / trayecto directo</option><option value="retroceso">Atrás / retroceso</option><option value="izquierda">Izquierda</option><option value="derecha">Derecha</option><option value="u">Vuelta en U</option><option value="libre">Trazado libre</option></select>
-<label class="st-label" for="stActivity">Actividad</label><input id="stActivity" maxlength="120" placeholder="Ej. Ingreso de personal en cambio de turno" />
-<p class="muted">Marca sobre el mapa el origen, los puntos intermedios y el destino. Para una vuelta en U, dibuja al menos tres puntos siguiendo la curva. La simulación reproduce recorridos ilustrativos; no calcula capacidad vial real.</p>
-<div class="st-actions"><button class="btn" id="stUndo" type="button">Deshacer punto</button><button class="btn" id="stClearPath" type="button">Limpiar trazado</button><button class="btn primary" id="stAdd" type="button">Añadir flujo</button></div><div id="stFlows" class="st-flows" aria-live="polite">Sin flujos todavía.</div>
-<div class="st-actions"><button class="btn primary" id="stPlay" type="button">Reproducir</button><button class="btn" id="stPause" type="button">Pausar</button><button class="btn" id="stReset" type="button">Reiniciar</button></div>
-<div class="st-two"><div><label class="st-label" for="stPlayback">Velocidad de reproducción</label><select id="stPlayback"><option value="1">Normal (1×)</option><option value="2">Rápida (2×)</option><option value="4">Muy rápida (4×)</option></select></div><div><label class="st-label" for="stScenario">Nombre del escenario</label><input id="stScenario" maxlength="90" placeholder="Simulación de acceso" /></div></div>
-<h3>Exportar escenario</h3><div class="st-actions"><button id="stPng" type="button" class="btn">PNG</button><button id="stSvg" type="button" class="btn">SVG</button><button id="stJson" type="button" class="btn">JSON</button><button id="stVideo" type="button" class="btn">Video WebM / MP4</button></div>
-<p id="stStatus" class="st-status" role="status" aria-live="polite">Plano vial ilustrativo disponible. Para un lugar real, adjunta su mapa o croquis.</p></div>
-<div class="card st-stage"><div class="st-stage-head"><h3>Vista de simulación</h3><span id="stClock" class="muted">00:00 / 10:00</span></div><canvas id="stCanvas" width="1100" height="700" role="img" aria-label="Plano interactivo donde se señalan rutas y se simulan los desplazamientos"></canvas>
-<div class="st-legend"><span><i class="st-key st-ped"></i> Peatón</span><span><i class="st-key st-car"></i> Ligero</span><span><i class="st-key st-heavy"></i> Pesado</span><span><i class="st-key st-route"></i> Ruta</span></div><p class="muted">Las cantidades, tiempos y velocidades son parámetros del escenario; el movimiento representado no está calibrado con observaciones reales. No usar como estimación de seguridad o aforo sin validación.</p></div></div></section>
+<!-- MODIFICADO: Simulador de tránsito reconstruido siguiendo code.html del ZIP adjunto, manteniendo sus textos e iconografía SVG sin CDNs. -->
+<section class="page" id="page-simuladorTransito"><!-- NUEVO: barra compacta con los indicadores del diseño de referencia -->
+<div class="st-topline"><strong>Simulador de Tránsito Multimodal <small>v2.4 · CCTT</small></strong><span>Tiempo Simulado: <b id="simTimeDisplay">00:00:00</b> / <span id="stTargetTime">00:10:00</span></span><span>Agentes Activos: <b id="activeAgentsCount">0</b></span><label>Escenario: <select id="mapPresetSelect"><option value="intersection">Cruce Semaforizado Urbano</option><option value="roundabout">Patio Logístico / Rotonda</option><option value="corridor">Corredor Peatonal Mixto</option></select></label></div><div class="st-ref-shell">
+<!-- BEGIN: LeftControlPanel (Sidebar) -->
+<aside class="w-96 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col shrink-0 overflow-y-auto" id="sidebarPanel">
+<!-- Scenario & Flow Config Section -->
+<div class="p-4 border-b border-slate-200 dark:border-slate-800 space-y-4">
+<!-- Header & Quick actions -->
+<div class="flex items-center justify-between">
+<h2 class="font-bold text-slate-900 dark:text-white text-xs tracking-wide uppercase flex items-center gap-1.5">
+<svg class="st-svg" role="img" aria-label="sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>
+            Parámetros del Escenario
+          </h2>
+<span class="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-0.5 rounded">Aforo Configurable</span>
+</div>
+<!-- Base Map / Blueprint Upload Container -->
+<div class="space-y-1.5">
+<label class="block text-xs font-medium text-slate-700 dark:text-slate-300">
+            Mapa o croquis de base <span class="text-[10px] text-slate-400 font-normal">(PNG, JPG, WebP o Vector)</span>
+</label>
+<div class="border border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-2.5 text-center bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-100/50 dark:hover:bg-slate-800 transition">
+<input accept="image/*" class="hidden" id="mapFileInput" type="file"/>
+<label class="cursor-pointer flex items-center justify-center gap-2 text-xs text-slate-600 dark:text-slate-300" for="mapFileInput">
+<svg class="st-svg" role="img" aria-label="upload-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-4 4 4-4 4 4"/><path d="M20 16a5 5 0 0 0-4-8h-1a7 7 0 0 0-13 4 5 5 0 0 0 4 8h12"/></svg>
+<span class="font-medium text-brand-800 dark:text-rose-400 hover:underline">Seleccionar archivo</span>
+<span class="text-slate-400 truncate max-w-[130px]" id="fileNameDisplay">Sin archivo</span>
+</label>
+</div>
+</div>
+<!-- Agent Type Selector Tabs -->
+<div>
+<label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            Tipo de tránsito / Modo
+          </label>
+<div class="grid grid-cols-4 gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg" id="agentTypeSelector">
+<button class="agent-btn active flex flex-col items-center py-1.5 px-1 rounded-md text-[11px] font-medium bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs border border-emerald-500/20" data-agent="pedestrian" type="button">
+<svg class="st-svg" role="img" aria-label="footprints" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16c-1-2 1-6 3-6 2 0 3 2 2 5-.5 2-4 5-5 1Zm11-7c-1-2 0-5 2-5s4 3 3 5-5 3-5 0Z"/><path d="M9 6v2m3-4v2m7 8 1 2m-5 1 1 2"/></svg>
+              Peatón
+            </button>
+<button class="agent-btn flex flex-col items-center py-1.5 px-1 rounded-md text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:text-blue-500" data-agent="light" type="button">
+<svg class="st-svg" role="img" aria-label="car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 11 2-5h10l2 5M4 11h16v8H4z"/><path d="M7 19v2m10-2v2M7 15h2m6 0h2"/></svg>
+              Ligero
+            </button>
+<button class="agent-btn flex flex-col items-center py-1.5 px-1 rounded-md text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:text-amber-500" data-agent="heavy" type="button">
+<svg class="st-svg" role="img" aria-label="truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h12v12H2zM14 10h4l4 4v4h-8z"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg>
+              Pesado
+            </button>
+<button class="agent-btn flex flex-col items-center py-1.5 px-1 rounded-md text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:text-purple-500" data-agent="special" type="button">
+<svg class="st-svg" role="img" aria-label="siren" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18h14M7 18V9a5 5 0 0 1 10 0v9M12 1v2M3 6l2 1M21 6l-2 1"/></svg>
+              Emergencia
+            </button>
+</div>
+</div>
+<!-- Numerical Inputs Grid -->
+<div class="grid grid-cols-2 gap-2.5">
+<div>
+<label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1" for="flowVolume">
+              Cantidad / Flujo
+            </label>
+<div class="relative">
+<input class="w-full text-xs py-1.5 px-2.5 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-brand-700" id="flowVolume" max="150" min="1" type="number" value="18"/>
+<span class="absolute right-2 top-2 text-[10px] text-slate-400">unid.</span>
+</div>
+</div>
+<div>
+<label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1" for="flowSpeed">
+              Velocidad media
+            </label>
+<div class="relative">
+<input class="w-full text-xs py-1.5 px-2.5 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-brand-700" id="flowSpeed" max="80" min="3" type="number" value="15"/>
+<span class="absolute right-2 top-2 text-[10px] text-slate-400">km/h</span>
+</div>
+</div>
+</div>
+<!-- Origin and Destination Inputs -->
+<div class="grid grid-cols-2 gap-2.5">
+<div>
+<label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1" for="originZone">
+              Zona de origen
+            </label>
+<input class="w-full text-xs py-1.5 px-2.5 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-brand-700" id="originZone" type="text" value="Acceso Norte (Puerta A)"/>
+</div>
+<div>
+<label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1" for="destZone">
+              Zona de destino
+            </label>
+<input class="w-full text-xs py-1.5 px-2.5 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-brand-700" id="destZone" type="text" value="Patio Central / Terminal"/>
+</div>
+</div>
+<!-- Maneuver and Activity Purpose -->
+<div class="space-y-2">
+<div>
+<label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1" for="maneuverType">
+              Maniobra del recorrido
+            </label>
+<select class="w-full text-xs py-1.5 px-2.5 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-brand-700" id="maneuverType">
+<option value="direct">Adelante / Trayecto directo</option>
+<option value="turn_left">Giro a la Izquierda protegido</option>
+<option value="turn_right">Giro a la Derecha con ceda</option>
+<option value="u_turn">Retorno en U / Cambio de sentido</option>
+<option value="crossing">Cruce de calzada peatonal</option>
+</select>
+</div>
+<div>
+<label class="block text-[11px] font-medium text-slate-700 dark:text-slate-300 mb-1" for="activityDesc">
+              Actividad / Propósito
+            </label>
+<input class="w-full text-xs py-1.5 px-2.5 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-brand-700" id="activityDesc" type="text" value="Ingreso de personal en cambio de turno matutino"/>
+</div>
+</div>
+<!-- NUEVO: herramientas adicionales de trazado y temporización, siguiendo panel de referencia -->
+<div class="st-advanced">
+ <label for="stTool">Herramienta sobre el mapa</label><select id="stTool"><option value="route">Trazar recorrido</option><option value="road">Dibujar carretera o sendero</option><option value="crossing">Colocar cruce peatonal</option><option value="signal">Colocar semáforo</option><option value="pin">Colocar punto de referencia</option></select>
+ <div class="st-advanced-grid"><label>Curvatura del trazado<select id="stCurve"><option value="smooth">Curva suave</option><option value="straight">Segmentos rectos</option><option value="tight">Curva cerrada / retorno</option></select></label><label>Duración (min)<input id="stDuration" type="number" value="10" min="1" max="180"></label></div>
+ <div class="st-advanced-grid"><label>Semáforo norte-sur (s)<input id="stNSGreen" type="number" value="30" min="3" max="180"></label><label>Semáforo este-oeste (s)<input id="stEWGreen" type="number" value="25" min="3" max="180"></label></div>
+ <label>Tiempo de paso / espera (s)<input id="stWait" type="number" value="0" min="0" max="180"></label>
+ <button id="stCommitRoad" type="button" class="st-subbtn">Guardar carretera o sendero</button>
+ <p class="st-guide-tiny">Dibuja con clics el eje de la carretera; los trazos curvos siguen los puntos marcados. Los recorridos se trazan independientemente sobre el plano.</p>
+</div>
+<!-- Path Definition Tools and Help Note -->
+<div class="bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-lg p-2.5">
+<p class="text-[11px] text-amber-800 dark:text-amber-300/90 leading-relaxed">
+<span class="font-bold">Guía de trazado:</span> Haz clic directamente sobre la vista de simulación para marcar puntos intermedios del itinerario vial.
+          </p>
+<div class="flex items-center gap-2 mt-2">
+<button class="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded shadow-xs hover:bg-slate-50" id="undoPointBtn" type="button">
+<svg class="st-svg" role="img" aria-label="undo-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-2"/></svg>
+              Deshacer punto
+            </button>
+<button class="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 text-xs font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded shadow-xs hover:bg-slate-50" id="clearPointsBtn" type="button">
+<svg class="st-svg" role="img" aria-label="trash-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2m-11 0 1 15h12l1-15M10 10v7m4-7v7"/></svg>
+              Limpiar trazado
+            </button>
+</div>
+</div>
+<!-- Action: Add Flow Button -->
+<button class="w-full py-2 px-3 bg-brand-800 hover:bg-brand-900 text-white rounded-lg font-medium text-xs shadow flex items-center justify-center gap-2 transition active:scale-[0.99]" id="addFlowBtn" type="button">
+<svg class="st-svg" role="img" aria-label="plus-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10m-5-5h10"/></svg>
+          Añadir Flujo a Simulación
+        </button>
+</div>
+<!-- Active Flows List Section -->
+<div class="p-4 flex-1 flex flex-col min-h-[220px]">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Flujos en Cola / Activos</span>
+<span class="text-[10px] font-mono font-bold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full" id="activeFlowsBadge">0 flujos</span>
+</div>
+<!-- Flows dynamic scrollable container -->
+<div class="flex-1 overflow-y-auto space-y-2 pr-1" id="flowItemsList">
+<!-- Flow items will be dynamically injected here -->
+<div class="text-center py-6 text-slate-400 dark:text-slate-500 text-xs" id="emptyFlowsState">
+<svg class="st-svg" role="img" aria-label="route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h6a4 4 0 0 0 4-4v-6"/></svg>
+            Sin flujos configurados todavía.<br/>Añade uno para comenzar la simulación.
+          </div>
+</div>
+</div>
+<!-- Playback Controls (Sticky Footer of sidebar) -->
+<div class="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/90 space-y-2.5">
+<div class="grid grid-cols-3 gap-1.5">
+<button class="py-1.5 px-2 bg-brand-800 hover:bg-brand-900 text-white font-medium rounded text-xs flex items-center justify-center gap-1.5 shadow-xs transition" id="playBtn">
+<svg class="st-svg" role="img" aria-label="play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 5 11 7-11 7z"/></svg>
+            Reproducir
+          </button>
+<button class="py-1.5 px-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded text-xs flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-700" id="pauseBtn">
+<svg class="st-svg" role="img" aria-label="pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5v14m8-14v14"/></svg>
+            Pausar
+          </button>
+<button class="py-1.5 px-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded text-xs flex items-center justify-center gap-1.5 hover:bg-slate-100 dark:hover:bg-slate-700" id="resetBtn">
+<svg class="st-svg" role="img" aria-label="rotate-ccw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-7M3 3v6h6"/></svg>
+            Reiniciar
+          </button>
+</div>
+<div class="flex items-center justify-between text-xs pt-1">
+<div class="flex items-center gap-2">
+<span class="text-[11px] text-slate-500">Velocidad:</span>
+<select class="text-xs bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded py-0.5 px-2 font-medium" id="simSpeedSelect">
+<option value="0.5">0.5x</option>
+<option selected="" value="1">Normal (1×)</option>
+<option value="2">2× Rápido</option>
+<option value="5">5× Acelerado</option>
+</select>
+</div>
+<button class="text-[11px] font-medium text-slate-600 dark:text-slate-400 hover:text-brand-800 dark:hover:text-rose-400 flex items-center gap-1" id="exportCsvBtn" title="Exportar métricas">
+<svg class="st-svg" role="img" aria-label="download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v13m-5-5 5 5 5-5M4 18v3h16v-3"/></svg>
+            Exportar datos
+          </button>
+</div>
+<!-- NUEVO: exportaciones reales adicionales sin herramientas externas. -->
+<div class="st-export-more"><button id="stExportPng" type="button">Exportar PNG</button><button id="stExportJson" type="button">Exportar JSON</button><button id="stRecord" type="button">Grabar video</button></div>
+</div>
+</aside>
+<!-- END: LeftControlPanel -->
+<!-- BEGIN: CanvasSimulationWorkspace -->
+<section class="flex-1 flex flex-col relative bg-slate-100 dark:bg-slate-950 overflow-hidden">
+<!-- Canvas Top Toolbar -->
+<div class="h-10 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xs px-4 flex items-center justify-between z-10">
+<div class="flex items-center gap-3">
+<span class="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+<svg class="st-svg" role="img" aria-label="monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 22h8m-4-4v4"/></svg>
+            Vista de simulación: <span class="font-normal text-slate-500" id="currentScenarioLabel">Cruce Semaforizado Urbano</span>
+</span>
+<span class="hidden sm:inline-flex text-[10px] bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800" id="canvasNoticeBadge">
+            Fase semafórica activa (Ciclo: 60s)
+          </span>
+</div>
+<!-- Canvas Quick View Actions -->
+<div class="flex items-center gap-2">
+<!-- Toggle Heatmap -->
+<button class="px-2.5 py-1 text-[11px] rounded font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 flex items-center gap-1.5" id="toggleHeatmapBtn">
+<svg class="st-svg" role="img" aria-label="flame" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5 0 8-3 8-8 0-3-2-6-4-8 0 3-2 4-3 5-1-3-2-5-3-7-2 4-6 7-6 11 0 4 3 7 8 7Z"/></svg>
+            Densidad
+          </button>
+<!-- Toggle Waypoints -->
+<button class="px-2.5 py-1 text-[11px] rounded font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 flex items-center gap-1.5" id="toggleWaypointsBtn">
+<svg class="st-svg" role="img" aria-label="milestone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v18m0-15h15l-3 4 3 4H4"/></svg>
+            Trayectos
+          </button>
+<!-- Reset Pan/Zoom -->
+<button class="p-1 rounded text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" id="resetViewBtn" title="Restablecer encuadre">
+<svg class="st-svg" role="img" aria-label="maximize" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>
+</button>
+</div>
+</div>
+<!-- Canvas Dynamic Viewport -->
+<div class="flex-1 relative cursor-crosshair overflow-hidden canvas-grid-bg" id="canvasViewport">
+<canvas class="w-full h-full block" id="trafficCanvas"></canvas>
+<!-- Floating Coordinates / Scale Indicator -->
+<div class="absolute top-3 left-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-md border border-slate-200/80 dark:border-slate-700/80 shadow-xs pointer-events-none flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-400">
+<div class="flex items-center gap-1">
+<svg class="st-svg" role="img" aria-label="crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 2v5m0 10v5M2 12h5m10 0h5"/></svg>
+<span id="coordsDisplay">X: 0 m, Y: 0 m</span>
+</div>
+<div class="w-px h-3 bg-slate-300 dark:bg-slate-700"></div>
+<div>Escala: 1m = 12px</div>
+</div>
+<!-- Real-time Traffic Metrics HUD -->
+<div class="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md pointer-events-none text-xs space-y-1 min-w-[190px]">
+<div class="flex justify-between items-center text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider">
+<span>Telemetría en Vivo</span>
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+</div>
+<div class="flex justify-between items-center font-mono">
+<span class="text-slate-600 dark:text-slate-300">Nivel de Servicio (LOS):</span>
+<span class="font-bold text-emerald-600 dark:text-emerald-400" id="hudLos">Sin calibrar</span>
+</div>
+<div class="flex justify-between items-center font-mono">
+<span class="text-slate-600 dark:text-slate-300">Demora media:</span>
+<span class="font-bold text-slate-800 dark:text-slate-100" id="hudDelay">—</span>
+</div>
+<div class="flex justify-between items-center font-mono">
+<span class="text-slate-600 dark:text-slate-300">Tasa de flujo:</span>
+<span class="font-bold text-blue-600 dark:text-blue-400" id="hudThroughput">—</span>
+</div>
+</div>
+</div>
+<!-- Canvas Bottom Legend & Disclaimers -->
+<div class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+<!-- Legend Color Tags -->
+<div class="flex items-center flex-wrap gap-4">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-3 rounded-full bg-emerald-500 shadow-xs"></span>
+<span class="font-medium text-slate-700 dark:text-slate-300">Peatón</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-4 h-2.5 rounded bg-blue-600 shadow-xs"></span>
+<span class="font-medium text-slate-700 dark:text-slate-300">Ligero (Auto)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-2.5 rounded bg-amber-500 shadow-xs"></span>
+<span class="font-medium text-slate-700 dark:text-slate-300">Pesado (Bus/Camión)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3.5 h-2 rounded bg-purple-600 shadow-xs"></span>
+<span class="font-medium text-slate-700 dark:text-slate-300">Emergencia</span>
+</div>
+<div class="flex items-center gap-1.5 text-slate-400">
+<span class="w-3 h-0.5 bg-slate-400 border-t border-dashed"></span>
+<span>Ruta trazada</span>
+</div>
+</div>
+<!-- Operational Note -->
+<p class="text-[11px] text-slate-500 dark:text-slate-400 leading-normal max-w-xl text-right">
+          Las trayectorias y tiempos son ilustrativos, no resultados de aforo real ni de validación vial. Los parámetros los define el operador.
+        </p>
+</div>
+</section>
+<!-- END: CanvasSimulationWorkspace -->
+</div><div class="st-toast" id="stToast" role="status" aria-live="polite">Marca puntos sobre el mapa y añade flujos para iniciar.</div></section>
 <!-- MODIFICADO: Verificación de citas ubicada dentro de .content. -->
 <section class="page" id="page-verificacionCitas"><div class="section-title"><h2>Verificación de citas</h2></div><div class="cctt-dec-grid"><div class="cctt-dec-panel"><h3>Documento electrónico de cita</h3><p class="cctt-dec-note">Adjunta una imagen JPG, PNG o WebP. El reconocimiento se procesa mediante una función segura de Supabase; el DEC sugerido debe confirmarse antes de consultar PIS.</p><label for="ccttDecFile">Imagen o fotografía</label><input id="ccttDecFile" type="file" accept="image/jpeg,image/png,image/webp"/><!-- NUEVO: controles optativos de fotografías difíciles y registro anónimo de correcciones. -->
 <div class="cctt-dec-adaptive" id="ccttDecAdaptiveControls">
@@ -8657,66 +9003,8 @@ const observer=new MutationObserver(()=>{const v=status.textContent||'';if(/Anal
 save.addEventListener('click',async()=>{if(!snapshot||!consent.checked)return;const client=window.ccttSupabaseClient;if(!client?.functions?.invoke){feedback.textContent='La conexión con Supabase no está disponible.';return}save.disabled=true;feedback.textContent='Guardando únicamente indicadores de corrección…';try{const original=snapshot.dec;const corrected=number.value.trim();const payload={action:'record_correction',quality_grade:qualityGrade,enhanced:enhance.checked,dec_corrected:!!original&&/^[0-9]{5,15}$/.test(corrected)&&original!==corrected,ocr_text_edited:snapshot.ocr!==text.value,operator_confirmed:true};const {data,error}=await client.functions.invoke('cctt-dec-feedback',{body:payload});if(error||data?.ok!==true)throw new Error('No se pudo guardar la confirmación.');feedback.textContent='Indicadores registrados sin conservar la imagen ni números del documento.';snapshot=null;}catch{feedback.textContent='No se guardó la corrección. Verifica que cctt-dec-feedback y su tabla estén desplegados.';save.disabled=false}});
 })();</script>
 <!-- NUEVO: estilos limitados al Simulador de tránsito; respetan variables de ambos temas. -->
-<style id="ccttSimuladorTransitoStyles">
-#page-simuladorTransito .st-layout{display:grid;grid-template-columns:minmax(310px,390px) minmax(0,1fr);gap:16px;align-items:start}
-#page-simuladorTransito .card{min-width:0;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))}
-#page-simuladorTransito .st-controls{display:grid;gap:10px}#page-simuladorTransito h3{margin:5px 0}
-#page-simuladorTransito .st-label{font-size:12px;font-weight:750;color:var(--cctt-theme-text,var(--text));display:block}
-#page-simuladorTransito select,#page-simuladorTransito input{width:100%;min-width:0;border-radius:9px;border:1px solid var(--cctt-theme-line,var(--line));background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));padding:9px;min-height:38px}
-#page-simuladorTransito .st-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}#page-simuladorTransito .st-two>div{min-width:0}
-#page-simuladorTransito .st-actions{display:flex;gap:7px;flex-wrap:wrap}#page-simuladorTransito .st-actions .btn{font-size:12px;padding:8px 11px}
-#page-simuladorTransito .st-flows{display:grid;gap:6px}#page-simuladorTransito .st-flow-item{border:1px solid var(--cctt-theme-line,var(--line));padding:9px;border-radius:10px;display:flex;justify-content:space-between;gap:8px;font-size:12px;overflow-wrap:anywhere}
-#page-simuladorTransito .st-flow-item button{background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-radius:7px;cursor:pointer}
-#page-simuladorTransito .st-status{border-left:3px solid var(--cctt-theme-accent,var(--blue));padding:9px;background:var(--cctt-theme-table,var(--bg));color:var(--cctt-theme-text,var(--text));font-size:12px;overflow-wrap:anywhere}
-#page-simuladorTransito .st-stage-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-/* MODIFICADO: tamaño de presentación idéntico a la proporción interna, evita desfase del puntero. */#stCanvas{display:block;width:100%;height:auto;aspect-ratio:11/7;max-height:none;border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;cursor:crosshair;background:#e9eef3;touch-action:manipulation}
-#page-simuladorTransito .st-legend{display:flex;gap:13px;flex-wrap:wrap;margin-top:10px;font-size:12px}#page-simuladorTransito .st-legend span{display:inline-flex;align-items:center;gap:6px}
-#page-simuladorTransito .st-key{display:inline-block;width:13px;height:13px;border-radius:3px}#page-simuladorTransito .st-ped{background:#12a878}#page-simuladorTransito .st-car{background:#367fe8}#page-simuladorTransito .st-heavy{background:#db8830}#page-simuladorTransito .st-route{background:#9967e8}
-#page-simuladorTransito :focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
-@media(max-width:1100px){#page-simuladorTransito .st-layout{grid-template-columns:1fr}}@media(max-width:600px){#page-simuladorTransito .st-two{grid-template-columns:1fr}#stCanvas{max-height:none}}
-</style>
-<script id="ccttSimuladorTransitoClient">(()=>{'use strict'; // NUEVO: simulación visual independiente, sin servicios externos.
-const $=id=>document.getElementById(id),canvas=$('stCanvas'),ctx=canvas.getContext('2d');if(!ctx)return;
-const W=canvas.width,H=canvas.height;let background=null,points=[],flows=[],elapsed=0,playing=false,last=0,raf=0,recording=false;
-const colors={peaton:'#12a878',ligero:'#367fe8',pesado:'#db8830'};
-const say=s=>{$('stStatus').textContent=s};const num=(id,min,max)=>Math.min(max,Math.max(min,Number($(id).value)||min));
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-/* MODIFICADO: plano vial esquemático explícitamente ilustrativo, sin inventar ubicación real. */
-function base(){
- ctx.save();ctx.fillStyle='#e7ece7';ctx.fillRect(0,0,W,H);
- if(background){const k=Math.min(W/background.width,H/background.height),w=background.width*k,h=background.height*k;ctx.drawImage(background,(W-w)/2,(H-h)/2,w,h)}
- else if($('stBaseMode').value==='vial'){
-  ctx.fillStyle='#cbdcc5';for(const [x,y,w,h] of [[15,15,235,170],[315,15,300,155],[700,15,380,145],[15,250,220,180],[315,265,305,165],[700,265,380,165],[15,515,225,165],[320,515,305,165],[700,515,380,165]]){ctx.fillRect(x,y,w,h);ctx.strokeStyle='#a7bba3';ctx.lineWidth=2;ctx.strokeRect(x,y,w,h)}
-  ctx.fillStyle='#9fa7b1';ctx.fillRect(0,185,W,64);ctx.fillRect(0,445,W,70);ctx.fillRect(248,0,64,H);ctx.fillRect(634,0,64,H);
-  ctx.strokeStyle='#fffce4';ctx.lineWidth=3;ctx.setLineDash([19,18]);for(const y of [217,479]){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}for(const x of [280,665]){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}ctx.setLineDash([]);
-  ctx.fillStyle='#eef1f5';for(const [x,y] of [[280,217],[665,217],[280,479],[665,479]]){ctx.beginPath();ctx.arc(x,y,31,0,2*Math.PI);ctx.fill();ctx.strokeStyle='#8695a5';ctx.lineWidth=7;ctx.stroke()}
-  ctx.fillStyle='#ffffff';for(const [x,y,vertical] of [[180,202,false],[840,464,false],[265,95,true],[651,585,true]]){for(let i=0;i<5;i++)ctx.fillRect(x+(vertical?0:i*15),y+(vertical?i*10:0),vertical?24:9,vertical?6:28)}
-  ctx.fillStyle='#36534b';ctx.font='bold 20px sans-serif';for(const [label,x,y] of [['Zona A',46,65],['Zona B',360,65],['Zona C',770,65],['Acceso',52,310],['Patio',380,320],['Destino',790,320],['Área D',45,565],['Área E',385,565],['Área F',780,565]])ctx.fillText(label,x,y);
-  ctx.fillStyle='#253b50';ctx.font='bold 17px sans-serif';ctx.fillText('PLANO VIAL ILUSTRATIVO — SIN REFERENCIA GEOGRÁFICA',18,H-15);
- }else{ctx.strokeStyle='#cbd5e1';ctx.lineWidth=1;for(let x=0;x<W;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}ctx.fillStyle='#53677f';ctx.font='22px sans-serif';ctx.fillText('Cuadrícula técnica — carga un mapa para georreferenciar visualmente',25,36)}
- ctx.restore();
-}
-function poly(path,color,wide=5,dash=[]){ctx.beginPath();path.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.strokeStyle=color;ctx.lineWidth=wide;ctx.setLineDash(dash);ctx.lineJoin='round';ctx.lineCap='round';ctx.stroke();ctx.setLineDash([])}
-function getPoint(path,t){if(path.length<2)return path[0]||{x:0,y:0};let d=0;const lengths=[];for(let i=1;i<path.length;i++){let l=Math.hypot(path[i].x-path[i-1].x,path[i].y-path[i-1].y);lengths.push(l);d+=l}let remain=(Math.max(0,Math.min(1,t)))*d;for(let i=0;i<lengths.length;i++){if(remain<=lengths[i]||i===lengths.length-1){let a=path[i],b=path[i+1],u=lengths[i]?remain/lengths[i]:0;return{x:a.x+(b.x-a.x)*u,y:a.y+(b.y-a.y)*u,angle:Math.atan2(b.y-a.y,b.x-a.x)}}remain-=lengths[i]}return path[path.length-1]}
-// NUEVO: tres figuras vectoriales propias, diferenciables incluso sin color.
-function actor(p,type){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle||0);ctx.fillStyle=colors[type];ctx.strokeStyle='#ffffff';ctx.lineWidth=2;if(type==='peaton'){ctx.beginPath();ctx.arc(0,-6,4,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(0,-1);ctx.lineTo(0,8);ctx.moveTo(0,2);ctx.lineTo(-6,6);ctx.moveTo(0,2);ctx.lineTo(6,6);ctx.moveTo(0,8);ctx.lineTo(-5,13);ctx.moveTo(0,8);ctx.lineTo(5,13);ctx.stroke()}else if(type==='ligero'){ctx.fillRect(-11,-6,22,12);ctx.strokeRect(-11,-6,22,12);ctx.fillStyle='#e7efff';ctx.fillRect(-3,-5,8,10)}else{ctx.fillRect(-15,-8,30,16);ctx.strokeRect(-15,-8,30,16);ctx.fillStyle='#e7efff';ctx.fillRect(7,-6,5,12)}ctx.restore()}
-function draw(){base();for(let fi=0;fi<flows.length;fi++){const f=flows[fi],c=colors[f.type];poly(f.path,c,5);const first=f.path[0],end=f.path[f.path.length-1];/* MODIFICADO: pines de origen/destino diferenciados y centrados en la ruta. */ctx.fillStyle=c;ctx.beginPath();ctx.arc(first.x,first.y,11,0,Math.PI*2);ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.stroke();ctx.strokeStyle='#142238';ctx.lineWidth=2;ctx.strokeRect(end.x-10,end.y-10,20,20);ctx.fillStyle=c;ctx.fillRect(end.x-8,end.y-8,16,16);for(let j=0;j<f.quantity;j++){const steps=f.quantity>1?j/f.quantity:0,progress=((elapsed/(f.duration*60)*f.playbackFactor)+steps)%1;actor(getPoint(f.path,progress),f.type)}}if(points.length){poly(points,'#8553d9',4,[9,6]);for(let i=0;i<points.length;i++){ctx.beginPath();ctx.fillStyle=i===0?'#00a775':'#8553d9';ctx.arc(points[i].x,points[i].y,7,0,Math.PI*2);ctx.fill()}}const max=flows.length?Math.max(...flows.map(f=>f.duration*60)):num('stDuration',1,180)*60,shown=Math.floor(elapsed),total=Math.floor(max);const fm=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');$('stClock').textContent=fm(shown)+' / '+fm(total)}
-function frame(now){if(!playing)return;if(last)elapsed+=(now-last)/1000*num('stPlayback',1,4);last=now;const duration=flows.length?Math.max(...flows.map(f=>f.duration*60)):num('stDuration',1,180)*60;if(elapsed>=duration){elapsed=duration;playing=false;last=0;say('Simulación terminada. Puedes reiniciar o exportar el escenario.')}draw();if(playing)raf=requestAnimationFrame(frame)}
-function stop(){playing=false;last=0;if(raf)cancelAnimationFrame(raf);raf=0}
-canvas.addEventListener('click',e=>{if(playing||recording)return;const b=canvas.getBoundingClientRect();/* MODIFICADO: coordenadas del lienzo reales, acotadas dentro del área visible. */points.push({x:Math.max(0,Math.min(W,Math.round((e.clientX-b.left)/b.width*W))),y:Math.max(0,Math.min(H,Math.round((e.clientY-b.top)/b.height*H)))});draw();say('Puntos del recorrido: '+points.length+'. Define al menos origen y destino.')});
-$('stFile').addEventListener('change',async()=>{const f=$('stFile').files?.[0];if(!f)return;if(!['image/png','image/jpeg','image/webp'].includes(f.type)||f.size>15*1024*1024){say('Adjunta un PNG/JPG/WebP de máximo 15 MB.');return}const url=URL.createObjectURL(f),img=new Image();img.onload=()=>{background=img;URL.revokeObjectURL(url);draw();say('Plano cargado. Marca origen, puntos intermedios y destino.')};img.onerror=()=>{URL.revokeObjectURL(url);say('No se pudo abrir el plano.')};img.src=url});
-/* NUEVO: actualizar fondo sin borrar trayectorias ni flujos. */$('stBaseMode').addEventListener('change',draw);
-$('stUndo').onclick=()=>{if(playing)return;points.pop();draw()};$('stClearPath').onclick=()=>{if(playing)return;points=[];draw()};
-function list(){const el=$('stFlows');el.replaceChildren();if(!flows.length){el.textContent='Sin flujos todavía.';return}flows.forEach((f,i)=>{const row=document.createElement('div');row.className='st-flow-item';const span=document.createElement('span');span.textContent=(i+1)+'. '+f.type+' · '+f.quantity+' · '+f.origin+' → '+f.destination+' · '+f.maneuver;const btn=document.createElement('button');btn.type='button';btn.textContent='Quitar';btn.onclick=()=>{if(recording)return;stop();flows.splice(i,1);elapsed=0;list();draw()};row.append(span,btn);el.append(row)})}
-$('stAdd').onclick=()=>{if(points.length<2){say('Dibuja al menos origen y destino sobre el plano.');return}const quantity=num('stQuantity',1,150),duration=num('stDuration',1,180),speed=num('stSpeed',1,100),maneuver=$('stManeuver').value;flows.push({type:$('stType').value,quantity,duration,speed,maneuver,origin:$('stOrigin').value.trim()||'Origen',destination:$('stDestination').value.trim()||'Destino',activity:$('stActivity').value.trim(),path:points.map(p=>({...p})),playbackFactor:1});points=[];stop();elapsed=0;list();draw();say('Flujo añadido. La animación es ilustrativa, no un cálculo de capacidad vial.')};
-$('stPlay').onclick=()=>{if(!flows.length){say('Añade al menos un flujo antes de reproducir.');return}if(playing)return;playing=true;last=0;raf=requestAnimationFrame(frame);say('Reproduciendo escenario.')};$('stPause').onclick=()=>{stop();say('Simulación pausada.')};$('stReset').onclick=()=>{stop();elapsed=0;draw();say('Simulación reiniciada.')};
-$('stPng').onclick=()=>{draw();canvas.toBlob(b=>b?download(b,'simulacion-transito.png'):say('No se pudo generar PNG.'),'image/png')};
-$('stJson').onclick=()=>download(new Blob([JSON.stringify({version:1,title:$('stScenario').value,canvas:{width:W,height:H},flows},null,2)],{type:'application/json'}),'simulacion-transito.json');
-$('stSvg').onclick=()=>{const ns='http://www.w3.org/2000/svg',parts=['<svg xmlns="'+ns+'" viewBox="0 0 '+W+' '+H+'"><rect width="'+W+'" height="'+H+'" fill="#eef2f6"/>'];if(background){parts.push('<desc>La imagen base no se incrusta en esta exportación SVG; exporta PNG para conservarla.</desc>')}for(const f of flows){parts.push('<polyline fill="none" stroke="'+colors[f.type]+'" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" points="'+f.path.map(p=>p.x+','+p.y).join(' ')+'"/>')}parts.push('</svg>');download(new Blob([parts.join('')],{type:'image/svg+xml'}),'simulacion-transito.svg');say(background?'SVG exportado con rutas; el mapa base no se incrusta por privacidad y tamaño. PNG incluye el mapa.':'SVG exportado.')};
-$('stVideo').onclick=()=>{if(recording)return;if(!canvas.captureStream||typeof MediaRecorder==='undefined'){say('Este navegador no permite grabar el lienzo a video.');return}if(!flows.length){say('Añade flujos para grabar una simulación.');return}const formats=['video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];const mime=formats.find(x=>MediaRecorder.isTypeSupported(x));if(!mime){say('No existe codificador de video compatible en este navegador.');return}const stream=canvas.captureStream(24),chunks=[];let recorder;try{recorder=new MediaRecorder(stream,{mimeType:mime})}catch{stream.getTracks().forEach(x=>x.stop());say('No se pudo iniciar la grabación.');return}recording=true;stop();elapsed=0;draw();recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};recorder.onstop=()=>{recording=false;stream.getTracks().forEach(x=>x.stop());if(chunks.length)download(new Blob(chunks,{type:mime}),'simulacion-transito.'+(mime.includes('mp4')?'mp4':'webm'));else say('No se generaron datos de video.')};recorder.onerror=()=>{say('El navegador no pudo grabar el video.')};recorder.start();let start=0;const seconds=Math.min(25,Math.max(4,flows.length?Math.max(...flows.map(f=>f.duration*60))/20:10));function capture(t){if(!recording)return;if(!start)start=t;elapsed=Math.min(1,(t-start)/(seconds*1000))*(flows.length?Math.max(...flows.map(f=>f.duration*60)):600);draw();if((t-start)<seconds*1000&&recorder.state==='recording')requestAnimationFrame(capture);else{try{recorder.stop()}catch{}say('Video generado. Se descargará en el formato compatible con tu navegador.')}}requestAnimationFrame(capture);say('Grabando animación del escenario…')};
-window.addEventListener('beforeunload',()=>stop());draw();
-})();</script>
+
+
 <!-- NUEVO: estilos exclusivos del revisor DEC compatibles con ambos modos existentes. -->
 <style id="ccttDecReviewStyles">
 #page-verificacionCitas .cctt-dec-review-actions strong{color:var(--cctt-theme-text,var(--text))}#page-verificacionCitas .cctt-dec-review-buttons{display:flex;flex-wrap:wrap;gap:9px}#page-verificacionCitas #ccttDecReviewStatus{font-size:13px;line-height:1.5;color:var(--cctt-theme-text,var(--text))}
@@ -8910,5 +9198,78 @@ if(matchMedia('(prefers-reduced-motion: reduce)').matches){tick(stamp+elapsed)}e
 /* MODIFICADO: actualizar sectores y contador al escribir, sin pulsar Actualizar ruleta. */entries.addEventListener('input',()=>{if(!spinning)apply()});$('rdApply').addEventListener('click',apply);$('rdClear').addEventListener('click',()=>{if(!spinning){entries.value='';apply()}});$('rdReset').addEventListener('click',()=>{if(!spinning){angle=0;draw();out.textContent='Ruleta reiniciada. Opciones conservadas.'}});$('rdSpin').addEventListener('click',spin);
 document.addEventListener('keydown',e=>{if(e.code!=='Space'||e.repeat||!root.classList.contains('active')||e.altKey||e.ctrlKey||e.metaKey)return;const a=document.activeElement;if(a&&(a.isContentEditable||/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(a.tagName)))return;e.preventDefault();spin()});apply();
 })();
+</script>
+<script id="ccttSimuladorStitchClient">
+/* NUEVO: motor local de dibujo y simulación para el diseño code.html, sin Tailwind/Lucide ni otras dependencias. */
+(()=>{'use strict';
+const root=document.getElementById('page-simuladorTransito');if(!root)return;
+const el=id=>root.querySelector('#'+id),canvas=el('trafficCanvas'),ctx=canvas.getContext('2d');if(!ctx)return;
+const palette={pedestrian:'#10b981',light:'#2563eb',heavy:'#f59e0b',special:'#8b5cf6'};
+let mode='pedestrian',scenario='intersection',tool='route',curve='smooth',flows=[],waypoints=[],roads=[],markers=[],agents=[],background=null,showHeatmap=false,showWaypoints=true,playing=false,seconds=0,multiplier=1,canvasW=900,canvasH=650,lastFrame=0,lastStatus='',statusTimeout=0,signalClock=0;
+let recorder=null,recordChunks=[],recordStream=null;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));const float=(id,def=0)=>{const v=Number(el(id).value);return Number.isFinite(v)?v:def};
+const safe=(id)=>el(id)?.value?.trim()||'';
+function notify(t){if(!el('stToast'))return;el('stToast').textContent=t;lastStatus=t;}
+function resize(){const rect=canvas.getBoundingClientRect();if(rect.width<80||rect.height<80)return;canvasW=rect.width;canvasH=rect.height;const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(canvasW*dpr);canvas.height=Math.round(canvasH*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);render();}
+const pt=(x,y)=>({x:clamp(x,0,1),y:clamp(y,0,1)}),xy=(p)=>({x:p.x*canvasW,y:p.y*canvasH});
+function samplePath(path,cur='smooth'){
+ if(path.length<2)return path.slice();if(cur==='straight')return path.slice();let out=[];
+ for(let j=0;j<path.length-1;j++){const a=path[Math.max(0,j-1)],b=path[j],c=path[j+1],d=path[Math.min(path.length-1,j+2)];for(let k=0;k<12;k++){const t=k/12,t2=t*t,t3=t2*t;const tension=cur==='tight'?.75:.45;const calc=(v0,v1,v2,v3)=>{const m1=(v2-v0)*tension,m2=(v3-v1)*tension;return (2*t3-3*t2+1)*v1+(t3-2*t2+t)*m1+(-2*t3+3*t2)*v2+(t3-t2)*m2};out.push(pt(calc(a.x,b.x,c.x,d.x),calc(a.y,b.y,c.y,d.y)));}}
+ out.push(path[path.length-1]);return out;
+}
+function getAt(path,p){if(!path?.length)return {x:0,y:0,angle:0};if(path.length===1)return {...xy(path[0]),angle:0};const dist=[],w=[];let total=0;for(let i=1;i<path.length;i++){const a=xy(path[i-1]),b=xy(path[i]),n=Math.hypot(b.x-a.x,b.y-a.y);w.push(n);total+=n;}let progress=clamp(p,0,1)*total;for(let i=0;i<w.length;i++){if(progress<=w[i]||i===w.length-1){const a=xy(path[i]),b=xy(path[i+1]),t=clamp(progress/Math.max(w[i],.001),0,1);return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t,angle:Math.atan2(b.y-a.y,b.x-a.x)};}progress-=w[i];}return {...xy(path[path.length-1]),angle:0};}
+function pathLength(path){let n=0;for(let i=1;i<path.length;i++){const a=xy(path[i-1]),b=xy(path[i]);n+=Math.hypot(a.x-b.x,a.y-b.y);}return Math.max(n,1)}
+function strokePath(path,color,width,dash=[]){if(path.length<2)return;ctx.save();ctx.lineWidth=width;ctx.strokeStyle=color;ctx.lineJoin='round';ctx.lineCap='round';ctx.setLineDash(dash);ctx.beginPath();const a=xy(path[0]);ctx.moveTo(a.x,a.y);for(const p of path.slice(1)){const q=xy(p);ctx.lineTo(q.x,q.y);}ctx.stroke();ctx.restore();}
+function road(color,w,dir){const cx=canvasW*.5,cy=canvasH*.5;ctx.fillStyle=color;if(dir==='NS')ctx.fillRect(cx-w/2,0,w,canvasH);else ctx.fillRect(0,cy-w/2,canvasW,w)}
+function base(){const rgb=getComputedStyle(root).color.match(/\d+/g);const dark=!!(rgb&&Number(rgb[0])>145&&Number(rgb[1])>145); const rs=getComputedStyle(root);const col=rs.getPropertyValue('--st-soft').trim()||'#f1f5f9';ctx.fillStyle=col;ctx.fillRect(0,0,canvasW,canvasH);
+ if(background){const r=Math.min(canvasW/background.width,canvasH/background.height),w=background.width*r,h=background.height*r;ctx.drawImage(background,(canvasW-w)/2,(canvasH-h)/2,w,h);return;}
+ const grid=dark?'#64748b':'#cbd5e1';ctx.strokeStyle=grid;ctx.lineWidth=.5;ctx.globalAlpha=.5;for(let x=0;x<=canvasW;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvasH);ctx.stroke();}for(let y=0;y<=canvasH;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvasW,y);ctx.stroke();}ctx.globalAlpha=1;
+ const w=Math.min(canvasW,canvasH)*.23,rc=dark?'#334155':'#dfe5ed';const cx=canvasW/2,cy=canvasH/2;
+ if(scenario==='roundabout'){
+ road(rc,w,'NS');road(rc,w,'EW');ctx.fillStyle=col;ctx.beginPath();ctx.arc(cx,cy,w*.79,0,Math.PI*2);ctx.fill();ctx.fillStyle=rc;ctx.beginPath();ctx.arc(cx,cy,w*.64,0,Math.PI*2);ctx.fill();ctx.fillStyle=col;ctx.beginPath();ctx.arc(cx,cy,w*.32,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#94a3b8';ctx.setLineDash([8,10]);ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,w*.48,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);return;
+ }
+ if(scenario==='corridor'){
+ const h=w*.95;ctx.fillStyle=rc;ctx.fillRect(0,cy-h/2,canvasW,h);ctx.fillStyle=dark?'#475569':'#cbd5e1';ctx.fillRect(0,cy-h*.14,canvasW,h*.28);ctx.strokeStyle='#94a3b8';ctx.setLineDash([12,9]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,cy);ctx.lineTo(canvasW,cy);ctx.stroke();ctx.setLineDash([]);return;
+ }
+ road(rc,w,'NS');road(rc,w,'EW');ctx.strokeStyle=dark?'#64748b':'#b6c4d5';ctx.lineWidth=1.5;ctx.setLineDash([10,9]);ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,cy-w/2);ctx.moveTo(cx,cy+w/2);ctx.lineTo(cx,canvasH);ctx.moveTo(0,cy);ctx.lineTo(cx-w/2,cy);ctx.moveTo(cx+w/2,cy);ctx.lineTo(canvasW,cy);ctx.stroke();ctx.setLineDash([]);
+ ctx.fillStyle=dark?'#cbd5e1':'#fff';for(let x=cx-w/2+8;x<cx+w/2-6;x+=13){ctx.fillRect(x,cy-w/2-15,7,12);ctx.fillRect(x,cy+w/2+4,7,12);}for(let y=cy-w/2+8;y<cy+w/2-6;y+=13){ctx.fillRect(cx-w/2-15,y,12,7);ctx.fillRect(cx+w/2+4,y,12,7);}
+}
+function drawSign(x,y,state){ctx.save();ctx.shadowColor=state;ctx.shadowBlur=7;ctx.fillStyle=state;ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.restore()}
+function drawSignals(){const cx=canvasW/2,cy=canvasH/2,w=Math.min(canvasW,canvasH)*.23,phase=signalPhase(),ns=phase==='NS'?'#10b981':phase==='YNS'?'#f59e0b':'#ef4444',ew=phase==='EW'?'#10b981':phase==='YEW'?'#f59e0b':'#ef4444';drawSign(cx-w/2-8,cy-w/2-8,ns);drawSign(cx+w/2+8,cy+w/2+8,ns);drawSign(cx+w/2+8,cy-w/2-8,ew);drawSign(cx-w/2-8,cy+w/2+8,ew)}
+function signalPhase(){const ns=clamp(float('stNSGreen',30),3,180),ew=clamp(float('stEWGreen',25),3,180),t=signalClock%(ns+ew+6);return t<ns?'NS':t<ns+3?'YNS':t<ns+3+ew?'EW':'YEW'}
+function render(){if(canvasW<80)return;base();if(!background&&scenario==='intersection')drawSignals();
+ for(const r of roads){if(r.kind==='road'){strokePath(r.path,'#64748b',Math.max(16,canvasW*.026));strokePath(r.path,'#f8fafc',1.5,[7,9]);}else if(r.kind==='crossing'){const p=xy(r.point);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(r.angle||0);ctx.fillStyle='#f8fafc';for(let i=-3;i<=3;i++)ctx.fillRect(-24,i*7,48,3);ctx.restore();}else if(r.kind==='signal'){const p=xy(r.point);drawSign(p.x,p.y,signalPhase()==='NS'?'#10b981':'#ef4444');}else if(r.kind==='pin'){const p=xy(r.point);drawSign(p.x,p.y,'#8b5cf6');}}
+ if(showWaypoints){for(const f of flows){strokePath(f.sample,f.color,2,[7,6]);const first=xy(f.path[0]),last=xy(f.path[f.path.length-1]);drawSign(first.x,first.y,'#16a34a');drawSign(last.x,last.y,'#dc2626');}if(waypoints.length){const draft=samplePath(waypoints,curve);strokePath(draft,tool==='road'?'#64748b':'#8b5cf6',tool==='road'?15:3,[6,5]);waypoints.forEach((p,i)=>{const q=xy(p);ctx.fillStyle=i===0?'#16a34a':'#8b5cf6';ctx.beginPath();ctx.arc(q.x,q.y,5,0,Math.PI*2);ctx.fill();});}}
+ if(showHeatmap){ctx.save();for(const a of agents){const q=getAt(a.flow.sample,a.progress);const g=ctx.createRadialGradient(q.x,q.y,2,q.x,q.y,40);g.addColorStop(0,'rgba(245,158,11,.21)');g.addColorStop(1,'rgba(245,158,11,0)');ctx.fillStyle=g;ctx.fillRect(q.x-40,q.y-40,80,80);}ctx.restore();}
+ for(const a of agents){const q=getAt(a.flow.sample,a.progress);ctx.save();ctx.translate(q.x,q.y);ctx.rotate(q.angle);ctx.fillStyle=a.flow.color;ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.shadowColor='#0005';ctx.shadowBlur=2;if(a.flow.type==='pedestrian'){ctx.beginPath();ctx.arc(0,0,3,0,Math.PI*2);ctx.fill();}else {const w=a.flow.type==='heavy'?20:a.flow.type==='special'?16:13;ctx.beginPath();ctx.roundRect(-w/2,-4.5,w,9,3);ctx.fill();ctx.stroke();if(a.flow.type==='special'){ctx.fillStyle='#fff';ctx.fillRect(-3,-1,6,2);}}ctx.restore();}}
+function recalc(){agents=[];flows.forEach(f=>{for(let i=0;i<f.volume;i++)agents.push({flow:f,progress:i/f.volume,stopped:0});});el('activeAgentsCount').textContent=String(agents.length);el('activeFlowsBadge').textContent=flows.length+' flujos';el('hudLos').textContent='Sin calibrar';el('hudDelay').textContent='—';el('hudThroughput').textContent='—';}
+function list(){const box=el('flowItemsList');box.replaceChildren();if(!flows.length){const p=document.createElement('p');p.textContent='Sin flujos configurados todavía. Añade uno para comenzar la simulación.';p.style.cssText='font-size:12px;text-align:center;color:var(--st-muted)';box.append(p);return;}for(const f of flows){const card=document.createElement('div');card.className='st-flow-card';const bar=document.createElement('span');bar.style.cssText='width:7px;min-height:38px;border-radius:6px;background:'+f.color;const details=document.createElement('div');const strong=document.createElement('strong');strong.textContent=f.origin+' → '+f.destination;const small=document.createElement('small');small.textContent=f.volume+' agentes · '+f.speed+' km/h · '+f.maneuver;details.append(strong,small);const del=document.createElement('button');del.type='button';del.title='Eliminar flujo';del.textContent='×';del.onclick=()=>{flows=flows.filter(x=>x.id!==f.id);recalc();list();notify('Flujo eliminado del escenario.');};card.append(bar,details,del);box.append(card);}}
+function updateTime(){let secondsInt=Math.floor(seconds);el('simTimeDisplay').textContent=[Math.floor(secondsInt/3600),Math.floor(secondsInt%3600/60),secondsInt%60].map(x=>String(x).padStart(2,'0')).join(':');let total=clamp(float('stDuration',10),1,180)*60;el('stTargetTime').textContent=[Math.floor(total/3600),Math.floor(total%3600/60),total%60].map(x=>String(x).padStart(2,'0')).join(':');el('canvasNoticeBadge').textContent='Fase semafórica '+(signalPhase()==='NS'?'N-S verde':signalPhase()==='EW'?'E-O verde':'amarilla')+' · Ciclo configurado';}
+function step(dt){if(!playing)return;const d=clamp(dt,0,.05)*multiplier;seconds+=d;signalClock+=d;if(seconds>=clamp(float('stDuration',10),1,180)*60){seconds=clamp(float('stDuration',10),1,180)*60;playing=false;notify('Simulación finalizada. Pulsa Reiniciar para repetir.');}for(const a of agents){const f=a.flow,dist=pathLength(f.sample),mps=f.speed*1000/3600;const actualPixels=mps*12*d;const q=getAt(f.sample,a.progress);const near=Math.abs(q.x-canvasW/2)<Math.min(canvasW,canvasH)*.14&&Math.abs(q.y-canvasH/2)<Math.min(canvasW,canvasH)*.14;const green=(Math.abs(Math.sin(q.angle))>.65?signalPhase()==='NS':signalPhase()==='EW');if(!background&&scenario==='intersection'&&near&&!green&&f.type!=='pedestrian')continue;if(a.stopped>0){a.stopped-=d;continue;}a.progress+=actualPixels/dist;if(a.progress>=1){a.progress=0;a.stopped=clamp(f.wait,0,180);}}updateTime();}
+function tick(t){if(!root.isConnected)return;const dt=lastFrame?(t-lastFrame)/1000:0;lastFrame=t;if(root.classList.contains('active')){const rect=canvas.getBoundingClientRect();if(Math.abs(rect.width-canvasW)>2||Math.abs(rect.height-canvasH)>2)resize();step(dt);render();}requestAnimationFrame(tick)}
+function clearPoints(){waypoints=[];render()}
+/* NUEVO: la maniobra elegida afecta a recorridos de dos puntos, pero no altera los trazados manuales de tres o más. */
+function prepareManeuver(path,maneuver){if(path.length!==2||maneuver==='direct'||maneuver==='crossing')return path.slice();const a=path[0],b=path[1];const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy)||.1,nx=-dy/len,ny=dx/len;
+ if(maneuver==='u_turn'){const bump=.10;return [a,pt(a.x+dx*.30+nx*bump,a.y+dy*.30+ny*bump),pt(b.x-dx*.30+nx*bump,b.y-dy*.30+ny*bump),b];}
+ const side=maneuver==='turn_left'?-1:1;return [a,pt((a.x+b.x)/2+nx*.09*side,(a.y+b.y)/2+ny*.09*side),b];}
+function addFlow(){if(waypoints.length<2){notify('Marca al menos dos puntos en el mapa para definir origen y destino.');return;}const quantity=clamp(Math.floor(float('flowVolume',18)),1,150),speed=clamp(float('flowSpeed',15),1,100),origin=safe('originZone')||'Origen sin nombre',destination=safe('destZone')||'Destino sin nombre';const maneuver=el('maneuverType').selectedOptions[0].textContent;const type=mode;const prepared=prepareManeuver(waypoints,el('maneuverType').value);const f={id:'f'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),type,volume:quantity,speed,origin,destination,maneuver,activity:safe('activityDesc'),wait:clamp(float('stWait'),0,180),path:prepared,sample:samplePath(prepared,curve),color:palette[type]};flows.push(f);clearPoints();recalc();list();notify('Flujo añadido: '+origin+' → '+destination+'.');}
+function loadImage(file){if(!file)return;if(!/^image\/(png|jpeg|webp)$/.test(file.type)){notify('Selecciona un PNG, JPG o WebP. No se admiten SVG ni archivos ejecutables.');return;}if(file.size>12*1024*1024){notify('La imagen excede 12 MB. Reduce el archivo antes de cargarlo.');return;}const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{background=img;URL.revokeObjectURL(url);el('fileNameDisplay').textContent=file.name;notify('Mapa cargado. Marca sobre él las calles y trayectorias que utilizarás.');render();};img.onerror=()=>{URL.revokeObjectURL(url);notify('No se pudo leer la imagen.');};img.src=url;}
+function exportFile(name,data,type){const blob=data instanceof Blob?data:new Blob([data],{type});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);}
+function exportCSV(){const quote=x=>'"'+String(x??'').replaceAll('"','""')+'"';const lines=[['ID','Tipo','Origen','Destino','Cantidad','Velocidad_kmh','Espera_s','Maniobra','Actividad','Puntos_x_y']];flows.forEach(f=>lines.push([f.id,f.type,f.origin,f.destination,f.volume,f.speed,f.wait,f.maneuver,f.activity,f.path.map(p=>p.x.toFixed(4)+':'+p.y.toFixed(4)).join('|')]));exportFile('cctt_transito_flujos.csv',lines.map(r=>r.map(quote).join(',')).join('\r\n'),'text/csv;charset=utf-8');notify('CSV exportado con los flujos configurados.');}
+function exportJSON(){const data={version:1,scene:scenario,durationMin:clamp(float('stDuration',10),1,180),signalNS:float('stNSGreen'),signalEW:float('stEWGreen'),roads,markers,flows:flows.map(({sample,...f})=>f),notes:'Parámetros ilustrativos sin calibración de tránsito real'};exportFile('cctt_transito_escenario.json',JSON.stringify(data,null,2),'application/json');notify('Escenario exportado como JSON.');}
+function record(){if(recorder&&recorder.state==='recording'){recorder.stop();el('stRecord').textContent='Grabar video';return;}if(!canvas.captureStream||!window.MediaRecorder){notify('Este navegador no permite grabar video desde el lienzo. Utiliza PNG o JSON.');return;}let mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));if(!mime){notify('No hay un formato de grabación de video compatible.');return;}recordStream=canvas.captureStream(24);recordChunks=[];recorder=new MediaRecorder(recordStream,{mimeType:mime});recorder.ondataavailable=e=>{if(e.data?.size)recordChunks.push(e.data)};recorder.onstop=()=>{exportFile('cctt_transito_simulacion.webm',new Blob(recordChunks,{type:mime}),mime);recordStream.getTracks().forEach(t=>t.stop());recorder=null;notify('Grabación WebM descargada. La exportación MP4 depende de soporte nativo del navegador.');};recorder.start();playing=true;el('stRecord').textContent='Detener grabación';notify('Grabación en curso; pulsa Detener grabación para descargar el archivo.');}
+const on=(id,event,fn)=>el(id)?.addEventListener(event,fn);
+root.querySelectorAll('.agent-btn').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.agent;root.querySelectorAll('.agent-btn').forEach(x=>x.classList.toggle('active',x===b));el('flowSpeed').value=mode==='pedestrian'?5:mode==='light'?25:mode==='heavy'?18:40;notify('Tipo de tránsito: '+b.textContent.trim());}));
+on('mapFileInput','change',e=>loadImage(e.target.files[0]));on('mapPresetSelect','change',e=>{scenario=e.target.value;el('currentScenarioLabel').textContent=e.target.selectedOptions[0].textContent;background=null;el('fileNameDisplay').textContent='Sin archivo';el('mapFileInput').value='';notify('Plano base seleccionado: '+el('currentScenarioLabel').textContent);render();});
+on('stTool','change',e=>{tool=e.target.value;clearPoints();notify('Herramienta: '+e.target.selectedOptions[0].textContent)});on('stCurve','change',e=>{curve=e.target.value;render();});
+canvas.addEventListener('pointermove',e=>{const r=canvas.getBoundingClientRect();el('coordsDisplay').textContent='X: '+((e.clientX-r.left)/12).toFixed(1)+' m, Y: '+((e.clientY-r.top)/12).toFixed(1)+' m (escala ilustrativa)';});
+canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect(),p=pt((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);if(['pin','signal','crossing'].includes(tool)){roads.push({kind:tool,point:p});notify('Elemento añadido al plano: '+tool+'.');}else{waypoints.push(p);notify(waypoints.length+' punto(s) marcados. '+(tool==='road'?'Guarda el trazo vial al finalizar.':'Añade el flujo al terminar el recorrido.'));}render();});
+on('undoPointBtn','click',()=>{waypoints.pop();render();notify('Último punto deshecho.');});on('clearPointsBtn','click',()=>{clearPoints();notify('Trazado temporal limpiado.');});on('stCommitRoad','click',()=>{if(tool==='road'&&waypoints.length>=2){roads.push({kind:'road',path:samplePath(waypoints,curve)});clearPoints();notify('Carretera o sendero guardado en el plano.');}else notify('Selecciona Dibujar carretera y marca al menos dos puntos.');});on('addFlowBtn','click',addFlow);
+on('playBtn','click',()=>{if(!flows.length){notify('Añade al menos un flujo antes de reproducir.');return;}if(seconds>=clamp(float('stDuration',10),1,180)*60)seconds=0;playing=true;notify('Simulación iniciada.');});on('pauseBtn','click',()=>{playing=false;notify('Simulación pausada.');});on('resetBtn','click',()=>{playing=false;seconds=0;signalClock=0;recalc();updateTime();notify('Tiempo y agentes reiniciados. Los flujos se conservaron.');render();});on('simSpeedSelect','change',e=>{multiplier=Number(e.target.value)||1;notify('Velocidad de reproducción: '+multiplier+'×.');});
+on('toggleHeatmapBtn','click',()=>{showHeatmap=!showHeatmap;el('toggleHeatmapBtn').setAttribute('aria-pressed',String(showHeatmap));render();});on('toggleWaypointsBtn','click',()=>{showWaypoints=!showWaypoints;el('toggleWaypointsBtn').setAttribute('aria-pressed',String(showWaypoints));render();});on('resetViewBtn','click',()=>{waypoints=[];render();notify('Vista restablecida.');});
+on('exportCsvBtn','click',exportCSV);on('stExportJson','click',exportJSON);on('stExportPng','click',()=>{try{canvas.toBlob(blob=>{if(blob)exportFile('cctt_transito_plano.png',blob,'image/png');else notify('No se pudo exportar la imagen.');},'image/png')}catch(e){notify('No se pudo exportar PNG.');}});on('stRecord','click',record);
+const obs=new ResizeObserver(()=>resize());obs.observe(canvas);window.addEventListener('resize',resize);document.addEventListener('visibilitychange',()=>{if(document.hidden)playing=false;});recalc();list();updateTime();requestAnimationFrame(()=>{resize();requestAnimationFrame(tick)});
+})();
+
 </script>
 </body></html>
