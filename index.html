@@ -9309,6 +9309,28 @@ const obs=new ResizeObserver(()=>resize());obs.observe(canvas);window.addEventLi
 @media(max-width:1050px) and (min-width:721px){.sidebar .cctt-layout-group>summary{justify-content:center;font-size:11px;padding:10px 2px;overflow-wrap:anywhere;text-align:center}.sidebar .cctt-layout-group>summary::before{display:none}.sidebar .cctt-layout-open{font-size:0;justify-content:center}.sidebar .cctt-layout-open svg{min-width:19px}.sidebar .cctt-layout-group .navbtn{padding-left:3px;padding-right:3px}}
 @media(max-width:720px){.sidebar.cctt-mobile-open .cctt-layout-group>summary{font-size:13px;justify-content:flex-start}.sidebar.cctt-mobile-open .cctt-layout-open{font-size:13px;justify-content:flex-start}#moduleCards .cctt-layout-group-content{grid-template-columns:1fr}#ccttHomeIconGrid .cctt-layout-group-content{grid-template-columns:repeat(2,minmax(0,1fr))}#ccttNavOrganizer .cctt-layout-panel{padding:13px}#ccttNavOrganizer .cctt-layout-row select{margin-left:0;width:100%;max-width:none}}
 @media(prefers-reduced-motion:reduce){.cctt-layout-group>summary::before{transition:none}}
+
+/* MODIFICADO: el agrupamiento se limita a la barra lateral; las vistas de Inicio mantienen su cuadrícula original. */
+#moduleCards.cctt-layout-active,#ccttHomeIconGrid.cctt-layout-active{display:grid;grid-template-columns:revert;gap:16px}
+/* NUEVO: organización por arrastre, sin botones de flechas y con contraste en ambos modos. */
+#ccttNavOrganizer .cctt-dnd-bucket{margin:10px 0;border:1px dashed var(--cctt-theme-line,var(--line));background:var(--cctt-theme-input,var(--card));border-radius:12px;padding:9px;min-height:62px}
+#ccttNavOrganizer .cctt-dnd-bucket[data-drop-active="true"],#ccttNavOrganizer .cctt-dnd-section[data-drop-active="true"]{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:1px;background:var(--cctt-theme-table,var(--card))}
+#ccttNavOrganizer .cctt-dnd-bucket-title{font-weight:850;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+#ccttNavOrganizer .cctt-dnd-item{display:flex;align-items:center;gap:10px;padding:10px;margin:5px 0;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-radius:10px;min-width:0;touch-action:pan-y}
+#ccttNavOrganizer .cctt-dnd-item .cctt-dnd-handle{flex:0 0 auto;border:1px solid var(--cctt-theme-line,var(--line));border-radius:8px;background:var(--cctt-theme-table,var(--card));color:var(--cctt-theme-text,var(--text));padding:7px 9px;cursor:grab;touch-action:none;user-select:none}
+#ccttNavOrganizer .cctt-dnd-item .cctt-dnd-handle:active{cursor:grabbing}
+#ccttNavOrganizer .cctt-dnd-item strong{flex:1;overflow-wrap:anywhere;font-size:13px}
+#ccttNavOrganizer .cctt-dnd-item.cctt-dnd-dragging{opacity:.42}
+#ccttNavOrganizer .cctt-dnd-item.cctt-dnd-target{border-color:var(--cctt-theme-accent,var(--blue));box-shadow:0 0 0 2px var(--cctt-theme-accent,var(--blue)) inset}
+#ccttNavOrganizer .cctt-dnd-section{margin:7px 0;border:1px solid var(--cctt-theme-line,var(--line));border-radius:11px;padding:9px}
+#ccttNavOrganizer .cctt-dnd-section-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#ccttNavOrganizer .cctt-dnd-section-head input{flex:1;min-width:120px}
+#ccttNavOrganizer .cctt-dnd-note{font-size:12px;color:var(--cctt-theme-muted,var(--muted));margin:7px 0}
+#ccttNavOrganizer .cctt-dnd-item[data-locked="true"]{opacity:.8}
+#ccttNavOrganizer .cctt-dnd-empty{padding:10px;color:var(--cctt-theme-muted,var(--muted));font-size:12px}
+#ccttNavOrganizer .cctt-dnd-ghost{position:fixed;z-index:285005;pointer-events:none;max-width:min(310px,75vw);padding:10px 14px;border:2px solid var(--cctt-theme-accent,var(--blue));border-radius:9px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));box-shadow:0 12px 30px #0006;font-weight:800}
+#ccttNavOrganizer .cctt-dnd-handle:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
+@media(max-width:720px){#ccttNavOrganizer .cctt-dnd-section-head input{width:100%}#ccttNavOrganizer .cctt-dnd-item{padding:7px}}
 </style>
 <!-- NUEVO: organización de módulos por cuenta y bloqueos globales administrados con RLS; sin alterar los permisos existentes. -->
 <script id="ccttNavSectionsClient">
@@ -9329,21 +9351,135 @@ function sorted(ids,group){const rank=layout.order?.[group]||[];return [...ids].
 function svg(){return '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/><path d="M7 2v6M15 9v6M11 16v6"/></svg>'}
 function groupNode(id,name,side){const d=document.createElement('details');d.className='cctt-layout-group';d.dataset.ccttGroup=id;d.open=true;const summary=document.createElement('summary');summary.textContent=name;const content=document.createElement('div');content.className='cctt-layout-group-content';d.append(summary,content);return d}
 function updateGroups(host,kind){if(!host)return;const selector=kind==='side'?'.navbtn[data-page]':'[data-page]';const nodes=[...host.querySelectorAll(selector)].filter(x=>!x.closest('#ccttNavOrganizer')&&x.dataset.page!=='inicio'&&x.dataset.page!=='perfil');if(!nodes.length)return;const byId=new Map();for(const n of nodes){const id=n.dataset.page;if(!id||byId.has(id))continue;n.dataset.ccttGrouped="1";byId.set(id,n)}const list=[...byId.keys()];const existing=[...host.querySelectorAll(':scope > .cctt-layout-group')];const expanded=new Map(existing.map(e=>[e.dataset.ccttGroup,e.open]));const frag=document.createDocumentFragment();for(const g of layout.groups){const members=sorted(list.filter(id=>effective(id)===g.id),g.id);if(!members.length)continue;const d=groupNode(g.id,g.name,kind==='side');if(expanded.has(g.id))d.open=expanded.get(g.id);for(const id of members)d.lastChild.append(byId.get(id));frag.append(d)}const outside=sorted(list.filter(id=>effective(id)==='outside'),'outside');for(const id of outside)frag.append(byId.get(id));if(kind==='side'){host.querySelectorAll(':scope > .cctt-layout-group').forEach(e=>e.remove());host.querySelectorAll(':scope > .navbtn[data-page]:not([data-cctt-grouped]):not([data-page="inicio"]):not([data-page="perfil"])').forEach(n=>{if(!frag.contains(n))n.remove()});const start=host.querySelector(':scope > .cctt-layout-open');if(start)start.after(frag);else host.append(frag)}else{host.replaceChildren(frag);host.classList.add('cctt-layout-active')}}
-function sync(){if(rendering)return;rendering=true;try{const side=document.querySelector('.sidebar');if(side)updateGroups(side,'side');updateGroups($('moduleCards'),'cards');updateGroups($('ccttHomeIconGrid'),'icons')}finally{rendering=false}}
+/* MODIFICADO: Inicio es siempre el primer control de la barra lateral y la agrupación no afecta tarjetas ni iconos. */
+function sync(){if(rendering)return;rendering=true;try{const side=document.querySelector('.sidebar');if(side){updateGroups(side,'side');const home=side.querySelector('.navbtn[data-page="inicio"]'),brand=side.querySelector('.brand'),organizer=side.querySelector(':scope > .cctt-layout-open');if(home&&brand){brand.after(home);if(organizer)home.after(organizer)}}}finally{rendering=false}}
 function schedule(){if(!uiReady)return;if(timer)clearTimeout(timer);timer=setTimeout(()=>{timer=0;sync()},90)}
 async function read(){if(!session?.user?.id||loading)return;loading=true;const expected=session.user.id;try{const client=sb();if(!client)return;const [rules,own]=await Promise.all([client.from('cctt_nav_rules').select('protected_modules').eq('id',1).maybeSingle(),client.from('cctt_nav_layouts').select('layout').eq('user_id',expected).maybeSingle()]);if(session?.user?.id!==expected)return;if(rules.error||own.error)throw new Error(rules.error?.message||own.error?.message);locked=[...new Set([...BASE_LOCKED,...(Array.isArray(rules.data?.protected_modules)?rules.data.protected_modules:[])])];layout=sanitize(own.data?.layout||defaultLayout());if(own.data?.layout&&JSON.stringify(layout)!==JSON.stringify(own.data.layout))await save(false);schedule();if(!$('ccttNavOrganizer')?.hidden)drawDialog()}catch(e){console.warn('Organización de módulos:',e.message);const msg=$('ccttNavMessage');if(msg){msg.textContent='No se cargó la configuración compartida: '+e.message;msg.className='cctt-layout-error'}schedule()}finally{loading=false}}
 async function save(message=true){if(!session?.user?.id)return false;const current=session.user.id;layout=sanitize(layout);const {error}=await sb().from('cctt_nav_layouts').upsert({user_id:current,layout},{onConflict:'user_id'});if(error){const m=$('ccttNavMessage');if(m){m.textContent='No se guardó la organización: '+error.message;m.className='cctt-layout-error'}return false}if(message){const m=$('ccttNavMessage');if(m){m.textContent='Organización guardada para esta cuenta.';m.className='cctt-layout-help'}}schedule();return true}
 async function savePolicy(ids){if(!admin)return;const clean=[...new Set([...BASE_LOCKED,...ids.filter(id=>!NO_GROUP.has(id))])];const {error}=await sb().from('cctt_nav_rules').upsert({id:1,protected_modules:clean},{onConflict:'id'});if(error)throw error;locked=clean;layout=sanitize(layout);await save(false);schedule()}
 function makeButton(label,fn,variant=''){const b=document.createElement('button');b.type='button';b.className='btn '+variant;b.textContent=label;b.onclick=fn;return b}
 function close(){const p=$('ccttNavOrganizer');if(p){p.hidden=true;p.querySelector('.cctt-layout-panel')?.removeAttribute('tabindex')}}
-function drawDialog(){const root=$('ccttNavOrganizer');if(!root||root.hidden)return;const panel=root.querySelector('.cctt-layout-panel');if(!panel)return;panel.replaceChildren();const heading=document.createElement('h2');heading.textContent='Organizar módulos';panel.append(heading);const help=document.createElement('p');help.className='cctt-layout-help';help.textContent='Las secciones son personales. Un módulo solo puede estar en una sección; los módulos protegidos permanecen fuera. Los cambios se comparten entre tus dispositivos.';panel.append(help);const toolbar=document.createElement('div');toolbar.className='cctt-layout-toolbar';const name=document.createElement('input');name.placeholder='Nueva sección';name.maxLength=45;name.setAttribute('aria-label','Nombre de sección');toolbar.append(name,makeButton('Añadir sección',async()=>{const n=name.value.trim();if(!n||layout.groups.length>=15)return;const id='grupo_'+Date.now().toString(36);layout.groups.push({id,name:n});if(await save())drawDialog()}));toolbar.append(makeButton('Cerrar',close));panel.append(toolbar);
-const categories=document.createElement('div');categories.className='cctt-layout-section';const h=document.createElement('h3');h.textContent='Apartados';categories.append(h);for(const group of layout.groups){const row=document.createElement('div');row.className='cctt-layout-row';const field=document.createElement('input');field.value=group.name;field.maxLength=45;field.setAttribute('aria-label','Nombre del apartado');row.append(field,makeButton('Renombrar',async()=>{if(!field.value.trim())return;group.name=field.value.trim().slice(0,45);if(await save())drawDialog()}));row.append(makeButton('↑',async()=>{const i=layout.groups.findIndex(g=>g.id===group.id);if(i<=0)return;[layout.groups[i-1],layout.groups[i]]=[layout.groups[i],layout.groups[i-1]];if(await save())drawDialog()}),makeButton('↓',async()=>{const i=layout.groups.findIndex(g=>g.id===group.id);if(i<0||i===layout.groups.length-1)return;[layout.groups[i+1],layout.groups[i]]=[layout.groups[i],layout.groups[i+1]];if(await save())drawDialog()}),makeButton('Eliminar apartado',async()=>{layout.groups=layout.groups.filter(g=>g.id!==group.id);for(const [id,gid] of Object.entries(layout.assign))if(gid===group.id)delete layout.assign[id];delete layout.order[group.id];if(await save())drawDialog()},'bad'));categories.append(row)}panel.append(categories);
-const mods=document.createElement('div');mods.className='cctt-layout-section';const mh=document.createElement('h3');mh.textContent='Asignar y ordenar módulos';mods.append(mh);const labels=catalog();for(const [id,label] of labels){if(id==='adminUsuarios'&&!admin)continue;if(!visible(id))continue;const row=document.createElement('div');row.className='cctt-layout-row';const strong=document.createElement('strong');strong.textContent=label;row.append(strong);const select=document.createElement('select');select.setAttribute('aria-label','Apartado de '+label);select.append(new Option('Fuera de apartados','outside'));for(const g of layout.groups)select.append(new Option(g.name,g.id));select.value=effective(id);select.disabled=isLocked(id);select.addEventListener('change',async()=>{const old=effective(id),next=select.value;if(next==='outside')delete layout.assign[id];else layout.assign[id]=next;for(const values of Object.values(layout.order))if(Array.isArray(values)){const i=values.indexOf(id);if(i!==-1)values.splice(i,1)}(layout.order[next]||(layout.order[next]=[])).push(id);if(await save())drawDialog()});row.append(select);if(isLocked(id)){const t=document.createElement('small');t.className='cctt-layout-help';t.textContent='Protegido';row.append(t)}else{for(const [label,shift] of [['↑',-1],['↓',1]])row.append(makeButton(label,async()=>{const bucket=effective(id),ids=sorted([...labels.keys()].filter(x=>visible(x)&&effective(x)===bucket),bucket),i=ids.indexOf(id),j=i+shift;if(j<0||j>=ids.length)return;[ids[i],ids[j]]=[ids[j],ids[i]];layout.order[bucket]=ids;if(await save())drawDialog()}))}mods.append(row)}panel.append(mods);
-if(admin){const section=document.createElement('div');section.className='cctt-layout-section';const title=document.createElement('h3');title.textContent='Administración: módulos que no se pueden agrupar';section.append(title);const p=document.createElement('p');p.className='cctt-layout-help';p.textContent='Los cuatro módulos base están protegidos permanentemente. Al proteger otro módulo, saldrá de cualquier apartado de los usuarios al actualizarse la configuración.';section.append(p);const checked=new Set(locked);for(const [id,label] of labels){if(id==='inicio'||id==='perfil')continue;const row=document.createElement('label');row.className='cctt-layout-row';const cb=document.createElement('input');cb.type='checkbox';cb.checked=checked.has(id);cb.disabled=BASE_LOCKED.includes(id);cb.onchange=()=>{if(cb.checked)checked.add(id);else checked.delete(id)};row.append(cb,document.createTextNode(label));section.append(row)}section.append(makeButton('Guardar restricciones globales',async()=>{try{await savePolicy([...checked]);drawDialog();const m=$('ccttNavMessage');if(m)m.textContent='Restricciones globales guardadas.'}catch(e){const m=$('ccttNavMessage');if(m){m.textContent='No se guardó: '+e.message;m.className='cctt-layout-error'}}},'primary'));panel.append(section)}const msg=document.createElement('p');msg.id='ccttNavMessage';msg.className='cctt-layout-help';panel.append(msg)}
+/* MODIFICADO: interfaz del organizador con arrastre de módulos y apartados; sin flechas. */
+let dragState=null;
+function clearDrag(){const root=$('ccttNavOrganizer');root?.querySelectorAll('[data-drop-active],.cctt-dnd-target,.cctt-dnd-dragging').forEach(el=>{el.removeAttribute('data-drop-active');el.classList.remove('cctt-dnd-target','cctt-dnd-dragging')});root?.querySelector('.cctt-dnd-ghost')?.remove();dragState=null}
+function applyDrop(type,id,targetBucket,targetId,after){
+ if(type==='module'){
+  if(isLocked(id)||!visible(id))return false;
+  const prev=effective(id),bucket=targetBucket||'outside';
+  if(bucket!=='outside'&&!layout.groups.some(g=>g.id===bucket))return false;
+  if(bucket==='outside')delete layout.assign[id];else layout.assign[id]=bucket;
+  const labels=[...catalog().keys()].filter(x=>visible(x)&&!isLocked(x));
+  for(const [key,values] of Object.entries(layout.order||{}))if(Array.isArray(values))layout.order[key]=values.filter(x=>x!==id);
+  const ids=sorted(labels.filter(x=>effective(x)===bucket&&x!==id),bucket);
+  const index=targetId?ids.indexOf(targetId):-1;
+  if(index<0)ids.push(id);else ids.splice(index+(after?1:0),0,id);
+  layout.order[bucket]=ids;
+  return true;
+ }
+ if(type==='section'){
+  if(id===targetId)return false;
+  const from=layout.groups.findIndex(g=>g.id===id),to=layout.groups.findIndex(g=>g.id===targetId);
+  if(from<0||to<0)return false;
+  const [item]=layout.groups.splice(from,1);
+  const idx=layout.groups.findIndex(g=>g.id===targetId);
+  layout.groups.splice(idx+(after?1:0),0,item);
+  return true;
+ }
+ return false;
+}
+function attachDrag(handle,type,id){
+ const parent=handle.closest('.cctt-dnd-item,.cctt-dnd-section');
+ handle.setAttribute('aria-label','Arrastrar para ordenar '+(parent?.querySelector('strong,input')?.textContent||id));
+ handle.addEventListener('pointerdown',ev=>{
+  if(ev.button!==0||dragState)return;
+  ev.preventDefault();handle.setPointerCapture?.(ev.pointerId);
+  const ghost=document.createElement('div');ghost.className='cctt-dnd-ghost';ghost.textContent=type==='section'?(layout.groups.find(g=>g.id===id)?.name||id):(catalog().get(id)||id);
+  $('ccttNavOrganizer').append(ghost);
+  dragState={type,id,ghost,origin:parent,target:null,pointer:ev.pointerId};
+  parent?.classList.add('cctt-dnd-dragging');
+  locate(ev.clientX,ev.clientY);
+ });
+ handle.addEventListener('pointermove',ev=>{if(dragState?.pointer===ev.pointerId)locate(ev.clientX,ev.clientY)});
+ handle.addEventListener('pointerup',async ev=>{
+  if(!dragState||dragState.pointer!==ev.pointerId)return;
+  locate(ev.clientX,ev.clientY);
+  const state=dragState,target=state.target;
+  clearDrag();
+  if(!target)return;
+  if(applyDrop(state.type,state.id,target.bucket,target.id,target.after)){
+   drawDialog();
+   await save();
+  }
+ });
+ handle.addEventListener('pointercancel',clearDrag);
+ handle.addEventListener('lostpointercapture',()=>{if(dragState?.pointer!==undefined)clearDrag()});
+}
+function locate(x,y){
+ const state=dragState;if(!state)return;
+ state.ghost.style.left=Math.min(x+12,innerWidth-180)+'px';state.ghost.style.top=Math.min(y+12,innerHeight-65)+'px';
+ const root=$('ccttNavOrganizer');root.querySelectorAll('[data-drop-active],.cctt-dnd-target').forEach(el=>{el.removeAttribute('data-drop-active');el.classList.remove('cctt-dnd-target')});
+ const hit=document.elementFromPoint(x,y);
+ if(!hit){state.target=null;return}
+ if(state.type==='section'){
+  const sect=hit.closest('.cctt-dnd-section[data-section-id]');
+  if(!sect||sect.dataset.sectionId===state.id){state.target=null;return}
+  const rect=sect.getBoundingClientRect(),after=y>rect.top+rect.height/2;
+  state.target={id:sect.dataset.sectionId,after};sect.classList.add('cctt-dnd-target');sect.dataset.dropActive='true';return;
+ }
+ const item=hit.closest('.cctt-dnd-item[data-module-id]'),bucket=hit.closest('.cctt-dnd-bucket[data-bucket-id]');
+ if(!bucket){state.target=null;return}
+ const bucketId=bucket.dataset.bucketId;
+ if(item&&item.dataset.moduleId!==state.id&&item.dataset.locked!=='true'){
+  const rect=item.getBoundingClientRect(),after=y>rect.top+rect.height/2;
+  state.target={bucket:bucketId,id:item.dataset.moduleId,after};item.classList.add('cctt-dnd-target');
+ }else{state.target={bucket:bucketId,id:null,after:true}}
+ bucket.dataset.dropActive='true';
+}
+function drawDialog(){
+ const root=$('ccttNavOrganizer');if(!root||root.hidden)return;
+ const panel=root.querySelector('.cctt-layout-panel');if(!panel)return;
+ panel.replaceChildren();
+ const heading=document.createElement('h2');heading.textContent='Organizar módulos';panel.append(heading);
+ const help=document.createElement('p');help.className='cctt-layout-help';help.textContent='Arrastra el asa de cada apartado o módulo para cambiar el orden o moverlo entre secciones. Solo se organiza la barra lateral. Los módulos protegidos quedan siempre fuera.';panel.append(help);
+ const toolbar=document.createElement('div');toolbar.className='cctt-layout-toolbar';
+ const name=document.createElement('input');name.placeholder='Nueva sección';name.maxLength=45;name.setAttribute('aria-label','Nombre de sección');toolbar.append(name,makeButton('Añadir sección',async()=>{const n=name.value.trim();if(!n||layout.groups.length>=15)return;const id='grupo_'+Date.now().toString(36);layout.groups.push({id,name:n});drawDialog();await save()}));
+ toolbar.append(makeButton('Cerrar',close));panel.append(toolbar);
+ const title=document.createElement('h3');title.textContent='Orden y distribución de la barra lateral';panel.append(title);
+ const labels=catalog();const allowed=[...labels].filter(([id])=>(id!=='adminUsuarios'||admin)&&visible(id));
+ const list=document.createElement('div');list.className='cctt-layout-dnd';panel.append(list);
+ function moduleItem(id,label){
+  const row=document.createElement('div');row.className='cctt-dnd-item';row.dataset.moduleId=id;
+  const lockedItem=isLocked(id);if(lockedItem)row.dataset.locked='true';
+  if(!lockedItem){const handle=document.createElement('button');handle.type='button';handle.className='cctt-dnd-handle';handle.textContent='⠿';handle.title='Arrastrar '+label;row.append(handle);attachDrag(handle,'module',id)}
+  const txt=document.createElement('strong');txt.textContent=label;row.append(txt);
+  if(lockedItem){const mark=document.createElement('small');mark.className='cctt-layout-help';mark.textContent='Protegido';row.append(mark)}
+  return row;
+ }
+ function bucket(id,items){
+  const b=document.createElement('div');b.className='cctt-dnd-bucket';b.dataset.bucketId=id;
+  const ordered=sorted(items.map(([key])=>key),id);
+  for(const key of ordered){const found=items.find(([item])=>item===key);if(found)b.append(moduleItem(...found))}
+  if(!ordered.length){const empty=document.createElement('div');empty.className='cctt-dnd-empty';empty.textContent='Suelta aquí los módulos';b.append(empty)}
+  return b;
+ }
+ for(const g of layout.groups){
+  const section=document.createElement('div');section.className='cctt-dnd-section';section.dataset.sectionId=g.id;
+  const head=document.createElement('div');head.className='cctt-dnd-section-head';
+  const handle=document.createElement('button');handle.type='button';handle.className='cctt-dnd-handle';handle.textContent='⠿';handle.title='Arrastrar apartado';head.append(handle);
+  const inp=document.createElement('input');inp.value=g.name;inp.maxLength=45;inp.setAttribute('aria-label','Nombre del apartado');head.append(inp);
+  head.append(makeButton('Renombrar',async()=>{if(!inp.value.trim())return;g.name=inp.value.trim().slice(0,45);drawDialog();await save()}));
+  head.append(makeButton('Eliminar apartado',async()=>{layout.groups=layout.groups.filter(x=>x.id!==g.id);for(const [id,gid] of Object.entries(layout.assign))if(gid===g.id)delete layout.assign[id];delete layout.order[g.id];drawDialog();await save()},'bad'));
+  section.append(head,bucket(g.id,allowed.filter(([id])=>effective(id)===g.id)));
+  list.append(section);attachDrag(handle,'section',g.id);
+ }
+ const out=document.createElement('div');out.className='cctt-layout-section';const outTitle=document.createElement('h3');outTitle.textContent='Fuera de apartados';out.append(outTitle,bucket('outside',allowed.filter(([id])=>effective(id)==='outside')));panel.append(out);
+ if(admin){const section=document.createElement('div');section.className='cctt-layout-section';const title=document.createElement('h3');title.textContent='Administración: módulos que no se pueden agrupar';section.append(title);const p=document.createElement('p');p.className='cctt-layout-help';p.textContent='Los cuatro módulos base están protegidos permanentemente. Al proteger otro módulo, saldrá de cualquier apartado de los usuarios al actualizarse la configuración.';section.append(p);const checked=new Set(locked);for(const [id,label] of labels){if(id==='inicio'||id==='perfil')continue;const row=document.createElement('label');row.className='cctt-layout-row';const cb=document.createElement('input');cb.type='checkbox';cb.checked=checked.has(id);cb.disabled=BASE_LOCKED.includes(id);cb.onchange=()=>{if(cb.checked)checked.add(id);else checked.delete(id)};row.append(cb,document.createTextNode(label));section.append(row)}section.append(makeButton('Guardar restricciones globales',async()=>{try{await savePolicy([...checked]);drawDialog();const m=$('ccttNavMessage');if(m)m.textContent='Restricciones globales guardadas.'}catch(e){const m=$('ccttNavMessage');if(m){m.textContent='No se guardó: '+e.message;m.className='cctt-layout-error'}}},'primary'));panel.append(section)}
+ const msg=document.createElement('p');msg.id='ccttNavMessage';msg.className='cctt-layout-help';msg.setAttribute('role','status');panel.append(msg);
+}
+
 function open(){const root=$('ccttNavOrganizer');if(!root)return;root.hidden=false;drawDialog();root.querySelector('.cctt-layout-panel')?.focus()}
-function boot(){if(uiReady)return;uiReady=true;const side=document.querySelector('.sidebar');if(side){const b=document.createElement('button');b.type='button';b.className='cctt-layout-open';b.innerHTML=svg()+'<span>Organizar módulos</span>';b.addEventListener('click',open);side.querySelector('.brand')?.after(b);const obs=new MutationObserver(()=>{if(!rendering&&[...side.children].some(el=>el.matches?.('.navbtn[data-page]:not([data-cctt-grouped]):not([data-page="inicio"]):not([data-page="perfil"])')))schedule()});obs.observe(side,{childList:true})}const home=$('page-inicio');if(home){const b=makeButton('Organizar módulos',open);b.classList.add('cctt-layout-home-trigger');const target=$('moduleCards');if(target)target.before(b)}const root=document.createElement('div');root.id='ccttNavOrganizer';root.hidden=true;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Organización de módulos');const pane=document.createElement('div');pane.className='cctt-layout-panel';pane.tabIndex=-1;root.append(pane);document.body.append(root);root.addEventListener('click',ev=>{if(ev.target===root)close()});document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&!root.hidden)close()});
-for(const id of ['moduleCards','ccttHomeIconGrid']){const h=$(id);if(h)new MutationObserver(()=>{if(!rendering&&[...h.children].some(el=>el.hasAttribute('data-page')&&!el.hasAttribute('data-cctt-grouped')))schedule()}).observe(h,{childList:true})}
-const prior=window.ccttRenderIconHome;window.ccttRenderIconHome=function(){prior?.();schedule()};
+function boot(){if(uiReady)return;uiReady=true;const side=document.querySelector('.sidebar');if(side){const b=document.createElement('button');b.type='button';b.className='cctt-layout-open';b.innerHTML=svg()+'<span>Organizar módulos</span>';b.addEventListener('click',open);side.querySelector('.brand')?.after(b);const obs=new MutationObserver(()=>{if(!rendering&&[...side.children].some(el=>el.matches?.('.navbtn[data-page]:not([data-cctt-grouped]):not([data-page="inicio"]):not([data-page="perfil"])')))schedule()});obs.observe(side,{childList:true})}/* MODIFICADO: el organizador se ofrece solamente desde la barra lateral. */const root=document.createElement('div');root.id='ccttNavOrganizer';root.hidden=true;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Organización de módulos');const pane=document.createElement('div');pane.className='cctt-layout-panel';pane.tabIndex=-1;root.append(pane);document.body.append(root);root.addEventListener('click',ev=>{if(ev.target===root)close()});document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&!root.hidden)close()});
+/* MODIFICADO: el renderizado original de tarjetas e iconos permanece intacto. */
 window.addEventListener('cctt:session',ev=>{const user=ev.detail?.session?.user;if(!user)return;const changed=sourceUser!==user.id;sourceUser=user.id;session=ev.detail.session;admin=user.app_metadata?.role==='admin';if(changed){layout=defaultLayout();locked=[...BASE_LOCKED]}setTimeout(read,450)});
 window.addEventListener('cctt:logout',()=>{session=null;sourceUser='';admin=false;layout=defaultLayout();locked=[...BASE_LOCKED];close();schedule()});
 window.addEventListener('focus',()=>{if(session)read()});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&session)read()});setInterval(()=>{if(!document.hidden&&session)read()},45000);
