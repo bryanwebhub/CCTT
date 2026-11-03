@@ -1999,7 +1999,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 
 <section class="page" id="page-turnos"><div class="section-title"><h2>Calendario de turnos</h2></div>
 <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:14px"><div><h3 style="margin:0">Rol de turnos · 8 horas</h3><p class="muted" style="margin:6px 0 0">Grupos A, B, C y D · Rotación de 24 días basada en el calendario 2026 proporcionado.</p></div><div class="row"><!-- MODIFICADO: restaurar atributo id del control Turnos; comentario fuera de la etiqueta. --><button class="btn" id="shiftPrev">Anterior</button><select class="ctl-year-select" id="shiftMonth" aria-label="Mes"></select><input id="shiftYear" type="number" min="2026" max="2100" value="2026" style="max-width:100px;padding:9px;border:1px solid var(--line);border-radius:9px" aria-label="Año"><!-- MODIFICADO: restaurar atributo id del control Turnos; comentario fuera de la etiqueta. --><button class="btn" id="shiftNext">Siguiente</button></div></div>
-<div class="row" style="margin:0 0 14px"><span class="pill">M = Mañana</span><span class="pill">T = Tarde</span><span class="pill">N = Noche</span><span class="pill">D = Descanso</span><button class="btn primary right" id="shiftExport">Descargar calendario anual .xlsm</button></div><!-- NUEVO: selección voluntaria de fecha y turno actuales, sin cambiar asignaciones. --><label class="cctt-shift-auto-option" for="shiftAutoSelect"><input id="shiftAutoSelect" type="checkbox"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 6v6l4 2M2 12h3m14 0h3M12 2v3m0 14v3"/></svg>Selección automática de fecha y turno</label><p id="shiftAutoStatus" role="status">Selección automática desactivada.</p><div class="table-wrap" id="shiftCalendar"></div><p class="muted" style="margin-top:12px">Los años posteriores a 2026 son proyecciones automáticas de la rotación observada; valida el rol oficial si existen cambios extraordinarios. El archivo .xlsm conserva el contenedor de macros del modelo original, pero sus macros no se modifican ni verifican.</p></div></section>
+<div class="row" style="margin:0 0 14px"><span class="pill">M = Mañana</span><span class="pill">T = Tarde</span><span class="pill">N = Noche</span><span class="pill">D = Descanso</span><button class="btn primary right" id="shiftExport">Descargar calendario anual .xlsm</button></div><!-- NUEVO: selección voluntaria de fecha y turno actuales, sin cambiar asignaciones. --><label class="cctt-shift-auto-option" for="shiftAutoSelect"><!-- MODIFICADO: selección automática activa desde la primera apertura. --><input id="shiftAutoSelect" type="checkbox" checked><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 6v6l4 2M2 12h3m14 0h3M12 2v3m0 14v3"/></svg>Selección automática de fecha y turno</label><!-- MODIFICADO: estado inicial acorde al selector automático. --><p id="shiftAutoStatus" role="status">Selección automática activada.</p><div class="table-wrap" id="shiftCalendar"></div><p class="muted" style="margin-top:12px">Los años posteriores a 2026 son proyecciones automáticas de la rotación observada; valida el rol oficial si existen cambios extraordinarios. El archivo .xlsm conserva el contenedor de macros del modelo original, pero sus macros no se modifican ni verifican.</p></div></section>
 <section class="page" id="page-inc35macro">
  <div class="section-title"><h2>Generador de incidentes</h2></div>
  <div class="split">
@@ -5490,10 +5490,12 @@ function init(){const sel=$('shiftMonth');if(!sel)return;sel.innerHTML=MONTHS.ma
  // NUEVO: la opción solo cambia la consulta visual de fecha y turno.
  $('shiftAutoSelect').addEventListener('change',()=>updateShiftAuto(true));
  setInterval(()=>{if($('page-turnos').classList.contains('active')&&!document.hidden&&$('shiftAutoSelect').checked)updateShiftAuto(true)},15000);
- new MutationObserver(()=>{if($('page-turnos').classList.contains('active')&&$('shiftAutoSelect').checked)updateShiftAuto(true)}).observe($('page-turnos'),{attributes:true,attributeFilter:['class']});
+ /* MODIFICADO: al entrar en Turnos se activa y selecciona la fecha y el turno vigentes. */
+ new MutationObserver(()=>{if($('page-turnos').classList.contains('active')){$('shiftAutoSelect').checked=true;updateShiftAuto(true)}}).observe($('page-turnos'),{attributes:true,attributeFilter:['class']});
  $('vialCopyBelow')?.addEventListener('click',()=>{if(typeof copyPlain==='function'&&typeof vialText==='function')copyPlain(vialText())});
  $('repCopyImageV23')?.addEventListener('click',copyReportImage);
- render();
+ /* NUEVO: sincronizar el primer render con la hora de Manzanillo, sin exigir clics. */
+ $('shiftAutoSelect').checked=true;render();updateShiftAuto(true);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
@@ -9962,4 +9964,80 @@ html[data-cctt-scheme="dark"] #page-recordatorioCumpleanos .bc-record-actions .b
 @media(prefers-reduced-motion:reduce){#page-ruletaDecisiones .rd-dialog-card.rd-winner-effect,#page-ruletaDecisiones #rdWinnerParticles i{animation:none!important}}
 
 </style>
+<!-- NUEVO: distribución e iconos de Administración de accesos; no modifica verificaciones ni permisos. -->
+<style id="ccttAdminFluidLayoutStyles">
+/* NUEVO: ancho completo y distribución adaptable, exclusivamente en Administración de accesos. */
+#page-adminUsuarios{width:100%;max-width:none;min-width:0}
+#page-adminUsuarios>.cctt-admin-card,#page-adminUsuarios>.card{width:100%;max-width:none;min-width:0;box-sizing:border-box}
+#page-adminUsuarios #ccttAdminPanel{width:100%;min-width:0}
+#page-adminUsuarios #ccttAdminPanel>.card,#page-adminUsuarios #ccttAdminPanel>section.card{width:100%;max-width:none;min-width:0;box-sizing:border-box}
+#page-adminUsuarios .grid.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:16px}
+#page-adminUsuarios .cctt-permission-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:10px;width:100%;max-width:none;min-width:0}
+#page-adminUsuarios .cctt-perm-option{min-width:0;min-height:54px;line-height:1.4;background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line));overflow-wrap:anywhere}
+#page-adminUsuarios .cctt-perm-option:has(input:checked){background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 88%,var(--cctt-theme-accent,#74132e) 12%);border-color:var(--cctt-theme-accent,#9e4060)}
+#page-adminUsuarios .cctt-perm-option input[type=checkbox]{width:18px;height:18px;flex:0 0 18px;accent-color:var(--cctt-theme-accent,#74132e)}
+#page-adminUsuarios .cctt-perm-option span{min-width:0}
+#page-adminUsuarios .field{min-width:0}
+#page-adminUsuarios .cctt-admin-card>.row>.field{min-width:0!important;flex:1 1 310px!important}
+#page-adminUsuarios input:not([type=checkbox]):not([type=color]),#page-adminUsuarios select,#page-adminUsuarios textarea{width:100%;max-width:100%;min-width:0;box-sizing:border-box;background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+#page-adminUsuarios .table-wrap{width:100%;max-width:100%;overflow-x:auto;box-sizing:border-box}
+#page-adminUsuarios .tbl{width:100%}
+#page-adminUsuarios .tbl td{overflow-wrap:anywhere;vertical-align:middle}
+#page-adminUsuarios .tbl td:last-child .btn{margin:3px 3px 3px 0;white-space:nowrap}
+#page-adminUsuarios .cctt-appearance-choices{width:100%;align-items:end;gap:14px}
+#page-adminUsuarios .cctt-appearance-choices .field{flex:1 1 220px;min-width:0}
+#page-adminUsuarios .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:38px;line-height:1.3;max-width:100%;white-space:normal}
+#page-adminUsuarios .btn>svg.cctt-admin-action-svg{display:block;width:18px;height:18px;flex:0 0 18px;align-self:center;margin:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#page-adminUsuarios #ccttAdminMsg{overflow-wrap:anywhere}
+html[data-cctt-scheme="dark"] #page-adminUsuarios #ccttAdminMsg{color:var(--cctt-theme-text,var(--text))!important}
+@media(max-width:850px){#page-adminUsuarios .grid.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}#page-adminUsuarios .cctt-permission-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}}
+@media(max-width:550px){#page-adminUsuarios .cctt-permission-grid,#page-adminUsuarios .grid.g2{grid-template-columns:1fr}#page-adminUsuarios .cctt-admin-card{padding:15px}#page-adminUsuarios .cctt-appearance-choices .field{flex-basis:100%}#page-adminUsuarios .row{gap:8px}#page-adminUsuarios .tbl{min-width:560px}}
+/* NUEVO: liberar el límite del contenedor solo mientras Administración de accesos está activa. */
+.content:has(>#page-adminUsuarios.active){width:100%;max-width:none}
+/* NUEVO: contraste de botones, cabeceras y título del administrador en ambos esquemas. */
+#page-adminUsuarios .btn{background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+#page-adminUsuarios .btn.primary{background:var(--cctt-theme-accent,#74132e);color:var(--cctt-theme-onaccent,#fff);border-color:var(--cctt-theme-accent,#74132e)}
+#page-adminUsuarios .btn.warn{background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 85%,#d69b3a 15%);color:var(--cctt-theme-text,var(--text));border-color:#c48b32}
+#page-adminUsuarios .btn.bad{background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 88%,#e66994 12%);color:var(--cctt-theme-text,var(--text));border-color:#cf6f90}
+#page-adminUsuarios .tbl th{background:color-mix(in srgb,var(--cctt-theme-card,var(--card)) 82%,var(--cctt-theme-accent,#74132e) 18%);color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))}
+#page-adminUsuarios>.section-title h2{color:var(--cctt-theme-text,var(--text))}
+html[data-cctt-scheme="dark"] #page-adminUsuarios{background:var(--cctt-theme-bg,#181516)}
+
+</style>
+<script id="ccttAdminActionIcons">
+/* NUEVO: SVG específicos por acción administrativa. Solo cambia la presentación de los botones. */
+(()=>{'use strict';
+const shapes={
+unlock:'<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M9 10V6a4 4 0 0 1 8-1M12 14v3"/>',
+lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15" r="1"/>',
+find:'<circle cx="9" cy="7" r="3"/><path d="M3 21v-3a6 6 0 0 1 8-6"/><circle cx="17" cy="15" r="4"/><path d="m20 18 3 3"/>',
+all:'<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 18h6m-3-3v6"/>',
+none:'<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6zM1 12h22"/>',
+save:'<path d="m12 2 8 3v6c0 6-8 11-8 11S4 17 4 11V5zM8 8h8v8H8zM10 8v3h4V8"/>',
+publish:'<path d="M4 2h11l5 5v15H4zM15 2v6h5M12 19v-8m-3 3 3-3 3 3"/>',
+updateFormat:'<path d="M4 2h11l5 5v15H4zM15 2v6h5M8 13a4 4 0 1 1 0 5m0-8v3h3"/>',
+ipLoad:'<circle cx="6" cy="5" r="3"/><circle cx="6" cy="19" r="3"/><path d="M6 8v8m3-4h5"/><circle cx="17" cy="11" r="4"/><path d="m20 14 3 3"/>',
+ipSave:'<path d="M2 3h7v6H2zM2 15h7v6H2zM5 9v6m4-3h5M14 7h7v14h-7zM16 7v4h3V7m-3 10h3"/>',
+appearance:'<path d="M12 3C6 3 2 7 2 12s4 9 9 9c3 0 2-3 1-4s1-3 4-2 6-1 6-4-4-8-10-8Z"/><circle cx="7" cy="10" r="1"/><circle cx="11" cy="7" r="1"/><circle cx="16" cy="8" r="1"/>',
+resetAppearance:'<path d="M3 10a9 9 0 1 1 1 8M3 4v6h6"/><circle cx="13" cy="12" r="3"/><path d="M13 6v1m0 10v1m-6-6h1m10 0h1"/>',
+cartoStatus:'<path d="m2 12 6-4 6 4-6 4-6-4Zm12-8h7v16h-7M17 8v3m0 3v2"/><circle cx="8" cy="12" r="1"/>',
+cartoTest:'<path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM15 13l7 4-7 4z"/>',
+cartoSave:'<path d="m2 5 5-2 6 2 5-2v6M2 5v15l5-2 5 2M7 3v15M13 11h8v10h-8zM15 11v3h4v-3m-4 7h4"/>',
+recipients:'<circle cx="8" cy="7" r="3"/><path d="M2 20v-2a6 6 0 0 1 12 0v2M16 4a3 3 0 0 1 0 6m3 4v7m-3-3h6"/>',
+editUser:'<circle cx="8" cy="6" r="3"/><path d="M2 21v-3a6 6 0 0 1 9-5m1 8 1-5 6-6 3 3-6 6-4 2z"/>',
+disableUser:'<circle cx="8" cy="6" r="3"/><path d="M2 21v-3a6 6 0 0 1 9-5"/><circle cx="17" cy="17" r="5"/><path d="m14 14 6 6"/>',
+removeAccess:'<path d="m12 2 8 3v6c0 6-8 11-8 11S4 17 4 11V5zM8 9l8 8M16 9l-8 8"/>',
+editFormat:'<path d="M3 2h11l4 4v5M14 2v5h4M3 2v20h9m0 0 1-5 6-6 3 3-6 6-4 2zM6 11h4m-4 4h3"/>',
+removeFormat:'<path d="M3 2h10l4 4v5M13 2v5h4M3 2v20h7m1-8h11m-8 0v-3h5v3m-7 0 1 8h7l1-8m-6 3v3m3-3v3"/>'
+};
+const byId={ccttUnlockAdmin:'unlock',ccttLockAdmin:'lock',ccttFindUser:'find',ccttAllModules:'all',ccttNoModules:'none',ccttSaveUser:'save',ccttUploadTemplate:'publish',ccttIpLoad:'ipLoad',ccttIpSave:'ipSave',ccttAppearanceSave:'appearance',ccttAppearanceReset:'resetAppearance',muCartoReveal:'cartoStatus',muCartoTest:'cartoTest',muCartoSave:'cartoSave'};
+function action(button){if(button.matches('[data-edit-user]'))return 'editUser';if(button.matches('[data-disable-user]'))return 'disableUser';if(button.matches('[data-remove-user-access]'))return 'removeAccess';if(button.matches('[data-edit-template]'))return 'editFormat';if(button.matches('[data-remove-template]'))return 'removeFormat';if(button.id==='ccttUploadTemplate'&&button.textContent.trim().startsWith('Guardar'))return 'updateFormat';if(byId[button.id])return byId[button.id];if(button.closest('#ccttReminderScope')&&button.textContent.trim()==='Seleccionar todos los usuarios')return 'recipients';return null}
+function mount(){const page=document.getElementById('page-adminUsuarios');if(!page)return false;if(page.dataset.ccttActionIconsMounted)return true;page.dataset.ccttActionIconsMounted='1';let queued=false;
+const observer=new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;paint()})});
+function paint(){observer.disconnect();for(const button of page.querySelectorAll('button')){const key=action(button),glyph=shapes[key];if(!glyph)continue;const icons=button.querySelectorAll('svg'),own=button.querySelector('svg.cctt-admin-action-svg');if(icons.length===1&&own&&button.dataset.ccttAdminAction===key)continue;icons.forEach(icon=>icon.remove());button.querySelectorAll('span.icon').forEach(span=>{if(!span.textContent.trim()&&!span.children.length)span.remove()});const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('class','cctt-admin-action-svg');svg.innerHTML=glyph;button.insertBefore(svg,button.firstChild);button.dataset.ccttAdminAction=key;button.dataset.iconized='1'}observer.observe(page,{childList:true,subtree:true,characterData:true})}
+paint();return true}
+if(!mount()){const pending=new MutationObserver(()=>{if(mount())pending.disconnect()});pending.observe(document.body,{childList:true,subtree:true})}
+})();
+
+</script>
 </body></html>
