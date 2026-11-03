@@ -10137,7 +10137,7 @@ section.insertBefore(controls,$('ccttVaultAccount').closest('label'));const card
 const summary=document.createElement('p');summary.className='muted';summary.id='ccttVaultMatches';controls.after(summary);
 const singleNodes=[$('ccttVaultAccount').closest('label'),$('ccttVaultCode'),$('ccttVaultCountdown'),$('ccttVaultGet').closest('.row')];
 // NUEVO: amejia se presenta abajo, solo cuando está incluida en las cuentas autorizadas.
-const originalId='cctt-original-amejia',originalPanel=document.createElement('section');originalPanel.id='ccttVaultOriginalPanel';originalPanel.className='cctt-totp-card cctt-vault-view cctt-vault-original-panel';originalPanel.hidden=true;section.after(originalPanel);
+const originalId='cctt-original-amejia',originalPanel=document.createElement('section');originalPanel.id='ccttVaultOriginalPanel';originalPanel.className='cctt-totp-card cctt-vault-view cctt-vault-original-panel';originalPanel.hidden=true;/* MODIFICADO: mostrar PIS · amejia antes de las cuentas compartidas. */section.before(originalPanel);
 const singleAlias=document.createElement('div');singleAlias.id='ccttVaultSingleAlias';section.append(singleAlias);
 let originalCard=null,syncBusy=false,lastSync=0,aliasDrafts=new Map(),aliasSaving=new Set();
 
