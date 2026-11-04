@@ -10177,6 +10177,13 @@ window.ccttMountTotpAdmin=(page,call)=>{const panel=page.querySelector('#ccttAdm
  const section=document.createElement('section');section.className='card cctt-vault-admin';section.id='ccttVaultAdmin';section.innerHTML='<h3>Cuentas del autenticador compartidas</h3><p class="muted">Cada usuario requiere acceso al módulo y asignación de las cuentas. PIS · amejia utiliza la cuenta original y se asigna de forma independiente.</p><label class="field">Cadenas de migración — una por línea<textarea id="ccttVaultMigration" rows="4" spellcheck="false" autocomplete="off" placeholder="otpauth-migration://offline?data=…"></textarea></label><div class="row">'+btn('ccttVaultPreview','preview','Revisar cuentas')+btn('ccttVaultImport','import','Importar seleccionadas')+btn('ccttVaultClear','clear','Limpiar importación')+'</div><div id="ccttVaultPreviewList" class="cctt-vault-grid"></div><hr><div class="row">'+btn('ccttVaultLoad','load','Consultar cuentas y asignaciones')+btn('ccttVaultSave','save','Guardar asignaciones')+'</div><p class="muted">Las asignaciones corresponden al UUID seleccionado arriba. Guardar aquí no cambia los permisos de otros módulos.</p><div id="ccttVaultGrants" class="cctt-vault-grid"></div><p id="ccttVaultAdminStatus" role="status"></p>';panel.append(section);
  const $=id=>section.querySelector('#'+id);let pending=[],accounts=[],loadedUser='',busy=false,epoch=0;const status=s=>{$('ccttVaultAdminStatus').textContent=s};
  const target=()=>{const id=page.querySelector('#ccttTargetUser').value.trim();if(!/^[0-9a-f-]{36}$/i.test(id))throw Error('Selecciona un UUID válido arriba');return id};
+ // NUEVO: selección masiva de cuentas para el UUID consultado, sin guardar automáticamente.
+ const massRow=document.createElement('div');massRow.className='row cctt-four-tools';massRow.id='ccttVaultMassSelection';
+ const allAccounts=document.createElement('button'),noAccounts=document.createElement('button');
+ for(const [control,id,label,path] of [[allAccounts,'ccttVaultSelectAll','Seleccionar todas','<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>'],[noAccounts,'ccttVaultDeselectAll','Deseleccionar todas','<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M8 12h8"/>']]){control.type='button';control.id=id;control.className='btn';control.dataset.iconized='1';control.innerHTML='<svg class="cctt-four-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">'+path+'</svg><span>'+label+'</span>';massRow.append(control)}
+ $('ccttVaultGrants').before(massRow);
+ const selectAccounts=checked=>{if(busy)return;try{if(target()!==loadedUser)throw Error('Consulta primero las asignaciones del usuario seleccionado');const boxes=[...$('ccttVaultGrants').querySelectorAll('label > input[type="checkbox"]:not(:disabled)')];boxes.forEach(c=>{c.checked=checked;c.dispatchEvent(new Event('change',{bubbles:true}))});status((checked?'Seleccionadas: ':'Deseleccionadas: ')+boxes.length+' cuentas. Pulsa Guardar asignaciones para aplicar los cambios.')}catch(e){status(e.message)}};
+ allAccounts.onclick=()=>selectAccounts(true);noAccounts.onclick=()=>selectAccounts(false);
  async function run(fn){if(busy)return;busy=true;const token=epoch;section.querySelectorAll('button').forEach(b=>b.disabled=true);try{await fn(token)}catch(e){if(token===epoch)status(e.message||'No se completó la operación')}finally{busy=false;section.querySelectorAll('button').forEach(b=>b.disabled=false)}}
  function reset(){epoch++;pending=[];accounts=[];loadedUser='';$('ccttVaultMigration').value='';$('ccttVaultPreviewList').replaceChildren();$('ccttVaultGrants').replaceChildren();status('')}
  $('ccttVaultPreview').onclick=()=>{try{pending=[];$('ccttVaultPreviewList').replaceChildren();pending=migration($('ccttVaultMigration').value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean));$('ccttVaultMigration').value='';pending.forEach((a,i)=>{const row=document.createElement('label');row.className='cctt-vault-option';const c=document.createElement('input');c.type='checkbox';c.value=i;c.checked=a.supported&&!!a.name;c.disabled=!a.supported||!a.name;row.append(c);text(row,'span',(a.issuer?a.issuer+' · ':'')+(a.name||'Sin nombre')+(a.supported?'':' — no compatible (HOTP o parámetros no admitidos)'));$('ccttVaultPreviewList').append(row)});status(pending.length+' cuentas detectadas. Revisa antes de importar.')}catch(e){pending=[];status(e.message)}};
@@ -10366,4 +10373,83 @@ window.addEventListener('cctt:session',e=>session(e.detail?.session));window.add
 </script>
 <script id="ccttPisrepUniqueIcons">// NUEVO: iconos SVG distintos por acción, exclusivamente en PIS-REP.
 (()=>{const shapes={ccttPisrepCalcButton:'M4 2h16v20H4V2ZM7 5h10v4H7zM7 13h2m4 0h2m-8 4h2m4 0h2',ccttPisrepCalcCopy:'M9 4h11v17H9zM5 17H3V1h11v2M12 9h5m-5 4h5',prSave:'M4 3h14l3 3v15H3V3h1M7 3v7h10V3M7 21v-7h10v7',prCopy:'M8 6h13v16H8zM3 17V2h12v2M11 10h7m-7 4h7m-7 4h4',prUndo:'M9 4 3 10l6 6M3 10h10a7 7 0 0 1 0 14'};for(const[id,path]of Object.entries(shapes)){const b=document.getElementById(id);if(!b)continue;let svg=b.querySelector('svg');if(!svg){svg=document.createElementNS('http://www.w3.org/2000/svg','svg');b.prepend(svg)}svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.8');svg.innerHTML='<path d="'+path+'"/>';b.dataset.iconized='1'}})();</script>
+
+<!-- NUEVO: controles de Consignas, Balance, Avisos y guardado administrativo. -->
+<style id="ccttFourModuleControlsStyles">
+/* NUEVO: estilos aislados, utilizan los colores de los modos existentes. */
+.cctt-four-tools{gap:8px;flex-wrap:wrap;margin:10px 0}.cctt-four-tools .btn,#ccttAdminQuickSave .btn{display:inline-flex;align-items:center;gap:8px}
+.cctt-four-svg{width:18px!important;height:18px!important;min-width:18px;flex:0 0 18px;fill:none!important;stroke:currentColor!important;vertical-align:middle}
+#page-consignas button:has(>.cctt-four-svg),#ccttConSiteManager button:has(>.cctt-four-svg){display:inline-flex;align-items:center;gap:7px}
+#balScenarioTotals[hidden],#ccttBalHideTotals[hidden],#ccttBalShowTotals[hidden],#ccttAdminQuickSave[hidden]{display:none!important}
+#ccttAdminQuickSave{position:fixed;right:20px;bottom:16px;z-index:1300;width:min(760px,calc(100vw - 40px));padding:13px 16px;border:1px solid var(--cctt-theme-line,var(--line));border-radius:14px;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));box-shadow:0 8px 30px #0004}
+#ccttAdminQuickSave strong{display:block;overflow-wrap:anywhere;margin-bottom:8px}#ccttAdminQuickSave .row{flex-wrap:wrap;gap:8px}#ccttAdminQuickSave p{font-size:12px;margin:8px 0 0;max-height:72px;overflow:auto;overflow-wrap:anywhere}#ccttAdminQuickSave .btn{background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))}#ccttAdminQuickSave .btn:disabled{opacity:.6;cursor:not-allowed}
+#page-adminUsuarios:has(#ccttAdminQuickSave:not([hidden])){padding-bottom:220px}
+@media(max-width:600px){#ccttAdminQuickSave{right:8px;bottom:8px;width:calc(100vw - 16px);padding:10px;max-height:36vh;overflow:auto}#ccttAdminQuickSave .btn{padding:8px;font-size:12px}#page-adminUsuarios:has(#ccttAdminQuickSave:not([hidden])){padding-bottom:280px}}
+
+</style>
+<script id="ccttFourModuleControls">
+/* NUEVO: controles acotados a los cuatro módulos solicitados; no cambia datos ni permisos al seleccionar. */
+(()=>{'use strict';
+const by=id=>document.getElementById(id);
+const shapes={
+new:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 7v10M7 12h10"/>',
+newTab:'<path d="M5 3h10l4 4v14H5zM14 3v5h5M8 14h8M12 10v8"/>',
+list:'<path d="M8 5h13M8 12h13M8 19h13"/><circle cx="3" cy="5" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="19" r="1"/>',
+detail:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 3v18M11 8h7M11 12h7M11 16h4"/>',
+map:'<circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="12" cy="19" r="3"/><path d="M8 6h8M6 9l4 7M18 9l-4 7"/>',
+save:'<path d="M4 3h13l4 4v14H3V3h1M7 3v6h9V3M7 21v-8h10v8"/>',
+reset:'<path d="m5 16 8-12 7 5-8 12H7zM12 21h9M8 11l7 5"/>',
+edit:'<path d="m14 4 6 6M3 21l5-1L21 7l-6-6L2 14z"/>',
+active:'<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 3"/>',
+done:'<rect x="4" y="7" width="16" height="14" rx="2"/><path d="M3 3h18v4H3zM9 12h6M9 16h6"/>',
+remove:'<path d="M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/>',
+back:'<path d="m9 5-7 7 7 7M2 12h19"/>',
+note:'<path d="M3 3h18v13l-5 5H3zM16 21v-5h5M7 7h10M7 11h7"/>',
+site:'<path d="M12 22S4 14 4 9a8 8 0 1 1 16 0c0 5-8 13-8 13zM9 9h6M12 6v6"/>',
+sites:'<path d="m3 4 6-2 6 3 6-2v17l-6 2-6-3-6 2zM9 2v17M15 5v17"/>',
+pending:'<path d="M5 3h14v18H5zM8 7h8M8 11h5"/><circle cx="15" cy="16" r="3"/><path d="M15 14v2l1 1"/>',
+close:'<circle cx="12" cy="12" r="9"/><path d="m8 8 8 8M16 8l-8 8"/>',
+urgent:'<path d="m12 3 10 18H2zM12 9v5M12 17h.01"/>',
+upcoming:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 2v6M17 2v6M3 10h18m-9 3 4 3-4 3"/>',
+closed:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 14v3"/>',
+today:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M7 2v5M17 2v5M3 9h18"/><circle cx="12" cy="15" r="3"/>',
+tomorrow:'<path d="M3 18h18M6 15a6 6 0 0 1 12 0M12 2v3M3 7l2 2M21 7l-2 2M9 21h6"/>',
+three:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M7 2v5M17 2v5M8 11h6l-3 4h3v3H8"/>',
+monday:'<path d="M3 4h18v17H3zM7 2v5M17 2v5M7 17v-6l3 3 3-3v6M17 11v6"/>',
+connect:'<path d="M9 7H6a4 4 0 0 0 0 8h3M15 7h3a4 4 0 0 1 0 8h-3M7 11h10"/>',
+disconnect:'<path d="m2 2 20 20M8 7H6a4 4 0 0 0 0 8h3M15 7h3a4 4 0 0 1 3 7M7 11h3M14 11h3"/>',
+arrange:'<rect x="2" y="3" width="6" height="6"/><rect x="16" y="3" width="6" height="6"/><rect x="9" y="15" width="6" height="6"/><path d="M5 9v3h14V9M12 12v3"/>',
+explore:'<circle cx="12" cy="12" r="9"/><path d="m16 7-2 7-7 3 3-7z"/>',
+zoomIn:'<circle cx="10" cy="10" r="7"/><path d="m15 15 7 7M6 10h8M10 6v8"/>',
+zoomOut:'<circle cx="10" cy="10" r="7"/><path d="m15 15 7 7M6 10h8"/>',
+zoomReset:'<path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/><circle cx="12" cy="12" r="4"/>',
+open:'<path d="M9 3H3v18h18v-6M13 3h8v8M21 3 10 14"/>',
+week:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M7 2v5M17 2v5M3 9h18M6 13h12M6 17h12"/>',
+all:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',
+none:'<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M8 12h8"/>',
+clear:'<path d="M3 6h18M6 6l1 15h10l1-15M9 6V3h6v3M9 12l6 5M15 12l-6 5"/>',
+show:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'
+};
+const svg=key=>'<svg class="cctt-four-svg" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+shapes[key]+'</svg>';
+function button(id,label,key){const b=document.createElement('button');b.id=id;b.type='button';b.className='btn';b.dataset.iconized='1';b.innerHTML=svg(key)+'<span>'+label+'</span>';return b}
+// NUEVO: vaciar solo la presentación; los cálculos y datos originales siguen intactos.
+const totals=by('balScenarioTotals'),card=by('balScenarioTotalsCard');
+if(totals&&card){const row=document.createElement('div');row.className='row cctt-four-tools';const clear=button('ccttBalHideTotals','Limpiar cuadrícula','clear'),show=button('ccttBalShowTotals','Mostrar totales','show'),message=document.createElement('p');message.className='muted';message.id='ccttBalTotalsViewStatus';message.setAttribute('role','status');show.hidden=true;row.append(clear,show);card.insertBefore(row,totals);card.append(message);clear.onclick=()=>{totals.hidden=true;clear.hidden=true;show.hidden=false;message.textContent='Presentación vacía. Los datos del balance se conservan.'};show.onclick=()=>{totals.hidden=false;show.hidden=true;clear.hidden=false;message.textContent=''};}
+// NUEVO: seleccionar la semana completa sin alterar el formato de días que se guarda.
+const weekdays=by('arWeekdays');if(weekdays){const row=document.createElement('div');row.className='row cctt-four-tools';const all=button('ccttArFullWeek','Toda la semana','week'),none=button('ccttArNoDays','Deseleccionar días','none');row.append(all,none);weekdays.after(row);const set=value=>weekdays.querySelectorAll('input[type="checkbox"]').forEach(input=>{if(input.disabled)return;input.checked=value;input.dispatchEvent(new Event('change',{bubbles:true}))});all.onclick=()=>set(true);none.onclick=()=>set(false);}
+// NUEVO: iconos semánticos de Consignas, incluidos controles que se generan al abrir detalles.
+const con=by('page-consignas');const ids={conNewFast:'new',conSave:'save',conReset:'reset',conEdit:'edit',conActive:'active',conDone:'done',conDelete:'remove',conBackToList:'back',conCommandAddNote:'note',conReferenceSaveSite:'site',conCompactSiteButton:'sites',conReferenceAlertGo:'pending',conReferenceAlertClose:'close',ccttConConnect:'connect',ccttConDisconnect:'disconnect',ccttConArrange:'arrange',conExplore:'explore',conZoomIn:'zoomIn',conZoomOut:'zoomOut',conZoomReset:'zoomReset'};
+function conKey(b){if(ids[b.id])return ids[b.id];if(b.dataset.conView)return {list:'list',new:'newTab',detail:'detail',map:'map'}[b.dataset.conView];if(b.dataset.refTab)return {urgent:'urgent',upcoming:'upcoming',closed:'closed'}[b.dataset.refTab];if(b.dataset.conShortcut)return {today:'today',tomorrow:'tomorrow','3days':'three',monday:'monday'}[b.dataset.conShortcut];if(b.matches('[data-con-open]'))return 'open';if(b.matches('[data-con-edit-item],.con-inline-edit'))return 'edit';if(b.matches('[data-con-site-close],.cctt-consigna-modal-close'))return 'close';const t=b.textContent.trim().toLocaleLowerCase('es-MX');if(/editar/.test(t))return 'edit';if(/eliminar/.test(t))return 'remove';if(/cerrar|terminar/.test(t))return 'close';return null}
+const conApplied=new WeakMap();
+function decorateCon(root){root.querySelectorAll('button').forEach(b=>{const key=conKey(b);if(!key)return;const expected=svg(key),old=[...b.querySelectorAll('svg')];if(old.length===1&&conApplied.get(b)===old[0].outerHTML)return;b.dataset.iconized='1';old.forEach(n=>n.remove());b.insertAdjacentHTML('afterbegin',expected);conApplied.set(b,b.querySelector('svg').outerHTML)})}
+if(con){const refresh=()=>{decorateCon(con);const sites=by('ccttConSiteManager');if(sites)decorateCon(sites)};refresh();let pending=false;new MutationObserver(()=>{if(pending)return;pending=true;queueMicrotask(()=>{pending=false;refresh()})}).observe(con,{childList:true,subtree:true});document.addEventListener('click',e=>{if(e.target.closest('#page-consignas,#ccttConSiteManager'))setTimeout(refresh,0)});document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,0),{once:true});}
+// NUEVO: barra accesible al desplazarse; reutiliza los guardados originales, sin conceder permisos adicionales.
+let dock=null,adminBusy=false;
+function mountAdmin(){const page=by('page-adminUsuarios'),panel=by('ccttAdminPanel');if(!page||!panel||dock)return;dock=document.createElement('aside');dock.id='ccttAdminQuickSave';dock.setAttribute('aria-label','Guardar cambios del usuario seleccionado');const target=document.createElement('strong'),row=document.createElement('div'),message=document.createElement('p');target.id='ccttAdminQuickTarget';row.className='row';message.id='ccttAdminQuickStatus';message.setAttribute('role','status');const permissions=button('ccttAdminQuickPermissions','Guardar permisos','save'),grants=button('ccttAdminQuickGrants','Guardar cuentas del autenticador','closed'),choose=button('ccttAdminQuickChoose','Ir al usuario','back');row.append(permissions,grants,choose);dock.append(target,row,message);page.append(dock);
+const sync=()=>{const unlocked=panel.classList.contains('unlocked'),active=page.classList.contains('active');dock.hidden=!unlocked||!active||!document.body.classList.contains('cctt-v16-admin');const id=by('ccttTargetUser')?.value.trim()||'';target.textContent=id?'Usuario: '+(by('ccttTargetName')?.value.trim()||id):'Selecciona un usuario para guardar';for(const [proxy,original] of [[permissions,by('ccttSaveUser')],[grants,by('ccttVaultSave')]])proxy.disabled=adminBusy||!id||!original||original.disabled;};
+const save=(proxy,id,statusId)=>{proxy.onclick=async()=>{const original=by(id);if(adminBusy||!original||original.disabled||!panel.classList.contains('unlocked'))return;adminBusy=true;message.textContent='Guardando…';sync();try{if(typeof original.onclick==='function')await original.onclick.call(original,new Event('click'));else original.click();message.textContent=by(statusId)?.textContent||'Revisa el resultado en el panel de administración.'}catch(e){message.textContent=e.message||'No se completó el guardado.'}finally{adminBusy=false;sync()}}};save(permissions,'ccttSaveUser','ccttAdminMsg');save(grants,'ccttVaultSave','ccttVaultAdminStatus');choose.onclick=()=>{by('ccttTargetUser')?.scrollIntoView({behavior:'smooth',block:'center'});by('ccttTargetUser')?.focus()};page.addEventListener('input',()=>{message.textContent='';sync()});page.addEventListener('change',sync);page.addEventListener('click',()=>queueMicrotask(sync));new MutationObserver(sync).observe(document.body,{attributes:true,attributeFilter:['class']});new MutationObserver(sync).observe(panel,{attributes:true,childList:true,subtree:true,attributeFilter:['class','disabled']});new MutationObserver(sync).observe(page,{attributes:true,attributeFilter:['class']});window.addEventListener('cctt:session',()=>{message.textContent='';sync()});sync();}
+mountAdmin();new MutationObserver(mountAdmin).observe(document.querySelector('.content')||document.body,{childList:true});
+})();
+
+</script>
 </body></html>
