@@ -1782,20 +1782,23 @@ body:not(.cctt-v16-admin) #page-adminUsuarios.cctt-access-security:not(:has(#cct
 </style>
 <!-- NUEVO: centro acumulado, notificaciones opcionales y estilos de protecciones. -->
 <style id="ccttAlertCenterStyles">
-/* NUEVO: ventanas apiladas a la izquierda y controles compatibles con ambos temas. */
-#ccttAlertCenter{position:fixed;left:14px;bottom:14px;width:min(370px,calc(100vw - 28px));z-index:2200;color:var(--cctt-theme-text,var(--text));font-size:14px}
+/* MODIFICADO: ventanas abajo a la derecha y paleta azul contrastante en ambos temas. */
+#ccttAlertCenter{position:fixed;left:auto;right:14px;bottom:14px;width:min(370px,calc(100vw - 28px));z-index:2200;color:var(--cctt-theme-text,var(--text));font-size:14px}
 #ccttAlertCenter[hidden]{display:none!important}#ccttAlertCenter header{position:static;height:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px;background:var(--cctt-theme-card,var(--card));border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;margin-bottom:8px;box-shadow:0 5px 18px #0002}#ccttAlertCenter summary{cursor:pointer;font-size:12px;padding:5px}
 #ccttAlertCenter details>div{display:flex;flex-wrap:wrap;gap:5px;padding-top:8px}#ccttAlertCenter details p{width:100%;margin:5px 0;line-height:1.5}
 #ccttAlertCards{display:flex;flex-direction:column;gap:9px;max-height:60vh;overflow:auto;padding:2px}
-#ccttAlertCenter .cctt-alert-card{background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-left:4px solid var(--cctt-theme-accent,var(--accent));border-radius:12px;box-shadow:0 6px 22px #0003;padding:14px}
+/* MODIFICADO: fondo, texto y bordes de cada aviso con colores propios del modo. */
+#ccttAlertCenter .cctt-alert-card{background:var(--cctt-alert-bg);color:var(--cctt-alert-text);border:1px solid var(--cctt-alert-border);border-left:4px solid var(--cctt-alert-accent);border-radius:12px;box-shadow:0 6px 22px #0003;padding:14px}
 #ccttAlertCenter h3{display:flex;align-items:center;gap:8px;font-size:14px;line-height:1.4;margin:0 0 8px}#ccttAlertCenter h3 span{overflow-wrap:anywhere}#ccttAlertCenter svg{width:19px!important;height:19px!important;flex:0 0 19px;fill:none!important;stroke:currentColor!important}
 #ccttAlertCenter .cctt-alert-preview{white-space:pre-wrap;overflow-wrap:anywhere;max-height:110px;overflow:auto;line-height:1.5;margin:7px 0 12px}#ccttAlertCenter .cctt-alert-actions{display:flex;gap:8px;flex-wrap:wrap}
-#ccttAlertCenter .btn{display:inline-flex;gap:6px;align-items:center;white-space:normal;padding:8px 10px;font-size:12px;color:var(--cctt-theme-text,var(--text));background:var(--cctt-theme-card,var(--card));border:1px solid var(--cctt-theme-line,var(--line))}
-#ccttAlertCenter :focus-visible{outline:3px solid var(--cctt-theme-accent,var(--accent));outline-offset:3px}
+/* MODIFICADO: contraste de botones e iconos con la nueva ventana. */
+#ccttAlertCenter .btn{display:inline-flex;gap:6px;align-items:center;white-space:normal;padding:8px 10px;font-size:12px;color:var(--cctt-alert-text);background:var(--cctt-alert-button);border:1px solid var(--cctt-alert-border)}
+/* MODIFICADO: foco visible en la paleta azul. */
+#ccttAlertCenter :focus-visible{outline:3px solid var(--cctt-alert-focus);outline-offset:3px}
 /* NUEVO: proteger/desproteger desde el organizador con contraste del modo vigente. */
 #ccttNavOrganizer .cctt-layout-panel,#ccttNavOrganizer .cctt-layout-section,#ccttNavOrganizer .cctt-dnd-section,#ccttNavOrganizer .cctt-dnd-item{background:var(--cctt-theme-card,var(--card))!important;color:var(--cctt-theme-text,var(--text))!important;border-color:var(--cctt-theme-line,var(--line))!important}
 #ccttNavOrganizer .cctt-layout-help{color:var(--cctt-theme-muted,var(--muted))!important}#ccttNavOrganizer input{background:var(--cctt-theme-input,var(--card))!important;color:var(--cctt-theme-inputtext,var(--text))!important;border-color:var(--cctt-theme-line,var(--line))!important}#ccttNavOrganizer .cctt-protection-action{margin-left:auto;font-size:12px}
-@media(max-width:600px){#ccttAlertCards{max-height:45vh}#ccttAlertCenter{bottom:9px;left:9px;width:calc(100vw - 18px)}#ccttNavOrganizer .cctt-dnd-item{flex-wrap:wrap}}
+@media(max-width:600px){#ccttAlertCards{max-height:45vh}#ccttAlertCenter{bottom:9px;left:auto;right:9px;width:calc(100vw - 18px)}#ccttNavOrganizer .cctt-dnd-item{flex-wrap:wrap}}
 
 /* NUEVO: controles administrativos y arrastre con colores del tema vigente. */
 #ccttNavOrganizer .btn,#ccttNavOrganizer .cctt-dnd-ghost{background:var(--cctt-theme-card,var(--card))!important;color:var(--cctt-theme-text,var(--text))!important;border-color:var(--cctt-theme-line,var(--line))!important}
@@ -1804,6 +1807,12 @@ body:not(.cctt-v16-admin) #page-adminUsuarios.cctt-access-security:not(:has(#cct
 /* NUEVO: sin panel de configuración ni espacio visible al no haber avisos. */
 #ccttAlertCenter>header,#ccttAlertCenter>details{display:none!important}
 #ccttAlertCenter>p[hidden]{display:none!important}
+
+/* NUEVO: variables locales, sin cambiar los colores de otros módulos. */
+#ccttAlertCenter{--cctt-alert-bg:#e8f2ff;--cctt-alert-text:#102e50;--cctt-alert-border:#4f83b8;--cctt-alert-accent:#165b9b;--cctt-alert-button:#d4e7ff;--cctt-alert-hover:#c1dcff;--cctt-alert-focus:#0b5798}
+html[data-cctt-scheme="dark"] #ccttAlertCenter{--cctt-alert-bg:#142d49;--cctt-alert-text:#f0f6ff;--cctt-alert-border:#6b9dce;--cctt-alert-accent:#82c2ff;--cctt-alert-button:#244968;--cctt-alert-hover:#315d83;--cctt-alert-focus:#a7d8ff}
+#ccttAlertCenter .cctt-alert-card h3,#ccttAlertCenter .cctt-alert-preview,#ccttAlertCenter .cctt-alert-card .btn span{color:var(--cctt-alert-text)}
+#ccttAlertCenter .btn:hover{background:var(--cctt-alert-hover);color:var(--cctt-alert-text)}
 </style>
 <script id="ccttAlertCenterClient">
 // NUEVO: centro local de avisos, sin consultas de datos ni cambios de autorización.
