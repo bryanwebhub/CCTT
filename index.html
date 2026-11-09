@@ -11501,7 +11501,12 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
         <button class="btn primary" type="button" id="correoLargo">${icon('M6 2h9l4 4v16H6zM14 2v6h5M9 12h7M9 16h7')}Generar opción larga</button>
       </div>
       <div class="field"><label for="correoBorrador">Borrador editable</label><textarea id="correoBorrador" rows="10"></textarea></div>
-      <div class="correo-actions"><button class="btn" type="button" id="correoCopiar">${icon('M8 8h12v13H8zM16 8V3H3v13h5')}Copiar borrador</button></div>
+      <div class="correo-actions"><button class="btn" type="button" id="correoCopiar">${icon('M8 8h12v13H8zM16 8V3H3v13h5')}Copiar borrador</button>
+        <!-- NUEVO: limpiar los campos del generador. -->
+        <button class="btn" type="button" id="correoLimpiar">${icon('M4 8h16M9 8V4h6v4M6 8l1 13h10l1-13M10 12v5m4-5v5')}Limpiar</button>
+      </div>
+      <!-- NUEVO: conservar la nota y señalarla para revisión. -->
+      <p id="correoPendiente" class="muted" role="status" hidden>Pendiente de revisión: emparejamiento por confirmar.</p>
       <p id="correoEstado" class="muted" role="status"></p>
     </div>`;
   parent.append(page);
@@ -11512,6 +11517,14 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
   const draft = get('correoBorrador');
   const status = get('correoEstado');
   const formal = text => typeof ccttSentenceMX === 'function' ? ccttSentenceMX(text) : text;
+  /* NUEVO: patrones de los ejemplos institucionales del TXT. Los datos proceden de la captura. */
+  const pending = get('correoPendiente');
+  function updatePending() {
+    pending.hidden = ![idea.value, context.value, draft.value].some(
+      text => /emparejamiento\s+por\s+confirmar/iu.test(text)
+    );
+  }
+  [idea, context, draft].forEach(field => field.addEventListener('input', updatePending));
   const generate = long => {
     if (!allowed()) return;
     const request = idea.value.trim();
@@ -11523,19 +11536,28 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
     const details = context.value.trim();
     // NUEVO: convertir un inicio de solicitud en una frase institucional sin reescribir sus datos.
     const direct = request.match(/^(?:(?:quiero|quisiera|deseo|necesito)\s+(?:solicitar|pedir)|solicitar|solicito|solicitamos|pedir|pido|pedimos)\s+([\s\S]+)$/iu);
-    const opening = formal(direct ? 'solicita' : 'solicita atentamente su apoyo con lo siguiente:').replace(/^S/, 's');
-    const paragraphs = direct
-      ? [prefix + ' ' + opening + ' ' + direct[1]]
-      : [prefix + ' ' + opening, request];
+    /* MODIFICADO: distinguir solicitudes, avisos y actualizaciones por su inicio explícito. */
+    const institutional = request.match(/^Por medio del presente,?\s+el Centro de Control de Tráfico Terrestre\s+([\s\S]+)$/iu);
+    const notice = request.match(/^(?:(?:quiero|deseo)\s+)?(?:informar|informo|informamos|comunicar|comunico|comunicamos)\s+([\s\S]+)$/iu);
+    const update = request.match(/^(?:actualización de estatus|actualización del estatus|actualización operativa)\s*:\s*([\s\S]+)$/iu);
+    const informative = !!(notice || update || /^(?:informa|comunica)\b/iu.test(institutional?.[1] || ''));
+    const paragraphs = [institutional ? prefix + ' ' + institutional[1]
+      : update ? prefix + ' comunica la siguiente actualización de estatus:\n\n' + update[1]
+      : notice ? prefix + ' informa ' + notice[1]
+      : direct ? prefix + ' solicita ' + direct[1]
+      : prefix + ' solicita su amable colaboración con lo siguiente:\n\n' + request];
     if (long) {
       if (details) paragraphs.push(formal('Como antecedente:'), details);
-      paragraphs.push(formal('Agradecemos su atención a esta solicitud y quedamos atentos a su respuesta para dar seguimiento.'));
+      paragraphs.push(formal(informative
+        ? 'Sin otro particular, agradecemos de antemano su atención.'
+        : 'Agradecemos de antemano su atención y colaboración. Quedamos atentos a su respuesta para dar seguimiento.'));
     } else {
       paragraphs.push(formal('Gracias por su atención.'));
     }
     paragraphs.push('Atentamente,\nCentro de Control de Tráfico Terrestre');
     draft.value = paragraphs.join('\n\n');
     status.textContent = long ? 'Borrador largo generado.' : 'Borrador corto generado.';
+    /* NUEVO */ updatePending();
     draft.focus();
   };
   get('correoCorto').onclick = () => generate(false);
@@ -11550,6 +11572,14 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
       draft.select();
       status.textContent = 'El borrador quedó seleccionado para copiarlo con el teclado.';
     }
+  };
+  /* NUEVO: limpiar la captura, el borrador y la marca de revisión. */
+  get('correoLimpiar').onclick = () => {
+    if (!allowed()) return;
+    idea.value = context.value = draft.value = '';
+    status.textContent = 'Campos limpiados.';
+    updatePending();
+    idea.focus();
   };
   function sync() {
     const visible = allowed();
@@ -11574,17 +11604,21 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
   window.addEventListener('cctt:access-updated', sync);
   window.addEventListener('cctt:logout', () => {
     idea.value = context.value = draft.value = status.textContent = '';
+    /* NUEVO */ updatePending();
   });
   const cards = get('moduleCards');
   if (cards) new MutationObserver(sync).observe(cards, {childList:true});
   sync();
   window.ccttLearning?.register(id, {
-    version:'1',
+    /* MODIFICADO */ version:'2',
     purpose:'Preparar borradores institucionales a partir de tu solicitud. El administrador asigna el acceso al módulo.',
     steps:[
-      {title:'Describe la solicitud',body:'Escribe la idea y los datos confirmados. Si necesitas más detalle, añade contexto para la opción larga.',controlId:'correoIdea'},
+      /* MODIFICADO */
+      {title:'Describe la solicitud',body:'Usa Solicitar para una petición, Informar para un aviso o Actualización de estatus: para un cambio operativo. Añade contexto confirmado para la versión larga.',controlId:'correoIdea'},
       {title:'Elige la extensión',body:'Genera una opción corta o larga. Las dos usan el inicio institucional y la larga añade el contexto que captures.',controlId:'correoLargo'},
-      {title:'Revisa y copia',body:'Ajusta el borrador antes de copiarlo a tu correo.',controlId:'correoCopiar'}
+      {title:'Revisa y copia',body:'Ajusta el borrador antes de copiarlo a tu correo. Si aparece un emparejamiento por confirmar, revisa el pendiente.',controlId:'correoCopiar'},
+      /* NUEVO */
+      {title:'Inicia otro borrador',body:'Limpiar vacía la solicitud, el contexto y el borrador actual.',controlId:'correoLimpiar'}
     ]
   });
   window.ccttLearning?.register('documentacion', {
