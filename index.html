@@ -5254,7 +5254,7 @@ body.cctt-authenticated .tbl th{font-size:12px}
 <script id="ccttEnhancementsV14Script">
 (()=>{
 'use strict';
-const modules=[/* NUEVO */['mensajesPersonajes','Mensajes con personajes'],/* NUEVO: permiso individual de aprendizaje. */['aprendizajeModulos','Aprendizaje de módulos'],/* NUEVO: editor con proyectos personales. */['diagramasMentales','Diagramas y mapas mentales'],/* NUEVO: permiso del Recordatorio de cumpleaños. */['recordatorioCumpleanos','Recordatorio de cumpleaños'],/* NUEVO: permiso de Ruleta de decisiones. */['ruletaDecisiones','Ruleta de decisiones'],/* NUEVO: permiso del Simulador de tránsito. */['simuladorTransito','Simulador de tránsito'],/* NUEVO: permiso individual de Verificación de citas. */['verificacionCitas','Verificación de citas'],/* NUEVO: permiso del módulo Conteos */['conteos','Conteos'],/* NUEVO: permiso específico del submódulo */['controlTerminales','Control terminales'],/* NUEVO: módulo asignable de seguimiento de fallos. */['fallos','Seguimiento de fallos'],/* NUEVO: permiso del módulo Documentación */['documentacion','Documentación'],['bibliotecaOperativa','Biblioteca operativa'],['mapaUbicaciones','Mapa de ubicaciones'],/* NUEVO: permiso del editor de croquis. */['mapasCroquis','Mapas y croquis'],/* NUEVO: permiso marítimo independiente. */['buquesManzanillo','Buques activos · Manzanillo'],/* NUEVO: permiso climático independiente */['climaManzanillo','Clima y alertas · Manzanillo'],['inicio','Inicio'],['perfil','Perfil y logo'],['pis','Bitácoras PIS'],['accidentes','Accidentes CCTT'],['comparador','Comparación terminales'],['reporte','Reporte cesionarios'],['balance','Balance de citas'],/* NUEVO: permiso exclusivo */['cumplimientoCitas','Cumplimiento de citas'],['comunicadosPdf','Registro comunicados'],['mensajes','Mensajes comunicados'],/* NUEVO: permiso de acceso independiente */['avisosRecurrentes','Avisos recurrentes'],/* MODIFICADO: permiso de Expedientes retirado de opciones. */['consignas','Consignas'],['controlCitas','Control citas portuarias'],['turnos','Turnos'],['inc35macro','Generador de incidentes'],['inc35copoma','COPOMA'],['inc35vial','Reporte de vialidades'],/* NUEVO: permiso independiente */['sobrevueloDron','Sobrevuelo de dron'],/* NUEVO: permiso independiente */['atencionAmbulancia','Atención por ambulancia'],['inc35bolet','Boletinados'],['inc35redes','Redes y reporte'],['inc35pisrep','PIS-REP'],/* NUEVO: permiso para habilitar el autenticador desde Administración de accesos. */['autenticadorAutorizado','Autenticador autorizado'],/* NUEVO: módulo asignable Diccionario de procesos; la autorización de edición permanece independiente. */['diccionarioProcesos','Diccionario de procesos'],/* NUEVO: permiso de consulta; controles restringidos en servidor. */['sesionesSeguridad','Sesiones y seguridad']];
+const modules=[/* NUEVO */['generadorCorreos','Generador de correos'],/* NUEVO */['mensajesPersonajes','Mensajes con personajes'],/* NUEVO: permiso individual de aprendizaje. */['aprendizajeModulos','Aprendizaje de módulos'],/* NUEVO: editor con proyectos personales. */['diagramasMentales','Diagramas y mapas mentales'],/* NUEVO: permiso del Recordatorio de cumpleaños. */['recordatorioCumpleanos','Recordatorio de cumpleaños'],/* NUEVO: permiso de Ruleta de decisiones. */['ruletaDecisiones','Ruleta de decisiones'],/* NUEVO: permiso del Simulador de tránsito. */['simuladorTransito','Simulador de tránsito'],/* NUEVO: permiso individual de Verificación de citas. */['verificacionCitas','Verificación de citas'],/* NUEVO: permiso del módulo Conteos */['conteos','Conteos'],/* NUEVO: permiso específico del submódulo */['controlTerminales','Control terminales'],/* NUEVO: módulo asignable de seguimiento de fallos. */['fallos','Seguimiento de fallos'],/* NUEVO: permiso del módulo Documentación */['documentacion','Documentación'],['bibliotecaOperativa','Biblioteca operativa'],['mapaUbicaciones','Mapa de ubicaciones'],/* NUEVO: permiso del editor de croquis. */['mapasCroquis','Mapas y croquis'],/* NUEVO: permiso marítimo independiente. */['buquesManzanillo','Buques activos · Manzanillo'],/* NUEVO: permiso climático independiente */['climaManzanillo','Clima y alertas · Manzanillo'],['inicio','Inicio'],['perfil','Perfil y logo'],['pis','Bitácoras PIS'],['accidentes','Accidentes CCTT'],['comparador','Comparación terminales'],['reporte','Reporte cesionarios'],['balance','Balance de citas'],/* NUEVO: permiso exclusivo */['cumplimientoCitas','Cumplimiento de citas'],['comunicadosPdf','Registro comunicados'],['mensajes','Mensajes comunicados'],/* NUEVO: permiso de acceso independiente */['avisosRecurrentes','Avisos recurrentes'],/* MODIFICADO: permiso de Expedientes retirado de opciones. */['consignas','Consignas'],['controlCitas','Control citas portuarias'],['turnos','Turnos'],['inc35macro','Generador de incidentes'],['inc35copoma','COPOMA'],['inc35vial','Reporte de vialidades'],/* NUEVO: permiso independiente */['sobrevueloDron','Sobrevuelo de dron'],/* NUEVO: permiso independiente */['atencionAmbulancia','Atención por ambulancia'],['inc35bolet','Boletinados'],['inc35redes','Redes y reporte'],['inc35pisrep','PIS-REP'],/* NUEVO: permiso para habilitar el autenticador desde Administración de accesos. */['autenticadorAutorizado','Autenticador autorizado'],/* NUEVO: módulo asignable Diccionario de procesos; la autorización de edición permanece independiente. */['diccionarioProcesos','Diccionario de procesos'],/* NUEVO: permiso de consulta; controles restringidos en servidor. */['sesionesSeguridad','Sesiones y seguridad']];
 const moduleIds=modules.map(m=>m[0]);
 let session=null,admin=false,secret='',permissions=null,adminReady=false;
 /* NUEVO: estado del desbloqueo adicional, sin exponer la contraseña. */window.ccttAccessUnlocked=()=>!!session&&adminReady;
@@ -7907,14 +7907,66 @@ try{
  placeholder('Vista previa directa no disponible para este formato. Puedes convertirlo o descargarlo.');
 }catch(err){if(token===generation)placeholder('No fue posible mostrar la vista previa: '+err.message)}
 }
-function selected(){/* MODIFICADO: vista previa de la cola acumulada y ordenada. */const files=window.ccttDocOrderedFiles?.()||[...(picker.files||[])];list.replaceChildren();summary.replaceChildren();const chip=document.createElement('span');chip.className='cctt-doc-chip';chip.textContent=files.length+' de 100 archivos';summary.appendChild(chip);if(!files.length){placeholder('Selecciona un documento para visualizarlo.');list.innerHTML='<span class="muted">No hay archivos seleccionados.</span>';return}const size=document.createElement('span');size.className='cctt-doc-chip';size.textContent=(files.reduce((n,f)=>n+f.size,0)/1048576).toFixed(1)+' MB';summary.appendChild(size);files.slice(0,100).forEach((file,i)=>{const b=document.createElement('button');b.type='button';b.className='cctt-doc-fileitem';/* NUEVO: índice para arrastre y teclado. */b.draggable=true;b.dataset.docOrder=String(i);b.setAttribute('aria-label','Archivo '+(i+1)+': '+file.name);b.innerHTML=svg('file');const txt=document.createElement('span');txt.className='cctt-doc-filename';txt.textContent=file.name;b.append(txt);b.onclick=()=>{list.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));preview(file,file.name)};list.appendChild(b);if(i===0)b.click()});if(files.length>100)placeholder('Máximo permitido: 100 documentos. Reduce la selección.')}
+function selected(){/* MODIFICADO: vista previa de la cola acumulada y ordenada. */const files=window.ccttDocOrderedFiles?.()||[...(picker.files||[])];list.replaceChildren();summary.replaceChildren();const chip=document.createElement('span');chip.className='cctt-doc-chip';chip.textContent=files.length+' de 100 archivos';summary.appendChild(chip);if(!files.length){placeholder('Selecciona un documento para visualizarlo.');list.innerHTML='<span class="muted">No hay archivos seleccionados.</span>';return}const size=document.createElement('span');size.className='cctt-doc-chip';size.textContent=(files.reduce((n,f)=>n+f.size,0)/1048576).toFixed(1)+' MB';summary.appendChild(size);files.slice(0,100).forEach((file,i)=>{const b=document.createElement('button');b.type='button';b.className='cctt-doc-fileitem';/* NUEVO: índice para arrastre y teclado. */b.draggable=true;b.dataset.docOrder=String(i);b.setAttribute('aria-label','Archivo '+(i+1)+': '+file.name);/* MODIFICADO: control visual e índice de la cola. */b.innerHTML='<span class="doc-order-grip" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>'+String(i+1)+'</span>'+svg('file');const txt=document.createElement('span');txt.className='cctt-doc-filename';txt.textContent=file.name;b.append(txt);b.onclick=()=>{list.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));preview(file,file.name)};list.appendChild(b);if(i===0)b.click()});if(files.length>100)placeholder('Máximo permitido: 100 documentos. Reduce la selección.')}
 // NUEVO: arrastrar archivos de la lista; Alt+flechas ofrece el mismo orden mediante teclado.
 let dragged=-1;
 const hint=document.createElement('p');hint.className='muted';hint.textContent='Añade archivos uno por uno o en conjunto. Arrastra para ordenar; también puedes usar Alt + flecha arriba/abajo sobre un archivo.';list.before(hint);
-list.addEventListener('dragstart',event=>{const item=event.target.closest('[data-doc-order]');if(!item)return;dragged=Number(item.dataset.docOrder);event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',String(dragged));});
-list.addEventListener('dragover',event=>{if(event.target.closest('[data-doc-order]')&&dragged>=0){event.preventDefault();event.dataTransfer.dropEffect='move'}});
-list.addEventListener('drop',event=>{const item=event.target.closest('[data-doc-order]');if(!item||dragged<0)return;event.preventDefault();const to=Number(item.dataset.docOrder);if(window.ccttDocMoveFile?.(dragged,to)){generation++;selected();}dragged=-1;});
-list.addEventListener('dragend',()=>dragged=-1);
+/* MODIFICADO: mostrar el punto de inserción y anunciar el nuevo orden. */
+const orderStatus=document.createElement('p');
+orderStatus.className='muted';
+orderStatus.setAttribute('role','status');
+list.after(orderStatus);
+let marked=null;
+function clearInsertion(){
+  marked?.removeAttribute('data-doc-drop');
+  marked=null;
+}
+function finishDrag(){
+  clearInsertion();
+  list.querySelector('[data-doc-dragging]')?.removeAttribute('data-doc-dragging');
+  dragged=-1;
+}
+function dropSide(item,event){
+  const rect=item.getBoundingClientRect();
+  return event.clientY<rect.top+rect.height/2?'before':'after';
+}
+list.addEventListener('dragstart',event=>{
+  const item=event.target.closest('[data-doc-order]');
+  if(!item||!event.dataTransfer)return;
+  finishDrag();
+  dragged=Number(item.dataset.docOrder);
+  item.setAttribute('data-doc-dragging','');
+  event.dataTransfer.effectAllowed='move';
+  event.dataTransfer.setData('text/plain',String(dragged));
+});
+list.addEventListener('dragover',event=>{
+  const item=event.target.closest('[data-doc-order]');
+  if(!item||dragged<0){clearInsertion();return}
+  event.preventDefault();
+  event.dataTransfer.dropEffect='move';
+  if(marked!==item){clearInsertion();marked=item}
+  item.dataset.docDrop=dropSide(item,event);
+});
+list.addEventListener('dragleave',event=>{
+  if(!list.contains(event.relatedTarget))clearInsertion();
+});
+list.addEventListener('drop',event=>{
+  const item=event.target.closest('[data-doc-order]');
+  if(!item||dragged<0)return;
+  event.preventDefault();
+  const from=dragged;
+  const slot=Number(item.dataset.docOrder)+(dropSide(item,event)==='after'?1:0);
+  const to=slot>from?slot-1:slot;
+  finishDrag();
+  if(to===from||!window.ccttDocMoveFile?.(from,to))return;
+  generation++;
+  selected();
+  const moved=list.querySelector('[data-doc-order="'+to+'"]');
+  moved?.click();
+  moved?.focus();
+  orderStatus.textContent='Archivo movido a la posición '+(to+1)+'.';
+});
+list.addEventListener('dragend',finishDrag);
 list.addEventListener('keydown',event=>{const item=event.target.closest('[data-doc-order]');if(!item||!event.altKey||!['ArrowUp','ArrowDown'].includes(event.key))return;event.preventDefault();const from=Number(item.dataset.docOrder),to=from+(event.key==='ArrowUp'?-1:1);if(window.ccttDocMoveFile?.(from,to)){generation++;selected();list.querySelector('[data-doc-order="'+to+'"]')?.focus()}});
 
 picker.addEventListener('change',selected);
@@ -11390,6 +11442,156 @@ function boot(){const nav=document.createElement('button');nav.type='button';nav
 function session(s){const old=current?.user?.id;current=s||null;if(old!==current?.user?.id){generation++;editing='';targets=[];sent=[];inbox=[];if(Q('cmForm'))reset();if(Q('cmMessageDialog')?.open)Q('cmMessageDialog').close();Q('cmScopeTargets')?.replaceChildren();if(Q('cmScopeSave'))Q('cmScopeSave').disabled=true;}if(Q('cmSend'))access()}
 window.addEventListener('cctt:session',e=>session(e.detail?.session));window.addEventListener('cctt:logout',()=>session(null));window.addEventListener('cctt:access-updated',()=>{if(Q('cmSend')){access();if(allowed()&&Q('page-'+ID)?.classList.contains('active'))void refresh()}});if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(!current&&r.data?.session&&document.documentElement.classList.contains('cctt-access-ready'))session(r.data.session)}).catch(()=>{});
+})();
+</script>
+
+<!-- NUEVO: borradores institucionales locales. -->
+<style>
+/* NUEVO: colores heredados del tema activo. */
+#page-generadorCorreos textarea {
+  width:100%; min-height:8rem; resize:vertical; padding:.75rem;
+  background:var(--cctt-theme-input,var(--card)); color:var(--cctt-theme-inputtext,var(--text));
+  border:1px solid var(--cctt-theme-line,var(--line)); border-radius:8px;
+}
+#page-generadorCorreos textarea:focus-visible, #ccttDocFileList .cctt-doc-fileitem:focus-visible {
+  outline:2px solid currentColor; outline-offset:2px;
+}
+#page-generadorCorreos .correo-actions {display:flex; flex-wrap:wrap; gap:.6rem; margin:.65rem 0;}
+#page-generadorCorreos button svg, #correoHomeCard button svg {width:1.15em;height:1.15em;vertical-align:middle;margin-right:.35em;}
+/* NUEVO: señal de inserción con el color de texto del tema. */
+#ccttDocFileList [data-doc-order] {cursor:grab;}
+#ccttDocFileList .doc-order-grip {display:inline-flex;flex:none;align-items:center;gap:.35rem;font-weight:700;}
+#ccttDocFileList .doc-order-grip svg {width:1em;height:1em;}
+#ccttDocFileList [data-doc-dragging] {opacity:.65;cursor:grabbing;}
+#ccttDocFileList [data-doc-drop="before"] {box-shadow:inset 0 3px currentColor;}
+#ccttDocFileList [data-doc-drop="after"] {box-shadow:inset 0 -3px currentColor;}
+</style>
+<script id="ccttCorreoDrafts">
+/* NUEVO */
+(() => {
+  const id = 'generadorCorreos';
+  const prefix = 'Por medio del presente el Centro de Control de Tráfico Terrestre';
+  const sidebar = document.querySelector('.sidebar');
+  const parent = document.getElementById('page-documentacion')?.parentElement;
+  if (!sidebar || !parent) return;
+
+  const icon = path => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + path + '"/></svg>';
+  const nav = document.createElement('button');
+  nav.type = 'button';
+  nav.className = 'navbtn';
+  nav.dataset.page = id;
+  nav.hidden = true;
+  nav.style.display = 'none';
+  nav.innerHTML = '<span class="ico">' + icon('M3 6h18v13H3zM3 7l9 7 9-7M8 3h8') + '</span><span class="lbl">Generador de correos</span>';
+  const allowed = () => window.ccttCanAccess?.(id) === true;
+  nav.onclick = () => { if (allowed()) go(id); };
+  sidebar.append(nav);
+
+  const page = document.createElement('section');
+  page.id = 'page-' + id;
+  page.className = 'page';
+  page.innerHTML = `
+    <div class="card">
+      <h2>Generador de correos</h2>
+      <p class="muted">Describe qué deseas solicitar. Puedes añadir contexto para el borrador largo.</p>
+      <div class="field"><label for="correoIdea">Solicitud</label><textarea id="correoIdea" maxlength="5000" placeholder="Escribe qué deseas solicitar"></textarea></div>
+      <div class="field"><label for="correoContexto">Contexto para la versión larga (opcional)</label><textarea id="correoContexto" maxlength="5000" placeholder="Añade solo antecedentes o datos confirmados"></textarea></div>
+      <div class="correo-actions">
+        <button class="btn primary" type="button" id="correoCorto">${icon('M3 5h18M3 10h12M3 15h7M3 20h4')}Generar opción corta</button>
+        <button class="btn primary" type="button" id="correoLargo">${icon('M6 2h9l4 4v16H6zM14 2v6h5M9 12h7M9 16h7')}Generar opción larga</button>
+      </div>
+      <div class="field"><label for="correoBorrador">Borrador editable</label><textarea id="correoBorrador" rows="10"></textarea></div>
+      <div class="correo-actions"><button class="btn" type="button" id="correoCopiar">${icon('M8 8h12v13H8zM16 8V3H3v13h5')}Copiar borrador</button></div>
+      <p id="correoEstado" class="muted" role="status"></p>
+    </div>`;
+  parent.append(page);
+
+  const get = key => document.getElementById(key);
+  const idea = get('correoIdea');
+  const context = get('correoContexto');
+  const draft = get('correoBorrador');
+  const status = get('correoEstado');
+  const formal = text => typeof ccttSentenceMX === 'function' ? ccttSentenceMX(text) : text;
+  const generate = long => {
+    if (!allowed()) return;
+    const request = idea.value.trim();
+    if (!request) {
+      status.textContent = 'Escribe la solicitud para generar un borrador.';
+      idea.focus();
+      return;
+    }
+    const details = context.value.trim();
+    // NUEVO: convertir un inicio de solicitud en una frase institucional sin reescribir sus datos.
+    const direct = request.match(/^(?:(?:quiero|quisiera|deseo|necesito)\s+(?:solicitar|pedir)|solicitar|solicito|solicitamos|pedir|pido|pedimos)\s+([\s\S]+)$/iu);
+    const opening = formal(direct ? 'solicita' : 'solicita atentamente su apoyo con lo siguiente:').replace(/^S/, 's');
+    const paragraphs = direct
+      ? [prefix + ' ' + opening + ' ' + direct[1]]
+      : [prefix + ' ' + opening, request];
+    if (long) {
+      if (details) paragraphs.push(formal('Como antecedente:'), details);
+      paragraphs.push(formal('Agradecemos su atención a esta solicitud y quedamos atentos a su respuesta para dar seguimiento.'));
+    } else {
+      paragraphs.push(formal('Gracias por su atención.'));
+    }
+    paragraphs.push('Atentamente,\nCentro de Control de Tráfico Terrestre');
+    draft.value = paragraphs.join('\n\n');
+    status.textContent = long ? 'Borrador largo generado.' : 'Borrador corto generado.';
+    draft.focus();
+  };
+  get('correoCorto').onclick = () => generate(false);
+  get('correoLargo').onclick = () => generate(true);
+  get('correoCopiar').onclick = async () => {
+    if (!allowed() || !draft.value.trim()) return;
+    try {
+      await navigator.clipboard.writeText(draft.value);
+      status.textContent = 'Borrador copiado.';
+    } catch {
+      draft.focus();
+      draft.select();
+      status.textContent = 'El borrador quedó seleccionado para copiarlo con el teclado.';
+    }
+  };
+  function sync() {
+    const visible = allowed();
+    nav.hidden = !visible;
+    nav.style.display = visible ? '' : 'none';
+    let card = get('correoHomeCard');
+    const host = get('moduleCards');
+    if (!card && host && visible) {
+      card = document.createElement('div');
+      card.id = 'correoHomeCard';
+      card.dataset.page = id;
+      card.className = 'card';
+      card.innerHTML = '<h3>Generador de correos</h3><p class="muted">Prepara borradores institucionales cortos o largos.</p><button type="button" class="btn">' + icon('M4 12h11m-4-4 4 4-4 4M14 4h6v16h-6') + 'Abrir módulo</button>';
+      card.querySelector('button').onclick = nav.onclick;
+      host.append(card);
+    }
+    if (card) {
+      card.hidden = !visible;
+      card.style.display = visible ? '' : 'none';
+    }
+  }
+  window.addEventListener('cctt:access-updated', sync);
+  window.addEventListener('cctt:logout', () => {
+    idea.value = context.value = draft.value = status.textContent = '';
+  });
+  const cards = get('moduleCards');
+  if (cards) new MutationObserver(sync).observe(cards, {childList:true});
+  sync();
+  window.ccttLearning?.register(id, {
+    version:'1',
+    purpose:'Preparar borradores institucionales a partir de tu solicitud. El administrador asigna el acceso al módulo.',
+    steps:[
+      {title:'Describe la solicitud',body:'Escribe la idea y los datos confirmados. Si necesitas más detalle, añade contexto para la opción larga.',controlId:'correoIdea'},
+      {title:'Elige la extensión',body:'Genera una opción corta o larga. Las dos usan el inicio institucional y la larga añade el contexto que captures.',controlId:'correoLargo'},
+      {title:'Revisa y copia',body:'Ajusta el borrador antes de copiarlo a tu correo.',controlId:'correoCopiar'}
+    ]
+  });
+  window.ccttLearning?.register('documentacion', {
+    version:'orden-cola-2',
+    purpose:'Consultar y convertir archivos según los controles habilitados en Documentación.',
+    steps:[{title:'Ordena los archivos',body:'Arrastra un archivo por la lista. La línea indica si se insertará antes o después. También puedes usar Alt y las flechas sobre una fila. El orden se aplica a la cola de conversión.',controlId:'ccttDocFileList'}]
+  });
 })();
 </script>
 
