@@ -11961,6 +11961,42 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   try {
    const sb = client();
    if (!sb?.functions) throw Error('El servicio de consulta no está disponible.');
+   /* MODIFICADO: recibir los mosaicos como bytes; invoke interpreta image/png como texto. */
+   if (action === 'traffic-tile') {
+    const {data:auth,error:authError} = await sb.auth.getSession();
+    const token = auth?.session?.access_token;
+    if (authError || !token) throw Error('Inicia sesión de nuevo para consultar el tráfico.');
+    const headers = {
+     'Authorization':'Bearer '+token,
+     'apikey':sb.supabaseKey,
+     'Content-Type':'application/json',
+     'Accept':'image/png'
+    };
+    if (window.ccttSecurityBrowser?.id) headers['x-cctt-device-id'] = window.ccttSecurityBrowser.id;
+    const response = await fetch(sb.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-admin',{
+     method:'POST',headers,body:JSON.stringify({action,...body}),signal:controller.signal
+    });
+    if (!response.ok) {
+     let detail;
+     try { detail = await response.json(); } catch {}
+     throw Error(detail?.error || 'No se pudo descargar el tráfico (HTTP '+response.status+').');
+    }
+    const mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
+    if (mime !== 'image/png') {
+     let detail;
+     if (mime === 'application/json') {
+      try { detail = await response.json(); } catch {}
+     }
+     throw Error(detail?.error || 'El servicio de tráfico devolvió un formato distinto de PNG.');
+    }
+    const image = await response.blob();
+    const signature = new Uint8Array(await image.slice(0,8).arrayBuffer());
+    const pngHeader = [137,80,78,71,13,10,26,10];
+    if (signature.length !== pngHeader.length || !pngHeader.every((value,index)=>signature[index]===value)) {
+     throw Error('El servicio de tráfico devolvió una imagen PNG vacía o dañada.');
+    }
+    return image;
+   }
    const {data,error} = await sb.functions.invoke('cctt-admin',{body:{action,...body},signal:controller.signal});
    if (error) {
     let detail;
@@ -12345,7 +12381,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  const home=$('moduleCards');
  if(home)new MutationObserver(syncCard).observe(home,{childList:true});
  window.ccttLearning?.register(ID,{
-  version:'trafico-terrestre-1',
+  /* MODIFICADO: revisión de la carga binaria de imágenes del proveedor. */
+  version:'trafico-terrestre-2',
   purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
   steps:[
    {title:'Elige las capas',body:'Abre Capas, selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
