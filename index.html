@@ -11976,8 +11976,29 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  const allowed = () => window.ccttCanAccess?.(ID) === true;
  const active = () => allowed() && page.classList.contains('active') && !document.hidden;
  let map = null, base = null, traffic = null, locationMarker = null;
- /* NUEVO: consulta anterior georreferenciada durante la carga del nuevo detalle. */
- let previousTraffic = null, previousTrafficSource = '';
+ /* MODIFICADO: memoria temporal por proveedor, nivel y sesión; sin guardado persistente. */
+ const trafficTileMemory=new Map();
+ let trafficTileBytes=0,trafficSuspended=false,resumeTicket=0;
+ function readTrafficTile(key) {
+  const entry=trafficTileMemory.get(key);
+  if(!entry)return null;
+  if(Date.now()-entry.receivedAt>=45000) {
+   trafficTileBytes-=entry.blob.size;trafficTileMemory.delete(key);return null;
+  }
+  trafficTileMemory.delete(key);trafficTileMemory.set(key,entry);
+  return entry;
+ }
+ function rememberTrafficTile(key,entry) {
+  const old=trafficTileMemory.get(key);
+  if(old)trafficTileBytes-=old.blob.size;
+  trafficTileMemory.delete(key);
+  if(entry.blob.size>8*1024*1024)return;
+  trafficTileMemory.set(key,entry);trafficTileBytes+=entry.blob.size;
+  while(trafficTileMemory.size>128||trafficTileBytes>8*1024*1024) {
+   const oldest=trafficTileMemory.keys().next().value;
+   trafficTileBytes-=trafficTileMemory.get(oldest).blob.size;trafficTileMemory.delete(oldest);
+  }
+ }
  /* NUEVO: un pin temporal por sesión, separado de Mi ubicación. */
  let pinMarker = null, pinPlacing = false;
  function pinMode(enabled) {
@@ -12145,7 +12166,9 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     if (!response.ok) {
      let detail;
      try { detail = await response.json(); } catch {}
-     throw Error(detail?.error || 'No se pudo descargar el tráfico (HTTP '+response.status+').');
+     /* MODIFICADO */
+     const failure=Error(detail?.error || 'No se pudo descargar el tráfico (HTTP '+response.status+').');
+     failure.httpStatus=response.status;throw failure;
     }
     const mime = (response.headers.get('content-type') || '').split(';')[0].trim().toLowerCase();
     if (mime !== 'image/png') {
@@ -12167,7 +12190,9 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    if (error) {
     let detail;
     try { detail = await error.context?.json(); } catch {}
-    throw Error(detail?.error || error.message || 'No se pudo completar la consulta.');
+    /* MODIFICADO */
+    const failure=Error(detail?.error || error.message || 'No se pudo completar la consulta.');
+    failure.httpStatus=error.context?.status;throw failure;
    }
    if (data?.error) throw Error(data.error);
    return data;
@@ -12202,9 +12227,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   host.append(note);
  }
  function dropTraffic() {
-  /* NUEVO: retirar también la consulta retenida al ocultar o cambiar de fuente. */
-  if(previousTraffic&&map)map.removeLayer(previousTraffic);
-  previousTraffic=null;previousTrafficSource='';
+  /* MODIFICADO: la capa nativa conserva sus mosaicos hasta que se retira el módulo. */
   if (traffic && map) map.removeLayer(traffic);
   traffic = null;
   loadedTiles = 0;
@@ -12212,187 +12235,224 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   lastLoadError = '';
   $('trConsulted').textContent = 'Sin consulta de tráfico completada';
  }
- /* NUEVO: conservar solo imágenes que el proveedor ya entregó y el navegador mostró. */
+ /* MODIFICADO: durante el zoom se cancelan consultas, conservando la capa nativa. */
  function retainTraffic() {
-  if(!map)return;
   traffic?.cancelPending();
-  if(!previousTraffic&&traffic) {
-   const snapshot=traffic.captureVisibleTiles();
-   if(snapshot) {
-    previousTraffic=snapshot;
-    previousTrafficSource=traffic.trafficSource;
-    previousTraffic.addTo(map);
-   }
-  }
-  if(traffic)map.removeLayer(traffic);
-  traffic=null;
-  loadedTiles=0;loadFailures=0;lastLoadError='';
  }
- function pause() {
-  /* NUEVO */
-  clearTimeout(zoomTimer);
-  zoomTimer=null;
-  zoomSettling=false;
+ function pause(preserve=false) {
+  clearTimeout(zoomTimer);zoomTimer=null;zoomSettling=false;
   $('trMap').dataset.trZooming='false';
-  clearTimeout(reloadTimer);
-  reloadTimer = null;
-  generation++;
-  for (const controller of apiControllers) controller.abort();
+  clearTimeout(reloadTimer);reloadTimer=null;
+  trafficSuspended=true;resumeTicket++;
+  traffic?.cancelPending();
+  for(const controller of apiControllers)controller.abort();
   apiControllers.clear();
-  dropTraffic();
+  if(!preserve) {
+   generation++;
+   dropTraffic();
+   trafficTileMemory.clear();trafficTileBytes=0;
+  }
+ }
+ /* NUEVO: revalidar al regresar sin retirar la consulta visible. */
+ async function resumeTraffic() {
+  if(!allowed()||!page.classList.contains('active')){pause();return;}
+  if(document.hidden)return;
+  if(!map){trafficSuspended=false;initialize();return;}
+  const ticket=++resumeTicket,stamp=generation;
+  requestAnimationFrame(()=>map?.invalidateSize());
+  try {
+   if(!await loadConfig()||ticket!==resumeTicket||stamp!==generation||!active())return;
+   trafficSuspended=false;
+   if(traffic&&traffic.trafficSource===$('trProvider').value&&$('trFlow').checked) {
+    traffic.resumeView();
+   } else {
+    drawTraffic();
+   }
+   if(!base||$('trBase').value==='auto')void setBase();
+  } catch(error) {
+   if(ticket!==resumeTicket||stamp!==generation||!active())return;
+   if([401,403].includes(error.httpStatus))pause();
+   status('No se pudo revalidar el tráfico. '+error.message,'error');
+  }
  }
  function scheduleRefresh() {
   clearTimeout(reloadTimer);
-  if (active() && config && $('trAuto').checked && $('trFlow').checked && $('trProvider').value) {
-   reloadTimer = setTimeout(() => { if (active()) void refresh(false); },60000);
+  if (active() && !trafficSuspended && !zoomSettling && config && $('trAuto').checked && $('trFlow').checked && $('trProvider').value) {
+   reloadTimer = setTimeout(() => { reloadTimer=null;if (active()) void refresh(false); },60000);
   }
  }
+ /* MODIFICADO: mosaicos nativos, prioridad del encuadre y reutilización temporal. */
  function makeTrafficLayer(source) {
-  const stamp = generation;
-  const queue = [];
-  let running = 0, disposed = false;
-  const jobs = new Set();
+  const stamp=generation;
+  const queue=[],jobs=new Set();
+  let running=0,disposed=false;
+  const keyFor=coords=>owner+':'+source+':'+coords.z+':'+coords.x+':'+coords.y;
   function release(job) {
-   job.cancelled = true;
-   job.controller.abort();
-   if (job.url) URL.revokeObjectURL(job.url);
-   job.url = '';
+   job.cancelled=true;
+   job.controller?.abort();
+   if(job.url)URL.revokeObjectURL(job.url);
+   job.url='';
    jobs.delete(job);
   }
+  function enqueue(job,force=false) {
+   if(job.cancelled)return;
+   job.needsRefresh=true;
+   job.force=job.force||force;
+   if(!job.queued&&!job.running) {
+    job.queued=true;
+    queue.push(job);
+   }
+  }
+  function inView(coords) {
+   if(coords.z!==Math.round(map.getZoom()))return false;
+   const bounds=map.getPixelBounds(),limit=2**coords.z;
+   const firstX=Math.floor(bounds.min.x/256),lastX=Math.ceil(bounds.max.x/256)-1;
+   const firstY=Math.floor(bounds.min.y/256),lastY=Math.ceil(bounds.max.y/256)-1;
+   if(coords.y<firstY||coords.y>lastY)return false;
+   for(let x=firstX;x<=lastX;x++)if(((x%limit)+limit)%limit===coords.x)return true;
+   return false;
+  }
   function pump() {
-   /* MODIFICADO: no iniciar mosaicos de niveles intermedios durante el zoom. */
-   if (disposed || zoomSettling) return;
-   while (running < 6 && queue.length) {
-    const job = queue.shift();
-    if (job.cancelled) continue;
+   if(disposed||zoomSettling||trafficSuspended||!active())return;
+   const zoom=Math.round(map.getZoom()),bounds=map.getPixelBounds(),limit=2**zoom;
+   const centerX=((bounds.min.x+bounds.max.x)/512)%limit;
+   const centerY=(bounds.min.y+bounds.max.y)/512;
+   while(running<6) {
+    let selected=-1,distance=Infinity;
+    for(let index=0;index<queue.length;index++) {
+     const job=queue[index];
+     if(job.cancelled||job.running||job.coords.z!==zoom||!inView(job.coords))continue;
+     const dx=Math.min(Math.abs(job.coords.x-centerX),limit-Math.abs(job.coords.x-centerX));
+     const score=dx*dx+(job.coords.y-centerY)**2;
+     if(score<distance){selected=index;distance=score;}
+    }
+    if(selected<0)return;
+    const [job]=queue.splice(selected,1);
+    job.queued=false;
+    job.running=true;
     running++;
-    execute(job).finally(() => {running--;pump();});
+    execute(job).finally(()=>{
+     job.running=false;running--;
+     layer.reportView();
+     if(job.needsRefresh&&!job.cancelled)enqueue(job);
+     pump();
+    });
    }
   }
   async function execute(job) {
+   const controller=new AbortController();
+   job.controller=controller;
+   let url='';
    try {
-    if (!active() || stamp !== generation) { release(job); return; }
-    const result = await call('traffic-tile',{provider:source,z:job.coords.z,x:job.coords.x,y:job.coords.y},job.controller.signal);
-    if (job.cancelled || disposed || stamp !== generation) return;
-    if (!(result instanceof Blob) || !result.type.startsWith('image/png')) throw Error('La respuesta no contiene una imagen de tráfico válida.');
-    const image = document.createElement('img');
-    image.alt = '';
-    job.url = URL.createObjectURL(result);
-    image.onload = () => {
-     if (job.cancelled || disposed || stamp !== generation) return;
-     /* NUEVO: distinguir imágenes completas de solicitudes pendientes. */
-     job.finished=true;
-     loadedTiles++;
-     job.done(null,job.tile);
-     if (job.url) URL.revokeObjectURL(job.url);
-     job.url = '';
+    if(!active()||trafficSuspended||stamp!==generation)return;
+    const cached=job.force?null:readTrafficTile(keyFor(job.coords));
+    job.force=false;
+    const value=cached||{
+     blob:await call('traffic-tile',{provider:source,z:job.coords.z,x:job.coords.x,y:job.coords.y},controller.signal),
+     receivedAt:Date.now()
     };
-    image.onerror = () => {
-     if (job.cancelled || disposed) return;
-     loadFailures++;
-     lastLoadError = 'No se pudo mostrar una de las imágenes del proveedor.';
-     status(lastLoadError,'error');
-     job.done(Error(lastLoadError),job.tile);
-     release(job);
-    };
-    job.tile.append(image);
-    image.src = job.url;
-   } catch (error) {
-    if (job.cancelled || disposed || stamp !== generation) return;
-    loadFailures++;
-    lastLoadError = error.message || 'No se pudo obtener la capa de tráfico.';
-    status(lastLoadError,'error');
-    job.done(error,job.tile);
+    if(job.cancelled||disposed||controller.signal.aborted||stamp!==generation||!active())return;
+    if(!(value.blob instanceof Blob)||!value.blob.type.startsWith('image/png'))throw Error('La respuesta no contiene una imagen de tráfico válida.');
+    const image=document.createElement('img');
+    image.alt='';
+    url=URL.createObjectURL(value.blob);
+    job.url=url;
+    await new Promise((resolve,reject)=>{
+     const abort=()=>{image.onload=null;image.onerror=null;reject(new DOMException('Consulta pausada','AbortError'));};
+     controller.signal.addEventListener('abort',abort,{once:true});
+     image.onload=()=>{controller.signal.removeEventListener('abort',abort);resolve();};
+     image.onerror=()=>{controller.signal.removeEventListener('abort',abort);reject(Error('No se pudo mostrar una imagen del proveedor.'));};
+     image.src=url;
+     if(controller.signal.aborted)abort();
+    });
+    if(job.cancelled||disposed||controller.signal.aborted||stamp!==generation||!active())return;
+    if(!cached)rememberTrafficTile(keyFor(job.coords),value);
+    job.tile.replaceChildren(image);
+    job.tile.classList.add('leaflet-tile-loaded');
+    job.finished=true;
+    job.receivedAt=value.receivedAt;
+    job.lastError='';
+    job.needsRefresh=false;
+    if(!job.ready){job.ready=true;job.done(null,job.tile);}
+    layer.reportView();
+   } catch(error) {
+    if(job.cancelled||disposed||controller.signal.aborted||stamp!==generation||!active()||trafficSuspended)return;
+    if([401,403].includes(error.httpStatus)){pause();status(error.message,'error');return;}
+    job.needsRefresh=false;
+    job.lastError=error.message||'No se pudo consultar el tráfico.';
+    if(!job.ready){job.ready=true;job.done(error,job.tile);}
+    layer.reportView();
+   } finally {
+    if(url)URL.revokeObjectURL(url);
+    if(job.url===url)job.url='';
+    if(job.controller===controller)job.controller=null;
    }
   }
-  const TrafficLayer = L.GridLayer.extend({
-   /* NUEVO: reutilizar los elementos IMG cargados, sin nuevas descargas ni datos estimados. */
-   captureVisibleTiles() {
-    const snapshot=L.layerGroup();
-    const size=256;
-    const center=map.getCenter().lng;
+  const TrafficLayer=L.GridLayer.extend({
+   /* MODIFICADO: pausar solicitudes conserva los elementos y las imágenes recibidas. */
+   cancelPending() {
+    for(const job of jobs)if(job.running)job.controller?.abort();
+   },
+   resumeView(force=false) {
+    if(disposed)return;
+    if(map.getZoom()<10){status('Acerca el mapa para consultar el tráfico de las vías.');return;}
     for(const job of jobs) {
-     if(!job.finished||job.cancelled)continue;
-     const image=job.tile.firstElementChild;
-     if(!image||image.tagName!=='IMG')continue;
-     const northWest=map.unproject(L.point(job.coords.x*size,job.coords.y*size),job.coords.z);
-     const southEast=map.unproject(L.point((job.coords.x+1)*size,(job.coords.y+1)*size),job.coords.z);
-     const middle=(northWest.lng+southEast.lng)/2;
-     const offset=360*Math.round((center-middle)/360);
-     northWest.lng+=offset;southEast.lng+=offset;
-     L.imageOverlay(image,L.latLngBounds(northWest,southEast),{
-      opacity:Number($('trOpacity').value)/100,interactive:false,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]
-     }).addTo(snapshot);
+     if(!inView(job.coords)) {
+      if(job.running)job.controller?.abort();
+      continue;
+     }
+     if(force||!job.finished||Date.now()-job.receivedAt>=45000)enqueue(job,force);
     }
-    return snapshot.getLayers().length?snapshot:null;
+    this.reportView();
+    pump();
    },
-   /* NUEVO: cambiar de consulta solo cuando el encuadre visible tiene imágenes válidas. */
-   hasViewportTiles() {
-    const zoom=Math.round(map.getZoom()),limit=2**zoom;
-    const bounds=map.getPixelBounds(),size=256;
-    const firstX=Math.floor(bounds.min.x/size),lastX=Math.ceil(bounds.max.x/size)-1;
-    const firstY=Math.max(0,Math.floor(bounds.min.y/size)),lastY=Math.min(limit-1,Math.ceil(bounds.max.y/size)-1);
-    const ready=new Set();
-    for(const job of jobs)if(job.finished&&!job.cancelled&&job.coords.z===zoom)ready.add(job.coords.x+':'+job.coords.y);
-    if(firstY>lastY||!ready.size)return false;
+   reportView() {
+    if(disposed||stamp!==generation||!active()||zoomSettling||trafficSuspended)return;
+    const zoom=Math.round(map.getZoom()),limit=2**zoom,bounds=map.getPixelBounds();
+    const current=new Map();
+    for(const job of jobs)if(job.coords.z===zoom&&!job.cancelled)current.set(job.coords.x+':'+job.coords.y,job);
+    let expected=0,visible=0,pending=0,errors=0,oldest=Infinity,lastError='';
+    const firstX=Math.floor(bounds.min.x/256),lastX=Math.ceil(bounds.max.x/256)-1;
+    const firstY=Math.max(0,Math.floor(bounds.min.y/256)),lastY=Math.min(limit-1,Math.ceil(bounds.max.y/256)-1);
     for(let x=firstX;x<=lastX;x++)for(let y=firstY;y<=lastY;y++) {
-     const wrappedX=((x%limit)+limit)%limit;
-     if(!ready.has(wrappedX+':'+y))return false;
+     expected++;
+     const job=current.get((((x%limit)+limit)%limit)+':'+y);
+     if(job?.finished){visible++;oldest=Math.min(oldest,job.receivedAt);}
+     if(!job||job.needsRefresh||job.running)pending++;
+     if(job?.lastError){errors++;lastError=job.lastError;}
     }
-    return true;
+    loadedTiles=visible;loadFailures=errors;lastLoadError=lastError;
+    if(errors) {
+     status('Actualización incompleta. '+lastError+(visible?' Se conserva el tráfico ya recibido.':''),'error');
+    } else if(expected&&visible===expected&&!pending) {
+     status('Capa de '+providerNames[source]+' consultada. Comprueba la cobertura.','ready');
+     $('trConsulted').textContent='Consulta mostrada · '+new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',dateStyle:'short',timeStyle:'medium'}).format(new Date(oldest));
+    } else {
+     status('Actualizando tráfico de '+providerNames[source]+'…');
+    }
+    if(!reloadTimer)scheduleRefresh();
    },
-    /* NUEVO: cancelar las descargas del encuadre que el usuario abandona. */
-    cancelPending() {
-     for(const job of jobs)if(!job.finished)release(job);
-     queue.length=0;
-    },
-    createTile(coords,done) {
-    const tile = document.createElement('div');
-    tile.className = 'tr-map-tile';
-    /* MODIFICADO */ const job = {tile,coords,done,controller:new AbortController(),url:'',cancelled:false,finished:false};
+   createTile(coords,done) {
+    const tile=document.createElement('div');
+    tile.className='tr-map-tile';
+    const job={tile,coords,done,controller:null,url:'',cancelled:false,finished:false,ready:false,queued:false,running:false,force:false,needsRefresh:true,receivedAt:0,lastError:''};
     jobs.add(job);
-    tile.trJob = job;
-    queue.push(job);
+    tile.trJob=job;
+    enqueue(job);
     pump();
     return tile;
    },
    onRemove(target) {
-    disposed = true;
-    for (const job of jobs) release(job);
-    queue.length = 0;
+    disposed=true;
+    for(const job of jobs)release(job);
+    queue.length=0;
     L.GridLayer.prototype.onRemove.call(this,target);
    }
   });
-  const layer = new TrafficLayer({minZoom:10,maxZoom:19,tileSize:256,opacity:Number($('trOpacity').value)/100,/* MODIFICADO */ updateWhenIdle:true,updateWhenZooming:false,keepBuffer:3,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]});
-  /* NUEVO: identificar la fuente de la consulta retenida. */
+  const layer=new TrafficLayer({minZoom:10,maxZoom:19,tileSize:256,opacity:Number($('trOpacity').value)/100,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:3,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]});
   layer.trafficSource=source;
   layer.on('tileunload',event=>{if(event.tile.trJob)release(event.tile.trJob);});
-  layer.on('loading',()=>{
-   if (stamp !== generation) return;
-   loadedTiles = 0;
-   loadFailures = 0;
-   /* MODIFICADO */ status(previousTraffic?'Actualizando tráfico de '+providerNames[source]+'… Se conserva la consulta anterior.':'Consultando '+providerNames[source]+'…');
-  });
-  layer.on('load',()=>{
-   /* MODIFICADO */ if (stamp !== generation || !active() || zoomSettling) return;
-   /* MODIFICADO: mantener la última consulta si el nuevo encuadre está incompleto. */
-   const complete=layer.hasViewportTiles();
-   if(!complete) {
-    const message=lastLoadError||'No se completó el detalle de todas las vías visibles.';
-    status(previousTraffic?'Actualización incompleta. Se conserva la consulta anterior. '+message:(loadedTiles?'Carga parcial. ':'')+message,'error');
-    if(!previousTraffic)$('trConsulted').textContent=loadedTiles?'Consulta incompleta · revisa la cobertura':'Sin consulta de tráfico completada';
-   } else if (loadedTiles) {
-    /* NUEVO: intercambio sin vaciar el mapa entre consultas. */
-    layer.getContainer().style.visibility='';
-    if(previousTraffic) {
-     map.removeLayer(previousTraffic);
-     previousTraffic=null;previousTrafficSource='';
-    }
-    status('Capa de '+providerNames[source]+' consultada. Comprueba la cobertura.','ready');
-    $('trConsulted').textContent = 'Consulta completada · '+new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',dateStyle:'short',timeStyle:'medium'}).format(new Date());
-   }
-   scheduleRefresh();
-  });
+  layer.on('load',()=>layer.reportView());
   return layer;
  }
  async function setBase() {
@@ -12462,30 +12522,25 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   legend();
   return true;
  }
- function drawTraffic(preserve = false) {
-  /* MODIFICADO: conservar la consulta anterior solo dentro de la misma fuente y sesión. */
-  const selected=$('trProvider').value;
-  if(preserve&&map&&active()&&$('trFlow').checked&&config?.providers?.[selected]&&navigator.onLine&&map.getZoom()>=10&&
-     (!previousTraffic||previousTrafficSource===selected)&&(!traffic||traffic.trafficSource===selected)) {
-   retainTraffic();
-  } else {
-   dropTraffic();
-  }
+ /* MODIFICADO: actualizar la capa existente sin reconstruirla ni ampliar capturas de otro nivel. */
+ function drawTraffic(preserve=false) {
   legend();
-  if (!map || !active()) return;
-  if (!$('trFlow').checked) {status('Capa de tráfico desactivada.');return;}
-  const source = $('trProvider').value;
-  if (!source || !config?.providers?.[source]) {status('Configura al menos un proveedor de tráfico para consultar el flujo vehicular.');return;}
-  if (!navigator.onLine) {status('Sin conexión. No se puede consultar el tráfico actual.','error');return;}
-  if (map.getZoom()<10) {status('Acerca el mapa para consultar el tráfico de las vías.');return;}
-  /* MODIFICADO */
-  status(previousTraffic?'Actualizando tráfico de '+providerNames[source]+'… Se conserva la consulta anterior.':'Consultando '+providerNames[source]+'…');
-  traffic = makeTrafficLayer(source);
+  if(!map||!active())return;
+  if(!$('trFlow').checked){dropTraffic();status('Capa de tráfico desactivada.');return;}
+  const source=$('trProvider').value;
+  if(!source||!config?.providers?.[source]){dropTraffic();status('Configura al menos un proveedor de tráfico para consultar el flujo vehicular.');return;}
+  if(!navigator.onLine){status('Sin conexión. Se conserva la última consulta disponible.','error');return;}
+  if(map.getZoom()<10){status('Acerca el mapa para consultar el tráfico de las vías.');return;}
+  trafficSuspended=false;
+  if(traffic&&traffic.trafficSource===source) {
+   traffic.resumeView(preserve);
+   return;
+  }
+  dropTraffic();
+  status('Consultando '+providerNames[source]+'…');
+  traffic=makeTrafficLayer(source);
   traffic.addTo(map);
-  /* MODIFICADO: la consulta anterior se retira cuando el nuevo encuadre está completo. */
   traffic.getContainer()?.classList.add('tr-flow-tiles');
-  if(previousTraffic)traffic.getContainer().style.visibility='hidden';
-  scheduleRefresh();
  }
  async function refresh(recheck = true) {
   if (!active()) return;
@@ -12501,7 +12556,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    if (recheck) void setBase();
   } catch (error) {
    if (stamp===generation&&active()) {
-    dropTraffic();
+    /* MODIFICADO: conservar imágenes ante un error de red; retirar si se deniega el acceso. */
+    if([401,403].includes(error.httpStatus))pause();
     status(error.message || 'No se pudo consultar la disponibilidad de tráfico.','error');
    }
   } finally {
@@ -12515,11 +12571,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   if(!active())return;
   zoomSettling=true;
   clearTimeout(zoomTimer);
-  clearTimeout(reloadTimer);
+  /* MODIFICADO */ clearTimeout(reloadTimer);reloadTimer=null;
   $('trMap').dataset.trZooming='true';
   /* MODIFICADO: mantener los mosaicos recibidos en sus coordenadas durante el zoom. */
   retainTraffic();
-  status(previousTraffic?'Actualizando tráfico… Se conserva la consulta anterior.':'Actualizando tráfico…');
+  /* MODIFICADO */ status('Actualizando tráfico… Se conserva el detalle disponible.');
  }
  function finishTrafficZoom() {
   clearTimeout(zoomTimer);
@@ -12528,8 +12584,9 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    if(!active()||!map)return;
    zoomSettling=false;
    $('trMap').dataset.trZooming='false';
-   /* MODIFICADO: descargar el nivel final conservando la consulta visible. */
-   drawTraffic(true);
+   /* MODIFICADO: priorizar el nivel final y reutilizar los mosaicos recientes de ese nivel. */
+   if(traffic)traffic.resumeView();
+   else drawTraffic();
   },180);
  }
  function initialize() {
@@ -12543,6 +12600,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    map.on('dblclick',placePin);
    map.on('zoomstart',beginTrafficZoom);
    map.on('zoomend',finishTrafficZoom);
+   /* NUEVO: priorizar las vías del encuadre tras desplazar el mapa. */
+   map.on('moveend',()=>{if(active()&&!zoomSettling&&!trafficSuspended)traffic?.resumeView();});
   }
   requestAnimationFrame(()=>map.invalidateSize());
   void refresh();
@@ -12584,8 +12643,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   const value = Number($('trOpacity').value);
   $('trOpacityValue').textContent = value+' %';
   traffic?.setOpacity(value/100);
-  /* NUEVO: aplicar la misma opacidad a la consulta que permanece visible. */
-  previousTraffic?.eachLayer(layer=>layer.setOpacity(value/100));
+
  };
  $('trAuto').onchange = scheduleRefresh;
  $('trManzanillo').onclick = () => {if(active()&&map)map.setView([19.083,-104.300],13);};
@@ -12609,8 +12667,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  /* MODIFICADO: las acciones de asignación pertenecen a Administrar accesos. */
  new MutationObserver(()=>{
   if(active())initialize();
-  /* MODIFICADO: al salir se detienen únicamente las consultas del mapa. */
-  else {
+  /* MODIFICADO: una pestaña oculta no equivale a salir del módulo. */
+  else if(!allowed()||!page.classList.contains('active')) {
    /* NUEVO: cancelar el modo de colocación al salir del apartado. */
    pinMode(false);
    baseRequest++;pause();
@@ -12619,9 +12677,10 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  new MutationObserver(()=>{
   if(active()&&$('trBase').value==='auto')void setBase();
  }).observe(document.documentElement,{attributes:true,attributeFilter:['data-cctt-scheme']});
+ /* MODIFICADO: pausar consultas en segundo plano conservando la capa, y revalidar al regresar. */
  document.addEventListener('visibilitychange',()=>{
-  if(!active()){pause();return;}
-  initialize();
+  if(document.hidden){if(page.classList.contains('active')&&allowed())pause(true);return;}
+  if(page.classList.contains('active'))void resumeTraffic();
  });
  window.addEventListener('offline',()=>{if(active()){pause();status('Sin conexión. No se puede consultar el tráfico actual.','error');}});
  window.addEventListener('online',()=>{if(active())initialize();});
@@ -12652,7 +12711,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   /* MODIFICADO: recorrido actualizado con el pin compartible. */
   /* MODIFICADO: colocación directa, ventana del pin y carga agrupada al cambiar de escala. */
   /* MODIFICADO: continuidad visual y mensajes de la consulta anterior durante el zoom. */
-  version:'trafico-terrestre-6',
+  /* MODIFICADO: conservación entre pestañas y detalle reutilizable por nivel de zoom. */
+  version:'trafico-terrestre-7',
   purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
   steps:[
    {title:'Elige las capas',body:'Abre Capas, selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
@@ -12660,7 +12720,9 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    {title:'Consulta las vías',body:'Acerca el mapa para ver el flujo. Ajusta su opacidad para leer los nombres. Una vía sin líneas puede carecer de datos y no confirma circulación fluida.',controlId:'trOpacity'},
    {title:'Actualiza y revisa el estado',body:'Actualizar tráfico vuelve a consultar la disponibilidad y las capas. La actualización automática opera cada 60 segundos mientras este módulo está visible. Una carga parcial o un error impiden confirmar una consulta completa.',controlId:'trReload'},
    /* NUEVO */
-   {title:'Cambio de zoom',body:'Al cambiar el zoom, las imágenes ya consultadas permanecen visibles y ancladas a sus coordenadas mientras llega el nuevo detalle. El aviso Actualizando tráfico indica que todavía se muestra la consulta anterior. El cambio se completa cuando todas las imágenes del encuadre son válidas. Si hay un error, se conserva la consulta anterior con su hora y se indica que la actualización está incompleta. La cobertura depende del proveedor y el nivel de zoom admitido.'},
+   {title:'Cambio de zoom',body:'El mapa conserva su capa al cambiar de zoom y prioriza las vías del encuadre visible. Reutiliza imágenes recibidas durante un máximo de 45 segundos en esta sesión y fuente. El detalle de un nivel todavía no consultado depende de su descarga; puede verse ampliado temporalmente hasta recibir las imágenes de ese nivel. Actualizar tráfico fuerza una nueva consulta sin vaciar las imágenes ya mostradas.'},
+   /* NUEVO */
+   {title:'Cambiar de pestaña',body:'Al ocultar la pestaña se pausan las solicitudes de tráfico y se conserva el mapa y su última consulta. Al regresar se revalida el acceso y se renuevan las imágenes pendientes o vencidas. Cerrar sesión, cambiar de cuenta, salir del módulo o perder el permiso elimina la memoria temporal. La hora mostrada corresponde a las imágenes consultadas, no a la hora exacta de cada medición.'},
    {title:'Ubicación de la consulta',body:'Mi ubicación requiere autorización del navegador. Centrar Manzanillo regresa al encuadre inicial. La ubicación consultada no se guarda como registro operativo.',controlId:'trLocate'},
    /* NUEVO */
    {title:'Coloca una ubicación',body:'Haz clic, toca o pulsa dos veces una ubicación para colocar el pin directamente. También puedes usar Colocar pin. Arrástralo para ajustar el punto. El doble clic se reserva al pin; utiliza la rueda, los botones o dos dedos para cambiar el zoom. Se conserva un único pin temporal durante la sesión y el acceso autorizado.',controlId:'trPinToggle'},
