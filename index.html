@@ -6194,10 +6194,13 @@ body{background:#f7f0e8!important}
 
  // MODIFICADO: inactividad real de usuarios comunes; cada interacción reinicia el periodo configurado.
  const ONE_HOUR=180*60*1000;
+ /* NUEVO: la exención se basa exclusivamente en metadatos de autenticación. */
+ const inactivityAdmin=user=>String(user?.app_metadata?.role||'').trim().toLowerCase()==='admin';
  let active=false,admin=false,lastActivity=Date.now(),signingOut=false,activityUser='';
  const activityKey=()=>activityUser?'cctt:last-activity:'+activityUser:'';
  const activity=()=>{
-  if(!active||admin||signingOut)return;
+  /* MODIFICADO: registrar actividad mientras se valida un posible cierre. */
+  if(!active||admin)return;
   lastActivity=Date.now();
   try{const key=activityKey();if(key)sessionStorage.setItem(key,String(lastActivity))}catch(e){}
  };
@@ -6206,7 +6209,7 @@ body{background:#f7f0e8!important}
  window.addEventListener('cctt:session',e=>{
   const user=e.detail?.session?.user;
   if(!user)return;
-  active=true;admin=user.app_metadata?.role==='admin';signingOut=false;
+  /* MODIFICADO */ active=true;admin=inactivityAdmin(user);signingOut=false;
   if(activityUser!==user.id){activityUser=user.id;lastActivity=Date.now()}
   activity();
  });
@@ -6216,16 +6219,34 @@ body{background:#f7f0e8!important}
   let stamp=lastActivity;
   try{const stored=Number(sessionStorage.getItem(activityKey()));if(Number.isFinite(stored))stamp=Math.max(stamp,stored)}catch(e){}
   if(Date.now()-stamp<ONE_HOUR)return;
-  signingOut=true;active=false;
-  try{const client=window.ccttSupabaseClient;if(client){const {error}=await client.auth.signOut();if(error)throw error;}
+  /* MODIFICADO: confirmar cuenta, rol y actividad tras consultar la sesión vigente. */
+  signingOut=true;
+  const owner=activityUser;
+  try{
+   const client=window.ccttSupabaseClient;
+   if(!client?.auth)return;
+   const {data,error}=await client.auth.getSession();
+   if(error)throw error;
+   const user=data?.session?.user;
+   if(!active||owner!==activityUser||!user||user.id!==owner)return;
+   admin=inactivityAdmin(user);
+   if(admin||Date.now()-lastActivity<ONE_HOUR)return;
+   active=false;
+   const result=await client.auth.signOut({scope:'local'});
+   if(result.error)throw result.error;
+   if(activityUser&&activityUser!==owner)return;
    window.dispatchEvent(new Event('cctt:logout'));document.getElementById('ccttLoginGate')?.classList.add('show');
-  }catch(err){console.error('No fue posible finalizar automáticamente la sesión.',err);signingOut=false;active=true;lastActivity=Date.now()}
+   window.ccttShowSessionExit?.('inactive');
+  }catch(err){
+   console.error('No fue posible finalizar automáticamente la sesión.',err);
+   if(activityUser===owner){active=true;lastActivity=Date.now()}
+  }finally{signingOut=false}
  }
  setInterval(expire,15000);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)void expire()});
  window.addEventListener('focus',()=>void expire());
  window.ccttSupabaseClient?.auth?.getSession().then(({data})=>{
-  if(data?.session&&!active){const user=data.session.user;active=true;admin=user?.app_metadata?.role==='admin';activityUser=user?.id||'';lastActivity=Date.now();activity()}
+  if(data?.session&&!active){const user=data.session.user;active=true;/* MODIFICADO */ admin=inactivityAdmin(user);activityUser=user?.id||'';lastActivity=Date.now();activity()}
  }).catch(()=>{});
 
 })();
@@ -10038,7 +10059,7 @@ const BASE_LOCKED=['recuerdo','adminUsuarios','ccttTotp','recordatorioCumpleanos
 /* MODIFICADO: los cuatro módulos base conservan su protección inicial, ahora editable. */
 const NO_GROUP=new Set(['inicio','perfil']);
 const DEFAULT_GROUPS=[{id:'operativos',name:'Operativos'},{id:'administrativos',name:'Administrativos'},{id:'documentos',name:'Documentación'},{id:'herramientas',name:'Herramientas'}];
-const DEFAULT_ASSIGN={pis:'operativos',accidentes:'operativos',comparador:'operativos',controlCitas:'operativos',balance:'operativos',cumplimientoCitas:'operativos',consignas:'operativos',turnos:'operativos',inc35macro:'operativos',inc35copoma:'operativos',inc35vial:'operativos',sobrevueloDron:'operativos',atencionAmbulancia:'operativos',inc35bolet:'operativos',inc35redes:'operativos',inc35pisrep:'operativos',climaManzanillo:'operativos',buquesManzanillo:'operativos',conteos:'operativos',controlTerminales:'operativos',reporte:'administrativos',mensajes:'administrativos',avisosRecurrentes:'administrativos',comunicadosPdf:'documentos',bibliotecaOperativa:'documentos',documentacion:'documentos',diccionarioProcesos:'documentos',mapaUbicaciones:'herramientas',mapasCroquis:'herramientas',simuladorTransito:'herramientas',ruletaDecisiones:'herramientas',verificacionCitas:'herramientas',fallos:'herramientas'};
+const DEFAULT_ASSIGN={pis:'operativos',accidentes:'operativos',comparador:'operativos',controlCitas:'operativos',balance:'operativos',cumplimientoCitas:'operativos',consignas:'operativos',turnos:'operativos',inc35macro:'operativos',inc35copoma:'operativos',inc35vial:'operativos',sobrevueloDron:'operativos',atencionAmbulancia:'operativos',inc35bolet:'operativos',inc35redes:'operativos',inc35pisrep:'operativos',climaManzanillo:'operativos',buquesManzanillo:'operativos',conteos:'operativos',controlTerminales:'operativos',reporte:'administrativos',mensajes:'administrativos',avisosRecurrentes:'administrativos',comunicadosPdf:'documentos',bibliotecaOperativa:'documentos',documentacion:'documentos',diccionarioProcesos:'documentos',mapaUbicaciones:'herramientas',mapasCroquis:'herramientas',simuladorTransito:'herramientas',ruletaDecisiones:'herramientas',verificacionCitas:'herramientas',fallos:'herramientas',/* NUEVO */ aprendizajeModulos:'herramientas'};
 const $=id=>document.getElementById(id),sb=()=>window.ccttSupabaseClient;
 const defaultLayout=()=>({groups:DEFAULT_GROUPS.map(x=>({...x})),assign:{...DEFAULT_ASSIGN},order:{}});
 let session=null,admin=false,layout=defaultLayout(),locked=[...BASE_LOCKED],loading=false,writing=false,uiReady=false,rendering=false,timer=0,sourceUser='';
@@ -10151,7 +10172,7 @@ function drawDialog(){
  function moduleItem(id,label){
   const row=document.createElement('div');row.className='cctt-dnd-item';row.dataset.moduleId=id;
   const lockedItem=isLocked(id);if(lockedItem)row.dataset.locked='true';
-  if(!lockedItem){const handle=document.createElement('button');handle.type='button';handle.className='cctt-dnd-handle';handle.textContent='⠿';handle.title='Arrastrar '+label;row.append(handle);attachDrag(handle,'module',id)}
+  if(!lockedItem){const handle=document.createElement('button');handle.type='button';handle.className='cctt-dnd-handle';/* MODIFICADO */ handle.dataset.iconized='1';handle.innerHTML='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 5h10M7 12h10M7 19h10M4 5h1m-1 7h1m-1 7h1"/></svg>';handle.title='Arrastrar '+label;row.append(handle);attachDrag(handle,'module',id)}
   const txt=document.createElement('strong');txt.textContent=label;row.append(txt);
   /* NUEVO: protección global editable desde la propia fila, solo administrador. */if(admin){const action=makeButton(lockedItem?'Desproteger':'Proteger',async()=>{action.disabled=true;try{await savePolicy(lockedItem?locked.filter(x=>x!==id):[...locked,id]);drawDialog();const msg=$('ccttNavMessage');if(msg)msg.textContent=(lockedItem?'Módulo desprotegido: ':'Módulo protegido: ')+label;}catch(e){const msg=$('ccttNavMessage');if(msg){msg.textContent='No se confirmó el cambio: '+e.message;msg.className='cctt-layout-error';}action.disabled=false;}});action.classList.add('cctt-protection-action');action.dataset.iconized='1';action.insertAdjacentHTML('afterbegin','<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="'+(lockedItem?'M5 10h14v11H5zM9 10V6a4 4 0 0 1 7-3':'M6 10h12v11H6zM8 10V6a4 4 0 0 1 8 0v4')+'"/></svg>');row.append(action);}
   if(lockedItem){const mark=document.createElement('small');mark.className='cctt-layout-help';mark.textContent='Protegido';row.append(mark)}
@@ -10167,7 +10188,7 @@ function drawDialog(){
  for(const g of layout.groups){
   const section=document.createElement('div');section.className='cctt-dnd-section';section.dataset.sectionId=g.id;
   const head=document.createElement('div');head.className='cctt-dnd-section-head';
-  const handle=document.createElement('button');handle.type='button';handle.className='cctt-dnd-handle';handle.textContent='⠿';handle.title='Arrastrar apartado';head.append(handle);
+  const handle=document.createElement('button');handle.type='button';handle.className='cctt-dnd-handle';/* MODIFICADO */ handle.dataset.iconized='1';handle.innerHTML='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8h18v12H3zM3 8V4h7l3 4m-4 6h6"/></svg>';handle.title='Arrastrar apartado';head.append(handle);
   const inp=document.createElement('input');inp.value=g.name;inp.maxLength=45;inp.setAttribute('aria-label','Nombre del apartado');head.append(inp);
   head.append(makeButton('Renombrar',async()=>{if(!inp.value.trim())return;g.name=inp.value.trim().slice(0,45);drawDialog();await save()}));
   head.append(makeButton('Eliminar apartado',async()=>{layout.groups=layout.groups.filter(x=>x.id!==g.id);for(const [id,gid] of Object.entries(layout.assign))if(gid===g.id)delete layout.assign[id];delete layout.order[g.id];drawDialog();await save()},'bad'));
@@ -11193,15 +11214,32 @@ document.addEventListener('click',e=>{const b=e.target.closest('#ccttUsersList .
 (()=>{'use strict';let current=null,sessionKey='',generation=0,timer=null,pending=false,shown=new Set(),queue=[];/* NUEVO: mensaje abierto independiente de la cola. */let selectedMessage=null,confirmed=false;
 const client=()=>{const c=window.ccttSupabaseClient;return typeof c==='function'&&!c.functions?c():c};
 const dialog=document.createElement('dialog');dialog.id='ccttSessionNotice';const heading=document.createElement('h3'),body=document.createElement('p'),noticeStatus=document.createElement('p'),read=document.createElement('button');read.type='button';read.className='btn';read.textContent='Confirmar lectura';noticeStatus.setAttribute('role','status');dialog.append(heading,body,read,noticeStatus);document.body.append(dialog);
-async function call(action,data={}){const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);let r;try{r=await client().functions.invoke('cctt-admin',{body:{action,...data},signal:controller.signal})}finally{clearTimeout(timeout)};if(r.error){let info;try{info=await r.error.context?.json()}catch{}const e=Error(info?.error||r.error.message);e.closed=info?.sessionClosed===true||r.error.context?.status===401;throw e}if(r.data?.error)throw Error(r.data.error);return r.data}
+async function call(action,data={}){const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),10000);let r;try{r=await client().functions.invoke('cctt-admin',{body:{action,...data},signal:controller.signal})}finally{clearTimeout(timeout)};if(r.error){let info;try{info=await r.error.context?.json()}catch{}const e=Error(info?.error||r.error.message);/* MODIFICADO */ e.closed=info?.sessionClosed===true;e.unauthorized=r.error.context?.status===401;throw e}if(r.data?.error){const e=Error(r.data.error);e.closed=r.data.sessionClosed===true;throw e}return r.data}
 /* MODIFICADO: entregar todos los mensajes al centro acumulado sin abrir un modal automáticamente. */
 function present(){if(!current)return;const stamp=generation;for(const m of [...queue]){if(shown.has(m.id))continue;const key='admin:'+m.id;window.ccttAlerts?.push({key,owner:current.user.id,kind:'admin',title:m.kind==='warning'?'Advertencia de administración':'Mensaje de administración',body:m.body||'',open:()=>openMessage(m),received:()=>{void call('security-session-receipt',{messageId:m.id,receipt:'received'}).catch(()=>{})}});}}
 /* NUEVO: abrir confirma lectura; cerrar la ventana acumulada solo la descarta localmente. */
 function openMessage(m){if(!current)return;const stamp=generation;shown.add(m.id);queue=queue.filter(x=>x.id!==m.id);selectedMessage=m;confirmed=false;heading.textContent=m.kind==='warning'?'Advertencia de administración':'Mensaje de administración';body.textContent=m.body||'';noticeStatus.textContent='Confirmando lectura…';read.textContent='Confirmar lectura';read.disabled=true;if(!dialog.open)dialog.showModal();void call('security-session-receipt',{messageId:m.id,receipt:'read'}).then(()=>{if(stamp===generation&&selectedMessage?.id===m.id){confirmed=true;noticeStatus.textContent='Lectura confirmada.';read.textContent='Cerrar mensaje';}}).catch(e=>{if(stamp===generation&&selectedMessage?.id===m.id)noticeStatus.textContent='No se confirmó la lectura: '+e.message;}).finally(()=>{if(stamp===generation&&selectedMessage?.id===m.id)read.disabled=false;});}
 read.onclick=async()=>{if(!selectedMessage)return;if(confirmed){dialog.close();selectedMessage=null;return}const stamp=generation,m=selectedMessage;read.disabled=true;try{await call('security-session-receipt',{messageId:m.id,receipt:'read'});if(stamp!==generation||selectedMessage?.id!==m.id)return;confirmed=true;dialog.close();selectedMessage=null;}catch(e){if(stamp===generation)noticeStatus.textContent='No se confirmó la lectura: '+e.message}finally{if(stamp===generation)read.disabled=false}};
 dialog.addEventListener('cancel',()=>{selectedMessage=null;});
-async function end(){const stamp=generation;try{await client()?.auth.signOut({scope:'local'})}finally{if(stamp===generation){current=null;queue=[];if(dialog.open)dialog.close();window.dispatchEvent(new Event('cctt:logout'));if(typeof window.ccttSiteNotice==='function')window.ccttSiteNotice('Esta sesión fue cerrada por administración o dejó de estar vigente.');}}}
-async function pulse(){if(!current||pending)return;const stamp=generation;pending=true;try{const r=await call('security-session-pulse');if(stamp!==generation)return;if(r.closed){await end();return}for(const m of r.messages||[])if(!shown.has(m.id)&&!queue.some(x=>x.id===m.id))queue.push(m);/* NUEVO */window.ccttCharacterMessages?.receive(r.characterMessages||[]);present()}catch(e){if(stamp===generation&&e.closed)await end();/* Una falla de red no se presenta como cierre confirmado ni modifica el control de IP. */}finally{pending=false;clearTimeout(timer);if(current)timer=setTimeout(pulse,document.hidden?60000:30000)}}
+/* MODIFICADO: diferenciar cierre confirmado y sesión sin vigencia. */
+async function end(reason='administrative'){
+ const stamp=generation;
+ try{if(reason==='administrative')await client()?.auth.signOut({scope:'local'})}
+ finally{if(stamp===generation){
+  current=null;queue=[];if(dialog.open)dialog.close();
+  window.dispatchEvent(new Event('cctt:logout'));
+  document.getElementById('ccttLoginGate')?.classList.add('show');
+  window.ccttShowSessionExit?.(reason);
+ }}
+}
+/* NUEVO: un 401 del sondeo requiere comprobar si Auth conserva una sesión. */
+async function checkExpired(stamp){
+ try{
+  const result=await client()?.auth.getSession();
+  if(stamp===generation&&result&&!result.error&&!result.data?.session)await end('expired');
+ }catch(error){console.warn('No se pudo confirmar la vigencia de la sesión.',error)}
+}
+async function pulse(){if(!current||pending)return;const stamp=generation;pending=true;try{const r=await call('security-session-pulse');if(stamp!==generation)return;if(r.closed){await end();return}for(const m of r.messages||[])if(!shown.has(m.id)&&!queue.some(x=>x.id===m.id))queue.push(m);/* NUEVO */window.ccttCharacterMessages?.receive(r.characterMessages||[]);present()}catch(e){/* MODIFICADO */ if(stamp===generation){if(e.closed)await end();else if(e.unauthorized)await checkExpired(stamp);}/* Una falla de red no se presenta como cierre confirmado ni modifica el control de IP. */}finally{pending=false;clearTimeout(timer);if(current)timer=setTimeout(pulse,document.hidden?60000:30000)}}
 function session(value){const id=value?.user?.id||'';let sid='';try{const part=value.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');sid=JSON.parse(atob(part.padEnd(Math.ceil(part.length/4)*4,'='))).session_id||''}catch{}const nextKey=id+':'+sid,oldKey=sessionKey;current=value||null;/* NUEVO: sincronizar el destinatario del centro con la sesión verificada. */window.ccttAlerts?.session(value);sessionKey=nextKey;if(nextKey===oldKey&&id)return;generation++;shown.clear();queue=[];selectedMessage=null;confirmed=false;if(dialog.open)dialog.close();clearTimeout(timer);if(current)void pulse()}
 window.addEventListener('cctt:session',e=>session(e.detail?.session));window.addEventListener('cctt:logout',()=>session(null));document.addEventListener('visibilitychange',()=>{if(!document.hidden&&current){clearTimeout(timer);void pulse()}});
 // Notificación de cierre voluntario: el servidor usa solo el usuario y session_id del JWT verificado.
@@ -11387,6 +11425,12 @@ function boot(){const page=el('section');page.id='page-'+ID;page.className='page
  /* NUEVO: montar interacción y SVG únicos antes de habilitar los controles. */rpgBoot(page);
  $('learnSearch').oninput=e=>{query=e.target.value.trim().toLocaleLowerCase('es');renderList()};$('learnPrev').onclick=()=>{if(!allowed(current))return;position--;remember();draw()};$('learnNext').onclick=()=>{if(!allowed(current))return;const guide=lesson(current);if(position===guide.steps.length-1){remember(true);/* NUEVO: señalamiento al completar el recorrido. */rpgTalk();$('learnBody').textContent='Recorrido completado. Puedes reiniciarlo o abrir el módulo para practicar con tus permisos.';renderList()}else{position++;remember();draw()}};$('learnRestart').onclick=()=>{position=0;remember();draw()};$('learnOpen').onclick=()=>{if(allowed(current))go(current)};
  home();new MutationObserver(schedule).observe(document.querySelector('.sidebar'),{childList:true,subtree:true});new MutationObserver(()=>{home();schedule()}).observe($('moduleCards'),{childList:true});new MutationObserver(schedule).observe(document.documentElement,{attributes:true,attributeFilter:['class']});new MutationObserver(schedule).observe(page,{attributes:true,attributeFilter:['class']});
+ /* NUEVO: mantener vigente la guía visible cuando cambian los controles del módulo consultado. */
+ new MutationObserver(records=>{
+  if(!page.classList.contains('active')||!current||!allowed(current))return;
+  const source=$('page-'+current);
+  if(source&&records.some(record=>source.contains(record.target)))schedule();
+ }).observe(document.querySelector('.content'),{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','disabled','aria-hidden','aria-disabled','open']});
  // Cambios de controles/privilegios: reconstruir solo cuando se entra al aprendizaje; no sondea APIs.
  document.addEventListener('click',e=>{if(e.target.closest?.('[data-page="'+ID+'"]'))schedule()});refresh();}
 window.addEventListener('cctt:session',e=>{const next=e.detail?.session?.user?.id||'';if(next!==owner){owner=next;current='';position=0;query='';progress={};loadProgress();if($('learnSearch'))$('learnSearch').value=''}schedule()});
@@ -11458,6 +11502,20 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
 }
 #page-generadorCorreos .correo-actions {display:flex; flex-wrap:wrap; gap:.6rem; margin:.65rem 0;}
 #page-generadorCorreos button svg, #correoHomeCard button svg {width:1.15em;height:1.15em;vertical-align:middle;margin-right:.35em;}
+/* NUEVO: campos de plantilla y aviso de sesión con colores del tema activo. */
+#correoPlantillas{margin:.8rem 0;padding:.85rem;border:1px solid var(--cctt-theme-line,var(--line));border-radius:10px;color:var(--cctt-theme-text,var(--text));background:var(--cctt-theme-card,var(--card))}
+#correoPlantillas select,#correoPlantillas input{width:100%;padding:.65rem;border-radius:8px;border:1px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))}
+#correoPlantillas :is(select,input,button):focus-visible,#ccttSessionExit button:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+#correoEditorPlantilla[hidden]{display:none!important}
+#correoEstadoPlantilla,#correoPendiente{color:var(--cctt-theme-text,var(--text))}
+#ccttSessionExit{box-sizing:border-box;width:min(470px,calc(100% - 32px));max-height:calc(100% - 32px);padding:24px;border-radius:16px;border:1px solid var(--cctt-theme-line,var(--line,#ddd));background:var(--cctt-theme-card,var(--card,#fff));color:var(--cctt-theme-text,var(--text,#182236));box-shadow:0 20px 64px #0005}
+#ccttSessionExit::backdrop{background:#050b19a6}
+#ccttSessionExit h2{margin:.6rem 0;color:inherit}
+#ccttSessionExit p{line-height:1.5;color:inherit}
+#ccttSessionExit svg{width:26px;height:26px;vertical-align:middle;flex:none}
+#ccttSessionExit button{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:9px;border:1px solid var(--cctt-theme-line,var(--line,#777));background:var(--cctt-theme-input,var(--card,#fff));color:var(--cctt-theme-inputtext,var(--text,#182236))}
+#ccttSessionExit button svg{width:18px;height:18px}
+html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6ff);background:var(--cctt-theme-card,#162338)}
 /* NUEVO: señal de inserción con el color de texto del tema. */
 #ccttDocFileList [data-doc-order] {cursor:grab;}
 #ccttDocFileList .doc-order-grip {display:inline-flex;flex:none;align-items:center;gap:.35rem;font-weight:700;}
@@ -11466,6 +11524,32 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
 #ccttDocFileList [data-doc-drop="before"] {box-shadow:inset 0 3px currentColor;}
 #ccttDocFileList [data-doc-drop="after"] {box-shadow:inset 0 -3px currentColor;}
 </style>
+<!-- NUEVO: aviso accesible y diferenciado de cierre de sesión. -->
+<script id="ccttSessionExitNotice">
+(() => {
+ const svg = path => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+path+'"/></svg>';
+ const details = {
+  inactive:['Sesión cerrada por inactividad','Transcurrieron 180 minutos sin actividad. Inicia sesión de nuevo para continuar.','M4 3h16m-16 18h16M7 3v4l5 5 5-5V3M7 21v-4l5-5 5 5v4'],
+  administrative:['Sesión cerrada por administración','Se confirmó el cierre de esta sesión desde el panel de administración. Inicia sesión de nuevo para continuar.','M12 2l8 4v6c0 4-4 8-8 10-4-2-8-6-8-10V6zM8 12h8'],
+  expired:['Sesión no vigente','La sesión ya no está disponible. Inicia sesión de nuevo para recuperar el acceso.','M5 3h14v18H5zM9 8l6 6m0-6-6 6M9 17h6']
+ };
+ const dialog=document.createElement('dialog');
+ dialog.id='ccttSessionExit';
+ dialog.setAttribute('aria-labelledby','ccttSessionExitTitle');
+ dialog.setAttribute('aria-describedby','ccttSessionExitDetail');
+ dialog.innerHTML='<div></div><h2 id="ccttSessionExitTitle"></h2><p id="ccttSessionExitDetail"></p><button type="button" data-iconized="1" autofocus>'+svg('M14 4h6v16h-6M3 12h12m-4-4 4 4-4 4')+'Volver al acceso</button>';
+ document.body.append(dialog);
+ dialog.querySelector('button').onclick=()=>dialog.close();
+ dialog.addEventListener('close',()=>document.getElementById('ccttLoginEmail')?.focus());
+ window.ccttShowSessionExit=reason=>{
+  const [title,body,path]=details[reason]||details.expired;
+  dialog.firstElementChild.innerHTML=svg(path);
+  dialog.querySelector('h2').textContent=title;
+  dialog.querySelector('p').textContent=body;
+  if(!dialog.open)dialog.showModal();
+ };
+})();
+</script>
 <script id="ccttCorreoDrafts">
 /* NUEVO */
 (() => {
@@ -11494,11 +11578,27 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
     <div class="card">
       <h2>Generador de correos</h2>
       <p class="muted">Describe qué deseas solicitar. Puedes añadir contexto para el borrador largo.</p>
+      <!-- NUEVO: plantillas de introducción de la cuenta activa. -->
+      <div id="correoPlantillas" class="field">
+        <label for="correoPlantilla">Plantilla de introducción</label>
+        <select id="correoPlantilla"><option value="">Introducción institucional</option></select>
+        <div class="correo-actions">
+          <button class="btn" type="button" id="correoNuevaPlantilla">${icon('M4 5h10v14H4zM17 10h6m-3-3v6')}Nueva plantilla</button>
+        </div>
+        <div id="correoEditorPlantilla" hidden>
+          <div class="field"><label for="correoNombrePlantilla">Nombre de la plantilla</label><input id="correoNombrePlantilla" maxlength="80"></div>
+          <div class="field"><label for="correoInicioPlantilla">Texto de introducción</label><textarea id="correoInicioPlantilla" maxlength="2000"></textarea></div>
+          <div class="correo-actions">
+            <button class="btn" type="button" id="correoGuardarPlantilla">${icon('M4 3h11l5 5v13H4zM8 3v6h7M8 21v-8h8v8')}Guardar plantilla</button>
+          </div>
+        </div>
+        <p id="correoEstadoPlantilla" class="muted" role="status"></p>
+      </div>
       <div class="field"><label for="correoIdea">Solicitud</label><textarea id="correoIdea" maxlength="5000" placeholder="Escribe qué deseas solicitar"></textarea></div>
       <div class="field"><label for="correoContexto">Contexto para la versión larga (opcional)</label><textarea id="correoContexto" maxlength="5000" placeholder="Añade solo antecedentes o datos confirmados"></textarea></div>
       <div class="correo-actions">
         <button class="btn primary" type="button" id="correoCorto">${icon('M3 5h18M3 10h12M3 15h7M3 20h4')}Generar opción corta</button>
-        <button class="btn primary" type="button" id="correoLargo">${icon('M6 2h9l4 4v16H6zM14 2v6h5M9 12h7M9 16h7')}Generar opción larga</button>
+        <button class="btn primary" type="button" id="correoLargo"><!-- MODIFICADO -->${icon('M3 4h12M3 9h9M3 14h7M3 19h10M19 10v11m-4-4 4 4 4-4')}Generar opción larga</button>
       </div>
       <div class="field"><label for="correoBorrador">Borrador editable</label><textarea id="correoBorrador" rows="10"></textarea></div>
       <div class="correo-actions"><button class="btn" type="button" id="correoCopiar">${icon('M8 8h12v13H8zM16 8V3H3v13h5')}Copiar borrador</button>
@@ -11518,13 +11618,88 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
   const status = get('correoEstado');
   const formal = text => typeof ccttSentenceMX === 'function' ? ccttSentenceMX(text) : text;
   /* NUEVO: patrones de los ejemplos institucionales del TXT. Los datos proceden de la captura. */
+  /* NUEVO: datos locales por usuario, cargados únicamente para la sesión activa. */
+  const selector = get('correoPlantilla'), editor = get('correoEditorPlantilla');
+  const templateName = get('correoNombrePlantilla'), introduction = get('correoInicioPlantilla');
+  const templateStatus = get('correoEstadoPlantilla');
+  let owner = '', templates = [];
+  const storageKey = () => 'cctt-correo-intros-v1:' + owner;
+  const selectedTemplate = () => selector.value === '' ? null : templates[Number(selector.value)];
+  function showTemplate(template) {
+    editor.hidden = !template;
+    templateName.value = template?.name || '';
+    introduction.value = template?.intro || '';
+    updatePending();
+  }
+  function renderTemplates(selection = '') {
+    selector.replaceChildren(new Option('Introducción institucional', ''));
+    templates.forEach((template, index) => selector.add(new Option(template.name, String(index))));
+    selector.value = selection;
+    showTemplate(selectedTemplate());
+  }
+  function setTemplateOwner(id) {
+    if (id === owner) return;
+    owner = id;
+    templates = [];
+    templateStatus.textContent = '';
+    if (owner) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey()) || '[]');
+        if (!Array.isArray(saved) || !saved.every(item => item && typeof item.name === 'string' && typeof item.intro === 'string')) throw Error();
+        templates = saved;
+      } catch {
+        templateStatus.textContent = 'No se pudieron leer las plantillas guardadas.';
+      }
+    }
+    renderTemplates();
+  }
+  selector.onchange = () => {templateStatus.textContent = '';showTemplate(selectedTemplate());};
+  get('correoNuevaPlantilla').onclick = () => {
+    if (!allowed() || !owner) return;
+    selector.value = '';
+    templateStatus.textContent = '';
+    showTemplate({});
+    templateName.focus();
+  };
+  get('correoGuardarPlantilla').onclick = () => {
+    if (!allowed() || !owner || editor.hidden) return;
+    const name = templateName.value.trim(), intro = introduction.value.trim();
+    if (!name || !intro) {
+      templateStatus.textContent = 'Completa el nombre y el texto de introducción.';
+      (name ? introduction : templateName).focus();
+      return;
+    }
+    const index = selector.value === '' ? templates.length : Number(selector.value);
+    const next = [...templates];
+    next[index] = {name, intro};
+    try {
+      const existing = JSON.parse(localStorage.getItem(storageKey()) || '[]');
+      if (JSON.stringify(existing) !== JSON.stringify(templates)) {
+        templateStatus.textContent = 'Las plantillas cambiaron en otra pestaña o no se pudieron leer. Recarga la página antes de guardar.';
+        return;
+      }
+      localStorage.setItem(storageKey(), JSON.stringify(next));
+    } catch {
+      templateStatus.textContent = 'No se pudo guardar la plantilla en este navegador.';
+      return;
+    }
+    templates = next;
+    renderTemplates(String(index));
+    templateStatus.textContent = 'Plantilla guardada en este navegador.';
+  };
+  window.addEventListener('cctt:session', event => setTemplateOwner(event.detail?.session?.user?.id || ''));
+  let templateSessionChanged = false;
+  for (const event of ['cctt:session','cctt:logout']) window.addEventListener(event, () => {templateSessionChanged = true;});
+  window.ccttSupabaseClient?.auth?.getSession().then(({data}) => {
+    if (!templateSessionChanged && allowed()) setTemplateOwner(data?.session?.user?.id || '');
+  }).catch(() => {});
   const pending = get('correoPendiente');
   function updatePending() {
-    pending.hidden = ![idea.value, context.value, draft.value].some(
+    pending.hidden = !/* MODIFICADO */ [idea.value, context.value, draft.value, introduction.value].some(
       text => /emparejamiento\s+por\s+confirmar/iu.test(text)
     );
   }
-  [idea, context, draft].forEach(field => field.addEventListener('input', updatePending));
+  /* MODIFICADO */ [idea, context, draft, introduction].forEach(field => field.addEventListener('input', updatePending));
   const generate = long => {
     if (!allowed()) return;
     const request = idea.value.trim();
@@ -11541,7 +11716,10 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
     const notice = request.match(/^(?:(?:quiero|deseo)\s+)?(?:informar|informo|informamos|comunicar|comunico|comunicamos)\s+([\s\S]+)$/iu);
     const update = request.match(/^(?:actualización de estatus|actualización del estatus|actualización operativa)\s*:\s*([\s\S]+)$/iu);
     const informative = !!(notice || update || /^(?:informa|comunica)\b/iu.test(institutional?.[1] || ''));
-    const paragraphs = [institutional ? prefix + ' ' + institutional[1]
+    /* MODIFICADO: una introducción elegida se aplica a las dos extensiones. */
+    const template = selectedTemplate();
+    const paragraphs = [template ? template.intro + '\n\n' + request
+      : institutional ? prefix + ' ' + institutional[1]
       : update ? prefix + ' comunica la siguiente actualización de estatus:\n\n' + update[1]
       : notice ? prefix + ' informa ' + notice[1]
       : direct ? prefix + ' solicita ' + direct[1]
@@ -11604,18 +11782,22 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
   window.addEventListener('cctt:access-updated', sync);
   window.addEventListener('cctt:logout', () => {
     idea.value = context.value = draft.value = status.textContent = '';
+    /* NUEVO */ setTemplateOwner('');
     /* NUEVO */ updatePending();
   });
   const cards = get('moduleCards');
   if (cards) new MutationObserver(sync).observe(cards, {childList:true});
   sync();
   window.ccttLearning?.register(id, {
-    /* MODIFICADO */ version:'2',
+    /* MODIFICADO */ version:'3-plantillas',
     purpose:'Preparar borradores institucionales a partir de tu solicitud. El administrador asigna el acceso al módulo.',
     steps:[
       /* MODIFICADO */
       {title:'Describe la solicitud',body:'Usa Solicitar para una petición, Informar para un aviso o Actualización de estatus: para un cambio operativo. Añade contexto confirmado para la versión larga.',controlId:'correoIdea'},
-      {title:'Elige la extensión',body:'Genera una opción corta o larga. Las dos usan el inicio institucional y la larga añade el contexto que captures.',controlId:'correoLargo'},
+      /* NUEVO */
+      {title:'Crea una plantilla de introducción',body:'Selecciona Nueva plantilla, escribe el nombre y la introducción desde cero y guarda. Para editar, selecciona la plantilla guardada, cambia sus datos y vuelve a guardar. Solo la cuenta activa puede usar sus plantillas en este navegador.',controlId:'correoNuevaPlantilla'},
+      /* MODIFICADO */
+      {title:'Elige la extensión',body:'Genera una opción corta o larga con la plantilla guardada que selecciones. La larga añade el contexto confirmado que captures. Para volver al inicio predeterminado, elige Introducción institucional.',controlId:'correoLargo'},
       {title:'Revisa y copia',body:'Ajusta el borrador antes de copiarlo a tu correo. Si aparece un emparejamiento por confirmar, revisa el pendiente.',controlId:'correoCopiar'},
       /* NUEVO */
       {title:'Inicia otro borrador',body:'Limpiar vacía la solicitud, el contexto y el borrador actual.',controlId:'correoLimpiar'}
