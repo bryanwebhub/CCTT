@@ -11847,6 +11847,20 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
 #page-traficoTerrestre .tr-legend [data-flow=blocked]{background:#c1272d}
 #page-traficoTerrestre .leaflet-control-zoom a,#page-traficoTerrestre .leaflet-control-attribution{background:var(--tr-card);color:var(--tr-ink);border-color:var(--tr-line)}
 #page-traficoTerrestre .leaflet-control-attribution a{color:var(--cctt-theme-accent,var(--blue))}
+/* NUEVO: punto compartible con contraste en ambos modos. */
+#page-traficoTerrestre .tr-pin-panel{margin:0 0 14px;padding:14px;border:1px solid var(--tr-line);border-radius:12px;background:var(--tr-card);color:var(--tr-ink)}
+#page-traficoTerrestre .tr-pin-panel label{display:grid;gap:7px;font-size:13px;font-weight:650;margin:8px 0}
+#page-traficoTerrestre .tr-pin-panel input{box-sizing:border-box;width:100%;min-width:0;padding:9px 10px;border:1px solid var(--tr-line);border-radius:8px;background:var(--tr-input);color:var(--cctt-theme-inputtext,var(--tr-ink))}
+#page-traficoTerrestre .tr-pin-panel .tr-actions{margin-top:10px}
+#page-traficoTerrestre .tr-pin-panel a.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;color:var(--tr-ink);background:var(--tr-input);border:1px solid var(--tr-line)}
+#page-traficoTerrestre .tr-pin-panel a:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:3px}
+#trPinToggle[aria-pressed="true"]{outline:2px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
+#trMap[data-pin-mode="on"]{cursor:crosshair}
+#page-traficoTerrestre .tr-pin-marker{background:transparent;border:0}
+#page-traficoTerrestre .tr-pin-marker svg{display:block;overflow:visible;filter:drop-shadow(0 2px 3px #0008)}
+#page-traficoTerrestre .tr-pin-marker path{fill:var(--cctt-theme-accent,var(--blue));stroke:#fff;stroke-width:1.6}
+#page-traficoTerrestre .tr-pin-marker circle{fill:var(--tr-card);stroke:var(--tr-ink);stroke-width:1}
+#page-traficoTerrestre .tr-pin-tooltip{color:var(--tr-ink);background:var(--tr-card);border-color:var(--tr-line)}
 /* MODIFICADO: el formulario de permisos se administra en Administrar accesos. */
 #page-traficoTerrestre .tr-map-tile{width:256px;height:256px}
 #page-traficoTerrestre .tr-map-tile img{display:block;width:100%;height:100%}
@@ -11867,7 +11881,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   refresh:'M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1',
   location:'M12 2v4m0 12v4M2 12h4m12 0h4M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10',
   /* MODIFICADO: iconos correspondientes a los controles del mapa. */
-  focus:'M4 9V4h5m6 0h5v5m0 6v5h-5M9 20H4v-5M8 12h8m-4-4v8'
+  focus:'M4 9V4h5m6 0h5v5m0 6v5h-5M9 20H4v-5M8 12h8m-4-4v8',
+  /* NUEVO: SVG propios para colocar, copiar y abrir el punto. */
+  pin:'M12 22S5 15 5 9a7 7 0 1 1 14 0c0 6-7 13-7 13M9 9h6m-3-3v6',
+  link:'M9 7H7a5 5 0 0 0 0 10h3m4-10h3a5 5 0 0 1 0 10h-2M8 12h8',
+  google:'M14 3h7v7m0-7L10 14M10 4H4v16h16v-6'
  };
  const icon = key => '<svg class="tr-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+paths[key]+'"/></svg>';
  const button = (id, label, key, primary = false) => '<button type="button" class="btn'+(primary?' primary':'')+'" id="'+id+'" data-iconized="1" data-cctt-icon-fixed="true">'+icon(key)+'<span>'+label+'</span></button>';
@@ -11882,6 +11900,20 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    ${button('trReload','Actualizar tráfico','refresh',true)}
    ${button('trLocate','Mi ubicación','location')}
    ${button('trManzanillo','Centrar Manzanillo','focus')}
+   <!-- NUEVO -->
+   ${button('trPinToggle','Colocar pin','pin')}
+  </div>
+ </div>
+ <!-- NUEVO: enlace del punto seleccionado, disponible para compartir fuera del sitio. -->
+ <p class="tr-help" id="trPinStatus" role="status" aria-live="polite"></p>
+ <div class="tr-pin-panel" id="trPinPanel" hidden>
+  <strong>Ubicación para compartir</strong>
+  <p class="tr-help">Arrastra el pin para ajustar el punto. Quien reciba el enlace podrá abrir esa ubicación en Google Maps.</p>
+  <output id="trPinCoordinates"></output>
+  <label for="trPinLink">Enlace de Google Maps<input type="url" id="trPinLink" readonly spellcheck="false"></label>
+  <div class="tr-actions">
+   ${button('trPinCopy','Copiar enlace','link')}
+   <a class="btn" id="trPinOpen" target="_blank" rel="noopener noreferrer" data-iconized="1" data-cctt-icon-fixed="true">${icon('google')}<span>Abrir en Google Maps</span></a>
   </div>
  </div>
  <div class="tr-layout" id="trLayout">
@@ -11929,6 +11961,83 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  const allowed = () => window.ccttCanAccess?.(ID) === true;
  const active = () => allowed() && page.classList.contains('active') && !document.hidden;
  let map = null, base = null, traffic = null, locationMarker = null;
+ /* NUEVO: un pin temporal por sesión, separado de Mi ubicación. */
+ let pinMarker = null, pinPlacing = false;
+ function pinMode(enabled) {
+  pinPlacing = enabled;
+  $('trPinToggle').setAttribute('aria-pressed',String(enabled));
+  $('trMap').dataset.pinMode = enabled ? 'on' : 'off';
+ }
+ function updatePinLink(point) {
+  const lat = point.lat, lng = point.lng;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat)>90 || Math.abs(lng)>180) return false;
+  const coordinates = String(lat)+','+String(lng);
+  const link = new URL('https://www.google.com/maps/search/');
+  link.searchParams.set('api','1');
+  link.searchParams.set('query',coordinates);
+  $('trPinCoordinates').textContent = 'Coordenadas · '+coordinates;
+  $('trPinLink').value = link.href;
+  $('trPinOpen').href = link.href;
+  $('trPinPanel').hidden = false;
+  $('trPinStatus').textContent = 'Ubicación seleccionada. Puedes arrastrar el pin o copiar su enlace.';
+  return true;
+ }
+ function clearPin() {
+  if (pinMarker && map) map.removeLayer(pinMarker);
+  pinMarker = null;
+  pinMode(false);
+  $('trPinPanel').hidden = true;
+  $('trPinLink').value = '';
+  $('trPinOpen').removeAttribute('href');
+  $('trPinCoordinates').textContent = '';
+  $('trPinStatus').textContent = '';
+ }
+ function placePin(event) {
+  if (!active() || !pinPlacing || !map) return;
+  const point = L.latLng(event.latlng).wrap();
+  if (!updatePinLink(point)) return;
+  if (pinMarker) {
+   pinMarker.setLatLng(point);
+  } else {
+   const pinIcon = L.divIcon({
+    className:'tr-pin-marker',
+    html:'<svg width="34" height="44" viewBox="0 0 24 30" aria-hidden="true"><path d="M12 28S2 18 2 11a10 10 0 0 1 20 0c0 7-10 17-10 17Z"/><circle cx="12" cy="11" r="3.2"/></svg>',
+    iconSize:[34,44],iconAnchor:[17,42],tooltipAnchor:[0,-38]
+   });
+   pinMarker = L.marker(point,{icon:pinIcon,draggable:true,autoPan:true,keyboard:true,title:'Ubicación para compartir',alt:'Pin de ubicación para compartir'}).addTo(map);
+   pinMarker.bindTooltip('Arrastra para ajustar la ubicación',{direction:'top',className:'tr-pin-tooltip'});
+   pinMarker.on('dragend',()=>{
+    if (!active()) return;
+    const position=pinMarker.getLatLng().wrap();
+    pinMarker.setLatLng(position);
+    updatePinLink(position);
+   });
+  }
+  pinMode(false);
+ }
+ $('trPinToggle').setAttribute('aria-pressed','false');
+ $('trPinToggle').setAttribute('aria-controls','trMap trPinPanel');
+ $('trPinToggle').onclick=()=>{
+  if (!active() || !map) return;
+  pinMode(!pinPlacing);
+  $('trPinStatus').textContent=pinPlacing?'Haz clic o toca el mapa para colocar el pin.':'Colocación de pin cancelada.';
+ };
+ $('trPinCopy').onclick=async()=>{
+  if (!active() || !pinMarker || !$('trPinLink').value) return;
+  const link=$('trPinLink').value;
+  try {
+   await navigator.clipboard.writeText(link);
+   if(active()&&$('trPinLink').value===link)$('trPinStatus').textContent='Enlace de Google Maps copiado.';
+  } catch {
+   if(!active()||$('trPinLink').value!==link)return;
+   $('trPinLink').focus();
+   $('trPinLink').select();
+   $('trPinStatus').textContent='Selecciona y copia el enlace con el teclado o el menú del dispositivo.';
+  }
+ };
+ $('trPinOpen').onclick=event=>{
+  if(!active()||!pinMarker||!$('trPinLink').value)event.preventDefault();
+ };
  let owner = '', config = null, starting = false, pendingReload = false;
  let generation = 0, baseRequest = 0, reloadTimer = null;
  let lastLoadError = '', loadFailures = 0, loadedTiles = 0, baseError = '';
@@ -12242,6 +12351,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   if (!window.L) {status('No se cargó el motor de mapas. Comprueba la conexión y recarga.','error');return;}
   if (!map) {
    map = L.map('trMap',{zoomControl:true,minZoom:5,maxZoom:19}).setView([19.083,-104.300],13);
+   /* NUEVO: selección de coordenadas únicamente al activar Colocar pin. */
+   map.on('click',placePin);
    map.on('zoomend',()=>{
     if (!active()) return;
     if (map.getZoom()<10 || !traffic) drawTraffic();
@@ -12267,6 +12378,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   }
   if (card) {card.hidden=!visible;card.style.display=visible?'':'none';}
   if (!visible) {
+   /* NUEVO: retirar el punto si la cuenta pierde el acceso. */
+   clearPin();
    pause();
   } else if (active() && !traffic && !starting) initialize();
  }
@@ -12309,7 +12422,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  new MutationObserver(()=>{
   if(active())initialize();
   /* MODIFICADO: al salir se detienen únicamente las consultas del mapa. */
-  else {baseRequest++;pause();}
+  else {
+   /* NUEVO: cancelar el modo de colocación al salir del apartado. */
+   pinMode(false);
+   baseRequest++;pause();
+  }
  }).observe(page,{attributes:true,attributeFilter:['class']});
  new MutationObserver(()=>{
   if(active()&&$('trBase').value==='auto')void setBase();
@@ -12324,12 +12441,16 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  window.addEventListener('cctt:session',event=>{
   const next=event.detail?.session?.user?.id||'';
   if(owner&&next!==owner){
+   /* NUEVO: el pin no se transfiere entre cuentas. */
+   clearPin();
    pause();config=null;baseRequest++;
    if(map){map.remove();map=null;base=null;locationMarker=null;}
   }
   owner=next;
  });
  window.addEventListener('cctt:logout',()=>{
+  /* NUEVO: limpiar la ubicación compartible al finalizar la sesión. */
+  clearPin();
   owner='';pause();baseRequest++;config=null;
   if(map){map.remove();map=null;base=null;locationMarker=null;}
   status('Inicia sesión con una cuenta autorizada.');
@@ -12340,7 +12461,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  window.ccttLearning?.register(ID,{
   /* MODIFICADO: revisión de la carga binaria de imágenes del proveedor. */
   /* MODIFICADO: aprendizaje de la asignación centralizada de accesos. */
-  version:'trafico-terrestre-3',
+  /* MODIFICADO: recorrido actualizado con el pin compartible. */
+  version:'trafico-terrestre-4',
   purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
   steps:[
    {title:'Elige las capas',body:'Abre Capas, selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
@@ -12348,6 +12470,9 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    {title:'Consulta las vías',body:'Acerca el mapa para ver el flujo. Ajusta su opacidad para leer los nombres. Una vía sin líneas puede carecer de datos y no confirma circulación fluida.',controlId:'trOpacity'},
    {title:'Actualiza y revisa el estado',body:'Actualizar tráfico vuelve a consultar la disponibilidad y las capas. La actualización automática opera cada 60 segundos mientras este módulo está visible. Una carga parcial o un error impiden confirmar una consulta completa.',controlId:'trReload'},
    {title:'Ubicación de la consulta',body:'Mi ubicación requiere autorización del navegador. Centrar Manzanillo regresa al encuadre inicial. La ubicación consultada no se guarda como registro operativo.',controlId:'trLocate'},
+   /* NUEVO */
+   {title:'Coloca una ubicación',body:'Activa Colocar pin y haz clic o toca el mapa. Puedes arrastrar el pin para ajustar el punto. Se mantiene un único pin temporal mientras conserves la sesión y el acceso al módulo.',controlId:'trPinToggle'},
+   {title:'Comparte el enlace',body:'El punto seleccionado genera un enlace de Google Maps. Usa Copiar enlace para compartirlo o Abrir en Google Maps para revisarlo. Cualquier persona que reciba el enlace podrá ver esas coordenadas, aunque no tenga acceso al CCTT. El enlace comparte la ubicación, no las capas de tráfico del módulo.',controlId:'trPinToggle'},
    /* MODIFICADO */
    {title:'Asignación de acceso',body:'El administrador habilita o revoca Tráfico terrestre en tiempo real desde Administrar accesos. Debe desbloquear la administración con la contraseña adicional, consultar la cuenta por UUID, marcar o desmarcar el módulo y guardar los permisos. El usuario debe volver a iniciar sesión para ver el cambio.'},
    /* MODIFICADO */
