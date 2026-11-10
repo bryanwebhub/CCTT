@@ -11847,14 +11847,12 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
 #page-traficoTerrestre .tr-legend [data-flow=blocked]{background:#c1272d}
 #page-traficoTerrestre .leaflet-control-zoom a,#page-traficoTerrestre .leaflet-control-attribution{background:var(--tr-card);color:var(--tr-ink);border-color:var(--tr-line)}
 #page-traficoTerrestre .leaflet-control-attribution a{color:var(--cctt-theme-accent,var(--blue))}
-#page-traficoTerrestre .tr-creator{margin-top:14px}
-#page-traficoTerrestre .tr-creator summary{font-weight:750;cursor:pointer}
-#page-traficoTerrestre .tr-creator .tr-grant-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+/* MODIFICADO: el formulario de permisos se administra en Administrar accesos. */
 #page-traficoTerrestre .tr-map-tile{width:256px;height:256px}
 #page-traficoTerrestre .tr-map-tile img{display:block;width:100%;height:100%}
 #page-traficoTerrestre .tr-actions button:disabled{opacity:.55;cursor:wait}
 @media(max-width:900px){#page-traficoTerrestre .tr-layout{grid-template-columns:230px minmax(0,1fr)}}
-@media(max-width:680px){#page-traficoTerrestre .tr-layout{grid-template-columns:1fr}#trMap{height:57vh;min-height:360px}#page-traficoTerrestre .tr-actions{width:100%}#page-traficoTerrestre .tr-actions .btn{flex:1 1 auto}#page-traficoTerrestre .tr-creator .tr-grant-grid{grid-template-columns:1fr}}
+@media(max-width:680px){#page-traficoTerrestre .tr-layout{grid-template-columns:1fr}#trMap{height:57vh;min-height:360px}#page-traficoTerrestre .tr-actions{width:100%}#page-traficoTerrestre .tr-actions .btn{flex:1 1 auto}}
 </style>
 <script id="ccttTrafficModule">
 /* NUEVO: datos reales del proveedor configurado; sin estimaciones ni registros sintéticos. */
@@ -11868,9 +11866,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   layers:'M12 3l10 5-10 5L2 8zM3 12l9 5 9-5M3 17l9 5 9-5',
   refresh:'M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1',
   location:'M12 2v4m0 12v4M2 12h4m12 0h4M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10',
-  focus:'M4 9V4h5m6 0h5v5m0 6v5h-5M9 20H4v-5M8 12h8m-4-4v8',
-  check:'M4 3h16v18H4zM8 7h8m-8 5h5m-5 5h3M16 15l2 2 4-5',
-  assign:'M3 4h10v16H3zM7 8h2m-2 4h2m-2 4h2M16 8l5 4-5 4m0-4h6'
+  /* MODIFICADO: iconos correspondientes a los controles del mapa. */
+  focus:'M4 9V4h5m6 0h5v5m0 6v5h-5M9 20H4v-5M8 12h8m-4-4v8'
  };
  const icon = key => '<svg class="tr-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+paths[key]+'"/></svg>';
  const button = (id, label, key, primary = false) => '<button type="button" class="btn'+(primary?' primary':'')+'" id="'+id+'" data-iconized="1" data-cctt-icon-fixed="true">'+icon(key)+'<span>'+label+'</span></button>';
@@ -11910,17 +11907,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  </div>
  <div class="tr-legend" id="trLegend" aria-label="Leyenda del proveedor"></div>
  <p class="tr-help" id="trCoverage">Una vía sin líneas de tráfico puede carecer de cobertura. La ausencia de color no confirma circulación fluida. La hora indicada corresponde a la consulta, no a la medición de cada vía.</p>
- <details class="tr-panel tr-creator" id="trCreator" hidden>
-  <summary>Asignar acceso a este módulo</summary>
-  <p class="tr-help">Administración también puede asignarlo desde Administrar accesos. Este formulario habilita o revoca únicamente Tráfico terrestre en tiempo real. El usuario debe volver a iniciar sesión para ver el permiso actualizado.</p>
-  <div class="tr-grant-grid">
-   <label for="trTarget">Identificador UUID del usuario<input id="trTarget" spellcheck="false" maxlength="36" autocomplete="off"></label>
-   <label for="trPassword">Contraseña administrativa adicional<input id="trPassword" type="password" autocomplete="off"></label>
-  </div>
-  <label class="tr-check"><input type="checkbox" id="trGrant">Habilitar Tráfico terrestre en tiempo real</label>
-  <div class="tr-actions">${button('trReadGrant','Consultar acceso','check')}${button('trSaveGrant','Aplicar permiso','assign')}</div>
-  <p id="trGrantStatus" class="tr-help" role="status"></p>
- </details>`;
+ <!-- MODIFICADO: el acceso se asigna desde Administrar accesos. -->
+ `;
  document.querySelector('.content').append(page);
  const $ = id => document.getElementById(id);
  const nav = document.createElement('button');
@@ -12209,7 +12197,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   }
   selector.value = result?.providers?.[selected] ? selected : ['tomtom','here'].find(source=>result?.providers?.[source]) || '';
   $('trProviders').textContent = ['tomtom','here'].map(source=>providerNames[source]+(result?.providers?.[source]?' disponible':' sin configurar')).join(' · ');
-  $('trCreator').hidden = result?.canAssign !== true;
+   /* MODIFICADO: la configuración consultada aquí solo se utiliza para el mapa. */
   legend();
   return true;
  }
@@ -12280,8 +12268,6 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   if (card) {card.hidden=!visible;card.style.display=visible?'':'none';}
   if (!visible) {
    pause();
-   $('trPassword').value = '';
-   $('trCreator').hidden = true;
   } else if (active() && !traffic && !starting) initialize();
  }
  $('trLayers').onclick = () => {
@@ -12319,33 +12305,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    if(active()&&stamp===generation)status(error.code===1?'No se autorizó el acceso a tu ubicación.':'No fue posible obtener tu ubicación.','error');
   },{enableHighAccuracy:false,timeout:12000,maximumAge:60000});
  };
- async function grant(save) {
-  if (!active() || !config?.canAssign) return;
-  const target=$('trTarget').value.trim(), password=$('trPassword').value;
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(target) || !password) {
-   $('trGrantStatus').textContent='Completa un UUID válido y la contraseña adicional.';
-   return;
-  }
-  const account=owner;
-  $('trReadGrant').disabled=$('trSaveGrant').disabled=true;
-  $('trGrantStatus').textContent='Validando acceso…';
-  try {
-   const result=await call(save?'traffic-grant-save':'traffic-grant-read',{userId:target,secondaryPassword:password,...(save?{enabled:$('trGrant').checked}:{})});
-   if(account!==owner||!allowed()||$('trTarget').value.trim()!==target)return;
-   $('trGrant').checked=result.enabled===true;
-   $('trGrantStatus').textContent=save?'Permiso de Tráfico terrestre guardado.':'Acceso consultado para el UUID indicado.';
-  } catch(error) {
-   if(account===owner&&allowed())$('trGrantStatus').textContent=save?'No se pudo confirmar el guardado. Consulta el acceso antes de volver a aplicar. '+error.message:error.message;
-  } finally {
-   $('trPassword').value='';
-   $('trReadGrant').disabled=$('trSaveGrant').disabled=false;
-  }
- }
- $('trReadGrant').onclick=()=>grant(false);
- $('trSaveGrant').onclick=()=>grant(true);
+ /* MODIFICADO: las acciones de asignación pertenecen a Administrar accesos. */
  new MutationObserver(()=>{
   if(active())initialize();
-  else {baseRequest++;pause();$('trPassword').value='';}
+  /* MODIFICADO: al salir se detienen únicamente las consultas del mapa. */
+  else {baseRequest++;pause();}
  }).observe(page,{attributes:true,attributeFilter:['class']});
  new MutationObserver(()=>{
   if(active()&&$('trBase').value==='auto')void setBase();
@@ -12362,19 +12326,12 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   if(owner&&next!==owner){
    pause();config=null;baseRequest++;
    if(map){map.remove();map=null;base=null;locationMarker=null;}
-   $('trTarget').value=$('trPassword').value=$('trGrantStatus').textContent='';
-   $('trGrant').checked=false;
-   $('trCreator').open=false;
   }
   owner=next;
  });
  window.addEventListener('cctt:logout',()=>{
   owner='';pause();baseRequest++;config=null;
   if(map){map.remove();map=null;base=null;locationMarker=null;}
-  $('trTarget').value=$('trPassword').value=$('trGrantStatus').textContent='';
-  $('trGrant').checked=false;
-  $('trCreator').hidden=true;
-  $('trCreator').open=false;
   status('Inicia sesión con una cuenta autorizada.');
   syncCard();
  });
@@ -12382,7 +12339,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  if(home)new MutationObserver(syncCard).observe(home,{childList:true});
  window.ccttLearning?.register(ID,{
   /* MODIFICADO: revisión de la carga binaria de imágenes del proveedor. */
-  version:'trafico-terrestre-2',
+  /* MODIFICADO: aprendizaje de la asignación centralizada de accesos. */
+  version:'trafico-terrestre-3',
   purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
   steps:[
    {title:'Elige las capas',body:'Abre Capas, selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
@@ -12390,8 +12348,12 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    {title:'Consulta las vías',body:'Acerca el mapa para ver el flujo. Ajusta su opacidad para leer los nombres. Una vía sin líneas puede carecer de datos y no confirma circulación fluida.',controlId:'trOpacity'},
    {title:'Actualiza y revisa el estado',body:'Actualizar tráfico vuelve a consultar la disponibilidad y las capas. La actualización automática opera cada 60 segundos mientras este módulo está visible. Una carga parcial o un error impiden confirmar una consulta completa.',controlId:'trReload'},
    {title:'Ubicación de la consulta',body:'Mi ubicación requiere autorización del navegador. Centrar Manzanillo regresa al encuadre inicial. La ubicación consultada no se guarda como registro operativo.',controlId:'trLocate'},
-   {title:'Asignación de acceso',body:'Solo administración y cuentas con rol creator o creador verificado en Auth pueden usar este formulario, con contraseña administrativa adicional. Permite asignar exclusivamente este módulo por UUID. Los usuarios de consulta no pueden asignar accesos.',controlId:'trCreator'},
-   {title:'Permisos y restricciones',body:'Solo las cuentas habilitadas pueden consultar el módulo. Administradores y creadores verificados pueden asignar exclusivamente este acceso desde su formulario, con la contraseña adicional. Los usuarios de consulta no pueden modificar permisos ni credenciales. La guía no concede accesos.'},
+   /* MODIFICADO */
+   {title:'Asignación de acceso',body:'El administrador habilita o revoca Tráfico terrestre en tiempo real desde Administrar accesos. Debe desbloquear la administración con la contraseña adicional, consultar la cuenta por UUID, marcar o desmarcar el módulo y guardar los permisos. El usuario debe volver a iniciar sesión para ver el cambio.'},
+   /* MODIFICADO */
+   {title:'Permisos y restricciones',body:'El módulo de Tráfico permite consultar los proveedores disponibles y sus capas. La asignación se realiza exclusivamente en Administrar accesos, con los privilegios y la verificación adicional que ese apartado exige. Los usuarios de consulta no pueden asignar permisos ni modificar credenciales. La guía no concede accesos.'},
+   /* NUEVO */
+   {title:'Organiza el módulo',body:'En Organizar módulos puedes mover Tráfico terrestre en tiempo real dentro de tu barra lateral, según los permisos y las protecciones vigentes de la cuenta. Cambiar su posición no concede acceso a otros usuarios.'},
    {title:'Límites de la información',body:'Los datos dependen del servicio, su credencial, cuota y cobertura. La hora mostrada corresponde a la consulta y no acredita la hora de observación de cada carretera. El mapa no registra aforos ni predice rutas.'}
   ]
  });
