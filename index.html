@@ -11861,6 +11861,17 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
 #page-traficoTerrestre .tr-pin-marker path{fill:var(--cctt-theme-accent,var(--blue));stroke:#fff;stroke-width:1.6}
 #page-traficoTerrestre .tr-pin-marker circle{fill:var(--tr-card);stroke:var(--tr-ink);stroke-width:1}
 #page-traficoTerrestre .tr-pin-tooltip{color:var(--tr-ink);background:var(--tr-card);border-color:var(--tr-line)}
+/* NUEVO: acciones dentro del pin y estado visual durante el zoom. */
+#page-traficoTerrestre .tr-pin-popup .leaflet-popup-content-wrapper,#page-traficoTerrestre .tr-pin-popup .leaflet-popup-tip{background:var(--tr-card);color:var(--tr-ink)}
+#page-traficoTerrestre .tr-pin-popup .leaflet-popup-content{margin:13px;line-height:1.5}
+#page-traficoTerrestre .tr-pin-popup a.leaflet-popup-close-button{color:var(--tr-ink)}
+#page-traficoTerrestre .tr-pin-popup small{display:block;overflow-wrap:anywhere;color:var(--tr-muted);margin:5px 0}
+#page-traficoTerrestre .tr-popup-actions{display:grid;gap:7px;margin-top:10px}
+#page-traficoTerrestre .tr-popup-actions .btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;font-size:12px;white-space:normal;color:var(--tr-ink);background:var(--tr-input);border:1px solid var(--tr-line)}
+#page-traficoTerrestre .tr-popup-actions a.btn{background:var(--tr-input);color:var(--cctt-theme-inputtext,var(--tr-ink));border:1px solid var(--tr-line);text-decoration:none}
+#page-traficoTerrestre .tr-popup-actions a:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:2px}
+#page-traficoTerrestre .tr-popup-status{font-size:12px;color:var(--tr-ink);margin-top:7px;overflow-wrap:anywhere}
+#trMap[data-tr-zooming="true"] .tr-flow-tiles{visibility:hidden}
 /* MODIFICADO: el formulario de permisos se administra en Administrar accesos. */
 #page-traficoTerrestre .tr-map-tile{width:256px;height:256px}
 #page-traficoTerrestre .tr-map-tile img{display:block;width:100%;height:100%}
@@ -11885,7 +11896,10 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   /* NUEVO: SVG propios para colocar, copiar y abrir el punto. */
   pin:'M12 22S5 15 5 9a7 7 0 1 1 14 0c0 6-7 13-7 13M9 9h6m-3-3v6',
   link:'M9 7H7a5 5 0 0 0 0 10h3m4-10h3a5 5 0 0 1 0 10h-2M8 12h8',
-  google:'M14 3h7v7m0-7L10 14M10 4H4v16h16v-6'
+  google:'M14 3h7v7m0-7L10 14M10 4H4v16h16v-6',
+  /* NUEVO: símbolos distintos para las acciones de la ventana del pin. */
+  popupCopy:'M9 5H4v15h13v-5M9 2h11v11H9zM12 6h5m-5 3h5',
+  popupOpen:'M12 22S5 15 5 9a7 7 0 0 1 11-6M14 4h7v7m0-7L11 14'
  };
  const icon = key => '<svg class="tr-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+paths[key]+'"/></svg>';
  const button = (id, label, key, primary = false) => '<button type="button" class="btn'+(primary?' primary':'')+'" id="'+id+'" data-iconized="1" data-cctt-icon-fixed="true">'+icon(key)+'<span>'+label+'</span></button>';
@@ -11993,7 +12007,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   $('trPinStatus').textContent = '';
  }
  function placePin(event) {
-  if (!active() || !pinPlacing || !map) return;
+  /* MODIFICADO: el clic, toque y doble clic también colocan el pin directamente. */
+  if (!active() || !map || zoomSettling) return;
   const point = L.latLng(event.latlng).wrap();
   if (!updatePinLink(point)) return;
   if (pinMarker) {
@@ -12011,16 +12026,65 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     const position=pinMarker.getLatLng().wrap();
     pinMarker.setLatLng(position);
     updatePinLink(position);
+    /* NUEVO: actualizar las acciones tras ajustar el punto. */
+    showPinPopup();
    });
+   /* NUEVO: un doble clic sobre el marcador mantiene abierta su ventana. */
+   pinMarker.on('dblclick',()=>{if(active())showPinPopup();});
   }
   pinMode(false);
+  /* NUEVO */
+  showPinPopup();
+ }
+ /* NUEVO: ventana local con las mismas coordenadas del enlace visible. */
+ function showPinPopup() {
+  if(!pinMarker||!active())return;
+  const content=document.createElement('div');
+  const heading=document.createElement('strong');
+  heading.textContent='Ubicación seleccionada';
+  const coordinates=document.createElement('small');
+  coordinates.textContent=$('trPinCoordinates').textContent;
+  const actions=document.createElement('div');
+  actions.className='tr-popup-actions';
+  const copy=document.createElement('button');
+  copy.type='button';
+  copy.className='btn';
+  copy.dataset.iconized='1';
+  copy.dataset.ccttIconFixed='true';
+  copy.innerHTML=icon('popupCopy')+'<span>Copiar enlace</span>';
+  const open=document.createElement('a');
+  open.className='btn';
+  open.href=$('trPinLink').value;
+  open.target='_blank';
+  open.rel='noopener noreferrer';
+  open.dataset.iconized='1';
+  open.dataset.ccttIconFixed='true';
+  open.innerHTML=icon('popupOpen')+'<span>Abrir en Google Maps</span>';
+  const feedback=document.createElement('div');
+  feedback.className='tr-popup-status';
+  feedback.setAttribute('role','status');
+  copy.onclick=async()=>{
+   const selected=$('trPinLink').value;
+   await $('trPinCopy').onclick();
+   if(active()&&$('trPinLink').value===selected)feedback.textContent=$('trPinStatus').textContent;
+  };
+  open.onclick=event=>{
+   if(!active()||!pinMarker||open.href!==$('trPinLink').value)event.preventDefault();
+  };
+  actions.append(copy,open);
+  content.append(heading,coordinates,actions,feedback);
+  L.DomEvent.disableClickPropagation(content);
+  L.DomEvent.disableScrollPropagation(content);
+  pinMarker.bindPopup(content,{className:'tr-pin-popup',maxWidth:280,minWidth:205,closeOnClick:false,autoPan:true});
+  pinMarker.closeTooltip();
+  pinMarker.openPopup();
  }
  $('trPinToggle').setAttribute('aria-pressed','false');
  $('trPinToggle').setAttribute('aria-controls','trMap trPinPanel');
  $('trPinToggle').onclick=()=>{
   if (!active() || !map) return;
   pinMode(!pinPlacing);
-  $('trPinStatus').textContent=pinPlacing?'Haz clic o toca el mapa para colocar el pin.':'Colocación de pin cancelada.';
+  $('trPinStatus').textContent=pinPlacing?'Haz clic o toca el mapa para colocar el pin.':'Puedes colocar el pin directamente con un clic, toque o doble clic en el mapa.';
  };
  $('trPinCopy').onclick=async()=>{
   if (!active() || !pinMarker || !$('trPinLink').value) return;
@@ -12040,6 +12104,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  };
  let owner = '', config = null, starting = false, pendingReload = false;
  let generation = 0, baseRequest = 0, reloadTimer = null;
+ /* NUEVO: esperar un encuadre estable antes de descargar los detalles del zoom. */
+ let zoomSettling = false, zoomTimer = null, baseUrl = '';
  let lastLoadError = '', loadFailures = 0, loadedTiles = 0, baseError = '';
  const apiControllers = new Set();
  const providerNames = {tomtom:'TomTom',here:'HERE'};
@@ -12141,6 +12207,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   $('trConsulted').textContent = 'Sin consulta de tráfico completada';
  }
  function pause() {
+  /* NUEVO */
+  clearTimeout(zoomTimer);
+  zoomTimer=null;
+  zoomSettling=false;
+  $('trMap').dataset.trZooming='false';
   clearTimeout(reloadTimer);
   reloadTimer = null;
   generation++;
@@ -12167,7 +12238,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    jobs.delete(job);
   }
   function pump() {
-   if (disposed) return;
+   /* MODIFICADO: no iniciar mosaicos de niveles intermedios durante el zoom. */
+   if (disposed || zoomSettling) return;
    while (running < 6 && queue.length) {
     const job = queue.shift();
     if (job.cancelled) continue;
@@ -12186,6 +12258,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     job.url = URL.createObjectURL(result);
     image.onload = () => {
      if (job.cancelled || disposed || stamp !== generation) return;
+     /* NUEVO: distinguir imágenes completas de solicitudes pendientes. */
+     job.finished=true;
      loadedTiles++;
      job.done(null,job.tile);
      if (job.url) URL.revokeObjectURL(job.url);
@@ -12210,10 +12284,15 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    }
   }
   const TrafficLayer = L.GridLayer.extend({
-   createTile(coords,done) {
+    /* NUEVO: cancelar las descargas del encuadre que el usuario abandona. */
+    cancelPending() {
+     for(const job of jobs)if(!job.finished)release(job);
+     queue.length=0;
+    },
+    createTile(coords,done) {
     const tile = document.createElement('div');
     tile.className = 'tr-map-tile';
-    const job = {tile,coords,done,controller:new AbortController(),url:'',cancelled:false};
+    /* MODIFICADO */ const job = {tile,coords,done,controller:new AbortController(),url:'',cancelled:false,finished:false};
     jobs.add(job);
     tile.trJob = job;
     queue.push(job);
@@ -12227,7 +12306,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     L.GridLayer.prototype.onRemove.call(this,target);
    }
   });
-  const layer = new TrafficLayer({minZoom:10,maxZoom:19,tileSize:256,opacity:Number($('trOpacity').value)/100,updateWhenIdle:true,keepBuffer:0,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]});
+  const layer = new TrafficLayer({minZoom:10,maxZoom:19,tileSize:256,opacity:Number($('trOpacity').value)/100,/* MODIFICADO */ updateWhenIdle:true,updateWhenZooming:false,keepBuffer:3,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]});
   layer.on('tileunload',event=>{if(event.tile.trJob)release(event.tile.trJob);});
   layer.on('loading',()=>{
    if (stamp !== generation) return;
@@ -12236,7 +12315,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    status('Consultando '+providerNames[source]+'…');
   });
   layer.on('load',()=>{
-   if (stamp !== generation || !active()) return;
+   /* MODIFICADO */ if (stamp !== generation || !active() || zoomSettling) return;
    if (loadFailures) {
     status((loadedTiles?'Carga parcial. ':'')+lastLoadError,'error');
     $('trConsulted').textContent = loadedTiles?'Consulta incompleta · revisa la cobertura':'Sin consulta de tráfico completada';
@@ -12268,8 +12347,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     $('trBaseNotice').textContent = 'Se utiliza la plantilla CARTO compartida. Su estilo depende de la configuración administrativa.';
    }
    else throw Error('CARTO no tiene disponible la capa solicitada. Revisa su configuración en Administrar accesos.');
-   const layer = L.tileLayer(sb.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/'+path,{
-    maxZoom:19,updateWhenIdle:true,keepBuffer:2,attribution:'© OpenStreetMap contributors · © CARTO'
+   /* MODIFICADO: conservar el mapa base cuando la URL y su estado siguen vigentes. */
+   const nextUrl=sb.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/'+path;
+   if(base&&baseUrl===nextUrl&&!baseError)return;
+   const layer = L.tileLayer(nextUrl,{
+    maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:3,attribution:'© OpenStreetMap contributors · © CARTO'
    });
    layer.on('tileerror',()=>{
     if(base!==layer||!active())return;
@@ -12280,6 +12362,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    if (base) map.removeLayer(base);
    baseError = '';
    base = layer;
+   /* NUEVO */
+   baseUrl=nextUrl;
    base.addTo(map);
    if (traffic) traffic.bringToFront();
   } catch (error) {
@@ -12322,6 +12406,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   status('Consultando '+providerNames[source]+'…');
   traffic = makeTrafficLayer(source);
   traffic.addTo(map);
+  /* NUEVO: retirar visualmente el detalle anterior mientras se cambia la escala. */
+  traffic.getContainer()?.classList.add('tr-flow-tiles');
   scheduleRefresh();
  }
  async function refresh(recheck = true) {
@@ -12346,17 +12432,43 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    if (pendingReload) {pendingReload=false;if(active())void refresh();}
   }
  }
+ /* NUEVO: agrupar cambios consecutivos de zoom en una única carga final. */
+ function beginTrafficZoom() {
+  if(!active())return;
+  zoomSettling=true;
+  clearTimeout(zoomTimer);
+  clearTimeout(reloadTimer);
+  $('trMap').dataset.trZooming='true';
+  traffic?.cancelPending();
+ }
+ function finishTrafficZoom() {
+  clearTimeout(zoomTimer);
+  zoomTimer=setTimeout(()=>{
+   zoomTimer=null;
+   if(!active()||!map)return;
+   zoomSettling=false;
+   $('trMap').dataset.trZooming='false';
+   if(map.getZoom()<10||!traffic) {
+    drawTraffic();
+   } else {
+    /* Las solicitudes canceladas se recrean para el nivel final. */
+    loadedTiles=0;loadFailures=0;lastLoadError='';
+    status('Consultando '+providerNames[$('trProvider').value]+'…');
+    traffic.redraw();
+   }
+  },180);
+ }
  function initialize() {
   if (!active()) return;
   if (!window.L) {status('No se cargó el motor de mapas. Comprueba la conexión y recarga.','error');return;}
   if (!map) {
-   map = L.map('trMap',{zoomControl:true,minZoom:5,maxZoom:19}).setView([19.083,-104.300],13);
-   /* NUEVO: selección de coordenadas únicamente al activar Colocar pin. */
+   /* MODIFICADO: el doble clic se utiliza para el pin. */
+   map = L.map('trMap',{zoomControl:true,minZoom:5,maxZoom:19,doubleClickZoom:false,wheelDebounceTime:100}).setView([19.083,-104.300],13);
+   /* MODIFICADO: colocación directa y carga del detalle al estabilizar el zoom. */
    map.on('click',placePin);
-   map.on('zoomend',()=>{
-    if (!active()) return;
-    if (map.getZoom()<10 || !traffic) drawTraffic();
-   });
+   map.on('dblclick',placePin);
+   map.on('zoomstart',beginTrafficZoom);
+   map.on('zoomend',finishTrafficZoom);
   }
   requestAnimationFrame(()=>map.invalidateSize());
   void refresh();
@@ -12462,17 +12574,20 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   /* MODIFICADO: revisión de la carga binaria de imágenes del proveedor. */
   /* MODIFICADO: aprendizaje de la asignación centralizada de accesos. */
   /* MODIFICADO: recorrido actualizado con el pin compartible. */
-  version:'trafico-terrestre-4',
+  /* MODIFICADO: colocación directa, ventana del pin y carga agrupada al cambiar de escala. */
+  version:'trafico-terrestre-5',
   purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
   steps:[
    {title:'Elige las capas',body:'Abre Capas, selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
    {title:'Compara los proveedores',body:'Cambia entre TomTom y HERE conservando el encuadre. Las fuentes pueden tener distinta cobertura y antigüedad. No se combinan sus colores en una sola medición.',controlId:'trProvider'},
    {title:'Consulta las vías',body:'Acerca el mapa para ver el flujo. Ajusta su opacidad para leer los nombres. Una vía sin líneas puede carecer de datos y no confirma circulación fluida.',controlId:'trOpacity'},
    {title:'Actualiza y revisa el estado',body:'Actualizar tráfico vuelve a consultar la disponibilidad y las capas. La actualización automática opera cada 60 segundos mientras este módulo está visible. Una carga parcial o un error impiden confirmar una consulta completa.',controlId:'trReload'},
+   /* NUEVO */
+   {title:'Cambio de zoom',body:'El mapa espera a que termines de cambiar el zoom para solicitar el detalle de tráfico. Las solicitudes pendientes de niveles abandonados se cancelan y los mosaicos cercanos del nivel visible se conservan al desplazar el mapa. Durante el cambio se ocultan las líneas ampliadas del nivel anterior. Actualizar tráfico vuelve a consultar la fuente.'},
    {title:'Ubicación de la consulta',body:'Mi ubicación requiere autorización del navegador. Centrar Manzanillo regresa al encuadre inicial. La ubicación consultada no se guarda como registro operativo.',controlId:'trLocate'},
    /* NUEVO */
-   {title:'Coloca una ubicación',body:'Activa Colocar pin y haz clic o toca el mapa. Puedes arrastrar el pin para ajustar el punto. Se mantiene un único pin temporal mientras conserves la sesión y el acceso al módulo.',controlId:'trPinToggle'},
-   {title:'Comparte el enlace',body:'El punto seleccionado genera un enlace de Google Maps. Usa Copiar enlace para compartirlo o Abrir en Google Maps para revisarlo. Cualquier persona que reciba el enlace podrá ver esas coordenadas, aunque no tenga acceso al CCTT. El enlace comparte la ubicación, no las capas de tráfico del módulo.',controlId:'trPinToggle'},
+   {title:'Coloca una ubicación',body:'Haz clic, toca o pulsa dos veces una ubicación para colocar el pin directamente. También puedes usar Colocar pin. Arrástralo para ajustar el punto. El doble clic se reserva al pin; utiliza la rueda, los botones o dos dedos para cambiar el zoom. Se conserva un único pin temporal durante la sesión y el acceso autorizado.',controlId:'trPinToggle'},
+   {title:'Comparte el enlace',body:'Al colocar el pin se abre una ventana con Copiar enlace y Abrir en Google Maps. También puedes pulsar el marcador para abrirla y usar los botones del panel de ubicación. Al arrastrar el pin se actualizan las coordenadas y los enlaces. Quien reciba el enlace podrá ver el punto en Google Maps, aunque no tenga acceso al CCTT.',controlId:'trPinToggle'},
    /* MODIFICADO */
    {title:'Asignación de acceso',body:'El administrador habilita o revoca Tráfico terrestre en tiempo real desde Administrar accesos. Debe desbloquear la administración con la contraseña adicional, consultar la cuenta por UUID, marcar o desmarcar el módulo y guardar los permisos. El usuario debe volver a iniciar sesión para ver el cambio.'},
    /* MODIFICADO */
