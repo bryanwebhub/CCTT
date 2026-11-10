@@ -5254,14 +5254,14 @@ body.cctt-authenticated .tbl th{font-size:12px}
 <script id="ccttEnhancementsV14Script">
 (()=>{
 'use strict';
-const modules=[/* NUEVO */['generadorCorreos','Generador de correos'],/* NUEVO */['mensajesPersonajes','Mensajes con personajes'],/* NUEVO: permiso individual de aprendizaje. */['aprendizajeModulos','Aprendizaje de módulos'],/* NUEVO: editor con proyectos personales. */['diagramasMentales','Diagramas y mapas mentales'],/* NUEVO: permiso del Recordatorio de cumpleaños. */['recordatorioCumpleanos','Recordatorio de cumpleaños'],/* NUEVO: permiso de Ruleta de decisiones. */['ruletaDecisiones','Ruleta de decisiones'],/* NUEVO: permiso del Simulador de tránsito. */['simuladorTransito','Simulador de tránsito'],/* NUEVO: permiso individual de Verificación de citas. */['verificacionCitas','Verificación de citas'],/* NUEVO: permiso del módulo Conteos */['conteos','Conteos'],/* NUEVO: permiso específico del submódulo */['controlTerminales','Control terminales'],/* NUEVO: módulo asignable de seguimiento de fallos. */['fallos','Seguimiento de fallos'],/* NUEVO: permiso del módulo Documentación */['documentacion','Documentación'],['bibliotecaOperativa','Biblioteca operativa'],['mapaUbicaciones','Mapa de ubicaciones'],/* NUEVO: permiso del editor de croquis. */['mapasCroquis','Mapas y croquis'],/* NUEVO: permiso marítimo independiente. */['buquesManzanillo','Buques activos · Manzanillo'],/* NUEVO: permiso climático independiente */['climaManzanillo','Clima y alertas · Manzanillo'],['inicio','Inicio'],['perfil','Perfil y logo'],['pis','Bitácoras PIS'],['accidentes','Accidentes CCTT'],['comparador','Comparación terminales'],['reporte','Reporte cesionarios'],['balance','Balance de citas'],/* NUEVO: permiso exclusivo */['cumplimientoCitas','Cumplimiento de citas'],['comunicadosPdf','Registro comunicados'],['mensajes','Mensajes comunicados'],/* NUEVO: permiso de acceso independiente */['avisosRecurrentes','Avisos recurrentes'],/* MODIFICADO: permiso de Expedientes retirado de opciones. */['consignas','Consignas'],['controlCitas','Control citas portuarias'],['turnos','Turnos'],['inc35macro','Generador de incidentes'],['inc35copoma','COPOMA'],['inc35vial','Reporte de vialidades'],/* NUEVO: permiso independiente */['sobrevueloDron','Sobrevuelo de dron'],/* NUEVO: permiso independiente */['atencionAmbulancia','Atención por ambulancia'],['inc35bolet','Boletinados'],['inc35redes','Redes y reporte'],['inc35pisrep','PIS-REP'],/* NUEVO: permiso para habilitar el autenticador desde Administración de accesos. */['autenticadorAutorizado','Autenticador autorizado'],/* NUEVO: módulo asignable Diccionario de procesos; la autorización de edición permanece independiente. */['diccionarioProcesos','Diccionario de procesos'],/* NUEVO: permiso de consulta; controles restringidos en servidor. */['sesionesSeguridad','Sesiones y seguridad']];
+const modules=[/* NUEVO: permiso individual del módulo de tráfico. */['traficoTerrestre','Tráfico terrestre en tiempo real'],/* NUEVO */['generadorCorreos','Generador de correos'],/* NUEVO */['mensajesPersonajes','Mensajes con personajes'],/* NUEVO: permiso individual de aprendizaje. */['aprendizajeModulos','Aprendizaje de módulos'],/* NUEVO: editor con proyectos personales. */['diagramasMentales','Diagramas y mapas mentales'],/* NUEVO: permiso del Recordatorio de cumpleaños. */['recordatorioCumpleanos','Recordatorio de cumpleaños'],/* NUEVO: permiso de Ruleta de decisiones. */['ruletaDecisiones','Ruleta de decisiones'],/* NUEVO: permiso del Simulador de tránsito. */['simuladorTransito','Simulador de tránsito'],/* NUEVO: permiso individual de Verificación de citas. */['verificacionCitas','Verificación de citas'],/* NUEVO: permiso del módulo Conteos */['conteos','Conteos'],/* NUEVO: permiso específico del submódulo */['controlTerminales','Control terminales'],/* NUEVO: módulo asignable de seguimiento de fallos. */['fallos','Seguimiento de fallos'],/* NUEVO: permiso del módulo Documentación */['documentacion','Documentación'],['bibliotecaOperativa','Biblioteca operativa'],['mapaUbicaciones','Mapa de ubicaciones'],/* NUEVO: permiso del editor de croquis. */['mapasCroquis','Mapas y croquis'],/* NUEVO: permiso marítimo independiente. */['buquesManzanillo','Buques activos · Manzanillo'],/* NUEVO: permiso climático independiente */['climaManzanillo','Clima y alertas · Manzanillo'],['inicio','Inicio'],['perfil','Perfil y logo'],['pis','Bitácoras PIS'],['accidentes','Accidentes CCTT'],['comparador','Comparación terminales'],['reporte','Reporte cesionarios'],['balance','Balance de citas'],/* NUEVO: permiso exclusivo */['cumplimientoCitas','Cumplimiento de citas'],['comunicadosPdf','Registro comunicados'],['mensajes','Mensajes comunicados'],/* NUEVO: permiso de acceso independiente */['avisosRecurrentes','Avisos recurrentes'],/* MODIFICADO: permiso de Expedientes retirado de opciones. */['consignas','Consignas'],['controlCitas','Control citas portuarias'],['turnos','Turnos'],['inc35macro','Generador de incidentes'],['inc35copoma','COPOMA'],['inc35vial','Reporte de vialidades'],/* NUEVO: permiso independiente */['sobrevueloDron','Sobrevuelo de dron'],/* NUEVO: permiso independiente */['atencionAmbulancia','Atención por ambulancia'],['inc35bolet','Boletinados'],['inc35redes','Redes y reporte'],['inc35pisrep','PIS-REP'],/* NUEVO: permiso para habilitar el autenticador desde Administración de accesos. */['autenticadorAutorizado','Autenticador autorizado'],/* NUEVO: módulo asignable Diccionario de procesos; la autorización de edición permanece independiente. */['diccionarioProcesos','Diccionario de procesos'],/* NUEVO: permiso de consulta; controles restringidos en servidor. */['sesionesSeguridad','Sesiones y seguridad']];
 const moduleIds=modules.map(m=>m[0]);
 let session=null,admin=false,secret='',permissions=null,adminReady=false;
 /* NUEVO: estado del desbloqueo adicional, sin exponer la contraseña. */window.ccttAccessUnlocked=()=>!!session&&adminReady;
 const $=id=>document.getElementById(id);
 const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const notify=(msg,error=false)=>{const el=$('ccttAdminMsg');if(el){el.textContent=msg;el.style.color=error?'#aa1b3e':'#205f48'}else ccttSiteNotice(msg)};
-/* MODIFICADO: los permisos pendientes nunca equivalen a acceso general. */function hasAccess(id){if(!session)return false;if(id==='adminUsuarios')return admin;/* NUEVO: galería global accesible a cuentas verificadas. */if(id==='recuerdo')return true;/* MODIFICADO: relacionar la página TOTP con el permiso administrativo existente. */if(id==='ccttTotp')return admin || (Array.isArray(permissions) && permissions.includes('autenticadorAutorizado'));return admin || (Array.isArray(permissions) && (id==='inicio' || permissions.includes(id)))}
+/* MODIFICADO: los permisos pendientes nunca equivalen a acceso general. */function hasAccess(id){if(!session)return false;/* NUEVO: el rol creador tiene acceso solo al nuevo módulo, sin habilitar administración general. */if(id==='traficoTerrestre'&&['creator','creador'].includes(String(session.user?.app_metadata?.role||'').toLowerCase()))return true;if(id==='adminUsuarios')return admin;/* NUEVO: galería global accesible a cuentas verificadas. */if(id==='recuerdo')return true;/* MODIFICADO: relacionar la página TOTP con el permiso administrativo existente. */if(id==='ccttTotp')return admin || (Array.isArray(permissions) && permissions.includes('autenticadorAutorizado'));return admin || (Array.isArray(permissions) && (id==='inicio' || permissions.includes(id)))}
 /* NUEVO: protección de la navegación por tarjetas y llamadas directas. */window.ccttCanAccess=id=>hasAccess(id);
 function applyAccess(){
  document.querySelectorAll('.sidebar [data-page]').forEach(b=>{b.hidden=!hasAccess(b.dataset.page);b.style.display=hasAccess(b.dataset.page)?'':'none'});
@@ -5617,7 +5617,7 @@ inc35redes:'<circle cx="5" cy="12" r="3"/><circle cx="19" cy="5" r="3"/><circle 
 inc35pisrep:'<path d="M3 4h18v16H3zM6 8h5m-5 4h3m5-4h4v8h-4zM6 16h4"/>',
 recuerdo:'<path d="M3 4h18v16H3zM3 17l5-5 4 4 3-3 6 6"/><circle cx="15" cy="9" r="2"/>',
 avisosRecurrentes:'<path d="M5 16V9a7 7 0 0 1 14 0v7l2 3H3zM9 22h6M2 5l2-3m16 0 2 3"/>'
-/* NUEVO: icono propio del módulo de aprendizaje. */};icons.aprendizajeModulos='<path d="m2 8 10-5 10 5-10 5zM6 11v6c4 3 8 3 12 0v-6M22 8v8"/>';/* NUEVO */icons.mensajesPersonajes='<path d="M3 4h14v11H9l-5 4v-4H3zM17 8h4v13l-4-3h-5"/>';window.ccttHomeModuleSvg=id=>{const glyph=icons[id];if(!glyph)return null;return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+glyph+'</svg>'};})();
+/* NUEVO: icono propio del módulo de aprendizaje. */};/* NUEVO: icono propio de tráfico en Inicio y la vista de iconos. */icons.traficoTerrestre='<path d="M2 4l7-2 6 3 7-2v17l-7 2-6-3-7 2zM9 2v17m6-14v17M5 8v5m14-5v5"/><path d="m4 11 1 2 1-2m12-1 1-2 1 2"/>';icons.aprendizajeModulos='<path d="m2 8 10-5 10 5-10 5zM6 11v6c4 3 8 3 12 0v-6M22 8v8"/>';/* NUEVO */icons.mensajesPersonajes='<path d="M3 4h14v11H9l-5 4v-4H3zM17 8h4v13l-4-3h-5"/>';window.ccttHomeModuleSvg=id=>{const glyph=icons[id];if(!glyph)return null;return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+glyph+'</svg>'};})();
 
 </script>
 <script id="cctt-v23-script">
@@ -10059,7 +10059,7 @@ const BASE_LOCKED=['recuerdo','adminUsuarios','ccttTotp','recordatorioCumpleanos
 /* MODIFICADO: los cuatro módulos base conservan su protección inicial, ahora editable. */
 const NO_GROUP=new Set(['inicio','perfil']);
 const DEFAULT_GROUPS=[{id:'operativos',name:'Operativos'},{id:'administrativos',name:'Administrativos'},{id:'documentos',name:'Documentación'},{id:'herramientas',name:'Herramientas'}];
-const DEFAULT_ASSIGN={pis:'operativos',accidentes:'operativos',comparador:'operativos',controlCitas:'operativos',balance:'operativos',cumplimientoCitas:'operativos',consignas:'operativos',turnos:'operativos',inc35macro:'operativos',inc35copoma:'operativos',inc35vial:'operativos',sobrevueloDron:'operativos',atencionAmbulancia:'operativos',inc35bolet:'operativos',inc35redes:'operativos',inc35pisrep:'operativos',climaManzanillo:'operativos',buquesManzanillo:'operativos',conteos:'operativos',controlTerminales:'operativos',reporte:'administrativos',mensajes:'administrativos',avisosRecurrentes:'administrativos',comunicadosPdf:'documentos',bibliotecaOperativa:'documentos',documentacion:'documentos',diccionarioProcesos:'documentos',mapaUbicaciones:'herramientas',mapasCroquis:'herramientas',simuladorTransito:'herramientas',ruletaDecisiones:'herramientas',verificacionCitas:'herramientas',fallos:'herramientas',/* NUEVO */ aprendizajeModulos:'herramientas'};
+const DEFAULT_ASSIGN={/* NUEVO: módulo móvil dentro de la organización personal. */traficoTerrestre:'operativos',pis:'operativos',accidentes:'operativos',comparador:'operativos',controlCitas:'operativos',balance:'operativos',cumplimientoCitas:'operativos',consignas:'operativos',turnos:'operativos',inc35macro:'operativos',inc35copoma:'operativos',inc35vial:'operativos',sobrevueloDron:'operativos',atencionAmbulancia:'operativos',inc35bolet:'operativos',inc35redes:'operativos',inc35pisrep:'operativos',climaManzanillo:'operativos',buquesManzanillo:'operativos',conteos:'operativos',controlTerminales:'operativos',reporte:'administrativos',mensajes:'administrativos',avisosRecurrentes:'administrativos',comunicadosPdf:'documentos',bibliotecaOperativa:'documentos',documentacion:'documentos',diccionarioProcesos:'documentos',mapaUbicaciones:'herramientas',mapasCroquis:'herramientas',simuladorTransito:'herramientas',ruletaDecisiones:'herramientas',verificacionCitas:'herramientas',fallos:'herramientas',/* NUEVO */ aprendizajeModulos:'herramientas'};
 const $=id=>document.getElementById(id),sb=()=>window.ccttSupabaseClient;
 const defaultLayout=()=>({groups:DEFAULT_GROUPS.map(x=>({...x})),assign:{...DEFAULT_ASSIGN},order:{}});
 let session=null,admin=false,layout=defaultLayout(),locked=[...BASE_LOCKED],loading=false,writing=false,uiReady=false,rendering=false,timer=0,sourceUser='';
@@ -11808,6 +11808,557 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     purpose:'Consultar y convertir archivos según los controles habilitados en Documentación.',
     steps:[{title:'Ordena los archivos',body:'Arrastra un archivo por la lista. La línea indica si se insertará antes o después. También puedes usar Alt y las flechas sobre una fila. El orden se aplica a la cola de conversión.',controlId:'ccttDocFileList'}]
   });
+})();
+</script>
+
+<!-- NUEVO: módulo independiente de tráfico terrestre; reutiliza Leaflet y la función CARTO existentes. -->
+<style id="ccttTrafficStyles">
+#page-traficoTerrestre{color:var(--cctt-theme-text,var(--text));--tr-card:var(--cctt-theme-card,var(--card));--tr-line:var(--cctt-theme-line,var(--line));--tr-input:var(--cctt-theme-input,var(--card));--tr-ink:var(--cctt-theme-text,var(--text));--tr-muted:var(--cctt-theme-muted,var(--muted))}
+#page-traficoTerrestre [hidden]{display:none!important}
+#page-traficoTerrestre .tr-head,#page-traficoTerrestre .tr-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#page-traficoTerrestre .tr-head{justify-content:space-between;margin-bottom:14px}
+#page-traficoTerrestre .tr-head h2{margin:0;color:var(--tr-ink)}
+#page-traficoTerrestre .tr-subtitle{margin:6px 0;color:var(--tr-muted);font-size:13px}
+#page-traficoTerrestre .tr-actions .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+#page-traficoTerrestre svg.tr-icon{width:19px;height:19px;flex:none;stroke:currentColor;fill:none}
+#page-traficoTerrestre button:focus-visible,#page-traficoTerrestre input:focus-visible,#page-traficoTerrestre select:focus-visible,#page-traficoTerrestre summary:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:3px}
+#page-traficoTerrestre .tr-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:14px;align-items:start}
+#page-traficoTerrestre .tr-layout.tr-wide{grid-template-columns:minmax(0,1fr)}
+#page-traficoTerrestre .tr-panel{padding:16px;border:1px solid var(--tr-line);border-radius:14px;background:var(--tr-card);color:var(--tr-ink);min-width:0}
+#page-traficoTerrestre .tr-panel h3{margin:0 0 12px;color:var(--tr-ink)}
+#page-traficoTerrestre .tr-panel label{display:grid;gap:7px;margin:12px 0;font-size:13px;font-weight:650}
+#page-traficoTerrestre .tr-panel label.tr-check{display:flex;align-items:center;gap:9px}
+#page-traficoTerrestre .tr-panel input:not([type=checkbox]),#page-traficoTerrestre .tr-panel select{box-sizing:border-box;width:100%;padding:9px 10px;border:1px solid var(--tr-line);border-radius:8px;background:var(--tr-input);color:var(--cctt-theme-inputtext,var(--tr-ink))}
+#page-traficoTerrestre .tr-panel input[type=range]{accent-color:var(--cctt-theme-accent,var(--blue))}
+#page-traficoTerrestre .tr-help{color:var(--tr-muted);font-size:12px;line-height:1.6;margin:10px 0}
+#page-traficoTerrestre .tr-view{position:relative;min-width:0;overflow:hidden;border:1px solid var(--tr-line);border-radius:14px;background:var(--tr-card)}
+#trMap{height:clamp(440px,68vh,820px);min-height:440px;background:var(--tr-card);isolation:isolate}
+#page-traficoTerrestre .tr-statusbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--tr-line);background:var(--tr-card);font-size:12px;color:var(--tr-ink)}
+#trStatus{font-weight:650}
+#trStatus[data-state=error]{border-left:3px solid #d34559;padding-left:9px}
+#trStatus[data-state=ready]{border-left:3px solid #249d75;padding-left:9px}
+#page-traficoTerrestre .tr-legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0;font-size:12px;color:var(--tr-ink)}
+#page-traficoTerrestre .tr-legend span{display:inline-flex;align-items:center;gap:5px}
+#page-traficoTerrestre .tr-swatch{width:17px;height:7px;border-radius:3px;border:1px solid #0003;display:inline-block}
+#page-traficoTerrestre .tr-legend [data-flow=free]{background:#2eab30}
+#page-traficoTerrestre .tr-legend [data-flow=slow]{background:#f1bf40}
+#page-traficoTerrestre .tr-legend [data-flow=heavy]{background:#f18237}
+#page-traficoTerrestre .tr-legend [data-flow=queue]{background:#e70704}
+#page-traficoTerrestre .tr-legend [data-flow=blocked]{background:#c1272d}
+#page-traficoTerrestre .leaflet-control-zoom a,#page-traficoTerrestre .leaflet-control-attribution{background:var(--tr-card);color:var(--tr-ink);border-color:var(--tr-line)}
+#page-traficoTerrestre .leaflet-control-attribution a{color:var(--cctt-theme-accent,var(--blue))}
+#page-traficoTerrestre .tr-creator{margin-top:14px}
+#page-traficoTerrestre .tr-creator summary{font-weight:750;cursor:pointer}
+#page-traficoTerrestre .tr-creator .tr-grant-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+#page-traficoTerrestre .tr-map-tile{width:256px;height:256px}
+#page-traficoTerrestre .tr-map-tile img{display:block;width:100%;height:100%}
+#page-traficoTerrestre .tr-actions button:disabled{opacity:.55;cursor:wait}
+@media(max-width:900px){#page-traficoTerrestre .tr-layout{grid-template-columns:230px minmax(0,1fr)}}
+@media(max-width:680px){#page-traficoTerrestre .tr-layout{grid-template-columns:1fr}#trMap{height:57vh;min-height:360px}#page-traficoTerrestre .tr-actions{width:100%}#page-traficoTerrestre .tr-actions .btn{flex:1 1 auto}#page-traficoTerrestre .tr-creator .tr-grant-grid{grid-template-columns:1fr}}
+</style>
+<script id="ccttTrafficModule">
+/* NUEVO: datos reales del proveedor configurado; sin estimaciones ni registros sintéticos. */
+(() => {
+ 'use strict';
+ const ID = 'traficoTerrestre';
+ const title = 'Tráfico terrestre en tiempo real';
+ const paths = {
+  nav:'M4 3v18M20 3v18M12 3v4m0 4v3m0 4v3M7 11l2-3 2 3m4 3 2 3 2-3',
+  home:'M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15m6-12v15M6 10h1m10 1h1',
+  layers:'M12 3l10 5-10 5L2 8zM3 12l9 5 9-5M3 17l9 5 9-5',
+  refresh:'M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1',
+  location:'M12 2v4m0 12v4M2 12h4m12 0h4M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10',
+  focus:'M4 9V4h5m6 0h5v5m0 6v5h-5M9 20H4v-5M8 12h8m-4-4v8',
+  check:'M4 3h16v18H4zM8 7h8m-8 5h5m-5 5h3M16 15l2 2 4-5',
+  assign:'M3 4h10v16H3zM7 8h2m-2 4h2m-2 4h2M16 8l5 4-5 4m0-4h6'
+ };
+ const icon = key => '<svg class="tr-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+paths[key]+'"/></svg>';
+ const button = (id, label, key, primary = false) => '<button type="button" class="btn'+(primary?' primary':'')+'" id="'+id+'" data-iconized="1" data-cctt-icon-fixed="true">'+icon(key)+'<span>'+label+'</span></button>';
+ const page = document.createElement('section');
+ page.className = 'page';
+ page.id = 'page-' + ID;
+ page.innerHTML = `
+ <div class="tr-head">
+  <div><h2>${title}</h2><p class="tr-subtitle">Flujo vehicular por proveedor · Manzanillo y vialidades cercanas</p></div>
+  <div class="tr-actions">
+   ${button('trLayers','Capas','layers')}
+   ${button('trReload','Actualizar tráfico','refresh',true)}
+   ${button('trLocate','Mi ubicación','location')}
+   ${button('trManzanillo','Centrar Manzanillo','focus')}
+  </div>
+ </div>
+ <div class="tr-layout" id="trLayout">
+  <aside class="tr-panel" id="trLayersPanel" aria-label="Capas del mapa">
+   <h3>Capas del mapa</h3>
+   <label for="trBase">Mapa base CARTO
+    <select id="trBase"><option value="auto">Automático según el tema</option><option value="voyager">Voyager · calles</option><option value="light_all">Positron · claro</option><option value="dark_all">Dark Matter · oscuro</option></select>
+   </label>
+   <p class="tr-help" id="trBaseNotice" role="status"></p>
+   <label for="trProvider">Fuente de tráfico
+    <select id="trProvider"><option value="">Consultar disponibilidad</option></select>
+   </label>
+   <label class="tr-check"><input type="checkbox" id="trFlow" checked>Mostrar flujo vehicular</label>
+   <label for="trOpacity">Opacidad del tráfico <output id="trOpacityValue">90 %</output><input id="trOpacity" type="range" min="20" max="100" value="90"></label>
+   <label class="tr-check"><input type="checkbox" id="trAuto" checked>Actualizar cada 60 segundos</label>
+   <p class="tr-help" id="trProviders" role="status">La disponibilidad se consulta al abrir el módulo.</p>
+   <p class="tr-help">Compara los proveedores conservando el mismo encuadre. La cobertura y la antigüedad de las observaciones dependen de cada fuente.</p>
+  </aside>
+  <div class="tr-view">
+   <div id="trMap" role="region" aria-label="Mapa de tráfico terrestre"></div>
+   <div class="tr-statusbar"><output id="trStatus" role="status" aria-live="polite">Abre el módulo para consultar los servicios.</output><span id="trConsulted">Sin consulta de tráfico completada</span></div>
+  </div>
+ </div>
+ <div class="tr-legend" id="trLegend" aria-label="Leyenda del proveedor"></div>
+ <p class="tr-help" id="trCoverage">Una vía sin líneas de tráfico puede carecer de cobertura. La ausencia de color no confirma circulación fluida. La hora indicada corresponde a la consulta, no a la medición de cada vía.</p>
+ <details class="tr-panel tr-creator" id="trCreator" hidden>
+  <summary>Asignar acceso a este módulo</summary>
+  <p class="tr-help">Administración también puede asignarlo desde Administrar accesos. Este formulario habilita o revoca únicamente Tráfico terrestre en tiempo real. El usuario debe volver a iniciar sesión para ver el permiso actualizado.</p>
+  <div class="tr-grant-grid">
+   <label for="trTarget">Identificador UUID del usuario<input id="trTarget" spellcheck="false" maxlength="36" autocomplete="off"></label>
+   <label for="trPassword">Contraseña administrativa adicional<input id="trPassword" type="password" autocomplete="off"></label>
+  </div>
+  <label class="tr-check"><input type="checkbox" id="trGrant">Habilitar Tráfico terrestre en tiempo real</label>
+  <div class="tr-actions">${button('trReadGrant','Consultar acceso','check')}${button('trSaveGrant','Aplicar permiso','assign')}</div>
+  <p id="trGrantStatus" class="tr-help" role="status"></p>
+ </details>`;
+ document.querySelector('.content').append(page);
+ const $ = id => document.getElementById(id);
+ const nav = document.createElement('button');
+ nav.type = 'button';
+ nav.className = 'navbtn';
+ nav.dataset.page = ID;
+ nav.dataset.iconized = '1';
+ nav.dataset.ccttIconFixed = 'true';
+ nav.hidden = true;
+ nav.style.display = 'none';
+ nav.innerHTML = '<span class="ico">'+icon('nav')+'</span><span class="lbl">'+title+'</span>';
+ nav.onclick = () => { if (allowed()) go(ID); };
+ document.querySelector('.sidebar').append(nav);
+ $('trLayers').setAttribute('aria-expanded','true');
+ $('trLayers').setAttribute('aria-controls','trLayersPanel');
+
+ const client = () => window.ccttSupabaseClient;
+ const allowed = () => window.ccttCanAccess?.(ID) === true;
+ const active = () => allowed() && page.classList.contains('active') && !document.hidden;
+ let map = null, base = null, traffic = null, locationMarker = null;
+ let owner = '', config = null, starting = false, pendingReload = false;
+ let generation = 0, baseRequest = 0, reloadTimer = null;
+ let lastLoadError = '', loadFailures = 0, loadedTiles = 0, baseError = '';
+ const apiControllers = new Set();
+ const providerNames = {tomtom:'TomTom',here:'HERE'};
+
+ function status(message, state = '') {
+  $('trStatus').textContent = state === 'ready' && baseError ? message + ' · ' + baseError : message;
+  $('trStatus').dataset.state = state === 'ready' && baseError ? 'error' : state;
+ }
+ async function call(action, body = {}, externalSignal) {
+  const controller = new AbortController();
+  apiControllers.add(controller);
+  const abort = () => controller.abort();
+  externalSignal?.addEventListener('abort', abort, {once:true});
+  if (externalSignal?.aborted) controller.abort();
+  const timeout = setTimeout(abort, 16000);
+  try {
+   const sb = client();
+   if (!sb?.functions) throw Error('El servicio de consulta no está disponible.');
+   const {data,error} = await sb.functions.invoke('cctt-admin',{body:{action,...body},signal:controller.signal});
+   if (error) {
+    let detail;
+    try { detail = await error.context?.json(); } catch {}
+    throw Error(detail?.error || error.message || 'No se pudo completar la consulta.');
+   }
+   if (data?.error) throw Error(data.error);
+   return data;
+  } finally {
+   clearTimeout(timeout);
+   externalSignal?.removeEventListener('abort', abort);
+   apiControllers.delete(controller);
+  }
+ }
+ function legend() {
+  const source = $('trProvider').value;
+  const host = $('trLegend');
+  host.replaceChildren();
+  if (!source || !$('trFlow').checked) return;
+  const label = document.createElement('strong');
+  label.textContent = providerNames[source] + ' · ';
+  host.append(label);
+  if (source === 'here') {
+   host.append(document.createTextNode('El proveedor representa circulación fluida, tráfico denso, filas y bloqueos con su propia escala de colores.'));
+   return;
+  }
+  for (const [color,text] of [['free','Flujo ≥75 %'],['slow','35–75 %'],['heavy','15–35 %'],['queue','Menos de 15 %'],['blocked','Cierre reportado']]) {
+   const item = document.createElement('span'), swatch = document.createElement('i');
+   swatch.className = 'tr-swatch';
+   swatch.dataset.flow = color;
+   swatch.setAttribute('aria-hidden','true');
+   item.append(swatch,document.createTextNode(text));
+   host.append(item);
+  }
+  const note = document.createElement('span');
+  note.textContent = 'Porcentaje respecto a la velocidad de circulación libre del proveedor.';
+  host.append(note);
+ }
+ function dropTraffic() {
+  if (traffic && map) map.removeLayer(traffic);
+  traffic = null;
+  loadedTiles = 0;
+  loadFailures = 0;
+  lastLoadError = '';
+  $('trConsulted').textContent = 'Sin consulta de tráfico completada';
+ }
+ function pause() {
+  clearTimeout(reloadTimer);
+  reloadTimer = null;
+  generation++;
+  for (const controller of apiControllers) controller.abort();
+  apiControllers.clear();
+  dropTraffic();
+ }
+ function scheduleRefresh() {
+  clearTimeout(reloadTimer);
+  if (active() && config && $('trAuto').checked && $('trFlow').checked && $('trProvider').value) {
+   reloadTimer = setTimeout(() => { if (active()) void refresh(false); },60000);
+  }
+ }
+ function makeTrafficLayer(source) {
+  const stamp = generation;
+  const queue = [];
+  let running = 0, disposed = false;
+  const jobs = new Set();
+  function release(job) {
+   job.cancelled = true;
+   job.controller.abort();
+   if (job.url) URL.revokeObjectURL(job.url);
+   job.url = '';
+   jobs.delete(job);
+  }
+  function pump() {
+   if (disposed) return;
+   while (running < 6 && queue.length) {
+    const job = queue.shift();
+    if (job.cancelled) continue;
+    running++;
+    execute(job).finally(() => {running--;pump();});
+   }
+  }
+  async function execute(job) {
+   try {
+    if (!active() || stamp !== generation) { release(job); return; }
+    const result = await call('traffic-tile',{provider:source,z:job.coords.z,x:job.coords.x,y:job.coords.y},job.controller.signal);
+    if (job.cancelled || disposed || stamp !== generation) return;
+    if (!(result instanceof Blob) || !result.type.startsWith('image/png')) throw Error('La respuesta no contiene una imagen de tráfico válida.');
+    const image = document.createElement('img');
+    image.alt = '';
+    job.url = URL.createObjectURL(result);
+    image.onload = () => {
+     if (job.cancelled || disposed || stamp !== generation) return;
+     loadedTiles++;
+     job.done(null,job.tile);
+     if (job.url) URL.revokeObjectURL(job.url);
+     job.url = '';
+    };
+    image.onerror = () => {
+     if (job.cancelled || disposed) return;
+     loadFailures++;
+     lastLoadError = 'No se pudo mostrar una de las imágenes del proveedor.';
+     status(lastLoadError,'error');
+     job.done(Error(lastLoadError),job.tile);
+     release(job);
+    };
+    job.tile.append(image);
+    image.src = job.url;
+   } catch (error) {
+    if (job.cancelled || disposed || stamp !== generation) return;
+    loadFailures++;
+    lastLoadError = error.message || 'No se pudo obtener la capa de tráfico.';
+    status(lastLoadError,'error');
+    job.done(error,job.tile);
+   }
+  }
+  const TrafficLayer = L.GridLayer.extend({
+   createTile(coords,done) {
+    const tile = document.createElement('div');
+    tile.className = 'tr-map-tile';
+    const job = {tile,coords,done,controller:new AbortController(),url:'',cancelled:false};
+    jobs.add(job);
+    tile.trJob = job;
+    queue.push(job);
+    pump();
+    return tile;
+   },
+   onRemove(target) {
+    disposed = true;
+    for (const job of jobs) release(job);
+    queue.length = 0;
+    L.GridLayer.prototype.onRemove.call(this,target);
+   }
+  });
+  const layer = new TrafficLayer({minZoom:10,maxZoom:19,tileSize:256,opacity:Number($('trOpacity').value)/100,updateWhenIdle:true,keepBuffer:0,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]});
+  layer.on('tileunload',event=>{if(event.tile.trJob)release(event.tile.trJob);});
+  layer.on('loading',()=>{
+   if (stamp !== generation) return;
+   loadedTiles = 0;
+   loadFailures = 0;
+   status('Consultando '+providerNames[source]+'…');
+  });
+  layer.on('load',()=>{
+   if (stamp !== generation || !active()) return;
+   if (loadFailures) {
+    status((loadedTiles?'Carga parcial. ':'')+lastLoadError,'error');
+    $('trConsulted').textContent = loadedTiles?'Consulta incompleta · revisa la cobertura':'Sin consulta de tráfico completada';
+   } else if (loadedTiles) {
+    status('Capa de '+providerNames[source]+' consultada. Comprueba la cobertura.','ready');
+    $('trConsulted').textContent = 'Consulta completada · '+new Intl.DateTimeFormat('es-MX',{timeZone:'America/Mexico_City',dateStyle:'short',timeStyle:'medium'}).format(new Date());
+   }
+   scheduleRefresh();
+  });
+  return layer;
+ }
+ async function setBase() {
+  if (!map || !active()) return;
+  const ticket = ++baseRequest;
+  const dark = document.documentElement.dataset.ccttScheme === 'dark';
+  const selected = $('trBase').value;
+  const style = selected === 'auto' ? (dark?'dark_all':'voyager') : selected;
+  try {
+   const sb = client();
+   const {data,error} = await sb.functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
+   if (ticket !== baseRequest || !active()) return;
+   if (error || data?.error) throw Error(data?.error || error.message);
+   let path;
+   if (data?.styles?.[style]) {
+    path = style+'/{z}/{x}/{y}.png';
+    $('trBaseNotice').textContent = 'CARTO · '+({voyager:'Voyager',light_all:'Positron',dark_all:'Dark Matter'}[style]);
+   } else if (data?.ready) {
+    path = '{z}/{x}/{y}.png';
+    $('trBaseNotice').textContent = 'Se utiliza la plantilla CARTO compartida. Su estilo depende de la configuración administrativa.';
+   }
+   else throw Error('CARTO no tiene disponible la capa solicitada. Revisa su configuración en Administrar accesos.');
+   const layer = L.tileLayer(sb.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/'+path,{
+    maxZoom:19,updateWhenIdle:true,keepBuffer:2,attribution:'© OpenStreetMap contributors · © CARTO'
+   });
+   layer.on('tileerror',()=>{
+    if(base!==layer||!active())return;
+    baseError='No se pudo cargar parte del mapa CARTO.';
+    $('trBaseNotice').textContent=baseError;
+    status(baseError+' Puedes intentar actualizar.','error');
+   });
+   if (base) map.removeLayer(base);
+   baseError = '';
+   base = layer;
+   base.addTo(map);
+   if (traffic) traffic.bringToFront();
+  } catch (error) {
+   if (ticket === baseRequest && active()) {
+    baseError=error.message || 'No se pudo cargar CARTO.';
+    $('trBaseNotice').textContent=baseError;
+    status(baseError,'error');
+   }
+  }
+ }
+ async function loadConfig() {
+  const stamp = generation;
+  const result = await call('traffic-config');
+  if (stamp !== generation || !active()) return false;
+  const selected = $('trProvider').value;
+  config = result;
+  const selector = $('trProvider');
+  selector.replaceChildren(new Option('Selecciona una fuente',''));
+  for (const source of ['tomtom','here']) {
+   const enabled = result?.providers?.[source] === true;
+   const option = new Option(providerNames[source]+(enabled?'':' · sin configurar'),source);
+   option.disabled = !enabled;
+   selector.add(option);
+  }
+  selector.value = result?.providers?.[selected] ? selected : ['tomtom','here'].find(source=>result?.providers?.[source]) || '';
+  $('trProviders').textContent = ['tomtom','here'].map(source=>providerNames[source]+(result?.providers?.[source]?' disponible':' sin configurar')).join(' · ');
+  $('trCreator').hidden = result?.canAssign !== true;
+  legend();
+  return true;
+ }
+ function drawTraffic() {
+  dropTraffic();
+  legend();
+  if (!map || !active()) return;
+  if (!$('trFlow').checked) {status('Capa de tráfico desactivada.');return;}
+  const source = $('trProvider').value;
+  if (!source || !config?.providers?.[source]) {status('Configura al menos un proveedor de tráfico para consultar el flujo vehicular.');return;}
+  if (!navigator.onLine) {status('Sin conexión. No se puede consultar el tráfico actual.','error');return;}
+  if (map.getZoom()<10) {status('Acerca el mapa para consultar el tráfico de las vías.');return;}
+  status('Consultando '+providerNames[source]+'…');
+  traffic = makeTrafficLayer(source);
+  traffic.addTo(map);
+  scheduleRefresh();
+ }
+ async function refresh(recheck = true) {
+  if (!active()) return;
+  if (starting) {pendingReload = true;return;}
+  starting = true;
+  const stamp = generation;
+  $('trReload').disabled = true;
+  try {
+   if ((recheck || !config) && !await loadConfig()) return;
+   if (stamp !== generation || !active()) return;
+   drawTraffic();
+   if (recheck) void setBase();
+  } catch (error) {
+   if (stamp===generation&&active()) {
+    dropTraffic();
+    status(error.message || 'No se pudo consultar la disponibilidad de tráfico.','error');
+   }
+  } finally {
+   starting = false;
+   $('trReload').disabled = false;
+   if (pendingReload) {pendingReload=false;if(active())void refresh();}
+  }
+ }
+ function initialize() {
+  if (!active()) return;
+  if (!window.L) {status('No se cargó el motor de mapas. Comprueba la conexión y recarga.','error');return;}
+  if (!map) {
+   map = L.map('trMap',{zoomControl:true,minZoom:5,maxZoom:19}).setView([19.083,-104.300],13);
+   map.on('zoomend',()=>{
+    if (!active()) return;
+    if (map.getZoom()<10 || !traffic) drawTraffic();
+   });
+  }
+  requestAnimationFrame(()=>map.invalidateSize());
+  void refresh();
+ }
+ function syncCard() {
+  const visible = allowed();
+  nav.hidden = !visible;
+  nav.style.display = visible?'':'none';
+  const host = $('moduleCards');
+  let card = $('trHomeCard');
+  if (!card && host && visible) {
+   card = document.createElement('div');
+   card.id = 'trHomeCard';
+   card.dataset.page = ID;
+   card.className = 'card';
+   card.innerHTML = '<h3>'+title+'</h3><p class="muted">Consulta el flujo vehicular disponible en TomTom y HERE sobre las capas CARTO.</p>'+button('trOpenHome','Abrir mapa','home');
+   card.querySelector('button').onclick = nav.onclick;
+   host.append(card);
+  }
+  if (card) {card.hidden=!visible;card.style.display=visible?'':'none';}
+  if (!visible) {
+   pause();
+   $('trPassword').value = '';
+   $('trCreator').hidden = true;
+  } else if (active() && !traffic && !starting) initialize();
+ }
+ $('trLayers').onclick = () => {
+  const hidden = !$('trLayersPanel').hidden;
+  $('trLayersPanel').hidden = hidden;
+  $('trLayout').classList.toggle('tr-wide',hidden);
+  $('trLayers').setAttribute('aria-expanded',String(!hidden));
+  requestAnimationFrame(()=>map?.invalidateSize());
+ };
+ $('trReload').onclick = () => {if(active())void refresh();};
+ $('trBase').onchange = () => {if(active())void setBase();};
+ $('trProvider').onchange = () => {if(active()){generation++;drawTraffic();}};
+ $('trFlow').onchange = () => {if(active()){generation++;drawTraffic();}};
+ $('trOpacity').oninput = () => {
+  const value = Number($('trOpacity').value);
+  $('trOpacityValue').textContent = value+' %';
+  traffic?.setOpacity(value/100);
+ };
+ $('trAuto').onchange = scheduleRefresh;
+ $('trManzanillo').onclick = () => {if(active()&&map)map.setView([19.083,-104.300],13);};
+ $('trLocate').onclick = () => {
+  if (!active() || !map) return;
+  if (!navigator.geolocation) {status('Este navegador no ofrece ubicación.','error');return;}
+  const stamp=generation;
+  $('trLocate').disabled=true;
+  navigator.geolocation.getCurrentPosition(position=>{
+   $('trLocate').disabled=false;
+   if (!active() || stamp!==generation) return;
+   const point=[position.coords.latitude,position.coords.longitude];
+   if (locationMarker) map.removeLayer(locationMarker);
+   locationMarker=L.circleMarker(point,{radius:7,color:'#fff',weight:2,fillColor:'#1976d2',fillOpacity:1}).addTo(map).bindTooltip('Mi ubicación');
+   map.setView(point,15);
+  },error=>{
+   $('trLocate').disabled=false;
+   if(active()&&stamp===generation)status(error.code===1?'No se autorizó el acceso a tu ubicación.':'No fue posible obtener tu ubicación.','error');
+  },{enableHighAccuracy:false,timeout:12000,maximumAge:60000});
+ };
+ async function grant(save) {
+  if (!active() || !config?.canAssign) return;
+  const target=$('trTarget').value.trim(), password=$('trPassword').value;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(target) || !password) {
+   $('trGrantStatus').textContent='Completa un UUID válido y la contraseña adicional.';
+   return;
+  }
+  const account=owner;
+  $('trReadGrant').disabled=$('trSaveGrant').disabled=true;
+  $('trGrantStatus').textContent='Validando acceso…';
+  try {
+   const result=await call(save?'traffic-grant-save':'traffic-grant-read',{userId:target,secondaryPassword:password,...(save?{enabled:$('trGrant').checked}:{})});
+   if(account!==owner||!allowed()||$('trTarget').value.trim()!==target)return;
+   $('trGrant').checked=result.enabled===true;
+   $('trGrantStatus').textContent=save?'Permiso de Tráfico terrestre guardado.':'Acceso consultado para el UUID indicado.';
+  } catch(error) {
+   if(account===owner&&allowed())$('trGrantStatus').textContent=save?'No se pudo confirmar el guardado. Consulta el acceso antes de volver a aplicar. '+error.message:error.message;
+  } finally {
+   $('trPassword').value='';
+   $('trReadGrant').disabled=$('trSaveGrant').disabled=false;
+  }
+ }
+ $('trReadGrant').onclick=()=>grant(false);
+ $('trSaveGrant').onclick=()=>grant(true);
+ new MutationObserver(()=>{
+  if(active())initialize();
+  else {baseRequest++;pause();$('trPassword').value='';}
+ }).observe(page,{attributes:true,attributeFilter:['class']});
+ new MutationObserver(()=>{
+  if(active()&&$('trBase').value==='auto')void setBase();
+ }).observe(document.documentElement,{attributes:true,attributeFilter:['data-cctt-scheme']});
+ document.addEventListener('visibilitychange',()=>{
+  if(!active()){pause();return;}
+  initialize();
+ });
+ window.addEventListener('offline',()=>{if(active()){pause();status('Sin conexión. No se puede consultar el tráfico actual.','error');}});
+ window.addEventListener('online',()=>{if(active())initialize();});
+ window.addEventListener('cctt:access-updated',syncCard);
+ window.addEventListener('cctt:session',event=>{
+  const next=event.detail?.session?.user?.id||'';
+  if(owner&&next!==owner){
+   pause();config=null;baseRequest++;
+   if(map){map.remove();map=null;base=null;locationMarker=null;}
+   $('trTarget').value=$('trPassword').value=$('trGrantStatus').textContent='';
+   $('trGrant').checked=false;
+   $('trCreator').open=false;
+  }
+  owner=next;
+ });
+ window.addEventListener('cctt:logout',()=>{
+  owner='';pause();baseRequest++;config=null;
+  if(map){map.remove();map=null;base=null;locationMarker=null;}
+  $('trTarget').value=$('trPassword').value=$('trGrantStatus').textContent='';
+  $('trGrant').checked=false;
+  $('trCreator').hidden=true;
+  $('trCreator').open=false;
+  status('Inicia sesión con una cuenta autorizada.');
+  syncCard();
+ });
+ const home=$('moduleCards');
+ if(home)new MutationObserver(syncCard).observe(home,{childList:true});
+ window.ccttLearning?.register(ID,{
+  version:'trafico-terrestre-1',
+  purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
+  steps:[
+   {title:'Elige las capas',body:'Abre Capas, selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
+   {title:'Compara los proveedores',body:'Cambia entre TomTom y HERE conservando el encuadre. Las fuentes pueden tener distinta cobertura y antigüedad. No se combinan sus colores en una sola medición.',controlId:'trProvider'},
+   {title:'Consulta las vías',body:'Acerca el mapa para ver el flujo. Ajusta su opacidad para leer los nombres. Una vía sin líneas puede carecer de datos y no confirma circulación fluida.',controlId:'trOpacity'},
+   {title:'Actualiza y revisa el estado',body:'Actualizar tráfico vuelve a consultar la disponibilidad y las capas. La actualización automática opera cada 60 segundos mientras este módulo está visible. Una carga parcial o un error impiden confirmar una consulta completa.',controlId:'trReload'},
+   {title:'Ubicación de la consulta',body:'Mi ubicación requiere autorización del navegador. Centrar Manzanillo regresa al encuadre inicial. La ubicación consultada no se guarda como registro operativo.',controlId:'trLocate'},
+   {title:'Asignación de acceso',body:'Solo administración y cuentas con rol creator o creador verificado en Auth pueden usar este formulario, con contraseña administrativa adicional. Permite asignar exclusivamente este módulo por UUID. Los usuarios de consulta no pueden asignar accesos.',controlId:'trCreator'},
+   {title:'Permisos y restricciones',body:'Solo las cuentas habilitadas pueden consultar el módulo. Administradores y creadores verificados pueden asignar exclusivamente este acceso desde su formulario, con la contraseña adicional. Los usuarios de consulta no pueden modificar permisos ni credenciales. La guía no concede accesos.'},
+   {title:'Límites de la información',body:'Los datos dependen del servicio, su credencial, cuota y cobertura. La hora mostrada corresponde a la consulta y no acredita la hora de observación de cada carretera. El mapa no registra aforos ni predice rutas.'}
+  ]
+ });
+ syncCard();
 })();
 </script>
 
