@@ -11629,6 +11629,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
 (() => {
   const id = 'generadorCorreos';
   const prefix = 'Por medio del presente el Centro de Control de Tráfico Terrestre';
+  /* NUEVO: compartir el texto institucional entre la vista previa y el borrador. */
+  const defaultIntro = prefix + ' solicita su amable colaboración con lo siguiente:';
   const sidebar = document.querySelector('.sidebar');
   const parent = document.getElementById('page-documentacion')?.parentElement;
   if (!sidebar || !parent) return;
@@ -11658,12 +11660,18 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
         <select id="correoPlantilla"><option value="">Introducción institucional</option></select>
         <div class="correo-actions">
           <button class="btn" type="button" id="correoNuevaPlantilla">${icon('M4 5h10v14H4zM17 10h6m-3-3v6')}Nueva plantilla</button>
-          <!-- NUEVO: acciones para la plantilla personal seleccionada. -->
+        </div>
+        <!-- MODIFICADO: las acciones pertenecen a la ficha de la introducción seleccionada. -->
+        <div id="correoFichaPlantilla">
+          <p id="correoVistaPlantilla"></p>
+          <div class="correo-actions">
+            <button class="btn" type="button" id="correoUsarPlantilla">${icon('M3 12h11m-4-4 4 4-4 4M16 4h5v16h-5')}Usar esta plantilla</button>
+            <span id="correoAccionesPlantilla" hidden style="display:none">
           <button class="btn" type="button" id="correoEditarPlantilla" disabled>${icon('M13 5l6 6M4 20l5-1L21 7l-4-4L5 15z')}Editar plantilla</button>
           <button class="btn bad" type="button" id="correoEliminarPlantilla" disabled>${icon('M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7')}Eliminar plantilla</button>
+            </span>
+          </div>
         </div>
-        <!-- NUEVO: estado de la selección y vista previa del texto guardado. -->
-        <p id="correoVistaPlantilla"></p>
         <div id="correoEditorPlantilla" hidden>
           <div class="field"><label for="correoNombrePlantilla">Nombre de la plantilla</label><input id="correoNombrePlantilla" maxlength="80"></div>
           <div class="field"><label for="correoInicioPlantilla">Texto de introducción</label><textarea id="correoInicioPlantilla" maxlength="2000"></textarea></div>
@@ -11723,7 +11731,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     editingIndex = null;
     showTemplate(null);
     const selected = selectedTemplate();
-    get('correoVistaPlantilla').textContent = selected?.intro || 'Introducción institucional predeterminada.';
+    /* MODIFICADO */
+    get('correoVistaPlantilla').textContent = selected?.intro || defaultIntro;
+    const personalActions = get('correoAccionesPlantilla');
+    personalActions.hidden = !owner || !selected;
+    personalActions.style.display = personalActions.hidden ? 'none' : 'contents';
     newTemplate.disabled = !owner || deleting;
     editTemplate.disabled = deleteTemplate.disabled = !owner || !selected || deleting;
     updatePending();
@@ -11757,6 +11769,14 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     showTemplate(templates[index] || {});
     templateName.focus();
   }
+  /* NUEVO: usar la selección actual, incluida la institucional, y continuar a Solicitud. */
+  get('correoUsarPlantilla').onclick = () => {
+    if (!allowed()) return;
+    renderTemplates(selector.value);
+    const selected = selectedTemplate();
+    templateStatus.textContent = (selected?.name || 'Introducción institucional') + ' seleccionada. Escribe tu solicitud y genera el borrador.';
+    idea.focus();
+  };
   newTemplate.onclick = () => openTemplateEditor(templates.length);
   editTemplate.onclick = () => {
     if (selectedTemplate()) openTemplateEditor(Number(selector.value));
@@ -11853,7 +11873,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
       : update ? prefix + ' comunica la siguiente actualización de estatus:\n\n' + update[1]
       : notice ? prefix + ' informa ' + notice[1]
       : direct ? prefix + ' solicita ' + direct[1]
-      : prefix + ' solicita su amable colaboración con lo siguiente:\n\n' + request];
+      /* MODIFICADO */ : defaultIntro + '\n\n' + request];
     if (long) {
       if (details) paragraphs.push(formal('Como antecedente:'), details);
       paragraphs.push(formal(informative
@@ -11917,9 +11937,11 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   });
   const cards = get('moduleCards');
   if (cards) new MutationObserver(sync).observe(cards, {childList:true});
+  /* NUEVO: la introducción predeterminada está disponible desde el primer render. */
+  renderTemplates(selector.value);
   sync();
   window.ccttLearning?.register(id, {
-    /* MODIFICADO */ version:'4-gestion-plantillas',
+    /* MODIFICADO */ version:'5-ficha-plantillas',
     purpose:'Preparar borradores institucionales a partir de tu solicitud. El administrador asigna el acceso al módulo.',
     steps:[
       /* MODIFICADO */
@@ -11928,8 +11950,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
       {title:'Crea una plantilla de introducción',body:'Pulsa Nueva plantilla, escribe el nombre y la introducción y guarda. Las plantillas personales pertenecen a la cuenta activa en este navegador.',controlId:'correoNuevaPlantilla'},
       /* MODIFICADO */
       /* NUEVO */
-      {title:'Gestiona tus plantillas',body:'Selecciona una plantilla personal para previsualizarla. Usa Editar plantilla y guarda los cambios, o Cancelar para descartarlos. Eliminar plantilla pide confirmación. La introducción institucional es fija.'},
-      {title:'Elige la extensión',body:'Genera una opción corta o larga con la plantilla guardada que selecciones. La larga añade el contexto confirmado que captures. Para volver al inicio predeterminado, elige Introducción institucional.',controlId:'correoLargo'},
+      {title:'Gestiona tus plantillas',body:'Selecciona una plantilla personal para ver su texto y sus acciones en la misma ficha. Usa Editar plantilla y guarda los cambios, o Cancelar para descartarlos. Eliminar plantilla pide confirmación. La introducción institucional se puede usar y permanece fija.'},
+      {title:'Elige la extensión',body:'Elige la introducción institucional o una plantilla personal y pulsa Usar esta plantilla para ir a Solicitud. Genera una opción corta o larga con la selección actual. La opción larga añade el contexto confirmado que captures.',controlId:'correoLargo'},
       {title:'Revisa y copia',body:'Ajusta el borrador antes de copiarlo a tu correo. Si aparece un emparejamiento por confirmar, revisa el pendiente.',controlId:'correoCopiar'},
       /* NUEVO */
       {title:'Inicia otro borrador',body:'Limpiar vacía la solicitud, el contexto y el borrador actual.',controlId:'correoLimpiar'}
