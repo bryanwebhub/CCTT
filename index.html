@@ -5291,9 +5291,21 @@ function createAdminUI(){if($('page-adminUsuarios'))return;
  $('ccttLockAdmin').onclick=()=>{secret='';adminReady=false;$('ccttAdminPanel').classList.remove('unlocked');/* MODIFICADO: revocar también los controles y consultas de seguridad. */window.ccttSecuritySetAdminUnlock?.('');window.ccttAccessLayout?.refreshLock();notify('Administración bloqueada.')};
  $('ccttAllModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=true);
  $('ccttNoModules').onclick=()=>document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=false);
- $('ccttFindUser').onclick=async()=>{try{const r=await invoke('get-user',{userId:$('ccttTargetUser').value.trim()},secret);$('ccttTargetName').value=r.name||'';document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=(r.modules||[]).includes(el.value));document.getElementById('ccttCanCreateAvisos').checked=!!r.canCreateReminders;/* NUEVO */$('ccttCanEditProcesses').checked=!!r.canEditProcesses;/* NUEVO: consultar delegación real, sin asumir permisos. */const docGrant=await window.ccttSupabaseClient.rpc('cctt_get_document_manager',{target_user_id:$('ccttTargetUser').value.trim()});if(docGrant.error)throw docGrant.error;$('ccttManageAllDocuments').checked=docGrant.data===true;await window.ccttLoadReminderScope?.($('ccttTargetUser').value.trim(),r.reminderTargets||[]);notify('Permisos cargados.')}catch(e){notify(e.message,true)}};
+ /* MODIFICADO: no aplicar una respuesta de otro usuario ni guardar durante la consulta. */
+ let userLookup=0;
+ $('ccttTargetUser').addEventListener('input',()=>{
+  userLookup++;
+  $('ccttSaveUser').disabled=true;
+ });
+ $('ccttFindUser').onclick=async()=>{
+  const lookup=++userLookup,userId=$('ccttTargetUser').value.trim(),lookupSession=session,lookupSecret=secret;
+  const current=()=>adminReady&&session===lookupSession&&secret===lookupSecret&&lookup===userLookup&&$('ccttTargetUser').value.trim()===userId;
+  $('ccttSaveUser').disabled=true;
+  try{
+   const r=await invoke('get-user',{userId},secret);
+   if(!current())return;$('ccttTargetName').value=r.name||'';document.querySelectorAll('#ccttPermGrid input').forEach(el=>el.checked=(r.modules||[]).includes(el.value));document.getElementById('ccttCanCreateAvisos').checked=!!r.canCreateReminders;/* NUEVO */$('ccttCanEditProcesses').checked=!!r.canEditProcesses;/* NUEVO: consultar delegación real, sin asumir permisos. */const docGrant=await window.ccttSupabaseClient.rpc('cctt_get_document_manager',{target_user_id:userId});if(!current())return;if(docGrant.error)throw docGrant.error;$('ccttManageAllDocuments').checked=docGrant.data===true;await window.ccttLoadReminderScope?.(userId,r.reminderTargets||[]);if(current()){$('ccttSaveUser').disabled=false;notify('Permisos cargados.')}}catch(e){if(current())notify(e.message,true)}};
  /* NUEVO: autorización individual de edición, separada del acceso de lectura. */ $('ccttSaveUser').closest('.row').insertAdjacentHTML('beforebegin','<label class="dp-publish" style="display:flex;gap:10px;align-items:center;margin:12px 0;color:var(--cctt-theme-text,var(--text))"><input type="checkbox" id="ccttCanEditProcesses"> Autorizar creación y edición de folios del Diccionario de procesos</label>');
- $('ccttSaveUser').onclick=async()=>{try{const userId=$('ccttTargetUser').value.trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId))throw Error('Introduce un UUID válido.');const selected=[...document.querySelectorAll('#ccttPermGrid input:checked')].map(x=>x.value);await invoke('save-user',{userId,name:$('ccttTargetName').value.trim(),modules:selected,canCreateReminders:!!document.getElementById('ccttCanCreateAvisos')?.checked,/* NUEVO */canEditProcesses:!!$('ccttCanEditProcesses')?.checked,reminderTargets:[...document.querySelectorAll('#ccttReminderScope input:checked')].map(x=>x.value)},secret);/* NUEVO: gestionar el permiso especial solo tras guardar los módulos. */const docGrant=await window.ccttSupabaseClient.rpc('cctt_set_document_manager',{target_user_id:userId,enabled:!!$('ccttManageAllDocuments').checked});if(docGrant.error)throw docGrant.error;const check=await invoke('get-user',{userId},secret);const actual=(check.modules||[]).slice().sort();if(JSON.stringify(actual)!==JSON.stringify(selected.slice().sort())){const missing=selected.filter(x=>!actual.includes(x));const excess=actual.filter(x=>!selected.includes(x));throw Error('Permisos sin confirmar en el servidor: '+[...missing.map(x=>'faltante '+(modules.find(m=>m[0]===x)?.[1]||x)),...excess.map(x=>'adicional '+x)].join(', ')+'. Revisa la función administrativa.')} /* MODIFICADO: validación individual y diagnóstico sin conceder acceso automáticamente. */notify('Permisos guardados y verificados. El usuario debe volver a iniciar sesión para verlos.');await loadAdminData()}catch(e){notify(e.message,true)}};
+ $('ccttSaveUser').onclick=async()=>{try{const userId=$('ccttTargetUser').value.trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId))throw Error('Introduce un UUID válido.');const selected=[...document.querySelectorAll('#ccttPermGrid input:checked')].map(x=>x.value);/* MODIFICADO: conservar el valor del usuario al iniciar el guardado. */const documentManager=!!$('ccttManageAllDocuments').checked;await invoke('save-user',{userId,name:$('ccttTargetName').value.trim(),modules:selected,canCreateReminders:!!document.getElementById('ccttCanCreateAvisos')?.checked,/* NUEVO */canEditProcesses:!!$('ccttCanEditProcesses')?.checked,reminderTargets:[...document.querySelectorAll('#ccttReminderScope input:checked')].map(x=>x.value)},secret);/* NUEVO: gestionar el permiso especial solo tras guardar los módulos. */const docGrant=await window.ccttSupabaseClient.rpc('cctt_set_document_manager',{target_user_id:userId,enabled:documentManager});if(docGrant.error)throw docGrant.error;const check=await invoke('get-user',{userId},secret);const actual=(check.modules||[]).slice().sort();if(JSON.stringify(actual)!==JSON.stringify(selected.slice().sort())){const missing=selected.filter(x=>!actual.includes(x));const excess=actual.filter(x=>!selected.includes(x));throw Error('Permisos sin confirmar en el servidor: '+[...missing.map(x=>'faltante '+(modules.find(m=>m[0]===x)?.[1]||x)),...excess.map(x=>'adicional '+x)].join(', ')+'. Revisa la función administrativa.')} /* MODIFICADO: validación individual y diagnóstico sin conceder acceso automáticamente. */notify('Permisos guardados y verificados. El usuario debe volver a iniciar sesión para verlos.');await loadAdminData()}catch(e){notify(e.message,true)}};
  // NUEVO: controles de configuración IP independientes de los permisos de módulos; sin activar restricciones de servidor.
  $('ccttSaveUser').closest('.row').insertAdjacentHTML('afterend', `<section class="card cctt-ip-policy" aria-labelledby="ccttIpPolicyHeading"><h3 id="ccttIpPolicyHeading">Redes IP permitidas para el usuario</h3><p class="muted">Selecciona primero el UUID del usuario. Esta configuración se guarda mediante cctt-admin, pero todavía NO bloquea conexiones ni restringe GitHub Pages o Supabase.</p><label class="cctt-ip-toggle"><input type="checkbox" id="ccttIpEnabled"> Habilitar política de redes (configuración pendiente de aplicación)</label><div class="field"><label for="ccttIpNetworks">Direcciones IP o rangos CIDR autorizados, uno por línea (máximo 32)</label><textarea id="ccttIpNetworks" rows="4" spellcheck="false" placeholder="Introduce las IP públicas o rangos reales, uno por línea"></textarea></div><div class="row"><button type="button" class="btn" id="ccttIpLoad">Consultar redes</button><button type="button" class="btn primary" id="ccttIpSave">Guardar redes</button></div><p id="ccttIpMessage" role="status" aria-live="polite">Sin consultar. Los administradores están exentos de restricciones IP.</p></section>`);
  const ccttIpUUID=()=>{const id=$('ccttTargetUser').value.trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id))throw Error('Selecciona un UUID válido antes de administrar las redes.');return id};
@@ -5310,7 +5322,7 @@ function createAdminUI(){if($('page-adminUsuarios'))return;
  if(removed){if(!await ccttSiteConfirm('¿Eliminar el registro de permisos de este usuario? No se eliminará su cuenta de autenticación.'))return;try{const id=removed.dataset.removeUserAccess;const sb=window.ccttSupabaseClient;const {data,error}=await sb.rpc('cctt_delete_user_access',{target_user_id:id});if(error)throw error;if(data!==true)throw Error('No se confirmó la eliminación.');/* NUEVO: revocar también gestión de comunicados. */const revoke=await window.ccttSupabaseClient.rpc('cctt_set_document_manager',{target_user_id:id,enabled:false});if(revoke.error)throw revoke.error;notify('Registro de acceso eliminado.');await loadAdminData()}catch(err){notify('Es necesario ejecutar el SQL de administración: '+err.message,true)}return}
  const edit=e.target.closest('[data-edit-user]');if(edit){$('ccttTargetUser').value=edit.dataset.editUser;$('ccttFindUser').click();return}const del=e.target.closest('[data-remove-template]');if(del&&await ccttSiteConfirm('¿Eliminar este formato compartido?')){try{await invoke('delete-template',{id:del.dataset.removeTemplate},secret);await loadAdminData()}catch(err){notify(err.message,true)}}});
 }
-async function loadAdminData(){if(!adminReady)return;try{const [u,t]=await Promise.all([invoke('list-users',{},secret),invoke('list-templates',{},secret)]);window.ccttAdminReferenceUsers=u.users||[];window.ccttRenderReminderScope?.();$('ccttUsersList').innerHTML=`<table class="tbl"><thead><tr><th>Referencia</th><th>UUID</th><th>Módulos</th><th>Acción</th></tr></thead><tbody>${(u.users||[]).map(x=>`<tr><td>${escapeHtml(x.name||'Sin nombre')}</td><td>${escapeHtml(x.user_id)}</td><!-- MODIFICADO: iconos consultables de los módulos realmente asignados, conservando su orden y datos. --><td>${window.ccttAccessModuleBadges?.(x.modules||[],modules)||'Sin módulos asignados'}</td><td><button class="btn" data-edit-user="${escapeHtml(x.user_id)}">Editar</button> <!-- NUEVO: administración individual del acceso. --><button class="btn warn" data-disable-user="${escapeHtml(x.user_id)}">Inhabilitar</button> <button class="btn bad" data-remove-user-access="${escapeHtml(x.user_id)}">Eliminar acceso</button></td></tr>`).join('')||'<tr><td colspan="4">Aún no hay usuarios configurados.</td></tr>'}</tbody></table>`;$('ccttTemplatesList').innerHTML=`<table class="tbl"><thead><tr><th>Módulo</th><th>Formato</th><th>Acción</th></tr></thead><tbody>${(t.templates||[]).map(x=>`<tr><td>${escapeHtml(modules.find(m=>m[0]===x.module_id)?.[1]||x.module_id)}</td><td>${escapeHtml(x.name)}</td><td><button class="btn" data-edit-template="${escapeHtml(x.id)}" data-template-name="${escapeHtml(x.name)}" data-template-module="${escapeHtml(x.module_id)}">Editar</button> <button class="btn bad" data-remove-template="${escapeHtml(x.id)}">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="3">No hay formatos publicados.</td></tr>'}</tbody></table>`}catch(e){notify(e.message,true)}}
+async function loadAdminData(){if(!adminReady)return;try{const [u,t]=await Promise.all([invoke('list-users',{},secret),invoke('list-templates',{},secret)]);window.ccttAdminReferenceUsers=u.users||[];/* MODIFICADO: al refrescar la lista no perder los destinatarios ya seleccionados. */const reminderScope=[...document.querySelectorAll('#ccttReminderScope input:checked')].map(input=>input.value);window.ccttLoadReminderScope?.($('ccttTargetUser').value.trim(),reminderScope);$('ccttUsersList').innerHTML=`<table class="tbl"><thead><tr><th>Referencia</th><th>UUID</th><th>Módulos</th><th>Acción</th></tr></thead><tbody>${(u.users||[]).map(x=>`<tr><td>${escapeHtml(x.name||'Sin nombre')}</td><td>${escapeHtml(x.user_id)}</td><!-- MODIFICADO: iconos consultables de los módulos realmente asignados, conservando su orden y datos. --><td>${window.ccttAccessModuleBadges?.(x.modules||[],modules)||'Sin módulos asignados'}</td><td><button class="btn" data-edit-user="${escapeHtml(x.user_id)}">Editar</button> <!-- NUEVO: administración individual del acceso. --><button class="btn warn" data-disable-user="${escapeHtml(x.user_id)}">Inhabilitar</button> <button class="btn bad" data-remove-user-access="${escapeHtml(x.user_id)}">Eliminar acceso</button></td></tr>`).join('')||'<tr><td colspan="4">Aún no hay usuarios configurados.</td></tr>'}</tbody></table>`;$('ccttTemplatesList').innerHTML=`<table class="tbl"><thead><tr><th>Módulo</th><th>Formato</th><th>Acción</th></tr></thead><tbody>${(t.templates||[]).map(x=>`<tr><td>${escapeHtml(modules.find(m=>m[0]===x.module_id)?.[1]||x.module_id)}</td><td>${escapeHtml(x.name)}</td><td><button class="btn" data-edit-template="${escapeHtml(x.id)}" data-template-name="${escapeHtml(x.name)}" data-template-module="${escapeHtml(x.module_id)}">Editar</button> <button class="btn bad" data-remove-template="${escapeHtml(x.id)}">Eliminar</button></td></tr>`).join('')||'<tr><td colspan="3">No hay formatos publicados.</td></tr>'}</tbody></table>`}catch(e){notify(e.message,true)}}
 async function showSharedFormats(){
  if(!session)return;
  try{
@@ -11092,6 +11104,9 @@ window.addEventListener('cctt:session',e=>{if(user?.id!==e.detail?.session?.user
 #ccttAccessTabs svg,#ccttAccessPane_vault>button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;flex-shrink:0}
 #page-adminUsuarios [role=tabpanel][hidden],#page-adminUsuarios #ccttAccessIdentity[hidden],#ccttAccessTabs button[hidden]{display:none!important}
 #page-adminUsuarios #ccttAccessIdentity,#page-adminUsuarios #ccttAccessEditor{border:1px solid var(--cctt-theme-line,var(--line));border-radius:12px;padding:14px;margin:12px 0;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text))}
+/* NUEVO: selector legible con el tema activo. */
+#ccttAccessUserFilter,#ccttAccessUserPicker{width:100%;color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card));border:1px solid var(--cctt-theme-line,var(--line));border-radius:8px;padding:.65rem}
+#ccttAccessUserFilter:focus-visible,#ccttAccessUserPicker:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 #ccttAccessIdentity>summary,#ccttAccessEditor>summary{cursor:pointer;font-weight:700;padding:6px;line-height:1.5}
 #ccttAccessIdentity[open]>summary,#ccttAccessEditor[open]>summary{margin-bottom:12px}
 #ccttAccessSearch{width:100%;max-width:620px;box-sizing:border-box;background:var(--cctt-theme-input,var(--card));color:var(--cctt-theme-inputtext,var(--text));border:1px solid var(--cctt-theme-line,var(--line));border-radius:9px;padding:11px}
@@ -11126,7 +11141,7 @@ function choose(name){
  /* MODIFICADO: mantener ocultos los apartados y su contenido hasta verificar la contraseña adicional. */const unlocked=window.ccttAccessUnlocked?.()===true;
  current=name;page.dataset.accessSection=name;tabs.hidden=!unlocked;
  for(const [key,node]of Object.entries(panes))node.hidden=!unlocked||key!==name;
- identity.hidden=!unlocked||!['users','vault'].includes(name);appearanceHost.hidden=!unlocked||name!=='settings'||!admin();syncIdentity();
+ /* MODIFICADO: mostrar la selección compartida también en Configuración. */identity.hidden=!unlocked||!admin()||!['users','vault','settings'].includes(name);renderUserPicker();appearanceHost.hidden=!unlocked||name!=='settings'||!admin();syncIdentity();
  if(!unlocked&&page.classList.contains('active')&&by('pageTitle'))by('pageTitle').textContent='Administrar accesos';
  for(const b of tabs.children){b.setAttribute('aria-selected',String(b.dataset.accessTab===name));b.tabIndex=b.dataset.accessTab===name?0:-1;b.hidden=!admin()&&b.dataset.accessTab!=='security'}
  const nav=document.querySelector('.sidebar .navbtn[data-page="sesionesSeguridad"]');if(nav){const label=nav.querySelector('.lbl');if(label&&label.textContent!=='Administrar accesos')label.textContent='Administrar accesos'}
@@ -11137,6 +11152,27 @@ function route(id){mount();if(!page)return;
 }
 /* MODIFICADO: sincronizar el bloqueo sin cambiar el apartado seleccionado. */window.ccttAccessLayout={route,refreshLock:()=>{if(page)choose(current)}};
 function syncIdentity(){if(!identity)return;const id=by('ccttTargetUser')?.value.trim(),name=by('ccttTargetName')?.value.trim();identity.querySelector('summary').textContent=id?'Usuario seleccionado · '+(name||id):'Usuario seleccionado · consultar o cambiar'}
+/* NUEVO: consultar los mismos usuarios ya cargados por Administrar accesos. */
+function renderUserPicker(){
+ const picker=by('ccttAccessUserPicker'), search=by('ccttAccessUserFilter');
+ if(!picker||!search)return;
+ const unlocked=admin()&&window.ccttAccessUnlocked?.()===true;
+ const query=search.value.trim().toLocaleLowerCase('es-MX');
+ const users=unlocked?(window.ccttAdminReferenceUsers||[]):[];
+ const matches=users.filter(user=>user.user_id&&((user.name||'')+' '+user.user_id).toLocaleLowerCase('es-MX').includes(query));
+ const placeholder=new Option(matches.length?'Elige un usuario':query?'Sin coincidencias':'Sin usuarios en la lista','');
+ picker.replaceChildren(placeholder);
+ for(const user of matches)picker.add(new Option((user.name||'Sin nombre')+' · '+user.user_id,user.user_id));
+ picker.value=by('ccttTargetUser').value.trim();
+ if(picker.selectedIndex<0)picker.selectedIndex=0;
+ picker.disabled=!unlocked||!matches.length;
+}
+function focusUserPicker(){
+ identity.open=true;
+ const search=by('ccttAccessUserFilter');
+ search.scrollIntoView({block:'nearest'});
+ search.focus();
+}
 function refreshTable(){const table=by('ccttUsersList');if(!table)return;const q=(by('ccttAccessSearch')?.value||'').trim().toLocaleLowerCase('es-MX');for(const row of table.querySelectorAll('tbody tr'))row.hidden=!!q&&!row.textContent.toLocaleLowerCase('es-MX').includes(q)}
 function collect(){if(!panel)return;for(const node of [...panel.children]){if(node===identity||Object.values(panes).includes(node))continue;if(node.id==='ccttVaultAdmin')panes.vault.append(node);else panes.settings.append(node)}
  const appearance=by('ccttAppearancePanel');if(appearance&&appearance.parentElement!==appearanceHost)appearanceHost.append(appearance);
@@ -11153,28 +11189,63 @@ function mount(){
  const labels=[['users','Usuarios y permisos','M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8M20 8v6m-3-3h6'],['vault','Autenticador','M5 10h14v11H5zM8 10V6a4 4 0 0 1 8 0v4M12 14v4'],['formats','Formatos','M5 2h9l5 5v15H5zM14 2v6h5M8 12h8m-8 4h8'],['settings','Configuración','M4 6h16M4 12h16M4 18h16M8 3v6m8 0v6M10 15v6'],['security','Sesiones y seguridad','M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6zM8 12h8']];
  for(const[key,label,path]of labels){const b=button(label,path);b.dataset.accessTab=key;b.id='ccttAccessTab_'+key;b.setAttribute('role','tab');b.setAttribute('aria-controls',key==='security'?security.id:'ccttAccessPane_'+key);b.onclick=()=>{if(key==='security'){if(window.ccttCanAccess?.('sesionesSeguridad'))go('sesionesSeguridad');return}if(!admin())return;if(security.classList.contains('active')){go('adminUsuarios')}choose(key)};tabs.append(b);if(key!=='security'){const node=make('section');node.id='ccttAccessPane_'+key;node.setAttribute('role','tabpanel');node.setAttribute('aria-labelledby',b.id);panes[key]=node}}
  tabs.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;const available=[...tabs.children].filter(b=>!b.hidden);let i=available.indexOf(document.activeElement);i=e.key==='Home'?0:e.key==='End'?available.length-1:(i+(e.key==='ArrowRight'?1:-1)+available.length)%available.length;e.preventDefault();available[i]?.click();available[i]?.focus()});
- identity=make('details');identity.id='ccttAccessIdentity';identity.append(make('summary','Usuario seleccionado · consultar o cambiar'));identity.append(targetGrid,targetActions);
+ identity=make('details');identity.id='ccttAccessIdentity';identity.append(make('summary','Usuario seleccionado · consultar o cambiar'));/* NUEVO: búsqueda y selección sin cambiar de apartado. */
+ const userSearch=make('label','Buscar por nombre o UUID');userSearch.className='field';
+ const userFilter=make('input');userFilter.id='ccttAccessUserFilter';userFilter.type='search';userSearch.append(userFilter);
+ const userChoice=make('label','Usuarios disponibles');userChoice.className='field';
+ const picker=make('select');picker.id='ccttAccessUserPicker';userChoice.append(picker);
+ userFilter.oninput=renderUserPicker;
+ picker.onchange=()=>{
+  if(!picker.value||!admin()||window.ccttAccessUnlocked?.()!==true)return;
+  const target=by('ccttTargetUser');
+  if(target.value.trim()===picker.value)return;
+  target.value=picker.value;
+  by('ccttTargetName').value='';
+  target.dispatchEvent(new Event('input',{bubbles:true}));
+  target.dispatchEvent(new Event('change',{bubbles:true}));
+  by('ccttFindUser').click();
+ };
+ identity.append(userSearch,userChoice,targetGrid,targetActions);
  editor=make('details');editor.id='ccttAccessEditor';editor.append(make('summary','Permisos y opciones del usuario'));
  let group='editor';for(const node of originalChildren){if(node===targetGrid||node===targetActions)continue;if(node===usersTitle)group='users';if(node===formatsTitle)group='formats';if(group==='editor')editor.append(node);else if(group==='users')panes.users.append(node);else if(group==='formats')panes.formats.append(node);else panes.settings.append(node);if(node===templatesList)group='settings';}
  const search=make('label','Buscar usuario configurado');search.className='field';const input=make('input');input.id='ccttAccessSearch';input.type='search';input.placeholder='Nombre, UUID o módulo asignado';input.addEventListener('input',refreshTable);search.append(input);panes.users.insertBefore(search,usersList);panes.users.append(editor);
- const help=make('p','Las asignaciones del autenticador corresponden al usuario seleccionado.');help.className='muted';const select=button('Seleccionar usuario','M19 12H5M11 6l-6 6 6 6');select.onclick=()=>{choose('users');identity.open=true;by('ccttTargetUser').focus()};panes.vault.append(help,select);
+ const help=make('p','Las asignaciones del autenticador corresponden al usuario seleccionado.');help.className='muted';/* MODIFICADO */const select=button('Seleccionar usuario','M10 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6M3 20v-2a5 5 0 0 1 5-5h4m3 4h6m-3-3v6');select.onclick=focusUserPicker;panes.vault.append(help,select);
+ /* NUEVO: cambiar el permiso del módulo desde Autenticador con el guardado existente. */
+ const vaultPermission=make('label');vaultPermission.className='cctt-perm-option';
+ const vaultToggle=make('input');vaultToggle.type='checkbox';vaultToggle.id='ccttAccessVaultPermission';
+ vaultPermission.append(vaultToggle,make('span','Habilitar Autenticador autorizado para este usuario'));
+ const originalVaultToggle=()=>by('ccttPermGrid').querySelector('input[value="autenticadorAutorizado"]');
+ const syncVaultPermission=()=>{
+  const original=originalVaultToggle();
+  vaultToggle.checked=!!original?.checked;
+  vaultToggle.disabled=!original||!by('ccttTargetUser').value.trim()||by('ccttSaveUser').disabled||!window.ccttAccessUnlocked?.();
+ };
+ vaultToggle.onchange=()=>{
+  const original=originalVaultToggle();
+  if(!vaultToggle.disabled&&original)original.checked=vaultToggle.checked;
+ };
+ panes.vault.append(vaultPermission);
+ new MutationObserver(syncVaultPermission).observe(by('ccttSaveUser'),{attributes:true,attributeFilter:['disabled']});
+ page.addEventListener('change',syncVaultPermission);
+ page.addEventListener('click',()=>queueMicrotask(syncVaultPermission));
+ syncVaultPermission();
  panel.append(identity,panes.users,panes.vault,panes.formats,panes.settings);
  appearanceHost=make('div');appearanceHost.id='ccttAccessAppearance';page.append(appearanceHost);
  panes.security=security;security.setAttribute('role','tabpanel');security.setAttribute('aria-labelledby','ccttAccessTab_security');page.append(security);
- page.addEventListener('click',e=>{if(e.target.closest('[data-edit-user]')){choose('users');identity.open=true;editor.open=true;requestAnimationFrame(()=>by('ccttTargetUser')?.scrollIntoView({block:'center',behavior:'smooth'}))}if(e.target.closest('#ccttAdminQuickChoose')){choose('users');identity.open=true;requestAnimationFrame(()=>{by('ccttTargetUser')?.scrollIntoView({block:'center',behavior:'smooth'});by('ccttTargetUser')?.focus()})}if(e.target.closest('#ccttFindUser'))editor.open=true});
+ page.addEventListener('click',e=>{if(e.target.closest('[data-edit-user]')){choose('users');identity.open=true;editor.open=true;requestAnimationFrame(()=>by('ccttTargetUser')?.scrollIntoView({block:'center',behavior:'smooth'}))}/* MODIFICADO */if(e.target.closest('#ccttAdminQuickChoose')){if(identity.hidden)choose('users');requestAnimationFrame(focusUserPicker)}if(e.target.closest('#ccttFindUser'))editor.open=true});
  document.querySelector('.cctt-admin-nav')?.addEventListener('click',()=>route('adminUsuarios'));
  page.addEventListener('input',syncIdentity);page.addEventListener('change',syncIdentity);
  if(by('ccttAdminMsg'))new MutationObserver(syncIdentity).observe(by('ccttAdminMsg'),{childList:true,subtree:true,characterData:true});
  new MutationObserver(collect).observe(panel,{childList:true});
  new MutationObserver(collect).observe(page,{childList:true});
- new MutationObserver(refreshTable).observe(usersList,{childList:true,subtree:true});
+ /* MODIFICADO */new MutationObserver(()=>{refreshTable();renderUserPicker()}).observe(usersList,{childList:true,subtree:true});
  /* MODIFICADO: actualizar todos los apartados también al bloquear o renovar la sesión. */new MutationObserver(()=>{choose(current);if(!panel.classList.contains('unlocked')){identity.open=false;editor.open=false}}).observe(panel,{attributes:true,attributeFilter:['class']});
  collect();choose('users');if(security.classList.contains('active'))route('sesionesSeguridad');
 }
 function schedule(){if(scheduled)return;scheduled=true;queueMicrotask(()=>{scheduled=false;mount()})}
 new MutationObserver(schedule).observe(document.querySelector('.content')||document.body,{childList:true});
 new MutationObserver(()=>{if(page)choose(current)}).observe(document.body,{attributes:true,attributeFilter:['class']});
-window.addEventListener('cctt:logout',()=>{if(page){page.classList.remove('cctt-access-security');security.classList.remove('active');choose('users');by('ccttAccessSearch').value='';refreshTable()}});
+window.addEventListener('cctt:logout',()=>{if(page){page.classList.remove('cctt-access-security');security.classList.remove('active');choose('users');by('ccttAccessSearch').value='';/* NUEVO */by('ccttAccessUserFilter').value='';renderUserPicker();refreshTable()}});
 mount();document.addEventListener('DOMContentLoaded',mount,{once:true});
 })();
 </script>
@@ -11506,6 +11577,9 @@ const sb=window.ccttSupabaseClient;if(sb?.auth)sb.auth.getSession().then(r=>{if(
 #correoPlantillas{margin:.8rem 0;padding:.85rem;border:1px solid var(--cctt-theme-line,var(--line));border-radius:10px;color:var(--cctt-theme-text,var(--text));background:var(--cctt-theme-card,var(--card))}
 #correoPlantillas select,#correoPlantillas input{width:100%;padding:.65rem;border-radius:8px;border:1px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))}
 #correoPlantillas :is(select,input,button):focus-visible,#ccttSessionExit button:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+/* NUEVO: vista previa de la introducción y contraste del editor. */
+#correoVistaPlantilla{white-space:pre-wrap;overflow-wrap:anywhere;padding:.7rem;border-inline-start:3px solid var(--cctt-theme-line,var(--line));color:var(--cctt-theme-text,var(--text))}
+#correoInicioPlantilla:focus-visible{outline:2px solid currentColor;outline-offset:3px}
 #correoEditorPlantilla[hidden]{display:none!important}
 #correoEstadoPlantilla,#correoPendiente{color:var(--cctt-theme-text,var(--text))}
 #ccttSessionExit{box-sizing:border-box;width:min(470px,calc(100% - 32px));max-height:calc(100% - 32px);padding:24px;border-radius:16px;border:1px solid var(--cctt-theme-line,var(--line,#ddd));background:var(--cctt-theme-card,var(--card,#fff));color:var(--cctt-theme-text,var(--text,#182236));box-shadow:0 20px 64px #0005}
@@ -11584,12 +11658,19 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
         <select id="correoPlantilla"><option value="">Introducción institucional</option></select>
         <div class="correo-actions">
           <button class="btn" type="button" id="correoNuevaPlantilla">${icon('M4 5h10v14H4zM17 10h6m-3-3v6')}Nueva plantilla</button>
+          <!-- NUEVO: acciones para la plantilla personal seleccionada. -->
+          <button class="btn" type="button" id="correoEditarPlantilla" disabled>${icon('M13 5l6 6M4 20l5-1L21 7l-4-4L5 15z')}Editar plantilla</button>
+          <button class="btn bad" type="button" id="correoEliminarPlantilla" disabled>${icon('M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7')}Eliminar plantilla</button>
         </div>
+        <!-- NUEVO: estado de la selección y vista previa del texto guardado. -->
+        <p id="correoVistaPlantilla"></p>
         <div id="correoEditorPlantilla" hidden>
           <div class="field"><label for="correoNombrePlantilla">Nombre de la plantilla</label><input id="correoNombrePlantilla" maxlength="80"></div>
           <div class="field"><label for="correoInicioPlantilla">Texto de introducción</label><textarea id="correoInicioPlantilla" maxlength="2000"></textarea></div>
           <div class="correo-actions">
             <button class="btn" type="button" id="correoGuardarPlantilla">${icon('M4 3h11l5 5v13H4zM8 3v6h7M8 21v-8h8v8')}Guardar plantilla</button>
+            <!-- NUEVO -->
+            <button class="btn" type="button" id="correoCancelarPlantilla">${icon('M12 4a8 8 0 1 1-7 4M4 4v5h5')}Cancelar</button>
           </div>
         </div>
         <p id="correoEstadoPlantilla" class="muted" role="status"></p>
@@ -11622,7 +11703,10 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   const selector = get('correoPlantilla'), editor = get('correoEditorPlantilla');
   const templateName = get('correoNombrePlantilla'), introduction = get('correoInicioPlantilla');
   const templateStatus = get('correoEstadoPlantilla');
-  let owner = '', templates = [];
+  /* NUEVO: distinguir un borrador nuevo del registro que se está editando. */
+  const newTemplate = get('correoNuevaPlantilla'), editTemplate = get('correoEditarPlantilla');
+  const deleteTemplate = get('correoEliminarPlantilla'), cancelTemplate = get('correoCancelarPlantilla');
+  let owner = '', templates = [], editingIndex = null, deleting = false, templateOwnerRevision = 0;
   const storageKey = () => 'cctt-correo-intros-v1:' + owner;
   const selectedTemplate = () => selector.value === '' ? null : templates[Number(selector.value)];
   function showTemplate(template) {
@@ -11635,10 +11719,18 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     selector.replaceChildren(new Option('Introducción institucional', ''));
     templates.forEach((template, index) => selector.add(new Option(template.name, String(index))));
     selector.value = selection;
-    showTemplate(selectedTemplate());
+    /* MODIFICADO: dejar la plantilla en vista de lectura. */
+    editingIndex = null;
+    showTemplate(null);
+    const selected = selectedTemplate();
+    get('correoVistaPlantilla').textContent = selected?.intro || 'Introducción institucional predeterminada.';
+    newTemplate.disabled = !owner || deleting;
+    editTemplate.disabled = deleteTemplate.disabled = !owner || !selected || deleting;
+    updatePending();
   }
   function setTemplateOwner(id) {
     if (id === owner) return;
+    /* NUEVO */ templateOwnerRevision++;
     owner = id;
     templates = [];
     templateStatus.textContent = '';
@@ -11653,37 +11745,75 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     }
     renderTemplates();
   }
-  selector.onchange = () => {templateStatus.textContent = '';showTemplate(selectedTemplate());};
-  get('correoNuevaPlantilla').onclick = () => {
-    if (!allowed() || !owner) return;
-    selector.value = '';
+  /* MODIFICADO: elegir una plantilla la previsualiza, editar abre su formulario. */
+  selector.onchange = () => {
     templateStatus.textContent = '';
-    showTemplate({});
+    renderTemplates(selector.value);
+  };
+  function openTemplateEditor(index) {
+    if (!allowed() || !owner || deleting) return;
+    editingIndex = index;
+    templateStatus.textContent = '';
+    showTemplate(templates[index] || {});
     templateName.focus();
+  }
+  newTemplate.onclick = () => openTemplateEditor(templates.length);
+  editTemplate.onclick = () => {
+    if (selectedTemplate()) openTemplateEditor(Number(selector.value));
+  };
+  cancelTemplate.onclick = () => {
+    renderTemplates(selector.value);
+    templateStatus.textContent = 'Edición cancelada.';
+    selector.focus();
+  };
+  /* NUEVO: comprobar cambios en otra pestaña antes de guardar o eliminar. */
+  function persistTemplates(next) {
+    const existing = JSON.parse(localStorage.getItem(storageKey()) || '[]');
+    if (JSON.stringify(existing) !== JSON.stringify(templates)) {
+      throw Error('Las plantillas cambiaron en otra pestaña. Recarga la página antes de continuar.');
+    }
+    localStorage.setItem(storageKey(), JSON.stringify(next));
+    templates = next;
+  }
+  deleteTemplate.onclick = async () => {
+    const selected = selectedTemplate();
+    if (!allowed() || !owner || deleting || !selected) return;
+    const selection = selector.value, revision = templateOwnerRevision;
+    deleting = true;
+    deleteTemplate.disabled = true;
+    try {
+      if (!await ccttSiteConfirm('¿Eliminar la plantilla «'+selected.name+'»?')) return;
+      if (!allowed() || revision !== templateOwnerRevision || selector.value !== selection || selectedTemplate() !== selected) return;
+      persistTemplates(templates.filter(template => template !== selected));
+      renderTemplates();
+      templateStatus.textContent = 'Plantilla eliminada de este navegador.';
+      selector.focus();
+    } catch (error) {
+      if (revision === templateOwnerRevision) templateStatus.textContent = error.message || 'No se pudo eliminar la plantilla.';
+    } finally {
+      deleting = false;
+      newTemplate.disabled = !owner;
+      editTemplate.disabled = deleteTemplate.disabled = !owner || !selectedTemplate();
+    }
   };
   get('correoGuardarPlantilla').onclick = () => {
-    if (!allowed() || !owner || editor.hidden) return;
+    if (!allowed() || !owner || deleting || editor.hidden || editingIndex === null) return;
     const name = templateName.value.trim(), intro = introduction.value.trim();
     if (!name || !intro) {
       templateStatus.textContent = 'Completa el nombre y el texto de introducción.';
       (name ? introduction : templateName).focus();
       return;
     }
-    const index = selector.value === '' ? templates.length : Number(selector.value);
+    /* MODIFICADO: guardar sobre la plantilla abierta, incluso si hay otra seleccionada. */
+    const index = editingIndex;
     const next = [...templates];
     next[index] = {name, intro};
     try {
-      const existing = JSON.parse(localStorage.getItem(storageKey()) || '[]');
-      if (JSON.stringify(existing) !== JSON.stringify(templates)) {
-        templateStatus.textContent = 'Las plantillas cambiaron en otra pestaña o no se pudieron leer. Recarga la página antes de guardar.';
-        return;
-      }
-      localStorage.setItem(storageKey(), JSON.stringify(next));
-    } catch {
-      templateStatus.textContent = 'No se pudo guardar la plantilla en este navegador.';
+      persistTemplates(next);
+    } catch (error) {
+      templateStatus.textContent = error.message || 'No se pudo guardar la plantilla en este navegador.';
       return;
     }
-    templates = next;
     renderTemplates(String(index));
     templateStatus.textContent = 'Plantilla guardada en este navegador.';
   };
@@ -11695,7 +11825,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   }).catch(() => {});
   const pending = get('correoPendiente');
   function updatePending() {
-    pending.hidden = !/* MODIFICADO */ [idea.value, context.value, draft.value, introduction.value].some(
+    pending.hidden = !/* MODIFICADO */ [idea.value, context.value, draft.value, introduction.value, /* NUEVO */ selectedTemplate()?.intro || ''].some(
       text => /emparejamiento\s+por\s+confirmar/iu.test(text)
     );
   }
@@ -11789,18 +11919,30 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   if (cards) new MutationObserver(sync).observe(cards, {childList:true});
   sync();
   window.ccttLearning?.register(id, {
-    /* MODIFICADO */ version:'3-plantillas',
+    /* MODIFICADO */ version:'4-gestion-plantillas',
     purpose:'Preparar borradores institucionales a partir de tu solicitud. El administrador asigna el acceso al módulo.',
     steps:[
       /* MODIFICADO */
       {title:'Describe la solicitud',body:'Usa Solicitar para una petición, Informar para un aviso o Actualización de estatus: para un cambio operativo. Añade contexto confirmado para la versión larga.',controlId:'correoIdea'},
       /* NUEVO */
-      {title:'Crea una plantilla de introducción',body:'Selecciona Nueva plantilla, escribe el nombre y la introducción desde cero y guarda. Para editar, selecciona la plantilla guardada, cambia sus datos y vuelve a guardar. Solo la cuenta activa puede usar sus plantillas en este navegador.',controlId:'correoNuevaPlantilla'},
+      {title:'Crea una plantilla de introducción',body:'Pulsa Nueva plantilla, escribe el nombre y la introducción y guarda. Las plantillas personales pertenecen a la cuenta activa en este navegador.',controlId:'correoNuevaPlantilla'},
       /* MODIFICADO */
+      /* NUEVO */
+      {title:'Gestiona tus plantillas',body:'Selecciona una plantilla personal para previsualizarla. Usa Editar plantilla y guarda los cambios, o Cancelar para descartarlos. Eliminar plantilla pide confirmación. La introducción institucional es fija.'},
       {title:'Elige la extensión',body:'Genera una opción corta o larga con la plantilla guardada que selecciones. La larga añade el contexto confirmado que captures. Para volver al inicio predeterminado, elige Introducción institucional.',controlId:'correoLargo'},
       {title:'Revisa y copia',body:'Ajusta el borrador antes de copiarlo a tu correo. Si aparece un emparejamiento por confirmar, revisa el pendiente.',controlId:'correoCopiar'},
       /* NUEVO */
       {title:'Inicia otro borrador',body:'Limpiar vacía la solicitud, el contexto y el borrador actual.',controlId:'correoLimpiar'}
+    ]
+  });
+  /* NUEVO: guía de selección administrativa y permisos separados del autenticador. */
+  window.ccttLearning?.register('adminUsuarios', {
+    version:'selector-usuarios-1',
+    purpose:'Administrar permisos de módulos y asignaciones de las cuentas con la verificación adicional.',
+    steps:[
+      {title:'Selecciona al usuario en el apartado',body:'Después de desbloquear Administrar accesos, abre Usuario seleccionado en Usuarios y permisos, Autenticador o Configuración. Busca por nombre o UUID y elige un usuario de la lista existente. También puedes consultar por UUID con los controles de siempre.'},
+      {title:'Habilita el módulo y asigna sus cuentas',body:'En Autenticador, elige al usuario y espera a que se carguen los permisos y las cuentas. Marca Habilitar Autenticador autorizado y usa Guardar permisos. Elige las cuentas que podrá consultar y pulsa Guardar asignaciones. Son dos guardados distintos. El usuario debe tener el módulo habilitado y solo verá las cuentas que tenga asignadas.'},
+      {title:'Organiza los módulos disponibles',body:'Usa Organizar módulos para mover las entradas habilitadas en tu navegación. Cambiar el orden no concede permisos ni desbloquea apartados.'}
     ]
   });
   window.ccttLearning?.register('documentacion', {
