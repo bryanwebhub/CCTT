@@ -11228,11 +11228,12 @@ function mount(){
   if(!vaultToggle.disabled&&original)original.checked=vaultToggle.checked;
  };
  panes.vault.append(vaultPermission);
+ /* MODIFICADO: conectar los controles antes de observarlos y consultar sus IDs; evita dejar incompleto el panel administrativo. */
+ panel.append(identity,panes.users,panes.vault,panes.formats,panes.settings);
  new MutationObserver(syncVaultPermission).observe(by('ccttSaveUser'),{attributes:true,attributeFilter:['disabled']});
  page.addEventListener('change',syncVaultPermission);
  page.addEventListener('click',()=>queueMicrotask(syncVaultPermission));
  syncVaultPermission();
- panel.append(identity,panes.users,panes.vault,panes.formats,panes.settings);
  appearanceHost=make('div');appearanceHost.id='ccttAccessAppearance';page.append(appearanceHost);
  panes.security=security;security.setAttribute('role','tabpanel');security.setAttribute('aria-labelledby','ccttAccessTab_security');page.append(security);
  page.addEventListener('click',e=>{if(e.target.closest('[data-edit-user]')){choose('users');identity.open=true;editor.open=true;requestAnimationFrame(()=>by('ccttTargetUser')?.scrollIntoView({block:'center',behavior:'smooth'}))}/* MODIFICADO */if(e.target.closest('#ccttAdminQuickChoose')){if(identity.hidden)choose('users');requestAnimationFrame(focusUserPicker)}if(e.target.closest('#ccttFindUser'))editor.open=true});
