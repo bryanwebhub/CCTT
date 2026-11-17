@@ -11635,7 +11635,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   const id = 'generadorCorreos';
   const prefix = 'Por medio del presente el Centro de Control de Tráfico Terrestre';
   /* NUEVO: compartir el texto institucional entre la vista previa y el borrador. */
-  const defaultIntro = prefix + ' solicita su amable colaboración';
+  const defaultIntro = prefix + ' solicita su amable colaboración con lo siguiente:';
   const sidebar = document.querySelector('.sidebar');
   const parent = document.getElementById('page-documentacion')?.parentElement;
   if (!sidebar || !parent) return;
@@ -12934,12 +12934,123 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
 #dsUsers{max-height:340px;overflow:auto}.ds-admin .ds-user{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:9px;border-bottom:1px solid var(--ds-line)}
 .ds-admin input[type=checkbox]{width:18px;height:18px;accent-color:var(--cctt-theme-accent,var(--blue))}.ds-admin .ds-user small{display:block;overflow-wrap:anywhere}
 @media(max-width:800px){#page-directorioSitios .ds-layout{grid-template-columns:1fr}#dsMap{height:55vh}#dsList{max-height:260px}}
+/* MODIFICADO: diseño de referencia aislado al directorio; no afecta al panel administrativo. */
+#page-directorioSitios{--ds-bg:#f3f5fc;--ds-card:#fff;--ds-panel:#f8faff;--ds-input:#fff;--ds-line:#c9d2e6;--ds-ink:#17223a;--ds-muted:#465976;--ds-accent:#4939cb;--ds-soft:#eceaff;--ds-selected:#f0efff;--ds-map:#e3eaf4;color:var(--ds-ink);background:var(--ds-bg);border:1px solid var(--ds-line);border-radius:16px;overflow:hidden;font-size:13px;isolation:isolate}
+html[data-cctt-scheme="dark"] #page-directorioSitios{--ds-bg:#0f172a;--ds-card:#182337;--ds-panel:#101a2c;--ds-input:#0b1322;--ds-line:#35435e;--ds-ink:#f1f5ff;--ds-muted:#b1bfd7;--ds-accent:#b0a8ff;--ds-soft:#242145;--ds-selected:#202b40;--ds-map:#121d2e;color-scheme:dark}
+#page-directorioSitios *{box-sizing:border-box}
+#page-directorioSitios .ds-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;background:var(--ds-panel);border-bottom:1px solid var(--ds-line)}
+#page-directorioSitios .ds-brand{display:flex;align-items:center;gap:10px;flex:1 1 240px;min-width:0}
+#page-directorioSitios .ds-brand-symbol{display:grid;place-items:center;width:40px;height:44px;flex:none;border-radius:13px;background:linear-gradient(135deg,#7c63ff,#4b40e7 65%,#32c2e6);color:#fff;box-shadow:0 4px 16px #5950ed40;border:1px solid #aaaeff}
+#page-directorioSitios .ds-brand h2{font-size:16px;line-height:1.3;letter-spacing:-.3px;margin:0;color:var(--ds-ink)}
+#page-directorioSitios .ds-brand small{display:block;margin-top:3px;color:var(--ds-muted);font-size:11px}
+#page-directorioSitios .ds-toolbar label{margin:0;min-width:0}
+#page-directorioSitios .ds-search-field{position:relative;flex:1.4 1 210px}
+#page-directorioSitios .ds-search-field>svg{position:absolute;left:11px;top:11px;color:var(--ds-muted);pointer-events:none}
+#page-directorioSitios #dsSearch{padding-left:36px}
+#page-directorioSitios .ds-layer-field{flex:.7 1 150px;max-width:220px}
+#page-directorioSitios .ds-toolbar .ds-actions{margin:0;gap:7px;flex-wrap:wrap}
+#page-directorioSitios .ds-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#page-directorioSitios .btn{background:var(--ds-card);border:1px solid var(--ds-line);border-radius:9px;color:var(--ds-ink);font:inherit;font-size:12px;font-weight:650;padding:9px 11px;line-height:1.4;box-shadow:none;cursor:pointer;transition:background .16s,border-color .16s,box-shadow .16s,transform .16s;min-height:38px;text-decoration:none}
+#page-directorioSitios .btn:hover:not(:disabled){background:var(--ds-soft);border-color:var(--ds-accent)}
+#page-directorioSitios .btn:active:not(:disabled){transform:translateY(1px)}
+#page-directorioSitios .btn:disabled{cursor:not-allowed;opacity:.55}
+#page-directorioSitios #dsNew,#page-directorioSitios #dsSave{background:linear-gradient(120deg,#5b46e5,#4432c4);color:#fff;border-color:#8774ff;box-shadow:0 4px 12px #5141d62e;font-weight:750}
+#page-directorioSitios #dsNew:hover,#page-directorioSitios #dsSave:hover{background:linear-gradient(120deg,#6a56f1,#5140d3)}
+#page-directorioSitios .ds-statusbar{display:flex;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;padding:8px 18px;background:var(--ds-panel);border-bottom:1px solid var(--ds-line);font-size:11px;line-height:1.6}
+#page-directorioSitios #dsStatus,#page-directorioSitios #dsRights{margin:0;color:var(--ds-muted)}
+#page-directorioSitios .ds-layout{display:grid;grid-template-columns:minmax(0,42%) minmax(0,58%);gap:0;align-items:stretch}
+#page-directorioSitios .ds-management{padding:0;border:0;border-right:1px solid var(--ds-line);border-radius:0;background:var(--ds-bg);min-width:0;display:flex;flex-direction:column;height:clamp(580px,75vh,950px)}
+#page-directorioSitios .ds-tabs{display:flex;gap:7px;padding:9px;background:var(--ds-input);border-bottom:1px solid var(--ds-line);flex:none}
+#page-directorioSitios .ds-tabs .btn{flex:1;justify-content:center;background:transparent;color:var(--ds-muted);border-color:transparent;font-size:12px}
+#page-directorioSitios .ds-tabs .btn[aria-selected="true"]{color:var(--ds-accent);background:var(--ds-soft);border-color:#766cf0}
+#page-directorioSitios .ds-list-pane{padding:16px;overflow:auto;min-height:0;flex:1}
+#page-directorioSitios .ds-list-caption{margin:0 0 14px;color:var(--ds-muted);font-size:12px}
+#page-directorioSitios #dsList{max-height:none;overflow:visible;display:grid;gap:12px}
+#page-directorioSitios .ds-site{padding:15px;border:1px solid var(--ds-line);border-radius:14px;background:var(--ds-card);min-width:0;transition:border-color .16s,background .16s,box-shadow .16s}
+#page-directorioSitios .ds-site:hover{border-color:var(--ds-accent)}
+#page-directorioSitios .ds-site[data-selected="true"]{background:var(--ds-selected);border-color:#8175ff;box-shadow:inset 0 0 0 1px #8175ff,0 5px 18px #2117561c}
+#page-directorioSitios .ds-site-top{display:flex;align-items:flex-start;gap:11px}
+#page-directorioSitios .ds-site-symbol{width:40px;height:43px;display:grid;place-items:center;flex:none;background:var(--ds-soft);border:1px solid var(--ds-line);border-radius:9px;color:var(--ds-accent)}
+#page-directorioSitios .ds-site-main{flex:1;min-width:0}
+#page-directorioSitios #dsList .ds-select{display:block;background:none;border:0;min-height:0;padding:0;color:var(--ds-ink);font-size:14px;line-height:1.5;font-weight:750;text-align:left}
+#page-directorioSitios .ds-site-coordinates{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+#page-directorioSitios .ds-site-coordinates span{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;padding:4px 7px;border-radius:5px;border:1px solid var(--ds-line);background:var(--ds-input);color:var(--ds-muted)}
+#page-directorioSitios .ds-site-footer{display:flex;align-items:center;justify-content:space-between;gap:7px;flex-wrap:wrap;border-top:1px solid var(--ds-line);padding-top:10px;margin-top:10px;color:var(--ds-muted);font-size:11px}
+#page-directorioSitios .ds-site .ds-actions{margin:0;gap:5px}
+#page-directorioSitios .ds-site .ds-actions .btn{padding:5px 7px;min-height:30px;font-size:11px}
+#page-directorioSitios .ds-site details{margin-top:10px;color:var(--ds-muted);font-size:12px}
+#page-directorioSitios summary{cursor:pointer;line-height:1.6;color:var(--ds-accent)}
+#page-directorioSitios .ds-explanation{display:flex;gap:10px;line-height:1.6;font-size:12px;background:var(--ds-soft);border:1px solid var(--ds-line);color:var(--ds-accent);border-radius:10px;padding:13px;margin-top:15px}
+#page-directorioSitios .ds-explanation svg{margin-top:2px}
+#page-directorioSitios .ds-map-stage{position:relative;min-width:0;height:clamp(580px,75vh,950px);background:var(--ds-map);overflow:hidden}
+#page-directorioSitios #dsMap{height:100%;min-height:0;width:100%;border:0;border-radius:0;background:var(--ds-map);z-index:1}
+#page-directorioSitios .ds-map-caption{position:absolute;left:15px;bottom:16px;max-width:calc(100% - 80px);z-index:500;padding:8px 11px;border:1px solid var(--ds-line);border-radius:9px;box-shadow:0 5px 18px #0002;background:var(--ds-panel);color:var(--ds-muted);font-size:10px;pointer-events:none}
+#page-directorioSitios #dsMapStatus{margin:0;line-height:1.5;color:var(--ds-muted)}
+#page-directorioSitios #dsMapCount{display:block;margin-top:3px;color:var(--ds-accent)}
+#page-directorioSitios .ds-selected-card{position:absolute;left:18px;top:24px;width:min(330px,calc(100% - 112px));z-index:510;background:var(--ds-card);color:var(--ds-ink);padding:16px;border:1px solid var(--ds-line);border-radius:15px;box-shadow:0 14px 38px #050b243b;max-height:calc(100% - 115px);overflow:auto}
+#page-directorioSitios .ds-selected-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid var(--ds-line);padding-bottom:11px;margin-bottom:12px}
+#page-directorioSitios .ds-eyebrow{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:800;color:var(--ds-accent);margin:0 0 6px}
+#page-directorioSitios .ds-selected-head strong{font-size:14px;overflow-wrap:anywhere}
+#page-directorioSitios .ds-close{padding:3px;min-height:26px;border:0;background:transparent;color:var(--ds-muted);flex:none}
+#page-directorioSitios .ds-fact{display:flex;justify-content:space-between;gap:15px;line-height:1.6;margin:6px 0;font-size:12px;color:var(--ds-muted)}
+#page-directorioSitios .ds-fact strong{color:var(--ds-ink);text-align:right}
+#page-directorioSitios .ds-selected-card .ds-actions{margin:10px 0 0}
+#page-directorioSitios .ds-selected-card .ds-note{font-size:12px;line-height:1.6}
+#page-directorioSitios .ds-floor-rail{position:absolute;right:14px;top:24px;z-index:510;display:flex;flex-direction:column;gap:5px;align-items:stretch;max-width:82px;max-height:calc(100% - 150px);overflow:auto;background:var(--ds-panel);border:1px solid var(--ds-line);border-radius:14px;padding:8px;box-shadow:0 8px 24px #0002}
+#page-directorioSitios .ds-floor-rail>strong{font-size:9px;color:var(--ds-muted);text-align:center;letter-spacing:1px;padding:3px 0 8px}
+#page-directorioSitios .ds-floor-rail .btn{font-size:11px;justify-content:center;padding:7px 4px;overflow-wrap:anywhere;min-width:38px}
+#page-directorioSitios .ds-floor-rail .btn[aria-pressed=true]{background:#5141dc;color:#fff;border-color:#8a7cff}
+#page-directorioSitios .ds-pin-icon{background:none;border:0}
+#page-directorioSitios .ds-pin-core{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:2px solid var(--ds-muted);background:var(--ds-card);color:var(--ds-accent);box-shadow:0 3px 8px #0005;transition:box-shadow .2s}
+#page-directorioSitios .ds-pin-icon.ds-pin-selected .ds-pin-core{background:#5543e6;color:#fff;border:2px solid #fff;box-shadow:0 0 0 6px #8274fa55,0 3px 10px #0005}
+#page-directorioSitios .ds-pin-label{background:var(--ds-panel);color:var(--ds-ink);border:1px solid var(--ds-line);border-radius:6px;font:inherit;font-size:11px;font-weight:650;box-shadow:0 3px 8px #0002;padding:5px 8px;max-width:220px;white-space:normal;overflow-wrap:anywhere}
+#page-directorioSitios .ds-pin-label:before{display:none}
+#page-directorioSitios .leaflet-control-zoom{border:1px solid var(--ds-line);border-radius:10px;overflow:hidden;box-shadow:0 5px 16px #0002;margin:14px 14px 42px 0}
+#page-directorioSitios .leaflet-control-zoom a{background:var(--ds-panel);color:var(--ds-ink);width:36px;height:37px;line-height:37px;border-color:var(--ds-line)}
+#page-directorioSitios .leaflet-control-zoom a:hover{background:var(--ds-soft)}
+#page-directorioSitios .leaflet-control-attribution{font-size:9px;background:var(--ds-card);color:var(--ds-muted)}
+#page-directorioSitios .leaflet-control-attribution a{color:var(--ds-accent)}
+#page-directorioSitios .leaflet-popup-content-wrapper,#page-directorioSitios .leaflet-popup-tip{background:var(--ds-card);color:var(--ds-ink)}
+#page-directorioSitios #dsEditor{padding:0;border:0;border-radius:0;overflow:auto;flex:1;min-height:0;background:var(--ds-bg)}
+#page-directorioSitios .ds-form-heading{padding:17px 18px 12px;border-bottom:1px solid var(--ds-line)}
+#page-directorioSitios #dsEditorTitle{margin:0;font-size:14px;color:var(--ds-ink)}
+#page-directorioSitios .ds-form-heading p{margin:6px 0 0;color:var(--ds-muted);font-size:11px;line-height:1.5}
+#page-directorioSitios #dsForm{padding:0 18px;display:flex;flex-direction:column;gap:5px}
+#page-directorioSitios label{font-size:11px;font-weight:650;line-height:1.6;color:var(--ds-muted);margin:10px 0 6px}
+#page-directorioSitios input,#page-directorioSitios select,#page-directorioSitios textarea{background:var(--ds-input);border:1px solid var(--ds-line);color:var(--ds-ink);font:inherit;font-size:12px;border-radius:8px;padding:9px 10px;line-height:1.5;min-width:0;box-shadow:none}
+#page-directorioSitios input::placeholder,#page-directorioSitios textarea::placeholder{color:var(--ds-muted);opacity:1}
+#page-directorioSitios input:focus-visible,#page-directorioSitios select:focus-visible,#page-directorioSitios textarea:focus-visible,#page-directorioSitios button:focus-visible,#page-directorioSitios summary:focus-visible{outline:2px solid #8370f5;outline-offset:2px}
+#page-directorioSitios textarea{min-height:64px;resize:vertical}
+#page-directorioSitios .ds-coordinate-box{background:var(--ds-input);border:1px solid var(--ds-line);border-radius:11px;padding:11px 12px;margin:7px 0}
+#page-directorioSitios .ds-coordinate-box>strong{font-size:11px;color:var(--ds-ink)}
+#page-directorioSitios .ds-coordinate-box .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px}
+#page-directorioSitios #dsLat,#page-directorioSitios #dsLng{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--ds-accent)}
+#page-directorioSitios .ds-coordinate-box p,#page-directorioSitios .ds-form-help{font-size:11px;color:var(--ds-muted);line-height:1.6;margin:5px 0}
+#page-directorioSitios .ds-areas-heading{border-top:1px solid var(--ds-line);padding-top:13px;display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin-top:8px}
+#page-directorioSitios .ds-areas-heading h4{margin:0;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--ds-ink)}
+#page-directorioSitios #dsAddArea{font-size:10px;padding:6px 8px;min-height:30px;color:var(--ds-accent);background:var(--ds-soft)}
+#page-directorioSitios #dsAreas{display:flex;flex-direction:column;gap:10px;margin:6px 0}
+#page-directorioSitios #dsAreas>.ds-area{margin:0;border:1px solid var(--ds-line);background:var(--ds-input);border-radius:10px;padding:10px}
+#page-directorioSitios .ds-floor-heading{display:flex;gap:8px;align-items:center;font-size:11px;font-weight:750;color:var(--ds-ink);padding:1px 0 10px;border-bottom:1px solid var(--ds-line);overflow-wrap:anywhere}
+#page-directorioSitios .ds-floor-heading span{background:var(--ds-soft);color:var(--ds-accent);padding:3px 7px;border-radius:5px}
+#page-directorioSitios .ds-form-actions{position:sticky;bottom:0;background:var(--ds-panel);padding:12px 0;border-top:1px solid var(--ds-line);margin:8px 0 0;z-index:2;display:flex;gap:8px;box-shadow:0 -8px 15px var(--ds-bg)}
+#page-directorioSitios #dsSave{flex:1;justify-content:center}
+#page-directorioSitios .ds-pending{font-size:10px;line-height:1.5;margin-top:7px;background:#fff0bf;color:#653700;border-color:#925200}
+#page-directorioSitios .ds-area{background:var(--ds-input);color:var(--ds-ink)}
+#page-directorioSitios .ds-area p{font-size:11px;margin:5px 0;color:var(--ds-muted)}
+@media(min-width:1450px){#page-directorioSitios .ds-toolbar{flex-wrap:nowrap}#page-directorioSitios .ds-brand{flex:1 1 240px}#page-directorioSitios .ds-toolbar .ds-actions{flex-wrap:nowrap}#page-directorioSitios #dsNew{max-width:180px}}
+@media(max-width:1050px){#page-directorioSitios .ds-toolbar{gap:10px}#page-directorioSitios .ds-brand{flex-basis:100%}#page-directorioSitios .ds-toolbar .ds-actions{flex:1 1 auto}#page-directorioSitios .ds-selected-card{width:calc(100% - 105px);padding:12px;left:12px}}
+@media(max-width:760px){#page-directorioSitios .ds-layout{grid-template-columns:minmax(0,1fr)}#page-directorioSitios .ds-management{height:auto;max-height:none;border-right:0;border-bottom:1px solid var(--ds-line)}#page-directorioSitios .ds-list-pane{max-height:440px}#page-directorioSitios #dsEditor{max-height:540px}#page-directorioSitios .ds-map-stage{height:auto;display:flex;flex-direction:column;overflow:visible}#page-directorioSitios #dsMap{height:420px;flex:none}#page-directorioSitios .ds-selected-card{position:relative;order:3;left:auto;top:auto;width:auto;max-height:360px;margin:12px;box-shadow:0 5px 16px #0002}#page-directorioSitios .ds-floor-rail{position:relative;order:2;right:auto;top:auto;max-width:none;max-height:none;flex-direction:row;align-items:center;margin:10px 12px 0;overflow-x:auto;padding:8px;box-shadow:none}#page-directorioSitios .ds-floor-rail>strong{padding:0 6px}#page-directorioSitios .ds-floor-rail .btn{flex:none;max-width:120px}#page-directorioSitios .ds-map-caption{position:relative;order:4;left:auto;bottom:auto;max-width:none;margin:0 12px 12px;box-shadow:none}#page-directorioSitios .ds-toolbar{padding:13px}#page-directorioSitios .ds-layer-field{max-width:none;flex:1 1 145px}#page-directorioSitios .ds-toolbar .ds-actions{width:100%}#page-directorioSitios #dsNew{flex:1;justify-content:center}#page-directorioSitios .ds-statusbar{padding:8px 13px}#page-directorioSitios .leaflet-control-zoom{margin-bottom:35px}}
+@media(prefers-reduced-motion:reduce){#page-directorioSitios *{transition:none!important;animation:none!important}}
+
 </style>
 <script id="ccttDirectoryModule">
 /* NUEVO: no reutilizar ni modificar los datos de Mapa de ubicaciones. */
 (()=>{'use strict';
 const ID='directorioSitios',title='Directorio de sitios y áreas',$=id=>document.getElementById(id),sb=()=>window.ccttSupabaseClient;
 const glyphs={nav:'M3 21V3h12v18M15 9h6v12M6 6h2m3 0h1M6 10h2m3 0h1M6 14h2m3 0h1M8 21v-4h3v4m7-9h1m-1 4h1',home:'M2 5h8l2 3h10v13H2zM6 12h4m-4 4h6m5-5v7m-3-4h6',refresh:'M19 4v5h-5M5 20v-5h5M5 9a7 7 0 0 1 12-5l2 5M5 15l2 5a7 7 0 0 0 12-5',pin:'M12 22S4 14 4 9a8 8 0 0 1 16 0c0 5-8 13-8 13M9 9h6m-3-3v6',save:'M4 3h13l4 4v14H3V3h1m3 0v6h9V3M7 21v-8h10v8',cancel:'M7 7l10 10M17 7 7 17M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20',area:'M3 4h10v16H3zM6 8h4m-4 4h4m-4 4h4m8-8v8m-4-4h8',remove:'M5 12h14',edit:'m4 16 11-11 4 4L8 20H4zM13 7l4 4',delete:'M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7',focus:'M3 9V3h6m6 0h6v6m0 6v6h-6M9 21H3v-6M8 12h8m-4-4v8',loadUsers:'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M2 21v-4a7 7 0 0 1 14 0v4M19 9v8m-3-4h6',all:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',none:'M3 3h18v18H3zM7 12h10',grant:'M12 2l9 4v6c0 5-9 10-9 10S3 17 3 12V6zM8 12h8m-4-4v8'};
+/* NUEVO: SVG específicos del rediseño, sin fuentes de iconos externas. */
+Object.assign(glyphs,{search:'M21 21l-6-6M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14',list:'M4 4h16v4H4zM4 11h16v4H4zM4 18h16v3H4z',form:'M5 3h10l4 4v14H5zM14 3v5h5M8 12h8m-8 4h5',info:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20M12 10v7m0-11v1',building:'M5 21V3h14v18M2 21h20M8 7h2m4 0h2M8 11h2m4 0h2M10 21v-6h4v6',close:'M6 6l12 12M18 6 6 18'});
 const icon=k=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+glyphs[k]+'"/></svg>';
 const btn=(id,label,key)=>'<button type="button" class="btn" id="'+id+'" data-iconized="1" data-cctt-icon-fixed="true">'+icon(key)+'<span>'+label+'</span></button>';
 const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
@@ -12947,7 +13058,44 @@ const emptyRights=()=>({read:false,create:false,edit:false,delete:false});
 let rights=emptyRights(),sites=[],map=null,base=null,markers=null,draft=null,editing=null,placing=false,busy=false,epoch=0,baseEpoch=0,owner='',users=[],selected=new Set(),adminBusy=false;
 const allowed=()=>window.ccttCanAccess?.(ID)===true;
 const page=el('section');page.id='page-'+ID;page.className='page';
-page.innerHTML='<div class="section-title"><h2>'+title+'</h2></div><p>Un sitio, un pin y varias áreas o departamentos por piso. Los registros son compartidos entre las cuentas autorizadas.</p><div class="ds-actions">'+btn('dsRefresh','Actualizar sitios','refresh')+btn('dsNew','Nuevo sitio / colocar pin','pin')+btn('dsFit','Ver todos los sitios','focus')+'</div><p id="dsStatus" role="status" aria-live="polite"></p><p id="dsRights"></p><div class="ds-layout"><aside class="ds-panel"><label for="dsSearch">Buscar sitio, área o piso<input id="dsSearch" type="search"></label><div id="dsList"></div></aside><div><label for="dsBase">Capa del mapa<select id="dsBase"><option value="auto">CARTO automático según tema</option><option value="voyager">CARTO Voyager</option><option value="light_all">CARTO Positron</option><option value="dark_all">CARTO Dark Matter</option><option value="osm">OpenStreetMap</option><option value="satellite">Satélite Esri</option></select></label><p id="dsMapStatus" role="status"></p><div id="dsMap" role="region" aria-label="Mapa del directorio"></div></div></div><section class="ds-panel" id="dsEditor" hidden><h3 id="dsEditorTitle">Sitio</h3><form id="dsForm"><label for="dsName">Nombre del sitio<input id="dsName" required maxlength="160"></label><div class="grid g2"><label for="dsLat">Latitud<input id="dsLat" type="number" step="any" min="-90" max="90" required></label><label for="dsLng">Longitud<input id="dsLng" type="number" step="any" min="-180" max="180" required></label></div><p>Puedes hacer clic en el mapa o arrastrar el pin temporal para ajustar el sitio.</p><label for="dsNotes">Notas del sitio<textarea id="dsNotes" maxlength="3000"></textarea></label><h4>Departamentos y áreas</h4><p>Registra el piso tal como lo conoces. Si no está confirmado, déjalo vacío. Máximo 100 áreas.</p><div id="dsAreas"></div><div class="ds-actions">'+btn('dsAddArea','Añadir departamento / área','area')+btn('dsSave','Guardar sitio','save')+btn('dsCancel','Cancelar edición','cancel')+'</div></form></section>';
+/* MODIFICADO: distribución autorizada; mismos IDs y campos funcionales. */
+page.innerHTML=`
+<header class="ds-toolbar">
+ <div class="ds-brand"><span class="ds-brand-symbol">${icon('nav')}</span><div><h2>${title}</h2><small>Sitios, pisos y departamentos</small></div></div>
+ <label class="ds-search-field" for="dsSearch"><span class="ds-sr">Buscar sitio, área o piso</span>${icon('search')}<input id="dsSearch" type="search" placeholder="Buscar sitio, piso o área…"></label>
+ <label class="ds-layer-field" for="dsBase"><span class="ds-sr">Capa del mapa</span><select id="dsBase"><option value="auto">CARTO automático según tema</option><option value="voyager">CARTO Voyager</option><option value="light_all">CARTO Positron</option><option value="dark_all">CARTO Dark Matter</option><option value="osm">OpenStreetMap</option><option value="satellite">Satélite Esri</option></select></label>
+ <div class="ds-actions">${btn('dsRefresh','Actualizar sitios','refresh')}${btn('dsFit','Ver todos los sitios','focus')}${btn('dsNew','Nuevo sitio / colocar pin','pin')}</div>
+</header>
+<div class="ds-statusbar"><p id="dsStatus" role="status" aria-live="polite"></p><p id="dsRights"></p></div>
+<div class="ds-layout">
+ <aside class="ds-panel ds-management">
+  <div class="ds-tabs" role="tablist" aria-label="Directorio y formulario">
+   <button type="button" class="btn" id="dsListTab" role="tab" aria-selected="true" aria-controls="dsListPane" data-iconized="1" data-cctt-icon-fixed="true">${icon('list')}<span id="dsListTabText">Sitios registrados</span></button>
+   <button type="button" class="btn" id="dsFormTab" role="tab" aria-selected="false" aria-controls="dsEditor" tabindex="-1" data-iconized="1" data-cctt-icon-fixed="true">${icon('form')}<span>Formulario de sitio</span></button>
+  </div>
+  <section id="dsListPane" class="ds-list-pane" role="tabpanel" aria-labelledby="dsListTab">
+   <p class="ds-list-caption">Sitios georreferenciados compartidos</p><div id="dsList"></div>
+   <div class="ds-explanation">${icon('info')}<span>Un sitio, un pin y varias áreas o departamentos por piso. Los registros son compartidos entre las cuentas autorizadas.</span></div>
+  </section>
+  <section class="ds-panel" id="dsEditor" role="tabpanel" aria-labelledby="dsFormTab" hidden>
+   <div class="ds-form-heading"><h3 id="dsEditorTitle">Sitio</h3><p>Geolocalización y distribución de áreas por nivel</p></div>
+   <form id="dsForm">
+    <label for="dsName">Nombre del sitio<input id="dsName" required maxlength="160"></label>
+    <div class="ds-coordinate-box"><strong>Posición geográfica</strong><div class="grid g2"><label for="dsLat">Latitud<input id="dsLat" type="number" step="any" min="-90" max="90" required></label><label for="dsLng">Longitud<input id="dsLng" type="number" step="any" min="-180" max="180" required></label></div><p>Puedes hacer clic en el mapa o arrastrar el pin temporal para ajustar el sitio.</p></div>
+    <label for="dsNotes">Notas del sitio<textarea id="dsNotes" maxlength="3000" rows="2"></textarea></label>
+    <div class="ds-areas-heading"><h4>Departamentos y áreas</h4>${btn('dsAddArea','Añadir departamento / área','area')}</div>
+    <p class="ds-form-help">Registra el piso tal como lo conoces. Si no está confirmado, déjalo vacío. Máximo 100 áreas.</p><p id="dsFloorSummary" class="ds-form-help"></p><div id="dsAreas"></div>
+    <div class="ds-actions ds-form-actions">${btn('dsSave','Guardar sitio','save')}${btn('dsCancel','Cancelar edición','cancel')}</div>
+   </form>
+  </section>
+ </aside>
+ <section class="ds-map-stage" aria-label="Mapa y sitio seleccionado">
+  <div id="dsMap" role="region" aria-label="Mapa del directorio"></div>
+  <section id="dsSelectedCard" class="ds-selected-card" aria-label="Ficha del sitio seleccionado" hidden></section>
+  <div id="dsFloorRail" class="ds-floor-rail" role="group" aria-label="Consultar áreas por piso" hidden></div>
+  <div class="ds-map-caption"><p id="dsMapStatus" role="status"></p><span id="dsMapCount"></span></div>
+ </section>
+</div>`;
 document.querySelector('.content')?.append(page);
 const nav=el('button');nav.type='button';nav.className='navbtn';nav.dataset.page=ID;nav.dataset.ccttIconFixed='true';nav.innerHTML='<span class="ico">'+icon('nav')+'</span><span class="lbl">'+title+'</span>';nav.hidden=true;document.querySelector('.sidebar')?.append(nav);
 const status=t=>$('dsStatus').textContent=t;
@@ -12963,32 +13111,74 @@ function badge(host){const n=el('span','Pendiente · emparejamiento por confirma
 function detail(s){const root=el('div');root.append(el('strong',s.name));if(pending(s.notes))badge(root);const note=el('p',s.notes);note.className='ds-note';root.append(note);for(const a of s.areas){const d=el('div');d.className='ds-area';d.append(el('strong',a.name),el('p','Piso: '+(a.floor||'No indicado')));if(pending(a.notes))badge(d);const n=el('p',a.notes);n.className='ds-note';d.append(n);root.append(d);}return root;}
 function action(label,key,handler){const b=el('button');b.type='button';b.className='btn';b.dataset.iconized='1';b.dataset.ccttIconFixed='true';b.innerHTML=icon(key);b.append(el('span',label));b.onclick=handler;return b;}
 function filtered(){const q=$('dsSearch').value.toLocaleLowerCase('es').trim();return sites.filter(s=>[s.name,s.notes,...s.areas.flatMap(a=>[a.name,a.floor,a.notes])].join(' ').toLocaleLowerCase('es').includes(q));}
-function render(){
- $('dsNew').hidden=!rights.create;$('dsNew').disabled=busy;$('dsRights').textContent='Tus permisos: '+(['read','create','edit','delete'].filter(k=>rights[k]).map(k=>({read:'consultar',create:'crear',edit:'editar',delete:'eliminar'}[k])).join(', ')||'sin acceso');
- const list=$('dsList');list.replaceChildren();markers?.clearLayers();
- const records=filtered();if(!records.length)list.append(el('p',rights.read?'No hay sitios para mostrar.':'No tienes permiso de consulta.'));
- for(const s of records){
-  const box=el('div');box.className='ds-site';const b=el('button',s.name);b.type='button';b.className='btn ds-select';b.onclick=()=>{map?.setView([s.latitude,s.longitude],Math.max(map.getZoom(),16));marker?.openPopup();};box.append(b,el('p',s.areas.length+' áreas / departamentos'));
-  if(pending(s.notes)||s.areas.some(a=>pending(a.notes)))badge(box);
-  const expanded=el('details');expanded.append(el('summary','Ver áreas y notas'),detail(s));box.append(expanded);
-  const acts=el('div');acts.className='ds-actions';if(rights.edit)acts.append(action('Editar','edit',()=>openEditor(s)));if(rights.delete)acts.append(action('Eliminar','delete',()=>remove(s)));box.append(acts);list.append(box);
-  const marker=map?L.marker([s.latitude,s.longitude]).addTo(markers).bindPopup(detail(s)):null;
- }
+/* NUEVO: selección visual local; no se guarda ni transforma información del sitio. */
+let siteSelection=null,floorSelection=null,formOpen=false,currentTab='list';
+const siteMarkers=new Map();
+function floorGroups(areas){const groups=new Map();for(const a of areas){const key=a.floor||'';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(a);}return groups;}
+function floorCount(s){return [...floorGroups(s.areas).keys()].filter(k=>k!=='').length;}
+function coordinates(s){return s.latitude+'°, '+s.longitude+'°';}
+function markerIcon(active){const node=el('span');node.className='ds-pin-core';node.innerHTML=icon('building');return L.divIcon({html:node,className:'ds-pin-icon'+(active?' ds-pin-selected':''),iconSize:[34,34],iconAnchor:[17,34],tooltipAnchor:[0,-38]});}
+function switchDirectoryTab(tab){
+ if(tab==='form'&&!formOpen){if(rights.create)openEditor();return;}
+ currentTab=tab;$('dsListPane').hidden=tab!=='list';$('dsEditor').hidden=tab!=='form';
+ for(const [id,value] of [['dsListTab','list'],['dsFormTab','form']]){$(id).setAttribute('aria-selected',String(tab===value));$(id).tabIndex=tab===value?0:-1;}
+ requestAnimationFrame(()=>map?.invalidateSize({pan:false}));
 }
-function closeEditor(){editing=null;placing=false;$('dsEditor').hidden=true;$('dsForm').reset();$('dsAreas').replaceChildren();if(draft){map?.removeLayer(draft);draft=null;}}
+function syncSelection(){
+ const s=sites.find(x=>x.id===siteSelection);
+ if(!s){siteSelection=null;floorSelection=null;}
+ for(const card of $('dsList').querySelectorAll('[data-site-id]')){const active=card.dataset.siteId===siteSelection;card.dataset.selected=String(active);card.querySelector('.ds-select')?.setAttribute('aria-pressed',String(active));}
+ for(const [id,marker]of siteMarkers){marker.setIcon(markerIcon(id===siteSelection));marker.setZIndexOffset(id===siteSelection?500:0);}
+ const host=$('dsSelectedCard'),rail=$('dsFloorRail');host.replaceChildren();rail.replaceChildren();host.hidden=!s;rail.hidden=!s;
+ if(!s)return;
+ const groups=floorGroups(s.areas);if(floorSelection!==null&&!groups.has(floorSelection))floorSelection=null;
+ const head=el('div');head.className='ds-selected-head';const heading=el('div'),caption=el('span','Sitio seleccionado');caption.className='ds-eyebrow';heading.append(caption,el('strong',s.name));const close=action('Cerrar ficha','close',()=>{siteSelection=null;floorSelection=null;syncSelection();});close.classList.add('ds-close');close.setAttribute('aria-label','Cerrar ficha del sitio seleccionado');close.querySelector('span').className='ds-sr';head.append(heading,close);host.append(head);
+ for(const [label,value]of [['Pisos indicados',String(floorCount(s))],['Áreas registradas',String(s.areas.length)],['Coordenadas',coordinates(s)]]){const line=el('div');line.className='ds-fact';line.append(el('span',label),el('strong',value));host.append(line);}
+ if(pending(s.notes)||s.areas.some(a=>pending(a.notes)))badge(host);
+ if(s.notes){const note=el('p',s.notes);note.className='ds-note';host.append(note);}
+ const areaDetails=el('details');areaDetails.open=floorSelection!==null;areaDetails.append(el('summary',floorSelection===null?'Consultar áreas y notas':'Áreas · '+(floorSelection||'Sin piso indicado')));
+ const areaList=el('div');for(const a of (floorSelection===null?s.areas:groups.get(floorSelection)||[])){const item=el('div');item.className='ds-area';item.append(el('strong',a.name),el('p','Piso: '+(a.floor||'No indicado')));if(a.notes){const n=el('p',a.notes);n.className='ds-note';item.append(n);}if(pending(a.notes))badge(item);areaList.append(item);}if(!s.areas.length)areaList.append(el('p','Sin áreas registradas.'));areaDetails.append(areaList);host.append(areaDetails);
+ const actions=el('div');actions.className='ds-actions';if(rights.edit)actions.append(action('Editar sitio y áreas','edit',()=>openEditor(s)));if(rights.delete)actions.append(action('Eliminar','delete',()=>remove(s)));if(actions.children.length)host.append(actions);
+ rail.hidden=!groups.size;if(groups.size){rail.append(el('strong','PISOS'));const add=(value,label)=>{const b=el('button',label);b.type='button';b.className='btn';b.setAttribute('aria-pressed',String(floorSelection===value));b.title=value===null?'Consultar todas las áreas':value?'Consultar áreas del piso '+value:'Consultar áreas sin piso indicado';b.onclick=()=>{floorSelection=value;syncSelection();[...$('dsFloorRail').querySelectorAll('button')].find(n=>n.getAttribute('aria-pressed')==='true')?.focus({preventScroll:true});};rail.append(b);};add(null,'Todos');for(const key of groups.keys())add(key,key||'Sin piso');}
+}
+function selectSite(id,focus=true){siteSelection=id;floorSelection=null;const s=sites.find(x=>x.id===id);if(s&&focus)map?.setView([s.latitude,s.longitude],Math.max(map.getZoom(),16));syncSelection();}
+/* NUEVO: agrupación exclusivamente visual, sin reordenar los controles ni el payload original. */
+function updateAreaHierarchy(){const groups=new Map();for(const row of $('dsAreas').children){const floor=row.querySelector('[data-field="floor"]').value;if(!groups.has(floor))groups.set(floor,groups.size);row.style.order=groups.get(floor);const head=row.querySelector('.ds-floor-heading');head.replaceChildren();const chip=el('span',floor||'Sin piso indicado');head.append(chip,el('strong','Área / departamento'));}
+ const levels=[...groups.keys()].filter(k=>k!=='').length;$('dsFloorSummary').textContent=levels+' pisos indicados · '+$('dsAreas').children.length+' áreas en el formulario';
+}
+/* MODIFICADO: tarjetas compactas y marcadores reales; permisos y registros originales. */
+function render(){
+ $('dsNew').hidden=!rights.create;$('dsNew').disabled=busy;$('dsFormTab').disabled=!formOpen&&!rights.create;$('dsRights').textContent='Tus permisos: '+(['read','create','edit','delete'].filter(k=>rights[k]).map(k=>({read:'consultar',create:'crear',edit:'editar',delete:'eliminar'}[k])).join(', ')||'sin acceso');
+ const list=$('dsList');list.replaceChildren();markers?.clearLayers();siteMarkers.clear();
+ const records=filtered();$('dsListTabText').textContent='Sitios registrados ('+sites.length+')';$('dsMapCount').textContent=records.length+' sitios en la lista';if(!records.some(s=>s.id===siteSelection)){siteSelection=null;floorSelection=null;}
+ if(!records.length){const empty=el('p',rights.read?'No hay sitios para mostrar.':'No tienes permiso de consulta.');empty.className='ds-list-caption';list.append(empty);}
+ for(const s of records){
+  const box=el('article');box.className='ds-site';box.dataset.siteId=s.id;const top=el('div');top.className='ds-site-top';const symbol=el('span');symbol.className='ds-site-symbol';symbol.innerHTML=icon('building');const main=el('div');main.className='ds-site-main';const b=el('button',s.name);b.type='button';b.className='btn ds-select';b.onclick=()=>selectSite(s.id);main.append(b);
+  const coords=el('div');coords.className='ds-site-coordinates';coords.append(el('span','Lat. '+s.latitude+'°'),el('span','Lon. '+s.longitude+'°'));main.append(coords);top.append(symbol,main);box.append(top);
+  if(pending(s.notes)||s.areas.some(a=>pending(a.notes)))badge(box);
+  const footer=el('div');footer.className='ds-site-footer';footer.append(el('span',floorCount(s)+' pisos indicados · '+s.areas.length+' áreas'));
+  const acts=el('div');acts.className='ds-actions';if(rights.edit)acts.append(action('Editar','edit',()=>openEditor(s)));if(rights.delete)acts.append(action('Eliminar','delete',()=>remove(s)));footer.append(acts);box.append(footer);
+  const expanded=el('details');expanded.append(el('summary','Ver áreas y notas'),detail(s));box.append(expanded);list.append(box);
+  if(map){const label=el('span',s.name);const marker=L.marker([s.latitude,s.longitude],{icon:markerIcon(s.id===siteSelection),title:s.name,keyboard:true}).addTo(markers).bindTooltip(label,{permanent:true,direction:'top',className:'ds-pin-label',opacity:1});marker.on('click',()=>selectSite(s.id,false));siteMarkers.set(s.id,marker);}
+ }
+ syncSelection();
+}
+/* MODIFICADO: cerrar restaura la pestaña de sitios; alternar pestañas no descarta el borrador. */
+function closeEditor(){editing=null;placing=false;formOpen=false;switchDirectoryTab('list');$('dsForm').reset();$('dsAreas').replaceChildren();$('dsFloorSummary').textContent='';$('dsFormTab').disabled=!rights.create;if(draft){map?.removeLayer(draft);draft=null;}}
 let areaCounter=0;
+/* MODIFICADO: mismos campos por área, con jerarquía visual de pisos. */
 function addArea(a={name:'',floor:'',notes:''}){
  if($('dsAreas').children.length>=100){status('Máximo 100 áreas por sitio.');return;}
- const row=el('div');row.className='ds-area';const n=++areaCounter;
- for(const [key,label,max] of [['name','Nombre del departamento / área',160],['floor','Piso o nivel',80],['notes','Notas del área',1000]]){const l=el('label',label),input=el(key==='notes'?'textarea':'input');input.id='dsArea'+n+key;input.dataset.field=key;input.value=a[key];input.maxLength=max;input.required=key==='name';l.htmlFor=input.id;l.append(input);row.append(l);}
- row.append(action('Retirar esta área del formulario','remove',()=>{if(confirm('¿Retirar esta área del formulario? Se aplicará al guardar el sitio.'))row.remove();}));$('dsAreas').append(row);
+ const row=el('div');row.className='ds-area';const n=++areaCounter;const heading=el('div');heading.className='ds-floor-heading';row.append(heading);
+ for(const [key,label,max] of [['name','Nombre del departamento / área',160],['floor','Piso o nivel',80],['notes','Notas del área',1000]]){const l=el('label',label),input=el(key==='notes'?'textarea':'input');input.id='dsArea'+n+key;input.dataset.field=key;input.value=a[key];input.maxLength=max;input.required=key==='name';l.htmlFor=input.id;l.append(input);row.append(l);if(key==='floor')input.addEventListener('change',updateAreaHierarchy);}
+ row.append(action('Retirar esta área del formulario','remove',()=>{if(confirm('¿Retirar esta área del formulario? Se aplicará al guardar el sitio.')){row.remove();updateAreaHierarchy();}}));$('dsAreas').append(row);updateAreaHierarchy();
 }
 function place(lat,lng){if(!map)return;if(!draft){draft=L.marker([lat,lng],{draggable:true,opacity:0.65}).addTo(map);draft.on('dragend',()=>{const p=draft.getLatLng();$('dsLat').value=p.lat;$('dsLng').value=p.lng;});}else draft.setLatLng([lat,lng]);$('dsLat').value=lat;$('dsLng').value=lng;}
 function openEditor(s=null){
  if(busy||!(s?rights.edit:rights.create))return;
- if(!$('dsEditor').hidden&&!confirm('¿Descartar el formulario actual?'))return;
- closeEditor();editing=s;placing=true;$('dsEditor').hidden=false;$('dsEditorTitle').textContent=s?'Editar sitio':'Nuevo sitio';
- if(s){$('dsName').value=s.name;$('dsNotes').value=s.notes;place(s.latitude,s.longitude);s.areas.forEach(addArea);map?.panTo([s.latitude,s.longitude]);}
+ /* MODIFICADO: conservar el borrador también cuando se consulta la lista. */if(formOpen&&!confirm('¿Descartar el formulario actual?'))return;
+ closeEditor();editing=s;placing=true;formOpen=true;$('dsFormTab').disabled=false;switchDirectoryTab('form');$('dsEditorTitle').textContent=s?'Editar sitio':'Nuevo sitio';
+ /* NUEVO: destacar el sitio editado sin cambiar el registro. */if(s){selectSite(s.id,false);$('dsName').value=s.name;$('dsNotes').value=s.notes;place(s.latitude,s.longitude);s.areas.forEach(addArea);map?.panTo([s.latitude,s.longitude]);}
  status(s?'Edita los datos y guarda los cambios.':'Haz clic en el mapa para colocar el pin o escribe sus coordenadas.');$('dsName').focus();
 }
 async function reload(){
@@ -13014,10 +13204,13 @@ async function setBase(){
   if(ticket!==baseEpoch||!map)return;const next=L.tileLayer(url,{maxZoom:19,attribution,keepBuffer:3,updateWhenIdle:true});next.on('tileerror',()=>{if(base===next)$('dsMapStatus').textContent='No se pudieron cargar algunos mosaicos. Comprueba la conexión o selecciona otra capa.';});if(base)map.removeLayer(base);base=next;next.addTo(map);$('dsMapStatus').textContent='Capa: '+$('dsBase').selectedOptions[0].textContent;
  }catch(e){if(ticket===baseEpoch)$('dsMapStatus').textContent=e.message;}
 }
-function initialize(){if(!allowed())return;if(!window.L){$('dsMapStatus').textContent='No se cargó Leaflet. Revisa la conexión y vuelve a abrir el módulo.';return;}if(!map){map=L.map('dsMap').setView([19.065,-104.31],12);markers=L.layerGroup().addTo(map);map.on('click',e=>{if(placing&&!busy&&(editing?rights.edit:rights.create))place(e.latlng.lat,e.latlng.lng);});void setBase();}else if($('dsBase').value==='auto')void setBase();requestAnimationFrame(()=>map?.invalidateSize());void reload();}
+function initialize(){if(!allowed())return;if(!window.L){$('dsMapStatus').textContent='No se cargó Leaflet. Revisa la conexión y vuelve a abrir el módulo.';return;}if(!map){map=L.map('dsMap').setView([19.065,-104.31],12);/* NUEVO: controles reales del mapa en la posición de referencia. */map.zoomControl?.setPosition('bottomright');markers=L.layerGroup().addTo(map);map.on('click',e=>{if(placing&&!busy&&(editing?rights.edit:rights.create))place(e.latlng.lat,e.latlng.lng);});void setBase();}else if($('dsBase').value==='auto')void setBase();requestAnimationFrame(()=>map?.invalidateSize());void reload();}
 nav.onclick=()=>{if(!allowed())return;if(typeof go==='function')go(ID);else{document.querySelectorAll('.page.active').forEach(p=>p.classList.remove('active'));page.classList.add('active');}};
 function sync(){const ok=allowed();nav.hidden=!ok;nav.style.display=ok?'':'none';let card=$('dsHomeCard');const host=$('moduleCards');if(!card&&host){card=el('div');card.className='card';card.id='dsHomeCard';card.dataset.page=ID;card.append(el('h3',title),el('p','Sitios compartidos con departamentos, áreas y pisos.'));card.append(action('Abrir directorio','home',nav.onclick));host.append(card);}if(card){card.hidden=!ok;card.style.display=ok?'':'none';}if(!ok){epoch++;busy=false;sites=[];rights=emptyRights();closeEditor();render();}}
 function reset(){epoch++;baseEpoch++;busy=false;sites=[];rights=emptyRights();closeEditor();if(map){map.remove();map=null;base=null;markers=null;}users=[];selected.clear();$('dsUsers')?.replaceChildren();$('dsSave').disabled=false;sync();}
+/* NUEVO: pestañas accesibles; no reinician el mapa ni los campos. */
+$('dsListTab').onclick=()=>switchDirectoryTab('list');$('dsFormTab').onclick=()=>switchDirectoryTab('form');
+page.querySelector('.ds-tabs').addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tab=event.key==='Home'?'dsListTab':event.key==='End'?'dsFormTab':document.activeElement===$('dsListTab')?'dsFormTab':'dsListTab';if(!$(tab).disabled){$(tab).click();$(tab).focus();}});
 $('dsRefresh').onclick=reload;$('dsNew').onclick=()=>openEditor();$('dsCancel').onclick=()=>{if(confirm('¿Descartar los cambios sin guardar?'))closeEditor();};$('dsAddArea').onclick=()=>addArea();$('dsSave').onclick=save;$('dsForm').onsubmit=save;$('dsSearch').oninput=render;$('dsBase').onchange=setBase;
 $('dsFit').onclick=()=>{const rows=filtered();if(map&&rows.length)map.fitBounds(rows.map(s=>[s.latitude,s.longitude]),{padding:[30,30],maxZoom:17});};
 for(const id of ['dsLat','dsLng'])$(id).onchange=()=>{if($('dsLat').value&&$('dsLng').value&&$('dsLat').checkValidity()&&$('dsLng').checkValidity())place(Number($('dsLat').value),Number($('dsLng').value));};
@@ -13033,7 +13226,7 @@ function installAdmin(){const host=$('ccttAdminPanel');if(!host||$('dsAdmin'))re
  new MutationObserver(()=>{if(!host.classList.contains('unlocked')){users=[];selected.clear();renderUsers();adminMessage('');}}).observe(host,{attributes:true,attributeFilter:['class']});
 }
 /* NUEVO: aprendizaje de la operación compartida y de sus permisos reales. */
-function learning(){window.ccttLearning?.register(ID,{version:'directorio-sitios-1',purpose:'Consultar sitios compartidos, con un pin por ubicación y múltiples departamentos o áreas en distintos pisos.',steps:[{title:'Acceso y permisos',body:'El administrador asigna consulta, creación, edición y eliminación a usuarios individuales o a una selección. Cada operación se valida en el servidor; abrir el módulo no habilita todas las acciones. Los administradores conservan acceso completo.'},{title:'Ubica el sitio',body:'Busca por nombre, área o piso. Pulsa el sitio para centrar el mapa y abre Ver áreas y notas para consultar sus departamentos. Capas cambia únicamente el mapa base.'},{title:'Registra un sitio',body:'Si tienes permiso de creación, pulsa Nuevo sitio, coloca el pin en el mapa o captura coordenadas. Añade las áreas y su piso. Los campos vacíos no se completan con datos inventados. Guardar publica el registro compartido.',controlId:'dsNew'},{title:'Edita o elimina',body:'Editar y Eliminar aparecen únicamente cuando el servidor concede esos permisos. La eliminación afecta al sitio y todas sus áreas. Si otra cuenta cambió el registro, la versión anterior se rechaza; actualiza antes de continuar.'},{title:'Pendientes y límites',body:'Las notas con emparejamiento por confirmar se muestran como pendientes. No se verifica automáticamente la ubicación ni el piso. Se permiten hasta 100 áreas por sitio. Las capas dependen de conexión y configuración del proveedor.'},{title:'Actualización y organización',body:'Actualizar sitios consulta la versión compartida. Organizar módulos permite cambiar la posición de este directorio sin modificar permisos. Las nuevas asignaciones requieren volver a iniciar sesión para actualizar la navegación.'}]});}
+function learning(){window.ccttLearning?.register(ID,{/* MODIFICADO: guía del diseño por pestañas y pisos. */version:'directorio-sitios-diseno-2',purpose:'Consultar sitios compartidos, con un pin por ubicación y múltiples departamentos o áreas en distintos pisos.',steps:[{title:'Acceso y permisos',body:'El administrador asigna consulta, creación, edición y eliminación a usuarios individuales o a una selección. Cada operación se valida en el servidor; abrir el módulo no habilita todas las acciones. Los administradores conservan acceso completo.'},{title:'Ubica el sitio',body:'Busca en la barra superior por nombre, área o piso. Selecciona una tarjeta o un marcador: el borde índigo y la ficha identifican el sitio. El selector de pisos muestra únicamente los niveles registrados y filtra las áreas de la ficha. Sin piso reúne las áreas cuyo piso está vacío. Capas cambia únicamente el mapa base.'},{title:'Registra un sitio',body:'Si tienes permiso de creación, pulsa Nuevo sitio para abrir la pestaña Formulario. Coloca el pin en el mapa o captura coordenadas. Añade las áreas y su piso; la agrupación por nivel solo cambia la presentación. Guardar y Cancelar permanecen al pie del formulario. Alternar pestañas conserva el borrador; Cancelar lo descarta tras confirmar. Cambiar de tema mantiene la selección, la vista y los campos. Guardar publica el registro compartido.',controlId:'dsNew'},{title:'Edita o elimina',body:'Editar y Eliminar aparecen únicamente cuando el servidor concede esos permisos. La eliminación afecta al sitio y todas sus áreas. Si otra cuenta cambió el registro, la versión anterior se rechaza; actualiza antes de continuar.'},{title:'Pendientes y límites',body:'Las notas con emparejamiento por confirmar se muestran como pendientes. No se verifica automáticamente la ubicación ni el piso. Se permiten hasta 100 áreas por sitio. Las capas dependen de conexión y configuración del proveedor.'},{title:'Actualización y organización',body:'Actualizar sitios consulta la versión compartida. Organizar módulos permite cambiar la posición de este directorio sin modificar permisos. Las nuevas asignaciones requieren volver a iniciar sesión para actualizar la navegación.'}]});}
 window.addEventListener('cctt:session',e=>{const next=e.detail?.session?.user?.id||'';if(next!==owner){owner=next;reset();}sync();});window.addEventListener('cctt:logout',()=>{owner='';reset();});window.addEventListener('cctt:access-updated',sync);
 new MutationObserver(()=>{if(page.classList.contains('active'))initialize();}).observe(page,{attributes:true,attributeFilter:['class']});
 new MutationObserver(()=>{if($('dsBase').value==='auto'&&page.classList.contains('active'))void setBase();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-cctt-scheme']});
