@@ -12151,6 +12151,16 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
 #page-traficoTerrestre .tr-actions button:disabled{opacity:.55;cursor:wait}
 @media(max-width:900px){#page-traficoTerrestre .tr-layout{grid-template-columns:230px minmax(0,1fr)}}
 @media(max-width:680px){#page-traficoTerrestre .tr-layout{grid-template-columns:1fr}#trMap{height:57vh;min-height:360px}#page-traficoTerrestre .tr-actions{width:100%}#page-traficoTerrestre .tr-actions .btn{flex:1 1 auto}}
+
+/* NUEVO: estilos exclusivos del visor complementario de Google Maps. */
+#page-traficoTerrestre .tr-google-embed{margin-top:18px;padding:16px;border:1px solid var(--tr-line);border-radius:12px;background:var(--tr-card);color:var(--tr-ink);min-width:0}
+#page-traficoTerrestre .tr-google-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+#page-traficoTerrestre .tr-google-heading h3{margin:0;font-size:16px;color:var(--tr-ink)}
+#page-traficoTerrestre .tr-google-heading .btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;background:var(--tr-input);color:var(--tr-ink);border:1px solid var(--tr-line)}
+#page-traficoTerrestre .tr-google-heading .btn:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--blue));outline-offset:3px}
+#page-traficoTerrestre .tr-google-heading .btn:hover{border-color:var(--cctt-theme-accent,var(--blue))}
+#page-traficoTerrestre #trGoogleMap{display:block;width:100%;height:450px;min-height:300px;border-radius:8px;color-scheme:normal;background:#fff}
+@media(max-width:680px){#page-traficoTerrestre .tr-google-embed{padding:12px}#page-traficoTerrestre #trGoogleMap{height:400px}}
 </style>
 <script id="ccttTrafficModule">
 /* NUEVO: datos reales del proveedor configurado; sin estimaciones ni registros sintéticos. */
@@ -12226,6 +12236,12 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
  </div>
  <div class="tr-legend" id="trLegend" aria-label="Leyenda del proveedor"></div>
  <p class="tr-help" id="trCoverage">Una vía sin líneas de tráfico puede carecer de cobertura. La ausencia de color no confirma circulación fluida. La hora indicada corresponde a la consulta, no a la medición de cada vía.</p>
+ <!-- NUEVO: consulta complementaria de Google Maps; URL proporcionada por el usuario. -->
+ <section class="tr-google-embed" aria-labelledby="trGoogleTitle">
+  <div class="tr-google-heading"><h3 id="trGoogleTitle">Google Maps · Manzanillo</h3><a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=Manzanillo%2C%20Colima" target="_blank" rel="noopener noreferrer" data-iconized="1" data-cctt-icon-fixed="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3h7v7m0-7L10 14M10 4H4v16h16v-6"/></svg><span>Abrir Google Maps</span></a></div>
+  <p class="tr-help" id="trGoogleHelp">Consulta complementaria. Si el mapa no muestra colores de tráfico, abre Google Maps y activa Capas → Tráfico. La ausencia de colores no confirma circulación fluida.</p>
+  <iframe id="trGoogleMap" title="Google Maps de Manzanillo, Colima" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d30165.05564323889!2d-104.30303953766622!3d19.07991283323929!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8424d43417bb3e19%3A0xddb3e9aae7750d4b!2sManzanillo%2C%20Col.!5e0!3m2!1ses-419!2smx!4v1795030918095!5m2!1ses-419!2smx" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" aria-describedby="trGoogleHelp"></iframe>
+ </section>
  <!-- MODIFICADO: el acceso se asigna desde Administrar accesos. -->
  `;
  document.querySelector('.content').append(page);
