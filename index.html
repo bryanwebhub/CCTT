@@ -12297,6 +12297,19 @@ html[data-cctt-scheme="dark"] #page-traficoTerrestre .tr-shared-toolbar,html[dat
  </section>
  <!-- MODIFICADO: el acceso se asigna desde Administrar accesos. -->
  `;
+ /* NUEVO: el mapa complementario no compite con CARTO antes de verse. */
+ const trGoogleFrame=page.querySelector('#trGoogleMap');
+ const trGoogleSource=trGoogleFrame.getAttribute('src');
+ trGoogleFrame.removeAttribute('src');
+ let trGoogleObserver=null;
+ function trLoadGoogle(){
+  if(!active()||trGoogleFrame.getAttribute('src'))return;
+  trGoogleFrame.setAttribute('src',trGoogleSource);trGoogleObserver?.disconnect();
+ }
+ if('IntersectionObserver' in window){
+  trGoogleObserver=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))trLoadGoogle();},{rootMargin:'150px'});
+  trGoogleObserver.observe(trGoogleFrame);
+ }
  document.querySelector('.content').append(page);
  const $ = id => document.getElementById(id);
  const nav = document.createElement('button');
@@ -12318,12 +12331,16 @@ html[data-cctt-scheme="dark"] #page-traficoTerrestre .tr-shared-toolbar,html[dat
  const active = () => allowed() && page.classList.contains('active') && !document.hidden;
  let map = null, base = null, traffic = null, locationMarker = null;
  /* MODIFICADO: memoria temporal por proveedor, nivel y sesión; sin guardado persistente. */
+ /* MODIFICADO: memoria LRU acotada a 24 MiB/384 mosaicos, por sesión y proveedor. */
  const trafficTileMemory=new Map();
+ const trTileLifetime=60000,trTileMaxBytes=24*1024*1024;
+ /* NUEVO: una única descarga por proveedor/nivel/coordenadas. */
+ const trTileRequests=new Map();
  let trafficTileBytes=0,trafficSuspended=false,resumeTicket=0;
  function readTrafficTile(key) {
   const entry=trafficTileMemory.get(key);
   if(!entry)return null;
-  if(Date.now()-entry.receivedAt>=45000) {
+  if(Date.now()-entry.receivedAt>=trTileLifetime) {
    trafficTileBytes-=entry.blob.size;trafficTileMemory.delete(key);return null;
   }
   trafficTileMemory.delete(key);trafficTileMemory.set(key,entry);
@@ -12333,12 +12350,28 @@ html[data-cctt-scheme="dark"] #page-traficoTerrestre .tr-shared-toolbar,html[dat
   const old=trafficTileMemory.get(key);
   if(old)trafficTileBytes-=old.blob.size;
   trafficTileMemory.delete(key);
-  if(entry.blob.size>8*1024*1024)return;
+  if(entry.blob.size>trTileMaxBytes)return;
   trafficTileMemory.set(key,entry);trafficTileBytes+=entry.blob.size;
-  while(trafficTileMemory.size>128||trafficTileBytes>8*1024*1024) {
+  while(trafficTileMemory.size>384||trafficTileBytes>trTileMaxBytes) {
    const oldest=trafficTileMemory.keys().next().value;
    trafficTileBytes-=trafficTileMemory.get(oldest).blob.size;trafficTileMemory.delete(oldest);
   }
+ }
+ /* NUEVO: completar y guardar descargas aunque el mosaico cambie de nivel durante el zoom. */
+ function trFetchTile(key,source,coords,force=false){
+  const cached=force?null:readTrafficTile(key);
+  if(cached)return Promise.resolve(cached);
+  const previous=trTileRequests.get(key);
+  if(previous&&previous.stamp===generation&&!previous.controller.signal.aborted)return previous.promise;
+  const request={stamp:generation,source,controller:new AbortController(),promise:null};
+  request.promise=(async()=>{
+   const blob=await call('traffic-tile',{provider:source,z:coords.z,x:coords.x,y:coords.y},request.controller.signal);
+   if(request.stamp!==generation||request.controller.signal.aborted||!active())throw new DOMException('Consulta descartada','AbortError');
+   const value={blob,receivedAt:Date.now()};
+   rememberTrafficTile(key,value);
+   return value;
+  })().finally(()=>{if(trTileRequests.get(key)===request)trTileRequests.delete(key);});
+  trTileRequests.set(key,request);return request.promise;
  }
  /* NUEVO: un pin temporal por sesión, separado de Mi ubicación. */
  let pinMarker = null, pinPlacing = false;
@@ -12541,7 +12574,23 @@ const trShared = (() => {
 
  function shape(r){if(!r.points.length)return null;return r.kind==='pin'?L.marker(r.points[0],{icon:pulse(r),keyboard:true,title:r.title||'Nuevo pin',bubblingMouseEvents:false}):(r.kind==='polygon'?L.polygon:L.polyline)(r.points,{color:r.color,weight:r.weight,fillOpacity:r.opacity/100,bubblingMouseEvents:false});}
  function updateList(){/* MODIFICADO: no crear ni mostrar un listado de elementos. */return;list.replaceChildren();summary.textContent='Elementos compartidos · '+rows.size;for(const r of rows.values()){const b=el('button',undefined,'tr-shared-item');b.type='button';b.append(el('strong',r.title),el('small',({pin:'Pin',line:'Línea',polygon:'Polígono'}[r.kind])+(r.kind==='pin'?' · '+names[r.priority]:'')+(pending(r)?' · Pendiente':'')));b.onclick=()=>select(r.id,true);list.append(b);}if(!rows.size)list.append(el('p','No hay elementos compartidos.'));}
- function paint(){if(!layers)return;layers.clearLayers();for(const r of rows.values()){if(draft?.id===r.id)continue;const s=shape(r);if(!s)continue;const label=el('span',r.title+(pending(r)?' · Pendiente':''));s.bindTooltip(label,{direction:'top',className:'tr-pin-tooltip'});s.on('click',()=>select(r.id));s.addTo(layers);}updateList();}
+ /* MODIFICADO: conservar marcadores/figuras sin cambios y sus animaciones. */
+ const painted=new Map();
+ function paint(){if(!layers)return;
+  for(const [id,entry] of painted){if(!rows.has(id)||draft?.id===id){layers.removeLayer(entry.layer);painted.delete(id);}}
+  for(const r of rows.values()){
+   if(draft?.id===r.id)continue;
+   const previous=painted.get(r.id);
+   if(previous&&previous.version===r.version)continue;
+   if(previous)layers.removeLayer(previous.layer);
+   const layer=shape(r);if(!layer)continue;
+   const label=el('span',r.title+(pending(r)?' · Pendiente':''));
+   layer.bindTooltip(label,{direction:'top',className:'tr-pin-tooltip'});
+   layer.on('click',()=>select(r.id));layer.addTo(layers);
+   painted.set(r.id,{version:r.version,layer});
+  }
+  updateList();
+ }
  function syncFields(){if(!draft)return;/* NUEVO: restaurar controles del punto seleccionado. */latInput.value=draft.kind==='pin'&&draft.points.length?draft.points[0][0]:'';lngInput.value=draft.kind==='pin'&&draft.points.length?draft.points[0][1]:'';linkInput.value='';sourceOpen.hidden=true;locationHelp.textContent='Usa coordenadas decimales o un enlace que las contenga. Los enlaces cortos deben abrirse primero.';titleInput.value=draft.title;notes.value=draft.notes;priority.value=draft.priority;color.value=draft.color;size.value=draft.size;weight.value=draft.weight;opacity.value=draft.opacity;renderDraft();}
  function renderDraft(){if(!draft||!map)return;preview.clearLayers();handles.clearLayers();const s=shape(draft);if(s)s.addTo(preview);if(draft.kind==='pin'&&s){s.dragging.enable();s.on('dragend',()=>{const p=s.getLatLng().wrap();draft.points=[[p.lat,p.lng]];latInput.value=p.lat;lngInput.value=p.lng;renderDraft();});}
  if(draft.kind!=='pin')draft.points.forEach((p,i)=>{const h=L.marker(p,{draggable:true,keyboard:true,title:'Vértice '+(i+1),icon:L.divIcon({className:'tr-shared-handle',html:'<span>'+(i+1)+'</span>',iconSize:[22,22],iconAnchor:[11,11]}),bubblingMouseEvents:false}).addTo(handles);h.on('dragend',()=>{const p=h.getLatLng().wrap();draft.points[i]=[p.lat,p.lng];renderDraft();});});
@@ -12572,11 +12621,11 @@ const trShared = (() => {
  async function persist(){if(!draft||busy||!active()||!ready)return;if(!titleInput.value.trim()){titleInput.focus();feedback('Escribe un nombre para identificar el elemento.');return;}if(draft.kind==='pin'&&!iconStorage){feedback('Actualiza el SQL de anotaciones para guardar el símbolo del pin. Tu borrador se conserva.');return;}const item=clone(draft),token=epoch;busy=true;renderDraft();try{const result=await rpc('save',item);if(token!==epoch)return;loadSerial++;rows.set(result.id,result);schedule();busy=false;reset();feedback('Guardado en el servidor. '+(connected?'La actualización se envía a los usuarios conectados.':'La conexión en tiempo real está pendiente.'));}catch(e){if(token===epoch)feedback(errorText(e)+' El borrador se conserva.');}finally{if(token===epoch){busy=false;save.disabled=false;cancel.disabled=false;remove.disabled=false;for(const n of editor.querySelectorAll('input,textarea,select'))n.disabled=false;for(const n of [finish,undo,grow,shrink,vertex,deleteVertex,applyManual,applyLink])n.disabled=false;for(const b of iconPicker.querySelectorAll('button'))b.disabled=false;}}}
  /* MODIFICADO: confirmar antes de abrir una edición al eliminar desde el mapa. */
  async function erase(target=null){if(busy||!(target||draft)?.id||!confirm('¿Eliminar esta anotación compartida para todos los usuarios?'))return;const item=clone(target||draft),token=epoch;if(target){map.closePopup();draft=clone(item);drawing=false;syncFields();}busy=true;renderDraft();try{await rpc('remove',{id:item.id,version:item.version});if(token!==epoch)return;loadSerial++;rows.delete(item.id);schedule();busy=false;reset();feedback('Anotación eliminada en el servidor.');}catch(e){if(token===epoch)feedback(errorText(e)+' Tu edición se conserva.');}finally{if(token===epoch){busy=false;if(draft){const message=$('trPinStatus').textContent;renderDraft();feedback(message);}}}}
- for(const n of [titleInput,notes,priority,color,size,weight,opacity])n.addEventListener('input',()=>{if(!draft||busy)return;draft.title=titleInput.value;draft.notes=notes.value;draft.priority=priority.value;draft.color=draft.kind==='pin'?colors[priority.value]:color.value;draft.size=Number(size.value);draft.weight=Number(weight.value);draft.opacity=Number(opacity.value);renderDraft();});
- async function load(){if(!active()||!attached)return;if(loading){again=true;return;}const token=epoch,serial=++loadSerial;loading=true;try{const data=await rpc('read');if(token!==epoch||serial!==loadSerial||!allowed())return;ready=true;iconStorage=data.icons_version===1;me=data.user_id;admin=data.admin;rows=new Map(data.items.map(r=>[r.id,r]));paint();if(!draft&&selected&&popupRef?.isOpen()){const id=selected;if(rows.has(id))select(id);else{map.closePopup();selected=null;}}live.textContent=connected?'Anotaciones · En tiempo real':'Anotaciones · Reconectando; revisión cada 30 s';if(draft?.id){const r=rows.get(draft.id);if(!r||r.version!==draft.version)feedback('Este elemento cambió o se eliminó en otro equipo. Tu borrador se conserva; cancela y vuelve a abrirlo antes de guardar.');}}catch(e){if(token===epoch){ready=false;live.textContent=errorText(e);if(e.code==='42501'){busy=false;reset();rows.clear();paint();}}}finally{if(token===epoch){loading=false;if(again){again=false;void load();}}}}
+ for(const n of [titleInput,notes,priority,color,size,weight,opacity])n.addEventListener('input',()=>{if(!draft||busy)return;draft.title=titleInput.value;draft.notes=notes.value;draft.priority=priority.value;draft.color=draft.kind==='pin'?colors[priority.value]:color.value;draft.size=Number(size.value);draft.weight=Number(weight.value);draft.opacity=Number(opacity.value);/* MODIFICADO: escribir notas no reconstruye vértices ni marcadores. */if(n===titleInput||n===notes){feedback((draft.id?'Editando':'Borrador')+' · '+(pending(draft)?'Pendiente · ':'')+'Sin guardar.');return;}renderDraft();});
+ async function load(){if(!active()||!attached)return;if(loading){again=true;return;}const token=epoch,serial=++loadSerial;loading=true;try{const data=await rpc('read');if(token!==epoch||serial!==loadSerial||!allowed())return;ready=true;iconStorage=data.icons_version===1;me=data.user_id;admin=data.admin;/* MODIFICADO: no cerrar/reabrir ventanas cuyos datos no cambiaron. */const selectedVersion=selected?rows.get(selected)?.version:null;rows=new Map(data.items.map(r=>[r.id,r]));paint();if(!draft&&selected&&popupRef?.isOpen()&&rows.get(selected)?.version!==selectedVersion){const id=selected;if(rows.has(id))select(id);else{map.closePopup();selected=null;}}live.textContent=connected?'Anotaciones · En tiempo real':'Anotaciones · Reconectando; revisión cada 30 s';if(draft?.id){const r=rows.get(draft.id);if(!r||r.version!==draft.version)feedback('Este elemento cambió o se eliminó en otro equipo. Tu borrador se conserva; cancela y vuelve a abrirlo antes de guardar.');}}catch(e){if(token===epoch){ready=false;live.textContent=errorText(e);if(e.code==='42501'){busy=false;reset();rows.clear();paint();}}}finally{if(token===epoch){loading=false;if(again){again=false;void load();}}}}
  function schedule(){clearTimeout(timer);timer=setTimeout(load,150);}
- function connect(){if(!active()||!map)return;if(attached===map){void load();return;}stop();attached=map;layers=L.layerGroup().addTo(map);preview=L.layerGroup().addTo(map);handles=L.layerGroup().addTo(map);const token=epoch;const sb=client();if(sb?.channel)channel=sb.channel('cctt-traffic-annotations-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'cctt_traffic_annotations_data'},schedule).subscribe(state=>{if(token!==epoch)return;connected=state==='SUBSCRIBED';if(connected)void load();else live.textContent='Anotaciones · Sin conexión en tiempo real; reintentando';});void load();poll=setInterval(load,30000);}
- function stop(){epoch++;loadSerial++;clearTimeout(timer);clearInterval(poll);if(channel)void client()?.removeChannel(channel);channel=null;connected=ready=loading=again=busy=false;draft=null;drawing=false;selected=null;popupRef=null;attached?.closePopup();me='';admin=false;rows.clear();for(const g of [layers,preview,handles]){g?.clearLayers();if(attached&&g)attached.removeLayer(g);}layers=preview=handles=attached=null;panel.hidden=true;updateList();}
+ function connect(){if(!active()||!map)return;if(attached===map){/* MODIFICADO: agrupar aperturas simultáneas; la suscripción mantiene su revalidación. */if(!loading)void load();return;}stop();attached=map;layers=L.layerGroup().addTo(map);preview=L.layerGroup().addTo(map);handles=L.layerGroup().addTo(map);const token=epoch;const sb=client();if(sb?.channel)channel=sb.channel('cctt-traffic-annotations-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'cctt_traffic_annotations_data'},schedule).subscribe(state=>{if(token!==epoch)return;connected=state==='SUBSCRIBED';if(connected)void load();else live.textContent='Anotaciones · Sin conexión en tiempo real; reintentando';});void load();poll=setInterval(load,30000);}
+ function stop(){epoch++;loadSerial++;clearTimeout(timer);clearInterval(poll);if(channel)void client()?.removeChannel(channel);channel=null;connected=ready=loading=again=busy=false;draft=null;drawing=false;selected=null;popupRef=null;attached?.closePopup();me='';admin=false;rows.clear();/* NUEVO: liberar referencias al cerrar sesión/cambiar de mapa. */painted.clear();for(const g of [layers,preview,handles]){g?.clearLayers();if(attached&&g)attached.removeLayer(g);}layers=preview=handles=attached=null;panel.hidden=true;updateList();}
  window.addEventListener('cctt:access-updated',()=>{if(!allowed())stop();else if(active())connect();});
  window.addEventListener('cctt:logout',stop);window.addEventListener('cctt:session',e=>{if(me&&me!==e.detail?.session?.user?.id)stop();});
  return {connect,stop,click,copy,beginPin:()=>begin('pin'),canOpen:()=>!!draft&&draft.kind==='pin'&&draft.points.length>0};
@@ -12721,7 +12770,7 @@ const trShared = (() => {
  }
  /* MODIFICADO: durante el zoom se cancelan consultas, conservando la capa nativa. */
  function retainTraffic() {
-  traffic?.cancelPending();
+  /* MODIFICADO: pump pausa el inicio de peticiones durante el zoom; las descargas activas alimentan la caché. */
  }
  function pause(preserve=false) {
   clearTimeout(zoomTimer);zoomTimer=null;zoomSettling=false;
@@ -12731,6 +12780,9 @@ const trShared = (() => {
   traffic?.cancelPending();
   for(const controller of apiControllers)controller.abort();
   apiControllers.clear();
+  /* NUEVO: la pausa de sesión/página sí cancela las descargas compartidas. */
+  for(const request of trTileRequests.values())request.controller.abort();
+  trTileRequests.clear();
   if(!preserve) {
    generation++;
    dropTraffic();
@@ -12829,12 +12881,9 @@ const trShared = (() => {
    let url='';
    try {
     if(!active()||trafficSuspended||stamp!==generation)return;
-    const cached=job.force?null:readTrafficTile(keyFor(job.coords));
-    job.force=false;
-    const value=cached||{
-     blob:await call('traffic-tile',{provider:source,z:job.coords.z,x:job.coords.x,y:job.coords.y},controller.signal),
-     receivedAt:Date.now()
-    };
+    /* MODIFICADO: el controlador del mosaico cancela su dibujo, no una descarga reutilizable por otro nivel. */
+    const force=job.force;job.force=false;
+    const value=await trFetchTile(keyFor(job.coords),source,job.coords,force);
     if(job.cancelled||disposed||controller.signal.aborted||stamp!==generation||!active())return;
     if(!(value.blob instanceof Blob)||!value.blob.type.startsWith('image/png'))throw Error('La respuesta no contiene una imagen de tráfico válida.');
     const image=document.createElement('img');
@@ -12845,12 +12894,12 @@ const trShared = (() => {
      const abort=()=>{image.onload=null;image.onerror=null;reject(new DOMException('Consulta pausada','AbortError'));};
      controller.signal.addEventListener('abort',abort,{once:true});
      image.onload=()=>{controller.signal.removeEventListener('abort',abort);resolve();};
-     image.onerror=()=>{controller.signal.removeEventListener('abort',abort);reject(Error('No se pudo mostrar una imagen del proveedor.'));};
+     image.onerror=()=>{controller.signal.removeEventListener('abort',abort);/* NUEVO: no conservar una imagen que no se puede decodificar. */const key=keyFor(job.coords);if(trafficTileMemory.get(key)?.blob===value.blob){trafficTileBytes-=value.blob.size;trafficTileMemory.delete(key);}reject(Error('No se pudo mostrar una imagen del proveedor.'));};
      image.src=url;
      if(controller.signal.aborted)abort();
     });
     if(job.cancelled||disposed||controller.signal.aborted||stamp!==generation||!active())return;
-    if(!cached)rememberTrafficTile(keyFor(job.coords),value);
+    /* MODIFICADO: la descarga ya se guardó antes de dibujar; evita perderla al cambiar de zoom. */
     job.tile.replaceChildren(image);
     job.tile.classList.add('leaflet-tile-loaded');
     job.finished=true;
@@ -12885,7 +12934,7 @@ const trShared = (() => {
       if(job.running)job.controller?.abort();
       continue;
      }
-     if(force||!job.finished||Date.now()-job.receivedAt>=45000)enqueue(job,force);
+     if(force||!job.finished||Date.now()-job.receivedAt>=trTileLifetime)enqueue(job,force);
     }
     this.reportView();
     pump();
@@ -12928,6 +12977,8 @@ const trShared = (() => {
    },
    onRemove(target) {
     disposed=true;
+    /* NUEVO: cambiar proveedor o retirar la capa cancela sus solicitudes, no el zoom. */
+    for(const request of trTileRequests.values())if(request.source===source&&request.stamp===stamp)request.controller.abort();
     for(const job of jobs)release(job);
     queue.length=0;
     L.GridLayer.prototype.onRemove.call(this,target);
@@ -12939,6 +12990,14 @@ const trShared = (() => {
   layer.on('load',()=>layer.reportView());
   return layer;
  }
+ /* NUEVO: agrupar peticiones CARTO simultáneas; no guardar credenciales ni permisos. */
+ let baseConfigFlight=null;
+ function readBaseConfig(){
+  if(baseConfigFlight)return baseConfigFlight;
+  const request=client().functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
+  const flight=Promise.resolve(request).finally(()=>{if(baseConfigFlight===flight)baseConfigFlight=null;});
+  baseConfigFlight=flight;return flight;
+ }
  async function setBase() {
   if (!map || !active()) return;
   const ticket = ++baseRequest;
@@ -12947,7 +13006,8 @@ const trShared = (() => {
   const style = selected === 'auto' ? (dark?'dark_all':'voyager') : selected;
   try {
    const sb = client();
-   const {data,error} = await sb.functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
+   /* MODIFICADO: reutilizar únicamente una consulta que aún está en curso. */
+   const {data,error} = await readBaseConfig();
    if (ticket !== baseRequest || !active()) return;
    if (error || data?.error) throw Error(data?.error || error.message);
    let path;
@@ -13032,12 +13092,14 @@ const trShared = (() => {
   starting = true;
   const stamp = generation;
   $('trReload').disabled = true;
+  /* MODIFICADO: CARTO no espera a la respuesta del proveedor de tráfico. */
+  if(recheck||!base)void setBase();
   try {
    if ((recheck || !config) && !await loadConfig()) return;
    if (stamp !== generation || !active()) return;
    /* MODIFICADO: las actualizaciones también conservan la consulta mientras llega el detalle. */
    drawTraffic(true);
-   if (recheck) void setBase();
+   /* MODIFICADO: el mapa base ya se solicitó en paralelo al iniciar. */
   } catch (error) {
    if (stamp===generation&&active()) {
     /* MODIFICADO: conservar imágenes ante un error de red; retirar si se deniega el acceso. */
@@ -13071,7 +13133,8 @@ const trShared = (() => {
    /* MODIFICADO: priorizar el nivel final y reutilizar los mosaicos recientes de ese nivel. */
    if(traffic)traffic.resumeView();
    else drawTraffic();
-  },180);
+  /* MODIFICADO: agrupar el gesto completo antes de consultar el nivel final. */
+  },450);
  }
  function initialize() {
   if (!active()) return;
@@ -13089,8 +13152,11 @@ const trShared = (() => {
   }
   /* NUEVO: conectar anotaciones sin reconstruir capas de tráfico. */
   trShared.connect();
-  requestAnimationFrame(()=>map.invalidateSize());
-  void refresh();
+  /* NUEVO: compatibilidad con navegadores sin observación de visibilidad. */
+  if(!trGoogleObserver)trLoadGoogle();
+  requestAnimationFrame(()=>map?.invalidateSize());
+  /* MODIFICADO: eventos de apertura repetidos no encolan otro refresco completo. */
+  if(!starting)void refresh();
  }
  function syncCard() {
   const visible = allowed();
@@ -13176,6 +13242,7 @@ const trShared = (() => {
   if(owner&&next!==owner){
    /* NUEVO: el pin no se transfiere entre cuentas. */
    clearPin();
+   /* NUEVO: no reutilizar una petición de la sesión anterior. */baseConfigFlight=null;
    pause();config=null;baseRequest++;
    if(map){map.remove();map=null;base=null;locationMarker=null;}
   }
@@ -13184,6 +13251,7 @@ const trShared = (() => {
  window.addEventListener('cctt:logout',()=>{
   /* NUEVO: limpiar la ubicación compartible al finalizar la sesión. */
   clearPin();
+  /* NUEVO */baseConfigFlight=null;
   owner='';pause();baseRequest++;config=null;
   if(map){map.remove();map=null;base=null;locationMarker=null;}
   status('Inicia sesión con una cuenta autorizada.');
@@ -13200,7 +13268,9 @@ const trShared = (() => {
   /* MODIFICADO: conservación entre pestañas y detalle reutilizable por nivel de zoom. */
   /* MODIFICADO: aprendizaje de anotaciones compartidas. */
   /* MODIFICADO: búsqueda por coordenadas, símbolos y acciones en el pin. */
-  version:'trafico-terrestre-9',
+  /* MODIFICADO: carga paralela y actualización selectiva. */
+  /* MODIFICADO: reutilización de consultas al cambiar de zoom. */
+  version:'trafico-terrestre-11',
   purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
   steps:[
    {title:'Elige las capas',body:'Pulsa el icono Capas situado sobre el mapa y selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
@@ -13208,7 +13278,9 @@ const trShared = (() => {
    {title:'Consulta las vías',body:'Acerca el mapa para ver el flujo. Ajusta su opacidad para leer los nombres. Una vía sin líneas puede carecer de datos y no confirma circulación fluida.',controlId:'trOpacity'},
    {title:'Actualiza y revisa el estado',body:'Actualizar tráfico vuelve a consultar la disponibilidad y las capas. La actualización automática opera cada 60 segundos mientras este módulo está visible. Una carga parcial o un error impiden confirmar una consulta completa.',controlId:'trReload'},
    /* NUEVO */
-   {title:'Cambio de zoom',body:'El mapa conserva su capa al cambiar de zoom y prioriza las vías del encuadre visible. Reutiliza imágenes recibidas durante un máximo de 45 segundos en esta sesión y fuente. El detalle de un nivel todavía no consultado depende de su descarga; puede verse ampliado temporalmente hasta recibir las imágenes de ese nivel. Actualizar tráfico fuerza una nueva consulta sin vaciar las imágenes ya mostradas.'},
+   /* NUEVO */
+   {title:'Carga y rendimiento',body:'El mapa CARTO y la disponibilidad del tráfico se consultan en paralelo. Las revisiones de anotaciones conservan los marcadores y ventanas sin cambios. La actualización automática, los permisos y las comprobaciones del servidor siguen activos; la rapidez final depende también de la red y los proveedores.'},
+   {title:'Cambio de zoom',body:'El mapa conserva su capa al cambiar de zoom y prioriza las vías del encuadre visible. Reutiliza imágenes recibidas durante un máximo de 60 segundos en esta sesión y fuente, con un límite de 24 MiB y 384 mosaicos. Agrupa cambios rápidos de zoom durante 450 ms y comparte descargas simultáneas del mismo mosaico. El detalle de un nivel todavía no consultado depende de su descarga; puede verse ampliado temporalmente hasta recibir las imágenes de ese nivel. Actualizar tráfico fuerza una nueva consulta sin vaciar las imágenes ya mostradas.'},
    /* NUEVO */
    {title:'Cambiar de pestaña',body:'Al ocultar la pestaña se pausan las solicitudes de tráfico y se conserva el mapa y su última consulta. Al regresar se revalida el acceso y se renuevan las imágenes pendientes o vencidas. Cerrar sesión, cambiar de cuenta, salir del módulo o perder el permiso elimina la memoria temporal. La hora mostrada corresponde a las imágenes consultadas, no a la hora exacta de cada medición.'},
    {title:'Ubicación de la consulta',body:'Mi ubicación requiere autorización del navegador. Centrar Manzanillo regresa al encuadre inicial. La ubicación consultada no se guarda como registro operativo.',controlId:'trLocate'},
