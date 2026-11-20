@@ -3453,7 +3453,8 @@ function copDesign(){
 }
 function applyCopDesign(){const el=document.getElementById('copPreview');if(!el)return;const d=copDesign();Object.assign(el.style,{top:d.top+'%',left:d.left+'%',width:d.width+'%',height:d.height+'%',fontSize:d.fontSize+'px',color:d.color,background:d.bg,padding:d.padding+'px',borderRadius:'10px'});}
 function ensureCopDesignControls(){const inp=document.getElementById('copTemplates');if(!inp||document.getElementById('copDesignControls'))return;const box=document.createElement('div');box.id='copDesignControls';box.innerHTML=`<div class="notice" style="margin-top:10px">La imagen seleccionada se utiliza completa como plantilla. Ajusta el área donde se colocará el comunicado sin modificar la imagen original.</div><div class="cop-design-grid"><div class="field"><label>Superior %</label><input id="copDTop" type="number" min="0" max="95"></div><div class="field"><label>Izquierda %</label><input id="copDLeft" type="number" min="0" max="95"></div><div class="field"><label>Ancho %</label><input id="copDWidth" type="number" min="5" max="100"></div><div class="field"><label>Alto %</label><input id="copDHeight" type="number" min="5" max="100"></div><div class="field"><label>Tamaño texto</label><input id="copDFont" type="number" min="8" max="72"></div><div class="field"><label>Color texto</label><input id="copDColor" type="color"></div></div><div class="row" style="margin-top:10px"><button class="btn" id="copTransparentBg">Fondo transparente</button><button class="btn" id="copWhiteBg">Fondo claro</button><button class="btn dark" id="copPng">Descargar vista PNG</button></div>`;inp.insertAdjacentElement('afterend',box);const d=copDesign();[['copDTop','top'],['copDLeft','left'],['copDWidth','width'],['copDHeight','height'],['copDFont','fontSize']].forEach(([id,k])=>{const e=document.getElementById(id);e.value=d[k];e.oninput=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{}, {[k]:+e.value});save();applyCopDesign()}});const c=document.getElementById('copDColor');c.value=d.color;c.oninput=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{},{color:c.value});save();applyCopDesign()};document.getElementById('copTransparentBg').onclick=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{},{bg:'transparent'});save();applyCopDesign()};document.getElementById('copWhiteBg').onclick=()=>{state.inc35.copomaDesign=Object.assign({},state.inc35.copomaDesign||{},{bg:'rgba(255,255,255,0.72)'});save();applyCopDesign()};document.getElementById('copPng').onclick=async()=>{if(!window.html2canvas)return toast('No se cargó el generador de imagen.',true);const node=document.getElementById('copTemplatePreview');try{const canvas=await html2canvas(node,{scale:2,useCORS:true,backgroundColor:'#ffffff'});canvas.toBlob(b=>downloadBlob(b,'COPOMA_'+today()+'.png'),'image/png')}catch(e){toast('No se pudo generar la imagen: '+e.message,true)}}}
-async function restorePersistentAssets(){try{reportTemplates=await loadTemplateSet('report');reportTemplateIndex=reportTemplates.length?Math.min(Math.max(0,state.report.templateIndex??0),reportTemplates.length-1):-1;renderReportTemplates();if(reportTemplateIndex>=0)await chooseReportTemplate(reportTemplateIndex);copTemplates=await loadTemplateSet('copoma');copTemplateIndex=copTemplates.length?Math.min(Math.max(0,state.inc35.copomaTemplateIndex??0),copTemplates.length-1):-1;renderCopTemplates();if(copTemplateIndex>=0)await chooseCopTemplate(copTemplateIndex)}catch(e){console.warn('No fue posible restaurar formatos persistentes',e)}}
+/* MODIFICADO: no descargar ni rasterizar plantillas de módulos ocultos durante el arranque. */
+async function restorePersistentAssets(){if(typeof window.ccttRestoreVisibleTemplates==='function')return window.ccttRestoreVisibleTemplates();}
 
 
 /* === Fixed-page template engine v3: preserves page geometry and prevents accidental blank pages === */
@@ -4209,6 +4210,8 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
       const isPdf=(f.type||'')==='application/pdf'||/\.pdf$/i.test(f.name||'');
       if(isImg||isPdf){
         const ras=await templateRaster(f);
+        /* NUEVO: impedir que una respuesta visual anterior se aplique a otra cuenta. */
+        if(window.ccttTemplateFileCurrent?.(f)===false)return;
         if(ras) renderExactTemplatePreview(target,f,ras,f.name||'Formato seleccionado');
         else if(isPdf){target.innerHTML=`<iframe style="width:100%;height:100%;min-height:340px;border:0" src="${URL.createObjectURL(f)}#toolbar=0&navpanes=0"></iframe>`;}
         else {const img=document.createElement('img');img.style.cssText='display:block;max-width:100%;max-height:100%;margin:auto';img.src=await fileData(f);target.innerHTML='';target.appendChild(img);}
@@ -4217,9 +4220,11 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
         const note=document.createElement('div');note.className='template-fidelity-note';note.textContent='Vista DOCX compatible. Si desea una coincidencia exacta con Word, convierta el archivo a PDF y cárguelo como plantilla base.';target.prepend(note);
       }else target.innerHTML='<div class="empty">Formato no compatible.</div>';
     }catch(err){
+      if(window.ccttTemplateFileCurrent?.(f)===false)return;
       console.warn('Vista previa de formato no disponible',err);
       target.innerHTML='<div class="empty">No se pudo generar la vista previa de esta plantilla, pero el archivo quedó guardado. Puede continuar con el diseño institucional o exportar un respaldo para mover el formato a otro dispositivo.</div>';
     }
+    /* NUEVO */if(window.ccttTemplateFileCurrent?.(f)===false)return;
     try{await updateReportPreview()}catch(err){console.warn(err)}
   };
   const updateReportPreviewBase=updateReportPreview;
@@ -4245,11 +4250,14 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
       const isPdf=(f.type||'')==='application/pdf'||/\.pdf$/i.test(f.name||'');
       if(isImg||isPdf){
         const ras=await templateRaster(f);
+        /* NUEVO: impedir que una respuesta visual anterior se aplique a otra cuenta. */
+        if(window.ccttTemplateFileCurrent?.(f)===false)return;
         if(ras){box.innerHTML='';const stage=document.createElement('div');stage.className='cop-exact-stage';stageSize(stage,ras.width,ras.height,760);stage.innerHTML=`<img class="template-bg" src="${ras.src}" alt="Plantilla COPOMA">`;box.appendChild(stage);buildCopLayers(stage);applyCopDesign();if(typeof copSavedStatus==='function')copSavedStatus();return;}
         if(isPdf){box.innerHTML=`<iframe style="width:100%;height:100%;min-height:360px;border:0" src="${URL.createObjectURL(f)}#toolbar=0&navpanes=0"></iframe>`;return;}
       }
       return await renderCopTemplateFinalBase();
     }catch(err){
+      if(window.ccttTemplateFileCurrent?.(f)===false)return;
       console.warn('Vista previa COPOMA no disponible',err);
       return await renderCopTemplateFinalBase();
     }
@@ -5560,16 +5568,103 @@ function renderDialog(){const box=getDialog().querySelector('#ccttCatList');cons
 function refreshCatalogs(){document.querySelectorAll('[data-cctt-cat]').forEach(el=>{const key=el.dataset.ccttCat,dl=document.getElementById('cctt-list-'+key);if(dl)dl.innerHTML=(catalogs()[key]||[]).map(v=>'<option value="'+escTxt(v)+'"></option>').join('')})}
 function initCatalogFields(){if(!document.getElementById('ccttCatalogOverlay'))getDialog();document.querySelectorAll('.page .field').forEach(f=>{const label=f.querySelector('label'),el=f.querySelector('input');if(!label||!el||el.dataset.ccttCat||!['text','search'].includes(el.type))return;const txt=label.textContent.trim();/* MODIFICADO: vialidades conserva sus propios controles de sugerencias. */if(!catalogLabels.test(txt)||exclude.test(txt)||el.closest('#page-adminUsuarios')||el.closest('#vialFields')||f.querySelector('.location-tools,[data-vial-save],[data-vial-manage]'))return;const key=catalogKey(txt);el.dataset.ccttCat=key;el.autocomplete='off';el.removeAttribute('list');let dl=document.getElementById('cctt-list-'+key);if(!dl){dl=document.createElement('datalist');dl.id='cctt-list-'+key;document.body.append(dl)}el.setAttribute('list',dl.id);const actions=document.createElement('div');actions.className='cctt-catalog-actions';actions.innerHTML='<button type="button" class="mini-btn">+ Guardar sugerencia</button><button type="button" class="mini-btn">Administrar sugerencias</button>';f.append(actions);actions.children[0].onclick=()=>{if(!el.value.trim())return ccttSiteNotice('Escribe primero el dato que deseas guardar.');addCatalog(key,el.value)};actions.children[1].onclick=()=>{selectedCatalog=key;selectedInput=el;const dialog=getDialog();dialog.querySelector('#ccttCatTitle').textContent='Sugerencias: '+txt;renderDialog();dialog.classList.add('open')};});refreshCatalogs()}
 // Un formato oficial no se anuncia mediante tarjeta de descarga; se usa directamente.
-async function fetchOfficialFile(item){const response=await fetch(item.url);if(!response.ok)throw Error('No fue posible cargar el formato oficial');const blob=await response.blob();return new File([blob],item.name||'Formato oficial',{type:blob.type})}
-async function loadOfficialBrand(item){const f=await fetchOfficialFile(item);if(!f.type.startsWith('image/')){console.warn('Redes y reporte requiere imagen PNG, JPG o WEBP como marca oficial.');return false}const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f)});officialBrand=data;window.ccttOfficialBrandData=data;const input=document.getElementById('socialBrandIcon');if(input){const field=input.closest('.field');if(field){field.style.display='none';field.dataset.official='true';let note=document.getElementById('ccttOfficialBrandNote');if(!note){note=document.createElement('p');note.id='ccttOfficialBrandNote';note.className='cctt-official-status';field.insertAdjacentElement('afterend',note)}note.textContent='Marca institucional aplicada automáticamente: '+item.name;}}await renderSocial();return true}
-async function applyOfficialTemplates(){if(!window.ccttSupabaseClient)return;try{const {data,error}=await window.ccttSupabaseClient.functions.invoke('cctt-admin',{body:{action:'visible-templates'}});if(error||data?.error)throw error||Error(data.error);const list=data?.templates||[];
+/* NUEVO: preparación oficial por módulo; caché solo en memoria de la sesión. */
+let officialEpoch=0,officialUser=null,officialList=null,officialListAt=0,officialListFlight=null;
+const officialJobs=new Map(),officialApplied=new Map(),officialFiles=new Map(),officialControllers=new Set();
+let officialFileSet=new WeakSet(),officialRasterCache=new WeakMap();
+const officialRasterBase=window.templateRaster;
+if(typeof officialRasterBase==='function')window.templateRaster=function(file){
+ if(!file||!officialFileSet.has(file))return officialRasterBase.apply(this,arguments);
+ if(officialRasterCache.has(file))return officialRasterCache.get(file);
+ const cache=officialRasterCache,token=officialEpoch;
+ const task=Promise.resolve().then(()=>officialRasterBase(file)).then(result=>{if(token!==officialEpoch)throw new DOMException('La sesión cambió','AbortError');return result;}).catch(error=>{cache.delete(file);throw error;});
+ cache.set(file,task);return task;
+};
+function officialActive(module){return document.getElementById('page-'+module)?.classList.contains('active')&&window.ccttCanAccess?.(module)===true;}
+function officialReset(){
+ officialEpoch++;for(const c of officialControllers)c.abort();officialControllers.clear();
+ officialList=null;officialListFlight=null;officialListAt=0;officialJobs.clear();officialFiles.clear();officialApplied.clear();officialFileSet=new WeakSet();officialRasterCache=new WeakMap();
+ /* NUEVO: retirar solo archivos oficiales que esta carga había aplicado. */
+ if(reportTemplates.some(f=>f.__ccttSessionTemplate)){reportTemplates=[];reportTemplateIndex=-1;document.getElementById('repTemplatePreview')?.replaceChildren();renderReportTemplates();}
+ if(copTemplates.some(f=>f.__ccttSessionTemplate)){copTemplates=[];copTemplateIndex=-1;document.getElementById('copTemplatePreview')?.replaceChildren();renderCopTemplates();}
+}
+async function officialGetList(){
+ if(officialList&&Date.now()-officialListAt<60000)return officialList;
+ if(officialListFlight)return officialListFlight;
+ const token=officialEpoch;
+ const task=(async()=>{const {data,error}=await window.ccttSupabaseClient.functions.invoke('cctt-admin',{body:{action:'visible-templates'}});if(error||data?.error)throw error||Error(data.error);if(token!==officialEpoch)throw new DOMException('La sesión cambió','AbortError');officialList=data?.templates||[];officialListAt=Date.now();return officialList;})().finally(()=>{if(officialListFlight===task)officialListFlight=null;});
+ officialListFlight=task;return task;
+}
+async function fetchOfficialFile(item){
+ const key=JSON.stringify([item.id,item.url,item.name,item.updated_at]);
+ if(officialFiles.has(key))return officialFiles.get(key);
+ const token=officialEpoch,controller=new AbortController();officialControllers.add(controller);
+ const task=(async()=>{const response=await fetch(item.url,{signal:controller.signal});if(!response.ok)throw Error('No fue posible cargar el formato oficial');const blob=await response.blob();if(token!==officialEpoch)throw new DOMException('La sesión cambió','AbortError');const file=new File([blob],item.name||'Formato oficial',{type:blob.type});return file;})().catch(e=>{if(officialFiles.get(key)===task)officialFiles.delete(key);throw e;}).finally(()=>officialControllers.delete(controller));
+ officialFiles.set(key,task);/* NUEVO: limitar versiones de archivos retenidas en memoria. */while(officialFiles.size>8)officialFiles.delete(officialFiles.keys().next().value);return task;
+}
+async function officialPrepare(module,list){
+ if(!officialActive(module))return;
+ if(officialJobs.has(module))return officialJobs.get(module);
+ const selected=list.filter(x=>x.module_id===module).slice(0,module==='reporte'?1:3);
+ const signature=JSON.stringify(selected.map(x=>[x.id,x.url,x.name,x.updated_at]));
+ if(officialApplied.get(module)===signature)return;
+ const token=officialEpoch;
+ const task=(async()=>{
+  const files=selected.length?await Promise.all(selected.map(fetchOfficialFile)):await loadTemplateSet(module==='reporte'?'report':'copoma');
+  if(token!==officialEpoch||!officialActive(module))return;
+  for(const file of files){file.__ccttSessionTemplate=true;file.__ccttTemplateEpoch=officialEpoch;file.__ccttOfficialTemplate=selected.length>0;officialFileSet.add(file);}
+  /* NUEVO: rasterizar solo en el módulo abierto; compartir el resultado con sus vistas/exportaciones. */
+  const chosen=files.length?(selected.length?0:Math.min(Math.max(0,Number(module==='reporte'?state.report?.templateIndex:state.inc35?.copomaTemplateIndex)||0),files.length-1)):-1;
+  for(const file of chosen>=0?[files[chosen]]:[]){if(/\.pdf$|\.(png|jpe?g|webp|gif)$/i.test(file.name)||/^(image\/|application\/pdf)/.test(file.type))await window.templateRaster(file);}
+  if(token!==officialEpoch||!officialActive(module))return;
+  const input=document.getElementById(module==='reporte'?'repTemplates':'copTemplates');
+  if(module==='reporte'){
+   if(files.length){reportTemplates=files;reportTemplateIndex=chosen;renderReportTemplates();await chooseReportTemplate(chosen);}
+   else if(reportTemplates.some(f=>f.__ccttSessionTemplate)){reportTemplates=[];reportTemplateIndex=-1;renderReportTemplates();await chooseReportTemplate(-1);}
+  }else{
+   if(files.length){copTemplates=files;copTemplateIndex=chosen;renderCopTemplates();await chooseCopTemplate(chosen);}
+   else if(copTemplates.some(f=>f.__ccttSessionTemplate)){copTemplates=[];copTemplateIndex=-1;renderCopTemplates();await chooseCopTemplate(-1);}
+  }
+  if(token!==officialEpoch)return;
+  if(input){input.closest('.field')?.style.setProperty('display',selected.length?'none':'');input.style.display=selected.length?'none':'';}
+  officialApplied.set(module,signature);
+ })().finally(()=>{if(officialJobs.get(module)===task)officialJobs.delete(module);});
+ officialJobs.set(module,task);return task;
+}
+
+/* NUEVO: restauración solicitada desde inicio/importación, resuelta solo para la página abierta. */
+window.ccttRestoreVisibleTemplates=()=>{officialApplied.delete('reporte');officialApplied.delete('inc35copoma');return applyOfficialTemplates();};
+
+/* NUEVO: descartar resultados visuales tardíos de archivos de otra sesión. */
+window.ccttTemplateFileCurrent=file=>!file?.__ccttSessionTemplate||file.__ccttTemplateEpoch===officialEpoch;
+/* MODIFICADO: una respuesta de la cuenta anterior no se aplica. */
+async function loadOfficialBrand(item){const token=officialEpoch;const f=await fetchOfficialFile(item);if(token!==officialEpoch)return false;if(!f.type.startsWith('image/')){console.warn('Redes y reporte requiere imagen PNG, JPG o WEBP como marca oficial.');return false}const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(f)});if(token!==officialEpoch)return false;officialBrand=data;window.ccttOfficialBrandData=data;const input=document.getElementById('socialBrandIcon');if(input){const field=input.closest('.field');if(field){field.style.display='none';field.dataset.official='true';let note=document.getElementById('ccttOfficialBrandNote');if(!note){note=document.createElement('p');note.id='ccttOfficialBrandNote';note.className='cctt-official-status';field.insertAdjacentElement('afterend',note)}note.textContent='Marca institucional aplicada automáticamente: '+item.name;}}await renderSocial();return true}
+/* MODIFICADO: los archivos de Reporte/COPOMA solo se preparan cuando su página está activa. */
+async function applyOfficialTemplates(){if(!window.ccttSupabaseClient)return;const token=officialEpoch;try{
+ const list=await officialGetList();if(token!==officialEpoch)return;
  document.querySelectorAll('.cctt-shared-formats').forEach(el=>el.remove());
+ const brandSignature=JSON.stringify(list.filter(x=>x.module_id==='inc35redes'));
+ if(officialApplied.get('inc35redes')!==brandSignature&&!officialJobs.has('inc35redes')){
+  const brandJob=(async()=>{
  /* MODIFICADO: conservar la marca oficial anterior durante su recarga asíncrona. */const network=list.filter(x=>x.module_id==='inc35redes');if(!network.length){officialBrand=null;window.ccttOfficialBrandData=null;}const brandField=document.getElementById('socialBrandIcon')?.closest('.field');if(brandField){brandField.style.removeProperty('display');brandField.dataset.official='false'}document.getElementById('ccttOfficialBrandNote')?.remove();if(network.length)try{await loadOfficialBrand(network[0])}catch(e){console.warn(e)};
- const report=list.filter(x=>x.module_id==='reporte');if(report.length)try{const f=await fetchOfficialFile(report[0]);reportTemplates=[f];reportTemplateIndex=0;renderReportTemplates();await chooseReportTemplate(0)}catch(e){console.warn(e)};
- const cop=list.filter(x=>x.module_id==='inc35copoma').slice(0,3);if(cop.length){try{copTemplates=await Promise.all(cop.map(fetchOfficialFile));copTemplateIndex=0;renderCopTemplates();await chooseCopTemplate(0)}catch(e){console.warn(e)} }
- ['repTemplates','copTemplates'].forEach(id=>{const input=document.getElementById(id);if(input){const isOfficial=id==='repTemplates'?report.length:cop.length;input.closest('.field')?.style.setProperty('display',isOfficial?'none':'');input.style.display=isOfficial?'none':''}});
-}catch(e){console.warn('Plantillas oficiales:',e)}}
-function start(){initCatalogFields();const obs=new MutationObserver(()=>initCatalogFields());const content=document.querySelector('.content');if(content)obs.observe(content,{childList:true,subtree:true});window.addEventListener('cctt:session',()=>{setTimeout(()=>{initCatalogFields();refreshCatalogs();applyOfficialTemplates()},450)});window.addEventListener('cctt:logout',()=>{officialBrand=null;window.ccttOfficialBrandData=null;document.getElementById('ccttOfficialBrandNote')?.remove();document.querySelectorAll('.cctt-catalog-overlay').forEach(e=>e.classList.remove('open'))});setTimeout(applyOfficialTemplates,1500)}
+   if(token===officialEpoch)officialApplied.set('inc35redes',brandSignature);
+  })();officialJobs.set('inc35redes',brandJob);
+  try{await brandJob;}finally{if(officialJobs.get('inc35redes')===brandJob)officialJobs.delete('inc35redes');}
+ }
+ if(token!==officialEpoch)return;
+ await Promise.all(['reporte','inc35copoma'].filter(officialActive).map(module=>officialPrepare(module,list)));
+}catch(e){if(e.name!=='AbortError')console.warn('Plantillas oficiales:',e)}}
+/* MODIFICADO: observar apertura, agrupar arranques y limpiar memoria al cambiar de cuenta. */
+function start(){
+ initCatalogFields();const obs=new MutationObserver(()=>initCatalogFields());const content=document.querySelector('.content');if(content)obs.observe(content,{childList:true,subtree:true});
+ let scheduled=null;
+ const schedule=()=>{clearTimeout(scheduled);scheduled=setTimeout(()=>{scheduled=null;void applyOfficialTemplates();},100);};
+ for(const module of ['reporte','inc35copoma']){const page=document.getElementById('page-'+module);if(page)new MutationObserver(()=>{if(officialActive(module))schedule();}).observe(page,{attributes:true,attributeFilter:['class']});}
+ window.addEventListener('cctt:session',event=>{const next=event.detail?.session?.user?.id||null;if(next!==officialUser){officialReset();officialUser=next;}setTimeout(()=>{initCatalogFields();refreshCatalogs();schedule();},450);});
+ window.addEventListener('cctt:access-updated',()=>{for(const module of ['reporte','inc35copoma'])if(window.ccttCanAccess?.(module)!==true){officialApplied.delete(module);}if(['reporte','inc35copoma'].some(officialActive))schedule();});
+ window.addEventListener('cctt:logout',()=>{clearTimeout(scheduled);officialReset();officialUser=null;officialBrand=null;window.ccttOfficialBrandData=null;document.getElementById('ccttOfficialBrandNote')?.remove();document.querySelectorAll('.cctt-catalog-overlay').forEach(e=>e.classList.remove('open'));});
+ setTimeout(schedule,1500);
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script>
