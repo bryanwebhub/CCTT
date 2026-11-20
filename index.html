@@ -12162,6 +12162,44 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
 #page-traficoTerrestre #trGoogleMap{display:block;width:100%;height:450px;min-height:300px;border-radius:8px;color-scheme:normal;background:#fff}
 @media(max-width:680px){#page-traficoTerrestre .tr-google-embed{padding:12px}#page-traficoTerrestre #trGoogleMap{height:400px}}
 </style>
+<!-- NUEVO: presentación de las anotaciones compartidas. -->
+<style id="ccttTrafficSharedStyles">
+/* NUEVO: estilos exclusivos de anotaciones del módulo de tráfico. */
+#page-traficoTerrestre .tr-shared-toolbar,#page-traficoTerrestre .tr-shared-editor{--tsa-bg:color-mix(in srgb,var(--cctt-theme-accent,#6b1640) 5%,white);--tsa-text:#211827;--tsa-border:color-mix(in srgb,var(--cctt-theme-accent,#6b1640) 30%,white);background:var(--tsa-bg);color:var(--tsa-text);border:1px solid var(--tsa-border);border-radius:12px;padding:12px;margin:0 0 12px;}
+html[data-cctt-scheme="dark"] #page-traficoTerrestre .tr-shared-toolbar,html[data-cctt-scheme="dark"] #page-traficoTerrestre .tr-shared-editor{--tsa-bg:color-mix(in srgb,var(--cctt-theme-accent,#6b1640) 24%,#08030d);--tsa-text:#fff7ff;--tsa-border:color-mix(in srgb,var(--cctt-theme-accent,#6b1640) 65%,#dbc9e4);}
+#page-traficoTerrestre .tr-shared-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;}
+#page-traficoTerrestre .tr-shared-live{font-size:12px;flex:1 1 220px;}
+#page-traficoTerrestre .tr-shared-catalog{flex:0 1 320px;max-width:100%;}
+#page-traficoTerrestre .tr-shared-catalog summary{cursor:pointer;font-weight:700;padding:8px;}
+#page-traficoTerrestre .tr-shared-list{max-height:180px;overflow:auto;display:grid;gap:6px;}
+#page-traficoTerrestre .tr-shared-item{display:grid;text-align:left;gap:3px;cursor:pointer;border:1px solid var(--tsa-border);border-radius:8px;padding:9px;background:var(--tsa-bg);color:var(--tsa-text);overflow-wrap:anywhere;}
+#page-traficoTerrestre .tr-shared-item small{color:inherit;opacity:.9;}
+#page-traficoTerrestre .tr-shared-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+#page-traficoTerrestre .tr-shared-editor label{font-size:12px;display:grid;gap:5px;min-width:0;color:inherit;}
+#page-traficoTerrestre .tr-shared-editor input,#page-traficoTerrestre .tr-shared-editor textarea,#page-traficoTerrestre .tr-shared-editor select{width:100%;min-width:0;box-sizing:border-box;background:var(--tsa-bg);color:var(--tsa-text);border:1px solid var(--tsa-border);border-radius:8px;padding:8px;accent-color:var(--cctt-theme-accent,#6b1640);}
+#page-traficoTerrestre .tr-shared-editor input[type=color]{height:36px;padding:3px;}
+#page-traficoTerrestre .tr-shared-editor textarea{resize:vertical;}
+#page-traficoTerrestre .tr-shared-editor .tr-actions{margin-bottom:8px;gap:7px;flex-wrap:wrap;}
+#page-traficoTerrestre .tr-shared-editor .tr-actions>label{max-width:110px;}
+#page-traficoTerrestre .tr-shared-editor>.tr-help{margin:4px 0;}
+#page-traficoTerrestre #trSharedSave{background:var(--cctt-theme-accent,#6b1640);color:var(--cctt-theme-onaccent,#fff);}
+#page-traficoTerrestre .tr-shared-editor [hidden],#page-traficoTerrestre .tr-shared-editor[hidden]{display:none!important;}
+#page-traficoTerrestre .tr-shared-editor :focus-visible,#page-traficoTerrestre .tr-shared-toolbar :focus-visible{outline:3px solid var(--cctt-theme-accent,#6b1640);outline-offset:2px;}
+#page-traficoTerrestre .tr-shared-item:hover{border-color:var(--cctt-theme-accent,#6b1640);box-shadow:inset 3px 0 var(--cctt-theme-accent,#6b1640);}
+#page-traficoTerrestre .tr-shared-editor button:disabled{opacity:.6;cursor:not-allowed;}
+#page-traficoTerrestre .tr-shared-pin{background:none;border:0;}
+#page-traficoTerrestre .tr-shared-pulse{position:relative;display:block;color:var(--tr-pin-color);filter:drop-shadow(0 1px 2px #0008);}
+#page-traficoTerrestre .tr-shared-pulse:before{content:'';position:absolute;inset:12% 8% 25%;border:3px solid var(--tr-pin-color);border-radius:50%;animation:trSharedPulse 2.8s ease-out infinite;pointer-events:none;}
+#page-traficoTerrestre .tr-shared-pulse.medium:before{animation-duration:1.8s;}
+#page-traficoTerrestre .tr-shared-pulse.high:before{animation-duration:1.1s;}
+@keyframes trSharedPulse{0%{transform:scale(.8);opacity:.85}100%{transform:scale(2.1);opacity:0}}
+#page-traficoTerrestre .tr-shared-handle{display:grid;place-items:center;background:var(--cctt-theme-accent,#6b1640);color:var(--cctt-theme-onaccent,#fff);border:2px solid white;border-radius:50%;font:700 11px sans-serif;box-shadow:0 1px 4px #0008;}
+#page-traficoTerrestre .tr-shared-popup{display:grid;gap:8px;overflow-wrap:anywhere;}
+#page-traficoTerrestre .tr-shared-popup p{white-space:pre-wrap;margin:0;max-height:180px;overflow:auto;}
+@media(prefers-reduced-motion:reduce){#page-traficoTerrestre .tr-shared-pulse:before{animation:none;opacity:.5;}}
+@media(max-width:800px){#page-traficoTerrestre .tr-shared-fields{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:480px){#page-traficoTerrestre .tr-shared-fields{grid-template-columns:1fr;}#page-traficoTerrestre .tr-shared-catalog{flex-basis:100%;}#page-traficoTerrestre .tr-shared-editor .btn{min-height:40px;}}
+</style>
 <script id="ccttTrafficModule">
 /* NUEVO: datos reales del proveedor configurado; sin estimaciones ni registros sintéticos. */
 (() => {
@@ -12319,6 +12357,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   $('trPinStatus').textContent = '';
  }
  function placePin(event) {
+  /* MODIFICADO: dibujar únicamente en el modo elegido; la selección no crea pines. */
+  return trShared.click(event);
   /* MODIFICADO: el clic, toque y doble clic también colocan el pin directamente. */
   if (!active() || !map || zoomSettling) return;
   const point = L.latLng(event.latlng).wrap();
@@ -12391,14 +12431,92 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   pinMarker.closeTooltip();
   pinMarker.openPopup();
  }
+/* NUEVO: anotaciones compartidas; borradores locales, guardado confirmado y control de versiones. */
+const trShared = (() => {
+ const colors={low:'#16834a',medium:'#d08a00',high:'#dc3545'},names={low:'Baja',medium:'Media',high:'Alta'};
+ const svg={line:'M4 19L10 7l5 8 5-11M2 17h4v4H2zM18 2h4v4h-4z',polygon:'M4 5l14-2 3 14-12 4-6-9zM2 3h4v4H2zM16 1h4v4h-4z',save:'M4 3h13l3 3v15H4zM8 3v6h8V3M8 21v-8h8v8',cancel:'M6 6l12 12M6 18L18 6',undo:'M8 4L3 9l5 5M3 9h11a6 6 0 0 1 0 12',finish:'M5 3v18M5 4h14l-4 5 4 5H5',remove:'M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7',edit:'M4 20l4-1L20 7l-3-3L5 16zM14 7l3 3',expand:'M4 9V4h5m6 0h5v5m0 6v5h-5M9 20H4v-5M8 8l8 8m-8 0l8-8',shrink:'M3 3l6 6m6 6l6 6M3 21l6-6m6-6l6-6M4 9h5V4m6 16v-5h5M9 20v-5H4m16-6h-5V4',vertex:'M4 5h16v14H4zM2 3h4v4H2zM18 17h4v4h-4zM9 12h6',list:'M8 5h13M8 12h13M8 19h13M3 4v2m0 5v2m0 5v2'};
+ const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
+ function btn(id,label,key,fn){const b=el('button',undefined,'btn');b.id=id;b.type='button';b.dataset.iconized='1';b.dataset.ccttIconFixed='true';b.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+svg[key]+'"/></svg>';b.append(el('span',label));b.onclick=fn;return b;}
+ const bar=el('section',undefined,'tr-shared-toolbar');bar.setAttribute('aria-label','Anotaciones compartidas');
+ const live=el('output','Anotaciones: pendientes de conexión','tr-shared-live');live.id='trSharedLive';live.setAttribute('role','status');
+ bar.append(btn('trSharedLine','Línea','line',()=>begin('line')),btn('trSharedPolygon','Polígono','polygon',()=>begin('polygon')),live);
+ const catalog=el('details',undefined,'tr-shared-catalog'),summary=el('summary','Elementos compartidos'),list=el('div',undefined,'tr-shared-list');catalog.append(summary,list);bar.append(catalog);
+ $('trLayout').before(bar);
+ const panel=$('trPinPanel');panel.classList.add('tr-shared-editor');
+ const editor=el('div',undefined,'tr-shared-fields');
+ function field(id,label,type,value){const wrap=el('label',label),n=el(type==='textarea'?'textarea':'input');n.id=id;if(type!=='textarea')n.type=type;n.value=value;wrap.append(n);editor.append(wrap);return n;}
+ const titleInput=field('trSharedTitle','Nombre','text','');titleInput.maxLength=120;
+ const notes=field('trSharedNotes','Notas','textarea','');notes.maxLength=2000;notes.rows=2;
+ const priLabel=el('label','Importancia'),priority=el('select');priority.id='trSharedPriority';for(const [v,t]of Object.entries(names))priority.add(new Option(t+' · '+({low:'verde',medium:'ámbar',high:'roja'}[v]),v));priLabel.append(priority);editor.append(priLabel);
+ const color=field('trSharedColor','Color de línea o polígono','color','#16834a');
+ const size=field('trSharedSize','Tamaño del pin (px)','range',32);size.min=20;size.max=56;
+ const weight=field('trSharedWeight','Grosor (px)','range',4);weight.min=1;weight.max=12;
+ const opacity=field('trSharedOpacity','Opacidad del relleno','range',25);opacity.min=5;opacity.max=80;
+ const actions=el('div',undefined,'tr-actions');
+ const save=btn('trSharedSave','Guardar y compartir','save',persist),cancel=btn('trSharedCancel','Cancelar','cancel',()=>reset()),finish=btn('trSharedFinish','Terminar trazado','finish',()=>{drawing=false;renderDraft();feedback('Ajusta los vértices y guarda para compartir.');}),undo=btn('trSharedUndo','Quitar último punto','undo',()=>{if(draft?.points.length){draft.points.pop();renderDraft();}}),remove=btn('trSharedDelete','Eliminar','remove',erase);
+ const grow=btn('trSharedGrow','Ampliar 10 %','expand',()=>scale(1.1)),shrink=btn('trSharedShrink','Reducir 10 %','shrink',()=>scale(1/1.1));
+ const vertexLabel=el('label','Vértice'),vertex=el('select');vertex.id='trSharedVertex';vertexLabel.append(vertex);
+ const deleteVertex=btn('trSharedDeleteVertex','Quitar vértice','vertex',()=>{if(draft){draft.points.splice(Number(vertex.value),1);renderDraft();}});
+ actions.append(finish,undo,grow,shrink,vertexLabel,deleteVertex,save,cancel,remove);
+ panel.querySelector(':scope>p').after(editor,actions);panel.querySelector(':scope>strong').textContent='Anotación compartida';panel.querySelector(':scope>p').textContent='Los cambios se comparten al guardar. Arrastra los puntos para ajustar la figura.';
+ let rows=new Map(),layers=null,handles=null,preview=null,draft=null,drawing=false,busy=false,ready=false,me='',admin=false,channel=null,connected=false,epoch=0,loading=false,again=false,timer=null,poll=null,attached=null,loadSerial=0,selected=null,popupRef=null;
+ function feedback(s){$('trPinStatus').textContent=s;}
+ const editable=r=>admin||r.created_by===me;
+ const pending=r=>/emparejamiento\s+por\s+confirmar/i.test(r.notes||'');
+ const clone=r=>JSON.parse(JSON.stringify(r));
+ function pulse(r){const c=colors[r.priority],sz=r.size;return L.divIcon({className:'tr-shared-pin',html:'<span class="tr-shared-pulse '+r.priority+'" style="--tr-pin-color:'+c+';width:'+sz+'px;height:'+sz+'px"><svg viewBox="0 0 24 24" width="'+sz+'" height="'+sz+'" aria-hidden="true"><path fill="currentColor" stroke="white" stroke-width="1.2" d="M12 22S4 15 4 9a8 8 0 1 1 16 0c0 6-8 13-8 13Z"/><circle fill="white" cx="12" cy="9" r="2.5"/></svg></span>',iconSize:[sz,sz],iconAnchor:[sz/2,sz],tooltipAnchor:[0,-sz]});}
+ function shape(r){if(!r.points.length)return null;return r.kind==='pin'?L.marker(r.points[0],{icon:pulse(r),keyboard:true,title:r.title||'Nuevo pin',bubblingMouseEvents:false}):(r.kind==='polygon'?L.polygon:L.polyline)(r.points,{color:r.color,weight:r.weight,fillOpacity:r.opacity/100,bubblingMouseEvents:false});}
+ function updateList(){list.replaceChildren();summary.textContent='Elementos compartidos · '+rows.size;for(const r of rows.values()){const b=el('button',undefined,'tr-shared-item');b.type='button';b.append(el('strong',r.title),el('small',({pin:'Pin',line:'Línea',polygon:'Polígono'}[r.kind])+(r.kind==='pin'?' · '+names[r.priority]:'')+(pending(r)?' · Pendiente':'')));b.onclick=()=>select(r.id,true);list.append(b);}if(!rows.size)list.append(el('p','No hay elementos compartidos.'));}
+ function paint(){if(!layers)return;layers.clearLayers();for(const r of rows.values()){if(draft?.id===r.id)continue;const s=shape(r);if(!s)continue;const label=el('span',r.title+(pending(r)?' · Pendiente':''));s.bindTooltip(label,{direction:'top',className:'tr-pin-tooltip'});s.on('click',()=>select(r.id));s.addTo(layers);}updateList();}
+ function syncFields(){if(!draft)return;titleInput.value=draft.title;notes.value=draft.notes;priority.value=draft.priority;color.value=draft.color;size.value=draft.size;weight.value=draft.weight;opacity.value=draft.opacity;renderDraft();}
+ function renderDraft(){if(!draft||!map)return;preview.clearLayers();handles.clearLayers();const s=shape(draft);if(s)s.addTo(preview);if(draft.kind==='pin'&&s){s.dragging.enable();s.on('dragend',()=>{const p=s.getLatLng().wrap();draft.points=[[p.lat,p.lng]];renderDraft();});}
+ if(draft.kind!=='pin')draft.points.forEach((p,i)=>{const h=L.marker(p,{draggable:true,keyboard:true,title:'Vértice '+(i+1),icon:L.divIcon({className:'tr-shared-handle',html:'<span>'+(i+1)+'</span>',iconSize:[22,22],iconAnchor:[11,11]}),bubblingMouseEvents:false}).addTo(handles);h.on('dragend',()=>{const p=h.getLatLng().wrap();draft.points[i]=[p.lat,p.lng];renderDraft();});});
+ vertex.replaceChildren();draft.points.forEach((p,i)=>vertex.add(new Option(String(i+1),i)));
+ panel.hidden=false;const isPin=draft.kind==='pin';priLabel.hidden=size.parentElement.hidden=!isPin;color.parentElement.hidden=weight.parentElement.hidden=isPin;opacity.parentElement.hidden=draft.kind!=='polygon';
+ for(const n of [finish,undo,grow,shrink,vertexLabel,deleteVertex])n.hidden=isPin;finish.hidden=isPin||!drawing;
+ remove.hidden=!draft.id;remove.disabled=busy;save.disabled=busy||draft.points.length<(isPin?1:draft.kind==='line'?2:3);cancel.disabled=busy;
+ for(const n of [titleInput,notes,priority,color,size,weight,opacity,finish,undo,grow,shrink,vertex,deleteVertex])n.disabled=busy;
+ $('trPinCoordinates').hidden=!isPin;$('trPinLink').parentElement.hidden=!isPin;$('trPinCopy').parentElement.hidden=!isPin;
+ if(isPin&&draft.points.length)updatePinLink({lat:draft.points[0][0],lng:draft.points[0][1]});
+ feedback((draft.id?'Editando':'Borrador')+' · '+(pending(draft)?'Pendiente · ':'')+(drawing?'Pulsa el mapa para añadir puntos. ':'Arrastra los puntos para ajustar. ')+'Sin guardar.');
+ }
+ function reset(){if(busy)return;selected=null;map?.closePopup();draft=null;drawing=false;preview?.clearLayers();handles?.clearLayers();pinMode(false);panel.hidden=true;feedback('');paint();}
+ function begin(kind){if(!active()||!ready||busy){feedback('Espera a que se verifique el almacenamiento compartido. Si no está instalado, ejecuta el SQL adjunto.');return;}if(draft&&!confirm('¿Descartar el borrador sin guardar?'))return;reset();draft={kind,title:'',notes:'',priority:'low',color:colors.low,size:32,weight:4,opacity:25,points:[]};drawing=true;pinMode(true);syncFields();feedback(kind==='pin'?'Pulsa el mapa para situar el pin.':'Pulsa el mapa para añadir vértices; después selecciona Terminar trazado.');}
+ function click(event){if(!draft||!drawing||busy||!active()||zoomSettling)return;const p=L.latLng(event.latlng).wrap(),v=[p.lat,p.lng];if(draft.kind==='pin'){draft.points=[v];drawing=false;pinMode(false);}else{if(draft.points.length>=200){feedback('Máximo 200 vértices por figura.');return;}const last=draft.points.at(-1);if(!last||last[0]!==v[0]||last[1]!==v[1])draft.points.push(v);}renderDraft();}
+ function scale(f){if(!draft?.points.length)return;const n=draft.points.length,center=draft.points.reduce((a,p)=>[a[0]+p[0]/n,a[1]+p[1]/n],[0,0]),next=draft.points.map(p=>p.map((v,i)=>center[i]+(v-center[i])*f));if(next.some(p=>Math.abs(p[0])>90||Math.abs(p[1])>180)){feedback('La figura excede los límites del mapa.');return;}draft.points=next;renderDraft();}
+ async function copy(){const r=draft;if(!r||r.kind!=='pin'||!r.points.length)return;try{await navigator.clipboard.writeText($('trPinLink').value);feedback('Enlace de Google Maps copiado.');}catch{feedback('No se pudo copiar. Selecciona el enlace y cópialo manualmente.');}}
+ function select(id,focus=false){const r=rows.get(id);if(!r||busy)return;if(draft&&!confirm('¿Descartar el borrador sin guardar?'))return;reset();selected=id;if(focus){if(r.kind==='pin')map.panTo(r.points[0]);else map.fitBounds(r.points,{padding:[30,30]});}
+ const content=el('div',undefined,'tr-shared-popup');content.append(el('strong',r.title),el('p',r.notes||'Sin notas'),el('small',pending(r)?'Pendiente · emparejamiento por confirmar':r.kind==='pin'?'Importancia '+names[r.priority]:r.kind==='line'?'Línea compartida':'Polígono compartido'));
+ if(editable(r))content.append(btn('trSharedEditSelected','Editar','edit',()=>{map.closePopup();draft=clone(r);drawing=false;syncFields();paint();}));
+ if(r.kind==='pin'){const link='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(r.points[0].join(',')),a=el('a','Abrir en Google Maps','btn');a.innerHTML=icon('popupOpen')+'<span>Abrir en Google Maps</span>';a.href=link;a.target='_blank';a.rel='noopener noreferrer';const copyButton=el('button',undefined,'btn');copyButton.type='button';copyButton.innerHTML=icon('popupCopy')+'<span>Copiar enlace</span>';const message=el('output');copyButton.onclick=async()=>{try{await navigator.clipboard.writeText(link);message.textContent='Enlace copiado.';}catch{message.textContent='No se pudo copiar el enlace.';}};content.append(copyButton,a,message);}
+ L.DomEvent.disableClickPropagation(content);popupRef=L.popup({className:'tr-pin-popup',maxWidth:330}).setLatLng(r.points[0]).setContent(content).openOn(map);
+ }
+ async function rpc(action,payload={}){const sb=client();if(!sb?.rpc)throw Error('Supabase no está disponible.');const {data,error}=await sb.rpc('cctt_traffic_annotations',{p_action:action,p_payload:payload});if(error)throw error;return data;}
+ function errorText(e){return /PGRST202|42P01|42883/.test(e.code||'')?'Falta instalar Instalar_Anotaciones_Trafico.sql en Supabase.':e.message||'No se pudo comunicar con el servidor.';}
+ async function persist(){if(!draft||busy||!active()||!ready)return;if(!titleInput.value.trim()){titleInput.focus();feedback('Escribe un nombre para identificar el elemento.');return;}const item=clone(draft),token=epoch;busy=true;renderDraft();try{const result=await rpc('save',item);if(token!==epoch)return;loadSerial++;rows.set(result.id,result);schedule();busy=false;reset();feedback('Guardado en el servidor. '+(connected?'La actualización se envía a los usuarios conectados.':'La conexión en tiempo real está pendiente.'));}catch(e){if(token===epoch)feedback(errorText(e)+' El borrador se conserva.');}finally{if(token===epoch){busy=false;save.disabled=false;cancel.disabled=false;remove.disabled=false;for(const n of editor.querySelectorAll('input,textarea,select'))n.disabled=false;for(const n of [finish,undo,grow,shrink,vertex,deleteVertex])n.disabled=false;}}}
+ async function erase(){if(!draft?.id||busy||!confirm('¿Eliminar esta anotación compartida para todos los usuarios?'))return;const item=clone(draft),token=epoch;busy=true;renderDraft();try{await rpc('remove',{id:item.id,version:item.version});if(token!==epoch)return;loadSerial++;rows.delete(item.id);schedule();busy=false;reset();feedback('Anotación eliminada en el servidor.');}catch(e){if(token===epoch)feedback(errorText(e)+' Tu edición se conserva.');}finally{if(token===epoch){busy=false;if(draft){const message=$('trPinStatus').textContent;renderDraft();feedback(message);}}}}
+ for(const n of [titleInput,notes,priority,color,size,weight,opacity])n.addEventListener('input',()=>{if(!draft||busy)return;draft.title=titleInput.value;draft.notes=notes.value;draft.priority=priority.value;draft.color=draft.kind==='pin'?colors[priority.value]:color.value;draft.size=Number(size.value);draft.weight=Number(weight.value);draft.opacity=Number(opacity.value);renderDraft();});
+ async function load(){if(!active()||!attached)return;if(loading){again=true;return;}const token=epoch,serial=++loadSerial;loading=true;try{const data=await rpc('read');if(token!==epoch||serial!==loadSerial||!allowed())return;ready=true;me=data.user_id;admin=data.admin;rows=new Map(data.items.map(r=>[r.id,r]));paint();if(!draft&&selected&&popupRef?.isOpen()){const id=selected;if(rows.has(id))select(id);else{map.closePopup();selected=null;}}live.textContent=connected?'Anotaciones · En tiempo real':'Anotaciones · Reconectando; revisión cada 30 s';if(draft?.id){const r=rows.get(draft.id);if(!r||r.version!==draft.version)feedback('Este elemento cambió o se eliminó en otro equipo. Tu borrador se conserva; cancela y vuelve a abrirlo antes de guardar.');}}catch(e){if(token===epoch){ready=false;live.textContent=errorText(e);if(e.code==='42501'){busy=false;reset();rows.clear();paint();}}}finally{if(token===epoch){loading=false;if(again){again=false;void load();}}}}
+ function schedule(){clearTimeout(timer);timer=setTimeout(load,150);}
+ function connect(){if(!active()||!map)return;if(attached===map){void load();return;}stop();attached=map;layers=L.layerGroup().addTo(map);preview=L.layerGroup().addTo(map);handles=L.layerGroup().addTo(map);const token=epoch;const sb=client();if(sb?.channel)channel=sb.channel('cctt-traffic-annotations-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'cctt_traffic_annotations_data'},schedule).subscribe(state=>{if(token!==epoch)return;connected=state==='SUBSCRIBED';if(connected)void load();else live.textContent='Anotaciones · Sin conexión en tiempo real; reintentando';});void load();poll=setInterval(load,30000);}
+ function stop(){epoch++;loadSerial++;clearTimeout(timer);clearInterval(poll);if(channel)void client()?.removeChannel(channel);channel=null;connected=ready=loading=again=busy=false;draft=null;drawing=false;selected=null;popupRef=null;attached?.closePopup();me='';admin=false;rows.clear();for(const g of [layers,preview,handles]){g?.clearLayers();if(attached&&g)attached.removeLayer(g);}layers=preview=handles=attached=null;panel.hidden=true;updateList();}
+ window.addEventListener('cctt:access-updated',()=>{if(!allowed())stop();else if(active())connect();});
+ window.addEventListener('cctt:logout',stop);window.addEventListener('cctt:session',e=>{if(me&&me!==e.detail?.session?.user?.id)stop();});
+ return {connect,stop,click,copy,beginPin:()=>begin('pin'),canOpen:()=>!!draft&&draft.kind==='pin'&&draft.points.length>0};
+})();
+
  $('trPinToggle').setAttribute('aria-pressed','false');
  $('trPinToggle').setAttribute('aria-controls','trMap trPinPanel');
  $('trPinToggle').onclick=()=>{
+  /* MODIFICADO: nuevo pin persistente con notas e importancia. */
+  return trShared.beginPin();
   if (!active() || !map) return;
   pinMode(!pinPlacing);
   $('trPinStatus').textContent=pinPlacing?'Haz clic o toca el mapa para colocar el pin.':'Puedes colocar el pin directamente con un clic, toque o doble clic en el mapa.';
  };
  $('trPinCopy').onclick=async()=>{
+  /* MODIFICADO: copiar el enlace del borrador seleccionado. */
+  return trShared.copy();
   if (!active() || !pinMarker || !$('trPinLink').value) return;
   const link=$('trPinLink').value;
   try {
@@ -12412,7 +12530,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   }
  };
  $('trPinOpen').onclick=event=>{
-  if(!active()||!pinMarker||!$('trPinLink').value)event.preventDefault();
+  /* MODIFICADO: validar el pin del editor compartido. */
+  if(!active()||!trShared.canOpen()||!$('trPinLink').value)event.preventDefault();
  };
  let owner = '', config = null, starting = false, pendingReload = false;
  let generation = 0, baseRequest = 0, reloadTimer = null;
@@ -12891,6 +13010,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    /* NUEVO: priorizar las vías del encuadre tras desplazar el mapa. */
    map.on('moveend',()=>{if(active()&&!zoomSettling&&!trafficSuspended)traffic?.resumeView();});
   }
+  /* NUEVO: conectar anotaciones sin reconstruir capas de tráfico. */
+  trShared.connect();
   requestAnimationFrame(()=>map.invalidateSize());
   void refresh();
  }
@@ -13000,7 +13121,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   /* MODIFICADO: colocación directa, ventana del pin y carga agrupada al cambiar de escala. */
   /* MODIFICADO: continuidad visual y mensajes de la consulta anterior durante el zoom. */
   /* MODIFICADO: conservación entre pestañas y detalle reutilizable por nivel de zoom. */
-  version:'trafico-terrestre-7',
+  /* MODIFICADO: aprendizaje de anotaciones compartidas. */
+  version:'trafico-terrestre-8',
   purpose:'Consultar capas reales de flujo vehicular de TomTom o HERE sobre el mapa CARTO, según los proveedores configurados y los permisos de tu cuenta.',
   steps:[
    {title:'Elige las capas',body:'Abre Capas, selecciona el mapa CARTO y una fuente de tráfico disponible. El estilo automático sigue el tema del sitio.',controlId:'trLayers'},
@@ -13013,8 +13135,13 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
    {title:'Cambiar de pestaña',body:'Al ocultar la pestaña se pausan las solicitudes de tráfico y se conserva el mapa y su última consulta. Al regresar se revalida el acceso y se renuevan las imágenes pendientes o vencidas. Cerrar sesión, cambiar de cuenta, salir del módulo o perder el permiso elimina la memoria temporal. La hora mostrada corresponde a las imágenes consultadas, no a la hora exacta de cada medición.'},
    {title:'Ubicación de la consulta',body:'Mi ubicación requiere autorización del navegador. Centrar Manzanillo regresa al encuadre inicial. La ubicación consultada no se guarda como registro operativo.',controlId:'trLocate'},
    /* NUEVO */
-   {title:'Coloca una ubicación',body:'Haz clic, toca o pulsa dos veces una ubicación para colocar el pin directamente. También puedes usar Colocar pin. Arrástralo para ajustar el punto. El doble clic se reserva al pin; utiliza la rueda, los botones o dos dedos para cambiar el zoom. Se conserva un único pin temporal durante la sesión y el acceso autorizado.',controlId:'trPinToggle'},
-   {title:'Comparte el enlace',body:'Al colocar el pin se abre una ventana con Copiar enlace y Abrir en Google Maps. También puedes pulsar el marcador para abrirla y usar los botones del panel de ubicación. Al arrastrar el pin se actualizan las coordenadas y los enlaces. Quien reciba el enlace podrá ver el punto en Google Maps, aunque no tenga acceso al CCTT.',controlId:'trPinToggle'},
+   /* MODIFICADO: el pin ahora se publica únicamente al guardar. */
+   {title:'Pines compartidos',body:'Pulsa Colocar pin y después el mapa. Escribe nombre y notas; elige importancia baja (verde, pulso lento), media (ámbar) o alta (roja, pulso rápido). Ajusta su tamaño y arrástralo. Guardar y compartir publica el elemento para usuarios autorizados. Cancelar descarta el borrador. La nota emparejamiento por confirmar se muestra como Pendiente.',controlId:'trPinToggle'},
+   /* NUEVO */
+   {title:'Líneas y polígonos',body:'Selecciona Línea o Polígono y pulsa para colocar vértices. Termina el trazado y arrastra los vértices; puedes quitar un vértice seleccionado, ampliar o reducir la figura y ajustar color, grosor y relleno. Guarda para compartir. Cada usuario edita y elimina sus propias anotaciones; administración puede gestionar todas.',controlId:'trSharedLine'},
+   {title:'Sincronización y conflictos',body:'Las anotaciones guardadas se sincronizan mediante Supabase Realtime. El estado indica si hay conexión; se revisan cada 30 segundos como recuperación. Un borrador no se publica hasta guardar. Si otro equipo modifica el mismo elemento, cancela y vuelve a abrirlo: el servidor evita sobrescribir versiones anteriores. Se necesita instalar el SQL de anotaciones en Supabase.'},
+   /* MODIFICADO: distinguir enlace externo de anotación compartida. */
+   {title:'Comparte el enlace',body:'Al seleccionar un pin guardado puedes copiar su enlace o abrir Google Maps. El enlace comparte únicamente las coordenadas; las notas y figuras se consultan dentro de CCTT con acceso autorizado. En el borrador también puedes copiar la ubicación antes de guardarla.',controlId:'trPinToggle'},
    /* MODIFICADO */
    {title:'Asignación de acceso',body:'El administrador habilita o revoca Tráfico terrestre en tiempo real desde Administrar accesos. Debe desbloquear la administración con la contraseña adicional, consultar la cuenta por UUID, marcar o desmarcar el módulo y guardar los permisos. El usuario debe volver a iniciar sesión para ver el cambio.'},
    /* MODIFICADO */
