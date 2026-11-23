@@ -361,6 +361,342 @@
   }
 }
 </style>
+<style id="ccttInc35RedesTacticalStyles">
+#page-inc35redes {
+  --sr-card: var(--cctt-theme-card, #ffffff);
+  --sr-subtle: var(--cctt-theme-table, #f8fafc);
+  --sr-border: var(--cctt-theme-line, #e2e8f0);
+  --sr-text: var(--cctt-theme-text, #1e293b);
+  --sr-muted: var(--cctt-theme-muted, #64748b);
+  --sr-accent: var(--cctt-theme-accent, #7a1c30);
+  --sr-onaccent: var(--cctt-theme-onaccent, #ffffff);
+  --sr-input: var(--cctt-theme-input, #ffffff);
+  --sr-inputtext: var(--cctt-theme-inputtext, #0f172a);
+  color: var(--sr-text);
+}
+#page-inc35redes .sr-subbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--sr-card);
+  border: 1px solid var(--sr-border);
+  border-radius: 12px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  font-size: 12px;
+}
+#page-inc35redes .sr-subbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+#page-inc35redes .sr-chip-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--sr-subtle);
+  border: 1px solid var(--sr-border);
+  border-radius: 8px;
+  padding: 4px 9px;
+  font-weight: 600;
+}
+#page-inc35redes .sr-template-pill {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 7px;
+}
+#page-inc35redes .sr-workspace {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+#page-inc35redes .sr-panel {
+  background: var(--sr-card);
+  border: 1px solid var(--sr-border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  min-width: 0;
+}
+#page-inc35redes .sr-panel-head {
+  padding: 10px 16px;
+  background: var(--sr-subtle);
+  border-bottom: 1px solid var(--sr-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+#page-inc35redes .sr-panel-head h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--sr-text);
+}
+#page-inc35redes .sr-panel-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+#page-inc35redes .sr-row-12 {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  gap: 12px;
+  align-items: end;
+}
+#page-inc35redes .sr-label-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+#page-inc35redes .sr-label-bar label,
+#page-inc35redes .sr-lbl {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sr-text);
+  margin: 0;
+}
+#page-inc35redes .sr-link-action {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sr-accent);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+#page-inc35redes .sr-link-action:hover {
+  text-decoration: underline;
+}
+#page-inc35redes .sr-mini-pill-btn {
+  background: var(--sr-subtle);
+  border: 1px solid var(--sr-border);
+  color: var(--sr-text);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#page-inc35redes .sr-mini-pill-btn:hover {
+  border-color: var(--sr-accent);
+}
+#page-inc35redes input[type="text"],
+#page-inc35redes input[type="time"],
+#page-inc35redes input:not([type]),
+#page-inc35redes select,
+#page-inc35redes textarea {
+  width: 100%;
+  background: var(--sr-input);
+  color: var(--sr-inputtext);
+  border: 1px solid var(--sr-border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+#page-inc35redes textarea#socialText {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  min-height: 118px;
+  resize: vertical;
+}
+#page-inc35redes .sr-hint-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 5px 9px;
+  background: var(--sr-subtle);
+  border: 1px solid var(--sr-border);
+  border-radius: 7px;
+  font-size: 11px;
+  color: var(--sr-muted);
+}
+#page-inc35redes .sr-dot-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sr-accent);
+  flex: none;
+}
+#page-inc35redes .sr-dropzone-box {
+  background: var(--sr-subtle);
+  border: 1px solid var(--sr-border);
+  border-radius: 10px;
+  padding: 12px;
+}
+#page-inc35redes .sr-drop-target {
+  border: 2px dashed var(--sr-border);
+  background: var(--sr-card);
+  border-radius: 8px;
+  padding: 14px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+#page-inc35redes .sr-drop-target:hover,
+#page-inc35redes .sr-drop-target.dragover {
+  border-color: var(--sr-accent);
+  background: color-mix(in srgb, var(--sr-accent) 5%, var(--sr-card));
+}
+#page-inc35redes .sr-media-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+#page-inc35redes .sr-subcard {
+  background: var(--sr-card);
+  border: 1px solid var(--sr-border);
+  border-radius: 8px;
+  padding: 8px;
+}
+#page-inc35redes .sr-seg-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+}
+#page-inc35redes .sr-seg-3 button,
+#page-inc35redes .sr-canvas-ratio button,
+#page-inc35redes .sr-text-fmt button {
+  border: 1px solid transparent;
+  background: var(--sr-subtle);
+  color: var(--sr-text);
+  border-radius: 6px;
+  padding: 5px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#page-inc35redes .sr-seg-3 button.active,
+#page-inc35redes .sr-canvas-ratio button.active,
+#page-inc35redes .sr-text-fmt button.active {
+  background: var(--sr-accent);
+  color: var(--sr-onaccent);
+  font-weight: 700;
+}
+#page-inc35redes .sr-panel-foot {
+  padding: 11px 16px;
+  background: var(--sr-subtle);
+  border-top: 1px solid var(--sr-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+#page-inc35redes .sr-canvas-stage {
+  background: #0f172a;
+  border: 1px solid var(--sr-border);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 270px;
+  position: relative;
+}
+#page-inc35redes #socialCanvas {
+  max-width: 100%;
+  max-height: 410px !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 8px;
+  border: 2px solid var(--sr-accent);
+  background: #1e293b;
+  display: block;
+}
+#page-inc35redes .sr-toolbar-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: var(--sr-subtle);
+  border: 1px solid var(--sr-border);
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+#page-inc35redes .sr-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--sr-card);
+  border: 1px solid var(--sr-border);
+  color: var(--sr-text);
+  border-radius: 7px;
+  padding: 6px 10px;
+  font-size: 11.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+#page-inc35redes .sr-tool-btn:hover {
+  border-color: var(--sr-accent);
+}
+#page-inc35redes .sr-output-box {
+  background: var(--sr-subtle);
+  border: 1px solid var(--sr-border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+#page-inc35redes #socialTextPreview {
+  background: var(--sr-card);
+  border: 1px solid var(--sr-border);
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  min-height: 112px;
+  max-height: 185px;
+  overflow-y: auto;
+  color: var(--sr-text);
+  margin: 0;
+}
+#page-inc35redes .location-tools,
+#page-inc35redes #ccttReviewFloating {
+  display: none !important;
+}
+@media (max-width: 1050px) {
+  #page-inc35redes .sr-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  #page-inc35redes .sr-row-12,
+  #page-inc35redes .sr-media-controls {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 <!-- NUEVO: control previo de IP y estilos aislados de Documentación y Seguridad. -->
 <style id="ccttDocGlobalIpStyles">
 /* NUEVO: bloqueo previo y arrastre con las variables de ambos temas. */
@@ -2792,10 +3128,368 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <!-- MODIFICADO: se retira la sección visual de Registros guardados de Boletinados; no se borran datos anteriores. -->
 </section>
 
-<section class="page" id="page-inc35redes">
- <div class="section-title"><h2>Redes y reporte</h2></div>
- <div class="split"><div class="card"><h3>Composición visual</h3><div class="field"><label>Plantilla</label><select id="socialLayout"><option value="1">Imagen 1 · reporte vial</option><option value="2">Imagen 2 · comunicado</option><option value="3">Imagen 3 · reenvío redes</option></select></div><div class="grid g2"><div class="field"><label>Evento / afectación</label><input id="socialEvent" placeholder="Ej. Patios Externos generando afectación al flujo vehicular"></div><div class="field"><label>Hora del registro</label><input id="socialTime" type="time"></div></div><div class="field" style="margin-top:10px"><label>Ubicación</label><input id="socialLoc" placeholder="Ej. Vialidad Puerto - Jalipa (A la altura de Patio Regulador)"></div><div class="field"><label>Texto independiente</label><textarea id="socialText" readonly></textarea><span class="muted">El evento, la hora y la ubicación son variables. Los hashtags, la atención por autoridad y la invitación al público se agregan automáticamente.</span></div><div class="field"><label>Cargar 1 o 2 imágenes o videos</label><input type="file" id="socialFiles" accept="image/*,video/*" multiple></div><!-- NUEVO: recorte opcional, no destructivo y por fotografía para retirar una franja con fecha/hora. --><div class="social-crop-panel" id="socialCropPanel" hidden><div class="row" style="justify-content:space-between"><strong>Recorte de fecha y hora</strong><span class="muted" id="socialOrientation" role="status"></span></div><p class="muted" id="socialCropHint" style="margin:7px 0">Comprueba visualmente si la imagen tiene fecha u hora impresas. La detección automática de texto no está disponible.</p><div class="field"><label for="socialCropPhoto">Fotografía que deseas ajustar</label><select id="socialCropPhoto"></select></div><label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" id="socialCropEnabled">Recortar franja inferior (opcional)</label><div class="field"><label for="socialCropPercent">Altura de la franja: <output id="socialCropValue">8 %</output></label><input id="socialCropPercent" type="range" min="1" max="25" value="8" step="1" disabled></div><p class="muted" style="margin:7px 0 0">El recorte se aplica a la copia exportada, sin alterar el archivo original. Verifica la vista previa para evitar retirar información importante.</p></div><div class="field"><label>Logo o marca sobre la imagen</label><input type="file" id="socialBrandIcon" accept="image/*"><span class="muted">El logo se coloca sin transparencia en la esquina superior izquierda de la composición. Si no cargas uno, se utiliza el logo del perfil.</span></div><div class="row"><button class="btn primary" id="socialBuild">Actualizar imagen</button><button class="btn" id="socialCopy">Copiar imagen</button><button class="btn" id="socialCopyText">Copiar texto</button><button class="btn" id="socialDownload">Guardar PNG</button><button class="btn bad" id="socialReset">Restablecer</button></div><div class="notice" style="margin-top:10px">La imagen exportada contiene únicamente la fotografía o fotografías y el logo. Si adjuntas dos imágenes, ambas se muestran completas, comprimidas lado a lado y sin separación blanca.</div></div><div class="card"><h3>Vista previa de imagen</h3><canvas id="socialCanvas" width="1080" height="1080" style="width:100%;max-height:610px;object-fit:contain;background:#eef2f7;border-radius:14px;border:1px solid var(--line)"></canvas><h3 style="margin-top:16px">Texto independiente</h3><div id="socialTextPreview" class="notice" style="white-space:pre-wrap;min-height:120px"></div><!-- NUEVO: acciones de recorte junto a Copiar texto debajo de la vista previa. --><div class="row" style="margin-top:10px"><button class="btn" id="socialCopyTextPreview">Copiar texto</button><button class="btn" type="button" id="socialOpenCrop"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M2 6h14a2 2 0 0 1 2 2v14"/></svg>Recortar imagen</button><button class="btn" type="button" id="socialApplyCrop"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17h18M5 5v8m14-8v8"/><path d="m9 9 3 3 3-3"/></svg>Recortar franja</button></div></div></div>
-</section>
+<script id="ccttInc35RedesTacticalLogic">
+(function () {
+  'use strict';
+  let srManualText = false;
+  let srUseBoldFormat = true;
+  let srForceRatio = 'auto'; // 'auto' | 'landscape' | 'portrait'
+  let srWatermarkEnabled = true;
+  let srWatermarkPosition = 'tl';
+
+  function srFormatDateMx() {
+    return new Date().toLocaleDateString('es-MX', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  function srSyncLocationsDatalist() {
+    const dl = document.getElementById('srLocationsDatalist');
+    if (!dl) return;
+    const locs = Array.isArray(window.state?.locations) ? window.state.locations : [];
+    dl.innerHTML = locs
+      .slice()
+      .sort((a, b) => a.localeCompare(b, 'es-MX'))
+      .map(x => `<option value="${esc(x)}"></option>`)
+      .join('');
+  }
+
+  function srUpdateTextStats(txt) {
+    const el = document.getElementById('srTextStats');
+    if (!el) return;
+    const chars = txt.length;
+    const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+    el.textContent = `${chars} caracteres · ${words} palabras`;
+  }
+
+  function srApplyTextPreview() {
+    const ta = document.getElementById('socialText');
+    const pv = document.getElementById('socialTextPreview');
+    if (!ta || !pv) return;
+    const raw = ta.value;
+    pv.textContent = srUseBoldFormat ? raw : raw.replace(/\*/g, '');
+    srUpdateTextStats(raw);
+  }
+
+  // Sobrescribir drawMark para respetar el interruptor Activa y la esquina elegida
+  window.socialDrawMark = async function (ctx, mark, box) {
+    if (!srWatermarkEnabled || !mark || !box) return;
+    try {
+      const logo = await imgFrom(mark);
+      const pad = Math.max(8, Math.round(Math.min(box.w, box.h) * 0.02));
+      let w = Math.min(box.w * 0.22, box.w - pad * 2);
+      let h = logo.height * (w / logo.width);
+      if (h > box.h * 0.26) {
+        h = box.h * 0.26;
+        w = logo.width * (h / logo.height);
+      }
+      if (w <= 0 || h <= 0) return;
+
+      let x = box.x + pad;
+      let y = box.y + pad;
+      if (srWatermarkPosition === 'tr' || srWatermarkPosition === 'br') {
+        x = box.x + box.w - w - pad;
+      }
+      if (srWatermarkPosition === 'bl' || srWatermarkPosition === 'br') {
+        y = box.y + box.h - h - pad;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = 1;
+      ctx.drawImage(logo, x, y, w, h);
+      ctx.restore();
+    } catch (_) {}
+  };
+
+  // Sobrescribir renderSocial manteniendo recorte no destructivo, dual-foto y encuadre opcional
+  window.renderSocial = async function () {
+    const c = document.getElementById('socialCanvas');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const pics = await socialLoadMedia();
+    const isDual = pics.length === 2;
+
+    const clipped = pics.map((im, i) => {
+      const st = socialCropStates[i];
+      if (!st || !st.enabled || !st.percent || socialImgs[i]?.kind === 'video') return im;
+      const cut = Math.max(1, Math.round(im.height * (1 - st.percent / 100)));
+      const cv = document.createElement('canvas');
+      cv.width = im.width;
+      cv.height = cut;
+      cv.getContext('2d').drawImage(im, 0, 0, im.width, cut, 0, 0, im.width, cut);
+      return cv;
+    });
+
+    const first = clipped[0];
+    let targetW = 1280;
+    let targetH = 720;
+
+    if (first) {
+      if (srForceRatio === 'landscape' && !isDual) {
+        targetW = 1280;
+        targetH = 720;
+      } else if (srForceRatio === 'portrait' && !isDual) {
+        targetW = 720;
+        targetH = 1280;
+      } else {
+        targetH = Math.min(1800, Math.max(1, first.height));
+        targetW = Math.max(1, Math.round(clipped.reduce((w, im) => w + (im.width * targetH) / im.height, 0)));
+      }
+    }
+
+    c.width = targetW;
+    c.height = targetH;
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    let actualBox = { x: 0, y: 0, w: c.width, h: c.height };
+    if (!first) {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 28px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Vista previa de composición CCTT · Carga una imagen o video', c.width / 2, c.height / 2);
+    } else if (!isDual && (srForceRatio === 'landscape' || srForceRatio === 'portrait')) {
+      drawCover(ctx, first, 0, 0, c.width, c.height);
+    } else {
+      actualBox = socialDrawGrid(ctx, clipped, { x: 0, y: 0, w: c.width, h: c.height }) || actualBox;
+    }
+
+    await window.socialDrawMark(ctx, window.ccttOfficialBrandData || state.inc35?.social?.brandIcon || null, actualBox);
+
+    const orientation = document.getElementById('socialOrientation');
+    if (orientation) {
+      const vertical = first && first.height > first.width;
+      orientation.textContent = isDual
+        ? 'Dos imágenes unidas'
+        : first
+        ? srForceRatio === 'landscape'
+          ? '16:9 Panorámico'
+          : srForceRatio === 'portrait'
+          ? '9:16 Vertical'
+          : vertical
+          ? 'Vertical (Auto)'
+          : 'Horizontal (Auto)'
+        : 'Sin archivos';
+    }
+
+    const timeVal = document.getElementById('socialTime')?.value || '';
+    const mirror = document.getElementById('srTimeMirror');
+    if (mirror) mirror.value = timeVal ? `${timeVal} hrs` : '';
+
+    const ta = document.getElementById('socialText');
+    if (ta && !srManualText) {
+      ta.value = socialReportText();
+    }
+    srApplyTextPreview();
+  };
+
+  function initRedesTactical() {
+    const page = document.getElementById('page-inc35redes');
+    if (!page || page.dataset.srReady) return;
+    page.dataset.srReady = '1';
+
+    const dateLbl = document.getElementById('srCurrentDateLabel');
+    if (dateLbl) dateLbl.textContent = srFormatDateMx();
+
+    srSyncLocationsDatalist();
+
+    // Sincronización de hora
+    const syncNow = () => {
+      const t = document.getElementById('socialTime');
+      if (t) {
+        t.value = socialDefaultTime();
+        srManualText = false;
+        window.renderSocial();
+        toast(`Hora sincronizada: ${t.value} hrs`);
+      }
+    };
+    document.getElementById('srSyncTimeSubbar')?.addEventListener('click', syncNow);
+    document.getElementById('srUseTimeFormBtn')?.addEventListener('click', syncNow);
+
+    // Plantilla badge
+    document.getElementById('socialLayout')?.addEventListener('change', e => {
+      const names = {
+        '1': 'Plantilla 1: Reporte Vial',
+        '2': 'Plantilla 2: Comunicado Operativo',
+        '3': 'Plantilla 3: Reenvío Redes'
+      };
+      const badge = document.getElementById('srTemplateBadge');
+      if (badge) badge.textContent = names[e.target.value] || 'Plantilla 1: Reporte Vial';
+    });
+
+    // Edición directa en el textarea
+    const ta = document.getElementById('socialText');
+    ta?.addEventListener('input', () => {
+      srManualText = true;
+      srApplyTextPreview();
+    });
+
+    // Insertar etiquetas dinámicas en el cursor del textarea
+    page.querySelectorAll('.sr-insert-tag').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!ta) return;
+        const tag = btn.dataset.tag;
+        const map = {
+          '{hora}': `${document.getElementById('socialTime')?.value || socialDefaultTime()} horas`,
+          '{evento}': ccttSentenceMX(document.getElementById('socialEvent')?.value || 'Evento vial en seguimiento'),
+          '{ubicacion}': ccttSentenceMX(document.getElementById('socialLoc')?.value || 'Ubicación por confirmar')
+        };
+        const insertVal = map[tag] || tag;
+        const start = ta.selectionStart || 0;
+        const end = ta.selectionEnd || 0;
+        ta.value = ta.value.slice(0, start) + insertVal + ta.value.slice(end);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = start + insertVal.length;
+        srManualText = true;
+        srApplyTextPreview();
+      });
+    });
+
+    // Cuando cambia Evento, Ubicación u Hora, volver a sincronizar el cuerpo
+    ['socialEvent', 'socialLoc', 'socialTime'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', () => {
+        srManualText = false;
+        window.renderSocial();
+      });
+    });
+
+    // Revisión ortográfica en Evento y Ubicación
+    document.getElementById('srReviewEventBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('socialEvent');
+      if (el && typeof ccttOfferTextReview === 'function') ccttOfferTextReview(el);
+    });
+    document.getElementById('srReviewLocBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('socialLoc');
+      if (el && typeof ccttOfferTextReview === 'function') ccttOfferTextReview(el);
+    });
+
+    // Catálogo de ubicaciones
+    document.getElementById('srSaveLocBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('socialLoc');
+      if (el && typeof addLocationFromField === 'function') {
+        addLocationFromField(el);
+        srSyncLocationsDatalist();
+      }
+    });
+    document.getElementById('srManageLocBtn')?.addEventListener('click', () => {
+      if (typeof openLocationManager === 'function') openLocationManager();
+      const mgr = document.getElementById('locationManager');
+      if (mgr && !mgr.dataset.srHook) {
+        mgr.dataset.srHook = '1';
+        mgr.addEventListener('click', () => setTimeout(srSyncLocationsDatalist, 80));
+      }
+    });
+
+    // Drag & Drop de imágenes/videos
+    const dropZone = document.getElementById('srDropZone');
+    const fileInput = document.getElementById('socialFiles');
+    if (dropZone && fileInput) {
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          fileInput.click();
+        }
+      });
+      ['dragenter', 'dragover'].forEach(ev => {
+        dropZone.addEventListener(ev, e => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(ev => {
+        dropZone.addEventListener(ev, e => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+      });
+      dropZone.addEventListener('drop', e => {
+        const files = e.dataTransfer?.files;
+        if (files && files.length) {
+          fileInput.files = files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+
+    document.getElementById('srCloseCropPanel')?.addEventListener('click', () => {
+      document.getElementById('socialCropPanel').hidden = true;
+    });
+
+    // Orientación / Encuadre
+    const setOrientation = mode => {
+      srForceRatio = mode;
+      page.querySelectorAll('[data-sr-orient]').forEach(b => {
+        b.classList.toggle('active', b.dataset.srOrient === mode);
+      });
+      document.getElementById('srRatio169')?.classList.toggle('active', mode === 'landscape');
+      document.getElementById('srRatio916')?.classList.toggle('active', mode === 'portrait');
+      window.renderSocial();
+    };
+    page.querySelectorAll('[data-sr-orient]').forEach(btn => {
+      btn.addEventListener('click', () => setOrientation(btn.dataset.srOrient));
+    });
+    document.getElementById('srRatio169')?.addEventListener('click', () => setOrientation('landscape'));
+    document.getElementById('srRatio916')?.addEventListener('click', () => setOrientation('portrait'));
+
+    // Marca institucional y logo
+    document.getElementById('srWatermarkActive')?.addEventListener('change', e => {
+      srWatermarkEnabled = e.target.checked;
+      window.renderSocial();
+    });
+    document.getElementById('srWatermarkPos')?.addEventListener('change', e => {
+      srWatermarkPosition = e.target.value;
+      window.renderSocial();
+    });
+    document.getElementById('srPickLogoBtn')?.addEventListener('click', () => {
+      document.getElementById('socialBrandIcon')?.click();
+    });
+
+    // Formato de texto salida (Con formato / Texto plano)
+    const fmtBold = document.getElementById('srFmtBold');
+    const fmtPlain = document.getElementById('srFmtPlain');
+    fmtBold?.addEventListener('click', () => {
+      srUseBoldFormat = true;
+      fmtBold.classList.add('active');
+      fmtPlain?.classList.remove('active');
+      srApplyTextPreview();
+    });
+    fmtPlain?.addEventListener('click', () => {
+      srUseBoldFormat = false;
+      fmtPlain.classList.add('active');
+      fmtBold?.classList.remove('active');
+      srApplyTextPreview();
+    });
+
+    // Copiar texto respetando el formato elegido
+    document.getElementById('socialCopyTextPreview').onclick = () => {
+      const txt = document.getElementById('socialTextPreview')?.textContent || '';
+      copyPlain(txt);
+    };
+
+    // Reinicio rápido desde la sub-barra y botón inferior
+    const doReset = () => {
+      srManualText = false;
+      srForceRatio = 'auto';
+      setOrientation('auto');
+      document.getElementById('socialReset')?.click();
+    };
+    document.getElementById('srQuickReset')?.addEventListener('click', doReset);
+
+    window.renderSocial();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRedesTactical);
+  } else {
+    initRedesTactical();
+  }
+})();
+</script>
 <section class="page" id="page-inc35pisrep">
  <div class="section-title"><h2>PIS-REP · clasificación y tiempos de respuesta</h2></div>
  <div class="split"><div class="card"><h3>Nuevo registro PIS-REP</h3><div class="field"><label>Código / evento</label><select id="prEvent"></select></div><div class="grid g2"><div class="field"><label>Prioridad</label><input id="prPriority" readonly></div><div class="field"><label>Ubicación / referencia</label><input id="prLocation"></div><div class="field"><label>Inicio</label><input type="datetime-local" id="prStart"></div><div class="field"><label>Fin</label><input type="datetime-local" id="prEnd"></div></div><!-- NUEVO: calculadora independiente de tiempos PIS-REP, sin modificar los valores del registro. --><div class="card" id="ccttPisrepTimeCalculator" style="margin:12px 0;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))"><h3>Calculadora de tiempo transcurrido</h3><div class="grid g2"><div class="field"><label for="ccttPisrepCalcStart">Hora de inicio</label><input type="time" id="ccttPisrepCalcStart" style="color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))"></div><div class="field"><label for="ccttPisrepCalcEnd">Hora de fin</label><input type="time" id="ccttPisrepCalcEnd" style="color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))"></div></div><div class="row" style="margin-top:10px"><button class="btn" type="button" id="ccttPisrepCalcButton">Calcular tiempo</button><!-- NUEVO: copiar solo el resultado calculado. --><button class="btn" type="button" id="ccttPisrepCalcCopy">Copiar tiempo</button><output id="ccttPisrepCalcResult" role="status" aria-live="polite" style="color:var(--cctt-theme-text,var(--text));font-weight:800"></output></div><p class="muted" style="margin:8px 0 0">Si la hora final es anterior a la inicial, se interpreta como el día siguiente.</p></div><div class="field"><label>Descripción / seguimiento</label><textarea id="prNotes"></textarea></div><div class="row"><button class="btn primary" id="prSave">Guardar</button><button class="btn" id="prCopy">Copiar ficha</button><button class="btn bad" id="prUndo">Deshacer último</button></div></div><div class="card"><h3>Resultado</h3><div id="prKpis" class="grid g3"></div><div id="prPreview" class="notice" style="white-space:pre-wrap;margin-top:12px;min-height:210px"></div></div></div>
@@ -14861,6 +15555,368 @@ html[data-cctt-scheme=dark] #page-inc35vial.vial-design{--vd-bg:color-mix(in srg
     document.addEventListener('DOMContentLoaded', initInc35Tactical);
   } else {
     initInc35Tactical();
+  }
+})();
+</script>
+<script id="ccttInc35RedesTacticalLogic">
+(function () {
+  'use strict';
+  let srManualText = false;
+  let srUseBoldFormat = true;
+  let srForceRatio = 'auto'; // 'auto' | 'landscape' | 'portrait'
+  let srWatermarkEnabled = true;
+  let srWatermarkPosition = 'tl';
+
+  function srFormatDateMx() {
+    return new Date().toLocaleDateString('es-MX', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  function srSyncLocationsDatalist() {
+    const dl = document.getElementById('srLocationsDatalist');
+    if (!dl) return;
+    const locs = Array.isArray(window.state?.locations) ? window.state.locations : [];
+    dl.innerHTML = locs
+      .slice()
+      .sort((a, b) => a.localeCompare(b, 'es-MX'))
+      .map(x => `<option value="${esc(x)}"></option>`)
+      .join('');
+  }
+
+  function srUpdateTextStats(txt) {
+    const el = document.getElementById('srTextStats');
+    if (!el) return;
+    const chars = txt.length;
+    const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+    el.textContent = `${chars} caracteres · ${words} palabras`;
+  }
+
+  function srApplyTextPreview() {
+    const ta = document.getElementById('socialText');
+    const pv = document.getElementById('socialTextPreview');
+    if (!ta || !pv) return;
+    const raw = ta.value;
+    pv.textContent = srUseBoldFormat ? raw : raw.replace(/\*/g, '');
+    srUpdateTextStats(raw);
+  }
+
+  // Sobrescribir drawMark para respetar el interruptor Activa y la esquina elegida
+  window.socialDrawMark = async function (ctx, mark, box) {
+    if (!srWatermarkEnabled || !mark || !box) return;
+    try {
+      const logo = await imgFrom(mark);
+      const pad = Math.max(8, Math.round(Math.min(box.w, box.h) * 0.02));
+      let w = Math.min(box.w * 0.22, box.w - pad * 2);
+      let h = logo.height * (w / logo.width);
+      if (h > box.h * 0.26) {
+        h = box.h * 0.26;
+        w = logo.width * (h / logo.height);
+      }
+      if (w <= 0 || h <= 0) return;
+
+      let x = box.x + pad;
+      let y = box.y + pad;
+      if (srWatermarkPosition === 'tr' || srWatermarkPosition === 'br') {
+        x = box.x + box.w - w - pad;
+      }
+      if (srWatermarkPosition === 'bl' || srWatermarkPosition === 'br') {
+        y = box.y + box.h - h - pad;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = 1;
+      ctx.drawImage(logo, x, y, w, h);
+      ctx.restore();
+    } catch (_) {}
+  };
+
+  // Sobrescribir renderSocial manteniendo recorte no destructivo, dual-foto y encuadre opcional
+  window.renderSocial = async function () {
+    const c = document.getElementById('socialCanvas');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const pics = await socialLoadMedia();
+    const isDual = pics.length === 2;
+
+    const clipped = pics.map((im, i) => {
+      const st = socialCropStates[i];
+      if (!st || !st.enabled || !st.percent || socialImgs[i]?.kind === 'video') return im;
+      const cut = Math.max(1, Math.round(im.height * (1 - st.percent / 100)));
+      const cv = document.createElement('canvas');
+      cv.width = im.width;
+      cv.height = cut;
+      cv.getContext('2d').drawImage(im, 0, 0, im.width, cut, 0, 0, im.width, cut);
+      return cv;
+    });
+
+    const first = clipped[0];
+    let targetW = 1280;
+    let targetH = 720;
+
+    if (first) {
+      if (srForceRatio === 'landscape' && !isDual) {
+        targetW = 1280;
+        targetH = 720;
+      } else if (srForceRatio === 'portrait' && !isDual) {
+        targetW = 720;
+        targetH = 1280;
+      } else {
+        targetH = Math.min(1800, Math.max(1, first.height));
+        targetW = Math.max(1, Math.round(clipped.reduce((w, im) => w + (im.width * targetH) / im.height, 0)));
+      }
+    }
+
+    c.width = targetW;
+    c.height = targetH;
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    let actualBox = { x: 0, y: 0, w: c.width, h: c.height };
+    if (!first) {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 28px Inter, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Vista previa de composición CCTT · Carga una imagen o video', c.width / 2, c.height / 2);
+    } else if (!isDual && (srForceRatio === 'landscape' || srForceRatio === 'portrait')) {
+      drawCover(ctx, first, 0, 0, c.width, c.height);
+    } else {
+      actualBox = socialDrawGrid(ctx, clipped, { x: 0, y: 0, w: c.width, h: c.height }) || actualBox;
+    }
+
+    await window.socialDrawMark(ctx, window.ccttOfficialBrandData || state.inc35?.social?.brandIcon || null, actualBox);
+
+    const orientation = document.getElementById('socialOrientation');
+    if (orientation) {
+      const vertical = first && first.height > first.width;
+      orientation.textContent = isDual
+        ? 'Dos imágenes unidas'
+        : first
+        ? srForceRatio === 'landscape'
+          ? '16:9 Panorámico'
+          : srForceRatio === 'portrait'
+          ? '9:16 Vertical'
+          : vertical
+          ? 'Vertical (Auto)'
+          : 'Horizontal (Auto)'
+        : 'Sin archivos';
+    }
+
+    const timeVal = document.getElementById('socialTime')?.value || '';
+    const mirror = document.getElementById('srTimeMirror');
+    if (mirror) mirror.value = timeVal ? `${timeVal} hrs` : '';
+
+    const ta = document.getElementById('socialText');
+    if (ta && !srManualText) {
+      ta.value = socialReportText();
+    }
+    srApplyTextPreview();
+  };
+
+  function initRedesTactical() {
+    const page = document.getElementById('page-inc35redes');
+    if (!page || page.dataset.srReady) return;
+    page.dataset.srReady = '1';
+
+    const dateLbl = document.getElementById('srCurrentDateLabel');
+    if (dateLbl) dateLbl.textContent = srFormatDateMx();
+
+    srSyncLocationsDatalist();
+
+    // Sincronización de hora
+    const syncNow = () => {
+      const t = document.getElementById('socialTime');
+      if (t) {
+        t.value = socialDefaultTime();
+        srManualText = false;
+        window.renderSocial();
+        toast(`Hora sincronizada: ${t.value} hrs`);
+      }
+    };
+    document.getElementById('srSyncTimeSubbar')?.addEventListener('click', syncNow);
+    document.getElementById('srUseTimeFormBtn')?.addEventListener('click', syncNow);
+
+    // Plantilla badge
+    document.getElementById('socialLayout')?.addEventListener('change', e => {
+      const names = {
+        '1': 'Plantilla 1: Reporte Vial',
+        '2': 'Plantilla 2: Comunicado Operativo',
+        '3': 'Plantilla 3: Reenvío Redes'
+      };
+      const badge = document.getElementById('srTemplateBadge');
+      if (badge) badge.textContent = names[e.target.value] || 'Plantilla 1: Reporte Vial';
+    });
+
+    // Edición directa en el textarea
+    const ta = document.getElementById('socialText');
+    ta?.addEventListener('input', () => {
+      srManualText = true;
+      srApplyTextPreview();
+    });
+
+    // Insertar etiquetas dinámicas en el cursor del textarea
+    page.querySelectorAll('.sr-insert-tag').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!ta) return;
+        const tag = btn.dataset.tag;
+        const map = {
+          '{hora}': `${document.getElementById('socialTime')?.value || socialDefaultTime()} horas`,
+          '{evento}': ccttSentenceMX(document.getElementById('socialEvent')?.value || 'Evento vial en seguimiento'),
+          '{ubicacion}': ccttSentenceMX(document.getElementById('socialLoc')?.value || 'Ubicación por confirmar')
+        };
+        const insertVal = map[tag] || tag;
+        const start = ta.selectionStart || 0;
+        const end = ta.selectionEnd || 0;
+        ta.value = ta.value.slice(0, start) + insertVal + ta.value.slice(end);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = start + insertVal.length;
+        srManualText = true;
+        srApplyTextPreview();
+      });
+    });
+
+    // Cuando cambia Evento, Ubicación u Hora, volver a sincronizar el cuerpo
+    ['socialEvent', 'socialLoc', 'socialTime'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', () => {
+        srManualText = false;
+        window.renderSocial();
+      });
+    });
+
+    // Revisión ortográfica en Evento y Ubicación
+    document.getElementById('srReviewEventBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('socialEvent');
+      if (el && typeof ccttOfferTextReview === 'function') ccttOfferTextReview(el);
+    });
+    document.getElementById('srReviewLocBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('socialLoc');
+      if (el && typeof ccttOfferTextReview === 'function') ccttOfferTextReview(el);
+    });
+
+    // Catálogo de ubicaciones
+    document.getElementById('srSaveLocBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('socialLoc');
+      if (el && typeof addLocationFromField === 'function') {
+        addLocationFromField(el);
+        srSyncLocationsDatalist();
+      }
+    });
+    document.getElementById('srManageLocBtn')?.addEventListener('click', () => {
+      if (typeof openLocationManager === 'function') openLocationManager();
+      const mgr = document.getElementById('locationManager');
+      if (mgr && !mgr.dataset.srHook) {
+        mgr.dataset.srHook = '1';
+        mgr.addEventListener('click', () => setTimeout(srSyncLocationsDatalist, 80));
+      }
+    });
+
+    // Drag & Drop de imágenes/videos
+    const dropZone = document.getElementById('srDropZone');
+    const fileInput = document.getElementById('socialFiles');
+    if (dropZone && fileInput) {
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          fileInput.click();
+        }
+      });
+      ['dragenter', 'dragover'].forEach(ev => {
+        dropZone.addEventListener(ev, e => {
+          e.preventDefault();
+          dropZone.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(ev => {
+        dropZone.addEventListener(ev, e => {
+          e.preventDefault();
+          dropZone.classList.remove('dragover');
+        });
+      });
+      dropZone.addEventListener('drop', e => {
+        const files = e.dataTransfer?.files;
+        if (files && files.length) {
+          fileInput.files = files;
+          fileInput.dispatchEvent(new Event('change'));
+        }
+      });
+    }
+
+    document.getElementById('srCloseCropPanel')?.addEventListener('click', () => {
+      document.getElementById('socialCropPanel').hidden = true;
+    });
+
+    // Orientación / Encuadre
+    const setOrientation = mode => {
+      srForceRatio = mode;
+      page.querySelectorAll('[data-sr-orient]').forEach(b => {
+        b.classList.toggle('active', b.dataset.srOrient === mode);
+      });
+      document.getElementById('srRatio169')?.classList.toggle('active', mode === 'landscape');
+      document.getElementById('srRatio916')?.classList.toggle('active', mode === 'portrait');
+      window.renderSocial();
+    };
+    page.querySelectorAll('[data-sr-orient]').forEach(btn => {
+      btn.addEventListener('click', () => setOrientation(btn.dataset.srOrient));
+    });
+    document.getElementById('srRatio169')?.addEventListener('click', () => setOrientation('landscape'));
+    document.getElementById('srRatio916')?.addEventListener('click', () => setOrientation('portrait'));
+
+    // Marca institucional y logo
+    document.getElementById('srWatermarkActive')?.addEventListener('change', e => {
+      srWatermarkEnabled = e.target.checked;
+      window.renderSocial();
+    });
+    document.getElementById('srWatermarkPos')?.addEventListener('change', e => {
+      srWatermarkPosition = e.target.value;
+      window.renderSocial();
+    });
+    document.getElementById('srPickLogoBtn')?.addEventListener('click', () => {
+      document.getElementById('socialBrandIcon')?.click();
+    });
+
+    // Formato de texto salida (Con formato / Texto plano)
+    const fmtBold = document.getElementById('srFmtBold');
+    const fmtPlain = document.getElementById('srFmtPlain');
+    fmtBold?.addEventListener('click', () => {
+      srUseBoldFormat = true;
+      fmtBold.classList.add('active');
+      fmtPlain?.classList.remove('active');
+      srApplyTextPreview();
+    });
+    fmtPlain?.addEventListener('click', () => {
+      srUseBoldFormat = false;
+      fmtPlain.classList.add('active');
+      fmtBold?.classList.remove('active');
+      srApplyTextPreview();
+    });
+
+    // Copiar texto respetando el formato elegido
+    document.getElementById('socialCopyTextPreview').onclick = () => {
+      const txt = document.getElementById('socialTextPreview')?.textContent || '';
+      copyPlain(txt);
+    };
+
+    // Reinicio rápido desde la sub-barra y botón inferior
+    const doReset = () => {
+      srManualText = false;
+      srForceRatio = 'auto';
+      setOrientation('auto');
+      document.getElementById('socialReset')?.click();
+    };
+    document.getElementById('srQuickReset')?.addEventListener('click', doReset);
+
+    window.renderSocial();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRedesTactical);
+  } else {
+    initRedesTactical();
   }
 })();
 </script>
