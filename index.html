@@ -1,6 +1,366 @@
 <!doctype html>
 <html lang="es-MX">
 <head>
+<style id="ccttInc35TacticalStyles">
+#page-inc35macro {
+  --i35-card: var(--cctt-theme-card, #ffffff);
+  --i35-subtle: var(--cctt-theme-table, #f4efeb);
+  --i35-border: var(--cctt-theme-line, #e8e3dd);
+  --i35-text: var(--cctt-theme-text, #1f2937);
+  --i35-muted: var(--cctt-theme-muted, #64748b);
+  --i35-accent: var(--cctt-theme-accent, #6b1d2f);
+  --i35-onaccent: var(--cctt-theme-onaccent, #ffffff);
+  --i35-input: var(--cctt-theme-input, #ffffff);
+  --i35-inputtext: var(--cctt-theme-inputtext, #0f172a);
+  color: var(--i35-text);
+}
+#page-inc35macro .i35-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(330px, 0.95fr);
+  gap: 20px;
+  align-items: start;
+}
+#page-inc35macro .i35-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+#page-inc35macro .i35-panel {
+  background: var(--i35-card);
+  border: 1px solid var(--i35-border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+#page-inc35macro .i35-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 13px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--i35-border);
+}
+#page-inc35macro .i35-step-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#page-inc35macro .i35-step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--i35-accent) 14%, transparent);
+  color: var(--i35-accent);
+  font-size: 12px;
+  font-weight: 800;
+}
+#page-inc35macro .i35-step-title h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--i35-text);
+}
+#page-inc35macro .i35-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+#page-inc35macro .i35-label-row label,
+#page-inc35macro .i35-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--i35-text);
+  margin: 0;
+}
+#page-inc35macro .i35-req {
+  color: var(--i35-accent);
+  font-weight: 900;
+}
+#page-inc35macro .i35-inline-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+#page-inc35macro .i35-link-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--i35-accent);
+  cursor: pointer;
+}
+#page-inc35macro .i35-link-btn:hover {
+  text-decoration: underline;
+}
+#page-inc35macro .i35-link-btn.muted-link {
+  color: var(--i35-muted);
+}
+#page-inc35macro input[type="text"],
+#page-inc35macro input:not([type]),
+#page-inc35macro select,
+#page-inc35macro textarea {
+  width: 100%;
+  background: var(--i35-input);
+  color: var(--i35-inputtext);
+  border: 1px solid var(--i35-border);
+  border-radius: 9px;
+  padding: 9px 11px;
+  font-size: 13px;
+  min-height: 39px;
+  box-sizing: border-box;
+}
+#page-inc35macro input:focus,
+#page-inc35macro select:focus,
+#page-inc35macro textarea:focus {
+  outline: none;
+  border-color: var(--i35-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--i35-accent) 18%, transparent);
+}
+#page-inc35macro .i35-vehicle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+#page-inc35macro .i35-vehicle-card {
+  background: color-mix(in srgb, var(--i35-subtle) 55%, var(--i35-card));
+  border: 1px solid var(--i35-border);
+  border-radius: 12px;
+  padding: 15px;
+  transition: border-color 0.16s ease;
+}
+#page-inc35macro .i35-vehicle-card:hover {
+  border-color: color-mix(in srgb, var(--i35-accent) 45%, var(--i35-border));
+}
+#page-inc35macro .i35-vehicle-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--i35-border);
+}
+#page-inc35macro .i35-inv-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--i35-accent);
+  color: var(--i35-onaccent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+#page-inc35macro .i35-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--i35-muted);
+  cursor: pointer;
+}
+#page-inc35macro .i35-icon-btn:hover {
+  background: var(--i35-card);
+  border-color: var(--i35-border);
+  color: var(--i35-text);
+}
+#page-inc35macro .i35-icon-btn.danger:hover {
+  background: #fde8e8;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+#page-inc35macro .i35-vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+  margin-bottom: 12px;
+}
+#page-inc35macro .i35-codes-box {
+  background: var(--i35-card);
+  border: 1px solid var(--i35-border);
+  border-radius: 9px;
+  padding: 10px 12px;
+}
+#page-inc35macro .i35-codes-title {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--i35-muted);
+  margin-bottom: 8px;
+}
+#page-inc35macro .i35-codes-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+#page-inc35macro .i35-codes-grid label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--i35-muted);
+  margin-bottom: 3px;
+}
+#page-inc35macro .i35-codes-grid input {
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  padding: 5px 6px;
+  min-height: 32px;
+}
+#page-inc35macro .i35-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--i35-card);
+  border: 1px solid var(--i35-border);
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+#page-inc35macro .i35-preview-card {
+  position: sticky;
+  top: 88px;
+  background: var(--i35-card);
+  border: 1px solid var(--i35-border);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+#page-inc35macro .i35-preview-head {
+  padding: 12px 16px;
+  background: var(--i35-subtle);
+  border-bottom: 1px solid var(--i35-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+#page-inc35macro .i35-preview-head h3 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--i35-text);
+}
+#page-inc35macro .i35-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--i35-accent);
+  display: inline-block;
+}
+#page-inc35macro .i35-format-switch {
+  display: inline-flex;
+  background: var(--i35-card);
+  border: 1px solid var(--i35-border);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+#page-inc35macro .i35-format-switch button {
+  border: 0;
+  background: transparent;
+  color: var(--i35-muted);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#page-inc35macro .i35-format-switch button.active {
+  background: color-mix(in srgb, var(--i35-accent) 15%, var(--i35-card));
+  color: var(--i35-accent);
+  font-weight: 800;
+}
+#page-inc35macro .i35-preview-paper {
+  padding: 18px;
+  min-height: 360px;
+  max-height: 540px;
+  overflow-y: auto;
+  background-color: var(--i35-card);
+  background-image: radial-gradient(var(--i35-border) 0.85px, transparent 0.85px);
+  background-size: 16px 16px;
+}
+#page-inc35macro #i35Preview {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--i35-text);
+  user-select: all;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+#page-inc35macro .i35-preview-foot {
+  padding: 14px 16px;
+  background: var(--i35-card);
+  border-top: 1px solid var(--i35-border);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+#page-inc35macro .i35-meta-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--i35-muted);
+}
+#page-inc35macro #i35Copy {
+  width: 100%;
+  justify-content: center;
+  padding: 11px 16px;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+@media (max-width: 1050px) {
+  #page-inc35macro .i35-layout {
+    grid-template-columns: 1fr;
+  }
+  #page-inc35macro .i35-preview-card {
+    position: static;
+  }
+}
+@media (max-width: 680px) {
+  #page-inc35macro .i35-vehicle-grid {
+    grid-template-columns: 1fr;
+  }
+  #page-inc35macro .i35-codes-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+</style>
 <!-- NUEVO: control previo de IP y estilos aislados de Documentación y Seguridad. -->
 <style id="ccttDocGlobalIpStyles">
 /* NUEVO: bloqueo previo y arrastre con las variables de ambos temas. */
@@ -13949,4 +14309,409 @@ html[data-cctt-scheme=dark] #page-inc35vial.vial-design{--vd-bg:color-mix(in srg
 @media(max-width:1000px){#page-inc35vial.vial-design .cctt-vial-main{grid-template-columns:1fr!important}}
 @media(max-width:600px){#page-inc35vial.vial-design .cctt-vial-header{padding:10px 12px!important}#page-inc35vial.vial-design .vial-capture{padding:8px 12px!important}#page-inc35vial.vial-design .vial-search{flex:1 1 100%!important;width:100%!important}#page-inc35vial.vial-design .vial-zone-grid{grid-template-columns:1fr!important}#page-inc35vial.vial-design .vial-zone-actions{margin-left:0!important}#page-inc35vial.vial-design .vial-card-footer{align-items:start}#page-inc35vial.vial-design .location-tools{margin-top:0!important}}
 </style>
+<script id="ccttInc35TacticalLogic">
+(function () {
+  'use strict';
+  let i35UseMarkdown = true;
+  let i35ExtraCounter = 1;
+
+  function i35SyncCatalogDatalists() {
+    const locDl = document.getElementById('i35Locs');
+    if (locDl) {
+      const locs = Array.isArray(window.state?.locations) ? window.state.locations : [];
+      locDl.innerHTML = locs
+        .slice()
+        .sort((a, b) => a.localeCompare(b, 'es-MX'))
+        .map(x => `<option value="${esc(x)}"></option>`)
+        .join('');
+    }
+    const compDl = document.getElementById('i35Companies');
+    if (compDl) {
+      const aliases = Object.values(window.state?.companyAliases || {});
+      const base = ['SSA México', 'OCUPA', 'TIMSA', 'Contecon Manzanillo', 'Hazesa', 'Multimodal', 'La Junta', 'Friman', 'ASIPONA', 'CEMEX S.A. de C.V.', 'CTM'];
+      const merged = [...new Set([...base, ...aliases])].sort((a, b) => a.localeCompare(b, 'es-MX'));
+      compDl.innerHTML = merged.map(x => `<option value="${esc(x)}"></option>`).join('');
+    }
+  }
+
+  function i35CollectVehicles() {
+    const cards = [...document.querySelectorAll('#i35VehiclesContainer .i35-vehicle-card')];
+    return cards.map((card, idx) => {
+      const getVal = (field, legacyId) => {
+        const el = card.querySelector(`[data-field="${field}"]`) || (idx === 0 ? document.getElementById(legacyId) : null);
+        return (el?.value || '').trim();
+      };
+      return {
+        company: company35(getVal('company', 'i35Company')),
+        plate: getVal('plate', 'i35Plate').toUpperCase(),
+        operator: proper35(getVal('operator', 'i35Operator')),
+        DEC: getVal('DEC', 'i35DEC'),
+        DEA: getVal('DEA', 'i35DEA'),
+        DEO: getVal('DEO', 'i35DEO'),
+        DEI: getVal('DEI', 'i35DEI'),
+        DEV: getVal('DEV', 'i35DEV'),
+        DEP: getVal('DEP', 'i35DEP')
+      };
+    });
+  }
+
+  function i35UpdateCardsUI() {
+    const container = document.getElementById('i35VehiclesContainer');
+    if (!container) return;
+    const cards = [...container.querySelectorAll('.i35-vehicle-card')];
+    cards.forEach((card, idx) => {
+      const badge = card.querySelector('[data-inv-badge]');
+      if (badge) badge.textContent = `Involucrado #${idx + 1}`;
+      const delBtn = card.querySelector('[data-del-vehicle]');
+      if (delBtn) delBtn.style.display = cards.length <= 1 ? 'none' : 'inline-flex';
+    });
+    const counter = document.getElementById('i35VehicleCounter');
+    if (counter) {
+      counter.textContent = `${cards.length} ${cards.length === 1 ? 'involucrado registrado' : 'involucrados registrados'}`;
+    }
+  }
+
+  function i35CreateExtraCard(prefill = {}) {
+    i35ExtraCounter++;
+    const n = i35ExtraCounter;
+    const card = document.createElement('div');
+    card.className = 'i35-vehicle-card';
+    card.dataset.vehicleSlot = String(n);
+    card.innerHTML = `
+      <div class="i35-vehicle-head">
+        <div class="row" style="gap:8px">
+          <span class="i35-inv-badge" data-inv-badge>Involucrado #${n}</span>
+          <span class="small" style="font-weight:700">Unidad / Participante</span>
+        </div>
+        <div class="row" style="gap:4px">
+          <button type="button" class="i35-icon-btn" data-dup-vehicle title="Duplicar datos de este involucrado" aria-label="Duplicar involucrado">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button type="button" class="i35-icon-btn danger" data-del-vehicle title="Eliminar involucrado" aria-label="Eliminar involucrado">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="i35-vehicle-grid">
+        <div>
+          <div class="i35-label-row">
+            <label>Empresa</label>
+            <div class="i35-inline-links">
+              <button type="button" class="i35-link-btn" data-save-company>+ Guardar</button>
+              <span class="muted">•</span>
+              <button type="button" class="i35-link-btn muted-link" data-manage-company>Gest.</button>
+            </div>
+          </div>
+          <input data-field="company" list="i35Companies" autocomplete="off" placeholder="Ej. Transportes del Pacífico" value="${esc(prefill.company || '')}">
+        </div>
+
+        <div>
+          <label class="i35-field-label" style="margin-bottom:6px">Placa</label>
+          <input data-field="plate" placeholder="Ej. 42-AA-9Z" style="font-family:monospace;text-transform:uppercase" value="${esc(prefill.plate || '')}">
+        </div>
+
+        <div>
+          <label class="i35-field-label" style="margin-bottom:6px">Operador</label>
+          <input data-field="operator" placeholder="Ej. Juan Pérez Morales" value="${esc(prefill.operator || '')}">
+        </div>
+      </div>
+
+      <div class="i35-codes-box">
+        <span class="i35-codes-title">Claves de despacho y enlace CCTT</span>
+        <div class="i35-codes-grid">
+          <div><label>DEC</label><input data-field="DEC" placeholder="-" value="${esc(prefill.DEC || '')}"></div>
+          <div><label>DEA</label><input data-field="DEA" placeholder="-" value="${esc(prefill.DEA || '')}"></div>
+          <div><label>DEO</label><input data-field="DEO" placeholder="-" value="${esc(prefill.DEO || '')}"></div>
+          <div><label>DEI</label><input data-field="DEI" placeholder="-" value="${esc(prefill.DEI || '')}"></div>
+          <div><label>DEV</label><input data-field="DEV" placeholder="-" value="${esc(prefill.DEV || '')}"></div>
+          <div><label>DEP</label><input data-field="DEP" placeholder="-" value="${esc(prefill.DEP || '')}"></div>
+        </div>
+      </div>
+    `;
+    return card;
+  }
+
+  function i35OpenCompanyManager() {
+    const overlay = document.createElement('div');
+    overlay.className = 'location-manager show';
+    overlay.innerHTML = `
+      <div class="location-panel" role="dialog" aria-modal="true">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h3 style="margin:0">Empresas guardadas</h3>
+          <button type="button" class="mini-btn" data-close>Cerrar</button>
+        </div>
+        <p class="muted">Formas oficiales guardadas para autocompletar en Generador de incidentes.</p>
+        <div id="i35CompMgrList" style="margin-top:10px"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const close = () => overlay.remove();
+    overlay.querySelector('[data-close]').onclick = close;
+    overlay.onclick = e => { if (e.target === overlay) close(); };
+
+    const draw = () => {
+      const host = overlay.querySelector('#i35CompMgrList');
+      const entries = Object.entries(window.state?.companyAliases || {});
+      host.innerHTML = entries.length
+        ? entries.map(([k, v]) => `
+            <div class="location-chip">
+              <span><b>${esc(v)}</b> <small class="muted">(${esc(k)})</small></span>
+              <button type="button" class="mini-btn" data-del-alias="${esc(k)}">Eliminar</button>
+            </div>
+          `).join('')
+        : '<div class="empty">No hay empresas personalizadas guardadas.</div>';
+      host.querySelectorAll('[data-del-alias]').forEach(btn => {
+        btn.onclick = () => {
+          delete state.companyAliases[btn.dataset.delAlias];
+          save();
+          i35SyncCatalogDatalists();
+          draw();
+        };
+      });
+    };
+    draw();
+  }
+
+  // Sobrescribir generación de texto manteniendo compatibilidad total con las macros
+  window.incident35Text = function () {
+    const bold = lbl => (i35UseMarkdown ? `*${lbl}*` : lbl);
+    const header = incident35TypeText();
+    const loc = proper35(document.getElementById('i35Location')?.value || '');
+    const vehicles = i35CollectVehicles();
+    const activeVehicles = vehicles.filter(v =>
+      v.company || v.plate || v.operator || v.DEC || v.DEA || v.DEO || v.DEI || v.DEV || v.DEP
+    );
+    const multiple = activeVehicles.length > 1;
+    const lines = [header];
+
+    if (loc) lines.push(`${bold('Ubicación:')} ${loc}`);
+
+    activeVehicles.forEach((v, idx) => {
+      if (multiple) {
+        lines.push('');
+        lines.push(i35UseMarkdown ? `*--- Involucrado #${idx + 1} ---*` : `--- Involucrado #${idx + 1} ---`);
+      }
+      if (v.company) lines.push(`${bold('Empresa:')} ${v.company}`);
+      if (v.plate) lines.push(`${bold('Placa:')} ${v.plate}`);
+      if (v.operator) lines.push(`${bold('Operador:')} ${v.operator}`);
+      for (const code of ['DEC', 'DEA', 'DEO', 'DEI', 'DEV', 'DEP']) {
+        if (v[code]) lines.push(`${bold(code + ':')} ${v[code]}`);
+      }
+    });
+
+    return lines.join('\n');
+  };
+
+  // Sobrescribir renderI35 para actualizar contador de caracteres e historial
+  window.renderI35 = function () {
+    const text = window.incident35Text();
+    const preview = document.getElementById('i35Preview');
+    if (preview) preview.textContent = text;
+    const countEl = document.getElementById('i35CharCount');
+    if (countEl) countEl.textContent = `${text.length} caracteres`;
+
+    const histBody = document.getElementById('i35History');
+    if (histBody) {
+      histBody.innerHTML = (state.inc35?.incidents || [])
+        .slice()
+        .map((x, i) => ({ ...x, _i: i }))
+        .reverse()
+        .map(x => `
+          <tr>
+            <td>${esc(x.at)}</td>
+            <td>${esc(x.type)}</td>
+            <td>${esc(x.location)}</td>
+            <td>${esc(x.company)}</td>
+            <td>${esc(x.plate)}</td>
+            <td><button type="button" class="mini-btn" data-i35-del="${x._i}">Eliminar</button></td>
+          </tr>
+        `).join('');
+      histBody.querySelectorAll('[data-i35-del]').forEach(b => {
+        b.onclick = () => {
+          state.inc35.incidents.splice(+b.dataset.i35Del, 1);
+          save();
+          window.renderI35();
+        };
+      });
+    }
+    if (typeof updateCompanySuggestion === 'function') updateCompanySuggestion();
+  };
+
+  function initInc35Tactical() {
+    const container = document.getElementById('i35VehiclesContainer');
+    if (!container || container.dataset.tacticalReady) return;
+    container.dataset.tacticalReady = '1';
+
+    i35SyncCatalogDatalists();
+    i35UpdateCardsUI();
+
+    // Añadir involucrado
+    document.getElementById('i35AddVehicleBtn')?.addEventListener('click', () => {
+      const card = i35CreateExtraCard();
+      container.appendChild(card);
+      i35UpdateCardsUI();
+      window.renderI35();
+      card.querySelector('[data-field="company"]')?.focus();
+      toast('Nuevo involucrado agregado.');
+    });
+
+    // Delegación de eventos en tarjetas de involucrados (duplicar, eliminar, guardar empresa, gestionar)
+    container.addEventListener('click', e => {
+      const card = e.target.closest('.i35-vehicle-card');
+      if (!card) return;
+
+      if (e.target.closest('[data-dup-vehicle]')) {
+        const read = f => card.querySelector(`[data-field="${f}"]`)?.value || '';
+        const copyCard = i35CreateExtraCard({
+          company: read('company'),
+          plate: read('plate'),
+          operator: read('operator'),
+          DEC: read('DEC'),
+          DEA: read('DEA'),
+          DEO: read('DEO'),
+          DEI: read('DEI'),
+          DEV: read('DEV'),
+          DEP: read('DEP')
+        });
+        container.appendChild(copyCard);
+        i35UpdateCardsUI();
+        window.renderI35();
+        toast('Involucrado duplicado.');
+        return;
+      }
+
+      if (e.target.closest('[data-del-vehicle]')) {
+        const cards = container.querySelectorAll('.i35-vehicle-card');
+        if (cards.length <= 1) return toast('Debe existir al menos un involucrado.', true);
+        if (card.dataset.vehicleSlot === '1') {
+          // Limpiar primer slot en lugar de destruir los IDs base del DOM
+          ['i35Company', 'i35Plate', 'i35Operator', 'i35DEC', 'i35DEA', 'i35DEO', 'i35DEI', 'i35DEV', 'i35DEP'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+          });
+        } else {
+          card.remove();
+        }
+        i35UpdateCardsUI();
+        window.renderI35();
+        toast('Involucrado eliminado.');
+        return;
+      }
+
+      if (e.target.closest('[data-save-company]')) {
+        const input = card.querySelector('[data-field="company"]');
+        const raw = (input?.value || '').trim();
+        if (!raw) return toast('Escriba una empresa primero.', true);
+        const formal = company35(raw);
+        if (!state.companyAliases) state.companyAliases = {};
+        state.companyAliases[companyKey(raw)] = formal;
+        input.value = formal;
+        save();
+        i35SyncCatalogDatalists();
+        window.renderI35();
+        toast(`"${formal}" guardada en sugerencias.`);
+        return;
+      }
+
+      if (e.target.closest('[data-manage-company]')) {
+        i35OpenCompanyManager();
+      }
+    });
+
+    // Actualización en vivo de todos los campos dentro del contenedor
+    container.addEventListener('input', e => {
+      if (e.target.matches('[data-field="plate"]')) {
+        const pos = e.target.selectionStart;
+        e.target.value = e.target.value.toUpperCase();
+        try { e.target.setSelectionRange(pos, pos); } catch (_) {}
+      }
+      window.renderI35();
+    });
+
+    // Botones de Ubicación (+ Guardar y Gestionar reutilizando el catálogo global)
+    document.getElementById('i35SaveLocBtn')?.addEventListener('click', () => {
+      const el = document.getElementById('i35Location');
+      if (!el) return;
+      addLocationFromField(el);
+      i35SyncCatalogDatalists();
+      window.renderI35();
+    });
+    document.getElementById('i35ManageLocBtn')?.addEventListener('click', () => {
+      openLocationManager();
+      const mgr = document.getElementById('locationManager');
+      if (mgr && !mgr.dataset.i35Hook) {
+        mgr.dataset.i35Hook = '1';
+        mgr.addEventListener('click', () => setTimeout(i35SyncCatalogDatalists, 80));
+      }
+    });
+
+    // Selector Con Formato (*) / Texto Plano
+    const btnMd = document.getElementById('i35FormatMd');
+    const btnPlain = document.getElementById('i35FormatPlain');
+    if (btnMd && btnPlain) {
+      btnMd.onclick = () => {
+        i35UseMarkdown = true;
+        btnMd.classList.add('active');
+        btnMd.setAttribute('aria-pressed', 'true');
+        btnPlain.classList.remove('active');
+        btnPlain.setAttribute('aria-pressed', 'false');
+        window.renderI35();
+      };
+      btnPlain.onclick = () => {
+        i35UseMarkdown = false;
+        btnPlain.classList.add('active');
+        btnPlain.setAttribute('aria-pressed', 'true');
+        btnMd.classList.remove('active');
+        btnMd.setAttribute('aria-pressed', 'false');
+        window.renderI35();
+      };
+    }
+
+    // Procesar, Copiar y Borrar Todo actualizados
+    document.getElementById('i35Process').onclick = () => {
+      const vehicles = i35CollectVehicles();
+      const first = vehicles[0] || {};
+      const ce = document.getElementById('i35Company');
+      if (ce) ce.value = first.company || '';
+      const text = window.incident35Text();
+      const companies = vehicles.map(v => v.company).filter(Boolean).join(' / ');
+      const plates = vehicles.map(v => v.plate).filter(Boolean).join(' / ');
+      state.inc35.incidents.push({
+        at: new Date().toLocaleString(),
+        type: incident35TypeText(),
+        location: proper35(document.getElementById('i35Location').value),
+        company: companies,
+        plate: plates,
+        text
+      });
+      save();
+      window.renderI35();
+      copyPlain(text);
+      toast('Reporte validado, guardado en historial y copiado.');
+    };
+
+    document.getElementById('i35Copy').onclick = () => copyPlain(window.incident35Text());
+
+    document.getElementById('i35Clear').onclick = () => {
+      ['i35Location', 'i35Company', 'i35Plate', 'i35Operator', 'i35DEC', 'i35DEA', 'i35DEO', 'i35DEI', 'i35DEV', 'i35DEP', 'i35CustomType'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      container.querySelectorAll('.i35-vehicle-card:not([data-vehicle-slot="1"])').forEach(c => c.remove());
+      i35UpdateCardsUI();
+      window.renderI35();
+      toast('Formulario reiniciado.');
+    };
+
+    window.renderI35();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initInc35Tactical);
+  } else {
+    initInc35Tactical();
+  }
+})();
+</script>
 </body></html>
