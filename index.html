@@ -2551,19 +2551,186 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:14px"><div><h3 style="margin:0">Rol de turnos · 8 horas</h3><p class="muted" style="margin:6px 0 0">Grupos A, B, C y D · Rotación de 24 días basada en el calendario 2026 proporcionado.</p></div><div class="row"><!-- MODIFICADO: restaurar atributo id del control Turnos; comentario fuera de la etiqueta. --><button class="btn" id="shiftPrev">Anterior</button><select class="ctl-year-select" id="shiftMonth" aria-label="Mes"></select><input id="shiftYear" type="number" min="2026" max="2100" value="2026" style="max-width:100px;padding:9px;border:1px solid var(--line);border-radius:9px" aria-label="Año"><!-- MODIFICADO: restaurar atributo id del control Turnos; comentario fuera de la etiqueta. --><button class="btn" id="shiftNext">Siguiente</button></div></div>
 <div class="row" style="margin:0 0 14px"><span class="pill">M = Mañana</span><span class="pill">T = Tarde</span><span class="pill">N = Noche</span><span class="pill">D = Descanso</span><button class="btn primary right" id="shiftExport">Descargar calendario anual .xlsm</button></div><!-- NUEVO: selección voluntaria de fecha y turno actuales, sin cambiar asignaciones. --><label class="cctt-shift-auto-option" for="shiftAutoSelect"><!-- MODIFICADO: selección automática activa desde la primera apertura. --><input id="shiftAutoSelect" type="checkbox" checked><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 6v6l4 2M2 12h3m14 0h3M12 2v3m0 14v3"/></svg>Selección automática de fecha y turno</label><!-- MODIFICADO: estado inicial acorde al selector automático. --><p id="shiftAutoStatus" role="status">Selección automática activada.</p><div class="table-wrap" id="shiftCalendar"></div><p class="muted" style="margin-top:12px">Los años posteriores a 2026 son proyecciones automáticas de la rotación observada; valida el rol oficial si existen cambios extraordinarios. El archivo .xlsm conserva el contenedor de macros del modelo original, pero sus macros no se modifican ni verifican.</p></div></section>
 <section class="page" id="page-inc35macro">
- <div class="section-title"><h2>Generador de incidentes</h2></div>
- <div class="split">
-  <div class="card"><h3>Captura operativa</h3><div class="grid g2">
-   <div class="field"><label>Tipo de reporte</label><select id="i35Type"><option>CCTT Reporta, choque entre unidades de autotransporte.</option><option>CCTT Reporta, colisión entre unidad y máquina de Ferromex.</option><option selected>CCTT Reporta, unidad de autotransporte con falla mecánica.</option><option>CCTT Reporta, choque entre particular y unidad de autotransporte.</option><option>CCTT Reporta, unidad de autotransporte sin combustible.</option><option>CCTT Reporta, unidad de autotransporte con falla electrica.</option><option>CCTT Reporta, choque entre motociclista y unidad de autotransporte.</option><option>CCTT Reporta, choque entre motociclista y unidad particular.</option><option value="__custom__">Transcribir / escribir reporte manualmente…</option></select><div id="i35CustomTypeWrap" style="display:none;margin-top:10px"><label>Texto del reporte</label><textarea id="i35CustomType" style="min-height:96px" placeholder="Escriba o pegue aquí el tipo de reporte o encabezado completo."></textarea><span class="muted">Puede usar el listado o redactar libremente un reporte no contemplado.</span></div></div>
-   <div class="field"><label>Ubicación</label><input id="i35Location" list="i35Locs"><datalist id="i35Locs"></datalist></div>
-   <div class="field"><label>Empresa</label><input id="i35Company" list="i35Companies" autocomplete="off"><datalist id="i35Companies"></datalist><div id="i35CompanySuggestion" class="company-suggest"></div></div>
-   <div class="field"><label>Placa</label><input id="i35Plate"></div><div class="field"><label>Operador</label><input id="i35Operator"></div><div class="field"><label>DEC</label><input id="i35DEC"></div><div class="field"><label>DEA</label><input id="i35DEA"></div><div class="field"><label>DEO</label><input id="i35DEO"></div><div class="field"><label>DEI</label><input id="i35DEI"></div><div class="field"><label>DEV</label><input id="i35DEV"></div><div class="field"><label>DEP</label><input id="i35DEP"></div>
-  </div><div class="row" style="margin-top:12px"><button class="btn primary" id="i35Process">Procesar</button><button class="btn" id="i35Copy">Copiar reporte</button><button class="btn bad" id="i35Clear">Borrar</button></div></div>
-  <div class="card"><h3>Vista previa</h3><div id="i35Preview" class="notice" style="white-space:pre-wrap;min-height:260px"></div><div class="muted" style="margin-top:10px">Replica la normalización de las macros: ubicación y operador en formato nombre, placa en mayúsculas y salida solo con campos capturados.</div></div>
- </div>
- <div class="card" style="margin-top:16px"><div class="row"><h3 style="margin:0">Historial</h3><button class="btn bad right" id="i35ClearHistory">Borrar historial</button></div><div class="table-wrap"><table class="tbl"><thead><tr><th>Fecha</th><th>Tipo</th><th>Ubicación</th><th>Empresa</th><th>Placa</th><th></th></tr></thead><tbody id="i35History"></tbody></table></div></div>
-</section>
+  <div class="section-title">
+    <h2>Generador táctico de incidentes</h2>
+    <span class="module-tag">Consola operativa CCTT · Multi-involucrados</span>
+  </div>
 
+  <div class="i35-layout">
+    <!-- COLUMNA IZQUIERDA: CAPTURA OPERATIVA -->
+    <div class="i35-left-col">
+      <!-- Bloque 1: Parámetros del Incidente -->
+      <div class="i35-panel">
+        <div class="i35-panel-head">
+          <div class="i35-step-title">
+            <span class="i35-step-badge">1</span>
+            <h3>Parámetros del Incidente</h3>
+          </div>
+          <span class="muted small">* Campos principales del reporte</span>
+        </div>
+
+        <div class="grid g2">
+          <div class="field">
+            <div class="i35-label-row">
+              <label for="i35Type">Tipo de reporte <span class="i35-req">*</span></label>
+            </div>
+            <select id="i35Type">
+              <option>CCTT Reporta, choque entre unidades de autotransporte.</option>
+              <option>CCTT Reporta, colisión entre unidad y máquina de Ferromex.</option>
+              <option selected>CCTT Reporta, unidad de autotransporte con falla mecánica.</option>
+              <option>CCTT Reporta, choque entre particular y unidad de autotransporte.</option>
+              <option>CCTT Reporta, unidad de autotransporte sin combustible.</option>
+              <option>CCTT Reporta, unidad de autotransporte con falla electrica.</option>
+              <option>CCTT Reporta, choque entre motociclista y unidad de autotransporte.</option>
+              <option>CCTT Reporta, choque entre motociclista y unidad particular.</option>
+              <option value="__custom__">Transcribir / escribir reporte manualmente…</option>
+            </select>
+            <div id="i35CustomTypeWrap" style="display:none;margin-top:10px">
+              <label class="i35-field-label" for="i35CustomType" style="margin-bottom:5px">Texto del reporte</label>
+              <textarea id="i35CustomType" style="min-height:84px" placeholder="Escriba o pegue aquí el tipo de reporte o encabezado completo."></textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="i35-label-row">
+              <label for="i35Location">Ubicación <span class="i35-req">*</span></label>
+              <div class="i35-inline-links">
+                <button type="button" class="i35-link-btn" id="i35SaveLocBtn">+ Guardar</button>
+                <span class="muted">•</span>
+                <button type="button" class="i35-link-btn muted-link" id="i35ManageLocBtn">Gestionar</button>
+              </div>
+            </div>
+            <input id="i35Location" list="i35Locs" autocomplete="off" placeholder="Ej. Vialidad Puerto - Jalipa, Patio Regulador">
+            <datalist id="i35Locs"></datalist>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bloque 2: Unidades e Involucrados -->
+      <div class="i35-panel">
+        <div class="i35-panel-head">
+          <div class="i35-step-title">
+            <span class="i35-step-badge">2</span>
+            <div>
+              <h3>Unidades e Involucrados</h3>
+              <span class="muted small">Agregue cada vehículo o involucrado con sus claves PIS</span>
+            </div>
+          </div>
+          <button type="button" class="btn primary" id="i35AddVehicleBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Añadir involucrado / unidad
+          </button>
+        </div>
+
+        <div id="i35VehiclesContainer" class="i35-vehicle-list">
+          <!-- Involucrado #1 (conserva todos los IDs originales del sistema) -->
+          <div class="i35-vehicle-card" data-vehicle-slot="1">
+            <div class="i35-vehicle-head">
+              <div class="row" style="gap:8px">
+                <span class="i35-inv-badge" data-inv-badge>Involucrado #1</span>
+                <span class="small" style="font-weight:700">Unidad / Participante</span>
+              </div>
+              <div class="row" style="gap:4px">
+                <button type="button" class="i35-icon-btn" data-dup-vehicle title="Duplicar datos de este involucrado" aria-label="Duplicar involucrado">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+                <button type="button" class="i35-icon-btn danger" data-del-vehicle title="Eliminar involucrado" aria-label="Eliminar involucrado" style="display:none">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="i35-vehicle-grid">
+              <div>
+                <div class="i35-label-row">
+                  <label for="i35Company">Empresa</label>
+                  <div class="i35-inline-links">
+                    <button type="button" class="i35-link-btn" data-save-company>+ Guardar</button>
+                    <span class="muted">•</span>
+                    <button type="button" class="i35-link-btn muted-link" data-manage-company>Gest.</button>
+                  </div>
+                </div>
+                <input id="i35Company" data-field="company" list="i35Companies" autocomplete="off" placeholder="Ej. Transportes del Pacífico">
+                <datalist id="i35Companies"></datalist>
+                <div id="i35CompanySuggestion" class="company-suggest"></div>
+              </div>
+
+              <div>
+                <label class="i35-field-label" for="i35Plate" style="margin-bottom:6px">Placa</label>
+                <input id="i35Plate" data-field="plate" placeholder="Ej. 42-AA-9Z" style="font-family:monospace;text-transform:uppercase">
+              </div>
+
+              <div>
+                <label class="i35-field-label" for="i35Operator" style="margin-bottom:6px">Operador</label>
+                <input id="i35Operator" data-field="operator" placeholder="Ej. Juan Pérez Morales">
+              </div>
+            </div>
+
+            <div class="i35-codes-box">
+              <span class="i35-codes-title">Claves de despacho y enlace CCTT</span>
+              <div class="i35-codes-grid">
+                <div><label for="i35DEC">DEC</label><input id="i35DEC" data-field="DEC" placeholder="-"></div>
+                <div><label for="i35DEA">DEA</label><input id="i35DEA" data-field="DEA" placeholder="-"></div>
+                <div><label for="i35DEO">DEO</label><input id="i35DEO" data-field="DEO" placeholder="-"></div>
+                <div><label for="i35DEI">DEI</label><input id="i35DEI" data-field="DEI" placeholder="-"></div>
+                <div><label for="i35DEV">DEV</label><input id="i35DEV" data-field="DEV" placeholder="-"></div>
+                <div><label for="i35DEP">DEP</label><input id="i35DEP" data-field="DEP" placeholder="-"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra inferior de acciones -->
+      <div class="i35-actions-bar">
+        <div class="row">
+          <button class="btn primary" id="i35Process" type="button">Validar y Procesar</button>
+          <button class="btn bad" id="i35Clear" type="button">Borrar Todo</button>
+        </div>
+        <span class="muted small" id="i35VehicleCounter" style="font-weight:700">1 involucrado registrado</span>
+      </div>
+    </div>
+
+    <!-- COLUMNA DERECHA: VISTA PREVIA EN VIVO -->
+    <aside class="i35-preview-card" aria-label="Vista previa operativa">
+      <div class="i35-preview-head">
+        <h3><span class="i35-dot"></span> Vista Previa Operativa CCTT</h3>
+        <div class="i35-format-switch" role="group" aria-label="Formato de texto">
+          <button type="button" id="i35FormatMd" class="active" aria-pressed="true">Con Formato (*)</button>
+          <button type="button" id="i35FormatPlain" aria-pressed="false">Texto Plano</button>
+        </div>
+      </div>
+
+      <div class="i35-preview-paper">
+        <div id="i35Preview"></div>
+      </div>
+
+      <div class="i35-preview-foot">
+        <div class="i35-meta-line">
+          <span>Normalización activa (Placas en mayúsculas, nombres capitalizados)</span>
+          <span id="i35CharCount" style="font-family:monospace;white-space:nowrap">0 caracteres</span>
+        </div>
+        <button class="btn primary" id="i35Copy" type="button">Copiar Reporte CCTT</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Historial persistente -->
+  <div class="card" style="margin-top:18px">
+    <div class="row">
+      <h3 style="margin:0">Historial</h3>
+      <button class="btn bad right" id="i35ClearHistory" type="button">Borrar historial</button>
+    </div>
+    <div class="table-wrap" style="margin-top:10px">
+      <table class="tbl">
+        <thead>
+          <tr><th>Fecha</th><th>Tipo</th><th>Ubicación</th><th>Empresa</th><th>Placa</th><th></th></tr>
+        </thead>
+        <tbody id="i35History"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 <section class="page" id="page-inc35copoma">
  <div class="section-title"><h2>COPOMA · comunicados</h2></div>
  <div class="grid g2"><div class="card"><h3>Contenido y formato</h3><div class="grid g2"><div class="field"><label>Fecha</label><input type="date" id="copDate"></div><div class="field"><label>Hora</label><input type="time" id="copTime"></div></div><div class="field" style="margin-top:10px"><label>Encabezado</label><input id="copHeader" value="COMUNIDAD PORTUARIA DE MANZANILLO INFORMA:"></div><div class="field"><label>Mensaje</label><textarea id="copText" style="min-height:150px">Por medio del presente, el Centro de Control de Tráfico Terrestre informa al gremio la solicitud de abstenerse de enviar unidades hacia la zona norte. Esta medida se deriva de la alta afluencia vehicular registrada en las vialidades de dicha área y tiene como finalidad prevenir la acumulación de vehículos, así como evitar la saturación en los accesos exteriores.</textarea></div><!-- NUEVO: asistente Gemini exclusivo de COPOMA; propuestas sujetas a selección del usuario. --><div id="copGeminiAssistant" class="cop-gemini-assistant"><div class="row"><!-- MODIFICADO: título neutral, sin identificar proveedores. --><strong>Asistente de redacción</strong><span class="muted">La idea escrita en Mensaje se utiliza para generar dos propuestas.</span></div><div class="row" style="margin-top:10px"><button type="button" class="btn primary" id="copGeminiGenerate">Generar versión corta y larga</button><span class="muted" id="copGeminiStatus" role="status" aria-live="polite"></span></div><div id="copGeminiOptions" class="cop-gemini-options" hidden><section class="cop-gemini-option"><h4>Versión corta</h4><textarea id="copGeminiShort" readonly aria-label="Propuesta corta"></textarea><button type="button" class="btn" id="copGeminiUseShort">Usar versión corta</button></section><section class="cop-gemini-option"><h4>Versión larga</h4><textarea id="copGeminiLong" readonly aria-label="Propuesta larga"></textarea><button type="button" class="btn" id="copGeminiUseLong">Usar versión larga</button></section></div><small class="muted">Verifica los datos antes de publicar. La propuesta no se inserta hasta que pulses «Usar».</small></div><div class="field"><label>Cierre</label><input id="copFooter" value="POR UNA COMUNIDAD PORTUARIA FORTALECIDA"></div><div class="row"><button class="btn primary" id="copGenerate">Generar contenido</button><button class="btn" id="copCopy">Copiar</button><button class="btn bad" id="copClear">Restablecer</button></div><h3 style="margin-top:18px">Editor de estilo</h3><div class="editor-toolbar" id="copToolbar"><button type="button" data-cmd="bold" title="Negrita"><b>B</b></button><button type="button" data-cmd="italic" title="Cursiva"><i>I</i></button><button type="button" data-cmd="underline" title="Subrayado"><u>U</u></button><select id="copFontSize" aria-label="Tamaño de letra"><option value="3">Normal</option><option value="4">Mediana</option><option value="5">Grande</option><option value="6">Muy grande</option></select></div><div class="cop-visible-align" id="copVisibleAlign"><div class="field"><label>Alineación del mensaje</label><select id="copBodyAlignVisible"><option value="left">Izquierda</option><option value="center">Centrado</option><option value="right">Derecha</option><option value="justify">Justificado</option></select></div><div class="field"><label>Alineación del encabezado</label><select id="copHeaderAlignVisible"><option value="left">Izquierda</option><option value="center">Centrado</option><option value="right">Derecha</option></select></div><div class="field"><label>Alineación del cierre</label><select id="copFooterAlignVisible"><option value="left">Izquierda</option><option value="center">Centrado</option><option value="right">Derecha</option></select></div></div><div id="copRichEditor" class="rich-editor" contenteditable="true"></div></div><div class="card"><h3>Formatos base</h3><p class="muted">Puedes adjuntar hasta tres plantillas de imagen o PDF. La opción seleccionada se usa como fondo real del comunicado y se comparte mediante el sistema.</p><input id="copTemplates" type="file" multiple accept="image/*,.pdf,application/pdf"><div id="copTemplateList" class="template-list"></div><h3 style="margin-top:18px">Vista previa</h3><div id="copTemplatePreview" class="format-preview"><div class="overlay-content" id="copPreview"></div></div></div></div>
