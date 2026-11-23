@@ -697,6 +697,36 @@
   }
 }
 </style>
+<style id="ccttInc35RedesRefStyle">
+/* Redes y reporte: acabado visual alineado a la referencia (neutros claros, acento institucional, iconos de línea). */
+html:not([data-cctt-scheme="dark"]):not(.dark) #page-inc35redes{--sr-card:#ffffff;--sr-subtle:#f8fafc;--sr-border:#e2e8f0;--sr-text:#1e293b;--sr-muted:#64748b}
+#page-inc35redes .sr-ico{width:13px;height:13px;flex:none;display:inline-block;vertical-align:-2px}
+#page-inc35redes .sr-mini-pill-btn,#page-inc35redes .sr-link-action,#page-inc35redes .sr-tool-btn{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+#page-inc35redes .sr-mini-pill-btn{background:#f1f5f9;border:1px solid #e2e8f0;color:#475569;border-radius:6px}
+#page-inc35redes .sr-mini-pill-btn:hover{background:#e2e8f0}
+#page-inc35redes .sr-mini-pill-btn.sr-pill-brand{background:#fdf2f4;border-color:#f7ccd5;color:#7a1c30;font-weight:600}
+#page-inc35redes .sr-mini-pill-btn.sr-pill-brand:hover{background:#fbe6ea}
+#page-inc35redes .sr-insert-tag{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;padding:2px 6px}
+#page-inc35redes .sr-link-action{background:none;border:0;padding:2px 4px;color:#7a1c30;font-weight:600;cursor:pointer}
+#page-inc35redes .sr-link-action:hover{text-decoration:underline}
+#page-inc35redes .sr-link-action#srQuickReset:hover{color:#b91c1c;background:#fef2f2;text-decoration:none;border-radius:6px}
+#page-inc35redes .sr-autosave{display:inline-flex;align-items:center;gap:5px}
+#page-inc35redes .sr-autosave .sr-ico{color:#10b981}
+#page-inc35redes .sr-drop-target{display:flex;flex-direction:column;align-items:center;gap:2px}
+#page-inc35redes .sr-drop-ico{display:inline-flex;color:#94a3b8;margin-bottom:2px}
+#page-inc35redes .sr-drop-ico .sr-ico{width:26px;height:26px}
+#page-inc35redes .sr-canvas-ratio{display:inline-flex;gap:2px;padding:2px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px}
+#page-inc35redes .sr-canvas-ratio button{display:inline-flex;align-items:center;gap:5px;background:transparent}
+#page-inc35redes .sr-toolbar-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;background:transparent;border:0;padding:0}
+#page-inc35redes .sr-tool-btn{justify-content:center;text-align:center;white-space:normal;line-height:1.15;padding:7px 8px;border-radius:7px;font-size:11.5px}
+#page-inc35redes .sr-tool-btn.sr-tool-primary{background:#fdf2f4;border-color:#f0a3b3;color:#7a1c30;font-weight:700}
+#page-inc35redes .sr-tool-btn.sr-tool-primary:hover{background:#fbe6ea}
+#page-inc35redes .sr-panel-foot .btn.bad{background:transparent;border-color:transparent;color:#94a3b8;box-shadow:none}
+#page-inc35redes .sr-panel-foot .btn.bad:hover{color:#b91c1c;background:#fef2f2}
+#page-inc35redes #socialBuild,#page-inc35redes #socialDownload,#page-inc35redes #socialCopyTextPreview,#page-inc35redes #socialReset{font-size:12px;padding:8px 14px;min-height:0;border-radius:8px;font-weight:650}
+#page-inc35redes #socialBuild svg,#page-inc35redes #socialDownload svg,#page-inc35redes #socialCopyTextPreview svg,#page-inc35redes #socialReset svg{width:14px;height:14px}
+@media (max-width:760px){#page-inc35redes .sr-toolbar-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
 <!-- NUEVO: control previo de IP y estilos aislados de Documentación y Seguridad. -->
 <style id="ccttDocGlobalIpStyles">
 /* NUEVO: bloqueo previo y arrastre con las variables de ambos temas. */
@@ -3129,368 +3159,6 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
  <!-- MODIFICADO: se retira la sección visual de Registros guardados de Boletinados; no se borran datos anteriores. -->
 </section>
 
-<script id="ccttInc35RedesTacticalLogic">
-(function () {
-  'use strict';
-  let srManualText = false;
-  let srUseBoldFormat = true;
-  let srForceRatio = 'auto'; // 'auto' | 'landscape' | 'portrait'
-  let srWatermarkEnabled = true;
-  let srWatermarkPosition = 'tl';
-
-  function srFormatDateMx() {
-    return new Date().toLocaleDateString('es-MX', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  }
-
-  function srSyncLocationsDatalist() {
-    const dl = document.getElementById('srLocationsDatalist');
-    if (!dl) return;
-    const locs = Array.isArray(window.state?.locations) ? window.state.locations : [];
-    dl.innerHTML = locs
-      .slice()
-      .sort((a, b) => a.localeCompare(b, 'es-MX'))
-      .map(x => `<option value="${esc(x)}"></option>`)
-      .join('');
-  }
-
-  function srUpdateTextStats(txt) {
-    const el = document.getElementById('srTextStats');
-    if (!el) return;
-    const chars = txt.length;
-    const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
-    el.textContent = `${chars} caracteres · ${words} palabras`;
-  }
-
-  function srApplyTextPreview() {
-    const ta = document.getElementById('socialText');
-    const pv = document.getElementById('socialTextPreview');
-    if (!ta || !pv) return;
-    const raw = ta.value;
-    pv.textContent = srUseBoldFormat ? raw : raw.replace(/\*/g, '');
-    srUpdateTextStats(raw);
-  }
-
-  // Sobrescribir drawMark para respetar el interruptor Activa y la esquina elegida
-  window.socialDrawMark = async function (ctx, mark, box) {
-    if (!srWatermarkEnabled || !mark || !box) return;
-    try {
-      const logo = await imgFrom(mark);
-      const pad = Math.max(8, Math.round(Math.min(box.w, box.h) * 0.02));
-      let w = Math.min(box.w * 0.22, box.w - pad * 2);
-      let h = logo.height * (w / logo.width);
-      if (h > box.h * 0.26) {
-        h = box.h * 0.26;
-        w = logo.width * (h / logo.height);
-      }
-      if (w <= 0 || h <= 0) return;
-
-      let x = box.x + pad;
-      let y = box.y + pad;
-      if (srWatermarkPosition === 'tr' || srWatermarkPosition === 'br') {
-        x = box.x + box.w - w - pad;
-      }
-      if (srWatermarkPosition === 'bl' || srWatermarkPosition === 'br') {
-        y = box.y + box.h - h - pad;
-      }
-
-      ctx.save();
-      ctx.globalAlpha = 1;
-      ctx.drawImage(logo, x, y, w, h);
-      ctx.restore();
-    } catch (_) {}
-  };
-
-  // Sobrescribir renderSocial manteniendo recorte no destructivo, dual-foto y encuadre opcional
-  window.renderSocial = async function () {
-    const c = document.getElementById('socialCanvas');
-    if (!c) return;
-    const ctx = c.getContext('2d');
-    const pics = await socialLoadMedia();
-    const isDual = pics.length === 2;
-
-    const clipped = pics.map((im, i) => {
-      const st = socialCropStates[i];
-      if (!st || !st.enabled || !st.percent || socialImgs[i]?.kind === 'video') return im;
-      const cut = Math.max(1, Math.round(im.height * (1 - st.percent / 100)));
-      const cv = document.createElement('canvas');
-      cv.width = im.width;
-      cv.height = cut;
-      cv.getContext('2d').drawImage(im, 0, 0, im.width, cut, 0, 0, im.width, cut);
-      return cv;
-    });
-
-    const first = clipped[0];
-    let targetW = 1280;
-    let targetH = 720;
-
-    if (first) {
-      if (srForceRatio === 'landscape' && !isDual) {
-        targetW = 1280;
-        targetH = 720;
-      } else if (srForceRatio === 'portrait' && !isDual) {
-        targetW = 720;
-        targetH = 1280;
-      } else {
-        targetH = Math.min(1800, Math.max(1, first.height));
-        targetW = Math.max(1, Math.round(clipped.reduce((w, im) => w + (im.width * targetH) / im.height, 0)));
-      }
-    }
-
-    c.width = targetW;
-    c.height = targetH;
-    ctx.clearRect(0, 0, c.width, c.height);
-
-    let actualBox = { x: 0, y: 0, w: c.width, h: c.height };
-    if (!first) {
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(0, 0, c.width, c.height);
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 28px Inter, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Vista previa de composición CCTT · Carga una imagen o video', c.width / 2, c.height / 2);
-    } else if (!isDual && (srForceRatio === 'landscape' || srForceRatio === 'portrait')) {
-      drawCover(ctx, first, 0, 0, c.width, c.height);
-    } else {
-      actualBox = socialDrawGrid(ctx, clipped, { x: 0, y: 0, w: c.width, h: c.height }) || actualBox;
-    }
-
-    await window.socialDrawMark(ctx, window.ccttOfficialBrandData || state.inc35?.social?.brandIcon || null, actualBox);
-
-    const orientation = document.getElementById('socialOrientation');
-    if (orientation) {
-      const vertical = first && first.height > first.width;
-      orientation.textContent = isDual
-        ? 'Dos imágenes unidas'
-        : first
-        ? srForceRatio === 'landscape'
-          ? '16:9 Panorámico'
-          : srForceRatio === 'portrait'
-          ? '9:16 Vertical'
-          : vertical
-          ? 'Vertical (Auto)'
-          : 'Horizontal (Auto)'
-        : 'Sin archivos';
-    }
-
-    const timeVal = document.getElementById('socialTime')?.value || '';
-    const mirror = document.getElementById('srTimeMirror');
-    if (mirror) mirror.value = timeVal ? `${timeVal} hrs` : '';
-
-    const ta = document.getElementById('socialText');
-    if (ta && !srManualText) {
-      ta.value = socialReportText();
-    }
-    srApplyTextPreview();
-  };
-
-  function initRedesTactical() {
-    const page = document.getElementById('page-inc35redes');
-    if (!page || page.dataset.srReady) return;
-    page.dataset.srReady = '1';
-
-    const dateLbl = document.getElementById('srCurrentDateLabel');
-    if (dateLbl) dateLbl.textContent = srFormatDateMx();
-
-    srSyncLocationsDatalist();
-
-    // Sincronización de hora
-    const syncNow = () => {
-      const t = document.getElementById('socialTime');
-      if (t) {
-        t.value = socialDefaultTime();
-        srManualText = false;
-        window.renderSocial();
-        toast(`Hora sincronizada: ${t.value} hrs`);
-      }
-    };
-    document.getElementById('srSyncTimeSubbar')?.addEventListener('click', syncNow);
-    document.getElementById('srUseTimeFormBtn')?.addEventListener('click', syncNow);
-
-    // Plantilla badge
-    document.getElementById('socialLayout')?.addEventListener('change', e => {
-      const names = {
-        '1': 'Plantilla 1: Reporte Vial',
-        '2': 'Plantilla 2: Comunicado Operativo',
-        '3': 'Plantilla 3: Reenvío Redes'
-      };
-      const badge = document.getElementById('srTemplateBadge');
-      if (badge) badge.textContent = names[e.target.value] || 'Plantilla 1: Reporte Vial';
-    });
-
-    // Edición directa en el textarea
-    const ta = document.getElementById('socialText');
-    ta?.addEventListener('input', () => {
-      srManualText = true;
-      srApplyTextPreview();
-    });
-
-    // Insertar etiquetas dinámicas en el cursor del textarea
-    page.querySelectorAll('.sr-insert-tag').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (!ta) return;
-        const tag = btn.dataset.tag;
-        const map = {
-          '{hora}': `${document.getElementById('socialTime')?.value || socialDefaultTime()} horas`,
-          '{evento}': ccttSentenceMX(document.getElementById('socialEvent')?.value || 'Evento vial en seguimiento'),
-          '{ubicacion}': ccttSentenceMX(document.getElementById('socialLoc')?.value || 'Ubicación por confirmar')
-        };
-        const insertVal = map[tag] || tag;
-        const start = ta.selectionStart || 0;
-        const end = ta.selectionEnd || 0;
-        ta.value = ta.value.slice(0, start) + insertVal + ta.value.slice(end);
-        ta.focus();
-        ta.selectionStart = ta.selectionEnd = start + insertVal.length;
-        srManualText = true;
-        srApplyTextPreview();
-      });
-    });
-
-    // Cuando cambia Evento, Ubicación u Hora, volver a sincronizar el cuerpo
-    ['socialEvent', 'socialLoc', 'socialTime'].forEach(id => {
-      document.getElementById(id)?.addEventListener('input', () => {
-        srManualText = false;
-        window.renderSocial();
-      });
-    });
-
-    // Revisión ortográfica en Evento y Ubicación
-    document.getElementById('srReviewEventBtn')?.addEventListener('click', () => {
-      const el = document.getElementById('socialEvent');
-      if (el && typeof ccttOfferTextReview === 'function') ccttOfferTextReview(el);
-    });
-    document.getElementById('srReviewLocBtn')?.addEventListener('click', () => {
-      const el = document.getElementById('socialLoc');
-      if (el && typeof ccttOfferTextReview === 'function') ccttOfferTextReview(el);
-    });
-
-    // Catálogo de ubicaciones
-    document.getElementById('srSaveLocBtn')?.addEventListener('click', () => {
-      const el = document.getElementById('socialLoc');
-      if (el && typeof addLocationFromField === 'function') {
-        addLocationFromField(el);
-        srSyncLocationsDatalist();
-      }
-    });
-    document.getElementById('srManageLocBtn')?.addEventListener('click', () => {
-      if (typeof openLocationManager === 'function') openLocationManager();
-      const mgr = document.getElementById('locationManager');
-      if (mgr && !mgr.dataset.srHook) {
-        mgr.dataset.srHook = '1';
-        mgr.addEventListener('click', () => setTimeout(srSyncLocationsDatalist, 80));
-      }
-    });
-
-    // Drag & Drop de imágenes/videos
-    const dropZone = document.getElementById('srDropZone');
-    const fileInput = document.getElementById('socialFiles');
-    if (dropZone && fileInput) {
-      dropZone.addEventListener('click', () => fileInput.click());
-      dropZone.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          fileInput.click();
-        }
-      });
-      ['dragenter', 'dragover'].forEach(ev => {
-        dropZone.addEventListener(ev, e => {
-          e.preventDefault();
-          dropZone.classList.add('dragover');
-        });
-      });
-      ['dragleave', 'drop'].forEach(ev => {
-        dropZone.addEventListener(ev, e => {
-          e.preventDefault();
-          dropZone.classList.remove('dragover');
-        });
-      });
-      dropZone.addEventListener('drop', e => {
-        const files = e.dataTransfer?.files;
-        if (files && files.length) {
-          fileInput.files = files;
-          fileInput.dispatchEvent(new Event('change'));
-        }
-      });
-    }
-
-    document.getElementById('srCloseCropPanel')?.addEventListener('click', () => {
-      document.getElementById('socialCropPanel').hidden = true;
-    });
-
-    // Orientación / Encuadre
-    const setOrientation = mode => {
-      srForceRatio = mode;
-      page.querySelectorAll('[data-sr-orient]').forEach(b => {
-        b.classList.toggle('active', b.dataset.srOrient === mode);
-      });
-      document.getElementById('srRatio169')?.classList.toggle('active', mode === 'landscape');
-      document.getElementById('srRatio916')?.classList.toggle('active', mode === 'portrait');
-      window.renderSocial();
-    };
-    page.querySelectorAll('[data-sr-orient]').forEach(btn => {
-      btn.addEventListener('click', () => setOrientation(btn.dataset.srOrient));
-    });
-    document.getElementById('srRatio169')?.addEventListener('click', () => setOrientation('landscape'));
-    document.getElementById('srRatio916')?.addEventListener('click', () => setOrientation('portrait'));
-
-    // Marca institucional y logo
-    document.getElementById('srWatermarkActive')?.addEventListener('change', e => {
-      srWatermarkEnabled = e.target.checked;
-      window.renderSocial();
-    });
-    document.getElementById('srWatermarkPos')?.addEventListener('change', e => {
-      srWatermarkPosition = e.target.value;
-      window.renderSocial();
-    });
-    document.getElementById('srPickLogoBtn')?.addEventListener('click', () => {
-      document.getElementById('socialBrandIcon')?.click();
-    });
-
-    // Formato de texto salida (Con formato / Texto plano)
-    const fmtBold = document.getElementById('srFmtBold');
-    const fmtPlain = document.getElementById('srFmtPlain');
-    fmtBold?.addEventListener('click', () => {
-      srUseBoldFormat = true;
-      fmtBold.classList.add('active');
-      fmtPlain?.classList.remove('active');
-      srApplyTextPreview();
-    });
-    fmtPlain?.addEventListener('click', () => {
-      srUseBoldFormat = false;
-      fmtPlain.classList.add('active');
-      fmtBold?.classList.remove('active');
-      srApplyTextPreview();
-    });
-
-    // Copiar texto respetando el formato elegido
-    document.getElementById('socialCopyTextPreview').onclick = () => {
-      const txt = document.getElementById('socialTextPreview')?.textContent || '';
-      copyPlain(txt);
-    };
-
-    // Reinicio rápido desde la sub-barra y botón inferior
-    const doReset = () => {
-      srManualText = false;
-      srForceRatio = 'auto';
-      setOrientation('auto');
-      document.getElementById('socialReset')?.click();
-    };
-    document.getElementById('srQuickReset')?.addEventListener('click', doReset);
-
-    window.renderSocial();
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initRedesTactical);
-  } else {
-    initRedesTactical();
-  }
-})();
-</script>
 <section class="page" id="page-inc35redes">
   <div class="section-title">
     <h2>Redes y reporte</h2>
@@ -3508,7 +3176,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
       <div class="sr-chip-box">
         <span class="muted">Hora:</span>
         <input id="socialTime" type="time" style="min-height:28px;padding:2px 6px;width:105px;font-family:monospace">
-        <button type="button" class="sr-mini-pill-btn" id="srSyncTimeSubbar">Usar hora actual</button>
+        <button type="button" class="sr-mini-pill-btn sr-pill-brand" id="srSyncTimeSubbar"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Usar hora actual</button>
       </div>
 
       <div class="sr-chip-box">
@@ -3518,8 +3186,8 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
     </div>
 
     <div class="sr-subbar-group">
-      <span class="muted small">Autoguardado en sesión</span>
-      <button type="button" class="sr-link-action" id="srQuickReset" style="color:#b91c1c">Limpiar formulario</button>
+      <span class="muted small sr-autosave"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Autoguardado en sesión</span>
+      <button type="button" class="sr-link-action" id="srQuickReset" style="color:#64748b"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>Limpiar formulario</button>
     </div>
   </div>
 
@@ -3551,7 +3219,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
           <div>
             <div class="sr-label-bar">
               <label for="socialEvent">Evento / Afectación</label>
-              <button type="button" class="sr-link-action" id="srReviewEventBtn">Revisar redacción</button>
+              <button type="button" class="sr-link-action" id="srReviewEventBtn"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Revisar redacción</button>
             </div>
             <input id="socialEvent" placeholder="Ej. Patios Externos generando afectación al flujo vehicular">
             <div class="sr-hint-strip">
@@ -3563,7 +3231,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
           <div>
             <label class="sr-lbl" for="srTimeMirror" style="display:block;margin-bottom:5px">Hora del registro</label>
             <input id="srTimeMirror" type="text" readonly style="font-family:monospace;text-align:center">
-            <button type="button" class="sr-mini-pill-btn" id="srUseTimeFormBtn" style="width:100%;margin-top:6px">Usar hora actual</button>
+            <button type="button" class="sr-mini-pill-btn sr-pill-brand" id="srUseTimeFormBtn" style="width:100%;margin-top:6px;justify-content:center"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Usar hora actual</button>
           </div>
         </div>
 
@@ -3572,7 +3240,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
           <div class="sr-label-bar">
             <div class="row" style="gap:10px">
               <label for="socialLoc">Ubicación</label>
-              <button type="button" class="sr-link-action" id="srReviewLocBtn">Revisar redacción</button>
+              <button type="button" class="sr-link-action" id="srReviewLocBtn"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>Revisar redacción</button>
             </div>
             <div class="row" style="gap:6px">
               <button type="button" class="sr-mini-pill-btn" id="srSaveLocBtn">+ Guardar sugerencia</button>
@@ -3616,7 +3284,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
             <span class="muted small" style="font-family:monospace">1 o 2 imágenes/videos</span>
           </div>
 
-          <div class="sr-drop-target" id="srDropZone" role="button" tabindex="0">
+          <div class="sr-drop-target" id="srDropZone" role="button" tabindex="0"><span class="sr-drop-ico"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg></span>
             <input type="file" id="socialFiles" accept="image/*,video/*" multiple hidden>
             <div style="font-size:12px;font-weight:600">
               <span style="color:var(--sr-accent);text-decoration:underline">Examinar imagen</span> o arrastrar captura operativa aquí
@@ -3692,8 +3360,8 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
         <div class="row" style="gap:6px">
           <span class="muted small">Lienzo:</span>
           <div class="sr-canvas-ratio" role="group">
-            <button type="button" id="srRatio169">16:9 Panorámico</button>
-            <button type="button" id="srRatio916">9:16 Vertical</button>
+            <button type="button" id="srRatio169"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/></svg>16:9 Panorámico</button>
+            <button type="button" id="srRatio916"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/></svg>9:16 Vertical</button>
           </div>
         </div>
       </div>
@@ -3705,11 +3373,10 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 
         <!-- Barra de herramientas de imagen -->
         <div class="sr-toolbar-strip">
-          <div class="row" style="gap:6px">
-            <button type="button" class="sr-tool-btn" id="socialOpenCrop">Recortar / Encuadre</button>
-            <button type="button" class="sr-tool-btn" id="socialApplyCrop">Recortar franja</button>
-          </div>
-          <button type="button" class="sr-tool-btn" id="socialCopy" style="border-color:var(--sr-accent);color:var(--sr-accent)">Copiar imagen</button>
+          <button type="button" class="sr-tool-btn" id="socialOpenCrop"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"/></svg>Recortar / Encuadre</button>
+            <button type="button" class="sr-tool-btn" id="srRotateRatio" title="Alterna entre 16:9 panorámico y 9:16 vertical"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>Rotar / Invertir relación</button>
+            <button type="button" class="sr-tool-btn" id="socialApplyCrop" title="Recorta la franja inferior de fecha y hora de la fotografía"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 15h18"/></svg>Ajustar franja</button>
+            <button type="button" class="sr-tool-btn sr-tool-primary" id="socialCopy"><svg class="sr-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copiar imagen</button>
         </div>
 
         <!-- Texto Independiente Formateado -->
@@ -3739,6 +3406,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
       </div>
     </div>
   </div>
+<script id="ccttRedesRotateRatio">(()=>{const b=document.getElementById("srRotateRatio");if(!b)return;b.addEventListener("click",()=>{const p=document.getElementById("srRatio916"),l=document.getElementById("srRatio169");if(p&&p.classList.contains("active"))l&&l.click();else p&&p.click()})})();</script>
 </section>
 <section class="page" id="page-inc35pisrep">
  <div class="section-title"><h2>PIS-REP · clasificación y tiempos de respuesta</h2></div>
@@ -9961,7 +9629,7 @@ try{const u=new URL(location.href);if(u.searchParams.has('cctt_version')||u.sear
 
 
 <!-- NUEVO: acceso voluntario a la fecha/hora local detectada sin sobrescribir los valores existentes. -->
-<script id="ccttFechaHoraActualOpcional">(()=>{'use strict';function attach(input){if(input.dataset.ccttCurrentTimeControl||!['date','time','datetime-local'].includes(input.type))return;if(input.closest('#page-adminUsuarios,#page-fallos'))return;input.dataset.ccttCurrentTimeControl='1';const button=document.createElement('button');button.type='button';button.className='btn';button.style.cssText='margin:5px 0 8px;padding:5px 9px;font-size:11px';button.textContent='Usar '+(input.type==='date'?'fecha':input.type==='time'?'hora':'fecha y hora')+' actual';button.addEventListener('click',()=>{const n=new Date(),pad=v=>String(v).padStart(2,'0');const day=[n.getFullYear(),pad(n.getMonth()+1),pad(n.getDate())].join('-'),time=pad(n.getHours())+':'+pad(n.getMinutes());input.value=input.type==='date'?day:input.type==='time'?time:day+'T'+time;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))});input.insertAdjacentElement('afterend',button)}function scan(){document.querySelectorAll('.page input[type="date"],.page input[type="time"],.page input[type="datetime-local"]').forEach(attach)}document.addEventListener('click',e=>{if(e.target.closest?.('[data-page]'))setTimeout(scan,0)},true);scan()})();</script>
+<script id="ccttFechaHoraActualOpcional">(()=>{'use strict';function attach(input){if(input.dataset.ccttCurrentTimeControl||!['date','time','datetime-local'].includes(input.type))return;if(input.closest('#page-adminUsuarios,#page-fallos,#page-inc35redes'))return;input.dataset.ccttCurrentTimeControl='1';const button=document.createElement('button');button.type='button';button.className='btn';button.style.cssText='margin:5px 0 8px;padding:5px 9px;font-size:11px';button.textContent='Usar '+(input.type==='date'?'fecha':input.type==='time'?'hora':'fecha y hora')+' actual';button.addEventListener('click',()=>{const n=new Date(),pad=v=>String(v).padStart(2,'0');const day=[n.getFullYear(),pad(n.getMonth()+1),pad(n.getDate())].join('-'),time=pad(n.getHours())+':'+pad(n.getMinutes());input.value=input.type==='date'?day:input.type==='time'?time:day+'T'+time;input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))});input.insertAdjacentElement('afterend',button)}function scan(){document.querySelectorAll('.page input[type="date"],.page input[type="time"],.page input[type="datetime-local"]').forEach(attach)}document.addEventListener('click',e=>{if(e.target.closest?.('[data-page]'))setTimeout(scan,0)},true);scan()})();</script>
 <!-- NUEVO: consulta externa AIS y generación de mensajes mediante función existente de COPOMA. -->
 <script id="ccttMarineMessagesBridge">
 (()=>{'use strict';
@@ -13168,7 +12836,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
 </script>
 <!-- NUEVO: reubicar el botón existente sin duplicarlo ni quitar las acciones de la vista previa. -->
-<script id="ccttSocialCopyPreview">(()=>{const copy=document.getElementById("socialCopy"),actions=document.getElementById("socialCopyTextPreview")?.parentElement;if(copy&&actions){actions.prepend(copy);/* MODIFICADO: mantener el botón inferior de texto y ocultar su duplicado superior. */const duplicate=document.getElementById("socialCopyText");if(duplicate)duplicate.hidden=true}})();</script>
 <!-- NUEVO: módulo Mensajes con personajes, sin dependencias adicionales. -->
 <style id="ccttCharacterMessagesStyle">
 /* NUEVO */
