@@ -3490,6 +3490,255 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
   }
 })();
 </script>
+<section class="page" id="page-inc35redes">
+  <div class="section-title">
+    <h2>Redes y reporte</h2>
+    <span class="module-tag">Módulo de Composición Visual &amp; Difusión Operativa</span>
+  </div>
+
+  <!-- Sub-barra operativa superior -->
+  <div class="sr-subbar">
+    <div class="sr-subbar-group">
+      <div class="sr-chip-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        <span id="srCurrentDateLabel">Hoy</span>
+      </div>
+
+      <div class="sr-chip-box">
+        <span class="muted">Hora:</span>
+        <input id="socialTime" type="time" style="min-height:28px;padding:2px 6px;width:105px;font-family:monospace">
+        <button type="button" class="sr-mini-pill-btn" id="srSyncTimeSubbar">Usar hora actual</button>
+      </div>
+
+      <div class="sr-chip-box">
+        <span class="muted">Plantilla Base:</span>
+        <span class="sr-template-pill" id="srTemplateBadge">Plantilla 1: Reporte Vial</span>
+      </div>
+    </div>
+
+    <div class="sr-subbar-group">
+      <span class="muted small">Autoguardado en sesión</span>
+      <button type="button" class="sr-link-action" id="srQuickReset" style="color:#b91c1c">Limpiar formulario</button>
+    </div>
+  </div>
+
+  <!-- Espacio de trabajo a 2 columnas -->
+  <div class="sr-workspace">
+    <!-- PANEL IZQUIERDO: COMPOSICIÓN VISUAL Y PARÁMETROS -->
+    <div class="sr-panel">
+      <div class="sr-panel-head">
+        <h3>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Composición Visual &amp; Parámetros Operativos
+        </h3>
+        <span class="muted small">Paso 1 de 2: Captura &amp; Parametrización</span>
+      </div>
+
+      <div class="sr-panel-body">
+        <!-- Selector de Plantilla -->
+        <div>
+          <label class="sr-lbl" for="socialLayout" style="display:block;margin-bottom:5px">Plantilla Gráfica Operativa</label>
+          <select id="socialLayout">
+            <option value="1">Imagen 1 · Reporte Vial - Incidencia de Tránsito</option>
+            <option value="2">Imagen 2 · Comunicado Operativo y Maniobra</option>
+            <option value="3">Imagen 3 · Reenvío Redes / Aviso Preventivo</option>
+          </select>
+        </div>
+
+        <!-- Evento y Hora -->
+        <div class="sr-row-12">
+          <div>
+            <div class="sr-label-bar">
+              <label for="socialEvent">Evento / Afectación</label>
+              <button type="button" class="sr-link-action" id="srReviewEventBtn">Revisar redacción</button>
+            </div>
+            <input id="socialEvent" placeholder="Ej. Patios Externos generando afectación al flujo vehicular">
+            <div class="sr-hint-strip">
+              <span class="sr-dot-pulse"></span>
+              <span><strong>Sugerencias operativas:</strong> Se normaliza automáticamente en el comunicado.</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="sr-lbl" for="srTimeMirror" style="display:block;margin-bottom:5px">Hora del registro</label>
+            <input id="srTimeMirror" type="text" readonly style="font-family:monospace;text-align:center">
+            <button type="button" class="sr-mini-pill-btn" id="srUseTimeFormBtn" style="width:100%;margin-top:6px">Usar hora actual</button>
+          </div>
+        </div>
+
+        <!-- Ubicación -->
+        <div>
+          <div class="sr-label-bar">
+            <div class="row" style="gap:10px">
+              <label for="socialLoc">Ubicación</label>
+              <button type="button" class="sr-link-action" id="srReviewLocBtn">Revisar redacción</button>
+            </div>
+            <div class="row" style="gap:6px">
+              <button type="button" class="sr-mini-pill-btn" id="srSaveLocBtn">+ Guardar sugerencia</button>
+              <button type="button" class="sr-mini-pill-btn" id="srManageLocBtn">Administrar</button>
+            </div>
+          </div>
+          <input id="socialLoc" list="srLocationsDatalist" placeholder="Ej. Vialidad Puerto - Jalipa (A la altura de Patio Regulador)">
+          <datalist id="srLocationsDatalist"></datalist>
+          <div class="sr-hint-strip">
+            <span class="sr-dot-pulse"></span>
+            <span><strong>Accesos frecuentes:</strong> Sincronizados con el catálogo de ubicaciones del CCTT.</span>
+          </div>
+        </div>
+
+        <!-- Área de Texto Independiente -->
+        <div>
+          <div class="sr-label-bar">
+            <label for="socialText">Texto Independiente / Cuerpo del Comunicado</label>
+            <div class="row" style="gap:4px">
+              <span class="muted small">Insertar:</span>
+              <button type="button" class="sr-mini-pill-btn sr-insert-tag" data-tag="{hora}">{hora}</button>
+              <button type="button" class="sr-mini-pill-btn sr-insert-tag" data-tag="{evento}">{evento}</button>
+              <button type="button" class="sr-mini-pill-btn sr-insert-tag" data-tag="{ubicacion}">{ubicación}</button>
+              <button type="button" class="sr-mini-pill-btn sr-insert-tag" data-tag="#CCTTASIPONA">#hashtag</button>
+            </div>
+          </div>
+          <textarea id="socialText" rows="5" placeholder="Escriba o edite el comunicado..."></textarea>
+          <div class="row" style="justify-content:space-between;margin-top:5px">
+            <span class="muted small">Sincronización automática con evento, hora y ubicación (editable manualmente).</span>
+            <span class="muted small" id="srTextStats" style="font-family:monospace">0 caracteres · 0 palabras</span>
+          </div>
+        </div>
+
+        <!-- Módulo Multimedia -->
+        <div class="sr-dropzone-box">
+          <div class="row" style="justify-content:space-between;margin-bottom:8px">
+            <div class="row" style="gap:8px">
+              <span style="font-size:12px;font-weight:750">Evidencia de Monitoreo CCTT</span>
+              <span class="pill" id="socialOrientation">Sin archivos</span>
+            </div>
+            <span class="muted small" style="font-family:monospace">1 o 2 imágenes/videos</span>
+          </div>
+
+          <div class="sr-drop-target" id="srDropZone" role="button" tabindex="0">
+            <input type="file" id="socialFiles" accept="image/*,video/*" multiple hidden>
+            <div style="font-size:12px;font-weight:600">
+              <span style="color:var(--sr-accent);text-decoration:underline">Examinar imagen</span> o arrastrar captura operativa aquí
+            </div>
+            <p class="muted small" style="margin:4px 0 0">Detecta automáticamente orientación horizontal o vertical; dos imágenes se unen lado a lado sin bordes blancos.</p>
+          </div>
+
+          <!-- Panel de recorte de fecha/hora -->
+          <div class="social-crop-panel" id="socialCropPanel" hidden style="margin-top:10px">
+            <div class="row" style="justify-content:space-between">
+              <strong>Recorte de fecha y hora inferior</strong>
+              <button type="button" class="sr-mini-pill-btn" id="srCloseCropPanel">Cerrar</button>
+            </div>
+            <div class="field" style="margin-top:8px">
+              <label for="socialCropPhoto">Fotografía que deseas ajustar</label>
+              <select id="socialCropPhoto"></select>
+            </div>
+            <label style="display:flex;gap:8px;align-items:center;margin:8px 0;font-size:12px;font-weight:700">
+              <input type="checkbox" id="socialCropEnabled"> Recortar franja inferior
+            </label>
+            <div class="field">
+              <label for="socialCropPercent">Altura de la franja: <output id="socialCropValue">8 %</output></label>
+              <input type="range" id="socialCropPercent" min="1" max="25" value="8" step="1" disabled>
+            </div>
+          </div>
+
+          <!-- Orientación y Marca Institucional -->
+          <div class="sr-media-controls">
+            <div class="sr-subcard">
+              <span class="sr-lbl" style="font-size:11px">Orientación / Encuadre Flyer:</span>
+              <div class="sr-seg-3" id="srOrientationGroup">
+                <button type="button" data-sr-orient="landscape">Horizontal 16:9</button>
+                <button type="button" data-sr-orient="portrait">Vertical 9:16</button>
+                <button type="button" data-sr-orient="auto" class="active">Auto-detectar</button>
+              </div>
+            </div>
+
+            <div class="sr-subcard">
+              <div class="row" style="justify-content:space-between;margin-bottom:5px">
+                <span class="sr-lbl" style="font-size:11px">Marca Institucional:</span>
+                <label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;cursor:pointer">
+                  <input type="checkbox" id="srWatermarkActive" checked> Activa
+                </label>
+              </div>
+              <div class="row" style="gap:6px">
+                <select id="srWatermarkPos" style="min-height:30px;padding:3px 7px;font-size:11px;flex:1">
+                  <option value="tl">Esquina Superior Izquierda</option>
+                  <option value="tr">Esquina Superior Derecha</option>
+                  <option value="bl">Franja Inferior Izquierda</option>
+                  <option value="br">Franja Inferior Derecha</option>
+                </select>
+                <button type="button" class="sr-mini-pill-btn" id="srPickLogoBtn" title="Cargar logo personalizado">Logo</button>
+                <input type="file" id="socialBrandIcon" accept="image/*" hidden>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sr-panel-foot">
+        <button class="btn primary" id="socialBuild" type="button">Actualizar imagen</button>
+        <button class="btn bad" id="socialReset" type="button">Restablecer</button>
+      </div>
+    </div>
+
+    <!-- PANEL DERECHO: VISTA PREVIA INSTITUCIONAL Y SALIDA -->
+    <div class="sr-panel">
+      <div class="sr-panel-head">
+        <h3>
+          <span style="width:8px;height:8px;border-radius:50%;background:#10b981;display:inline-block"></span>
+          Vista Previa Institucional &amp; Salida Gráfica
+        </h3>
+        <div class="row" style="gap:6px">
+          <span class="muted small">Lienzo:</span>
+          <div class="sr-canvas-ratio" role="group">
+            <button type="button" id="srRatio169">16:9 Panorámico</button>
+            <button type="button" id="srRatio916">9:16 Vertical</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sr-panel-body">
+        <div class="sr-canvas-stage">
+          <canvas id="socialCanvas" width="1080" height="1080"></canvas>
+        </div>
+
+        <!-- Barra de herramientas de imagen -->
+        <div class="sr-toolbar-strip">
+          <div class="row" style="gap:6px">
+            <button type="button" class="sr-tool-btn" id="socialOpenCrop">Recortar / Encuadre</button>
+            <button type="button" class="sr-tool-btn" id="socialApplyCrop">Recortar franja</button>
+          </div>
+          <button type="button" class="sr-tool-btn" id="socialCopy" style="border-color:var(--sr-accent);color:var(--sr-accent)">Copiar imagen</button>
+        </div>
+
+        <!-- Texto Independiente Formateado -->
+        <div class="sr-output-box">
+          <div class="row" style="justify-content:space-between;border-bottom:1px solid var(--sr-border);padding-bottom:8px">
+            <div class="row" style="gap:8px">
+              <strong style="font-size:12px">Texto Independiente Formateado</strong>
+              <span class="muted small">Canal de Difusión Oficial</span>
+            </div>
+            <div class="sr-text-fmt" role="group">
+              <button type="button" id="srFmtBold" class="active">Con formato</button>
+              <button type="button" id="srFmtPlain">Texto plano</button>
+            </div>
+          </div>
+
+          <div id="socialTextPreview"></div>
+
+          <div class="row" style="justify-content:space-between">
+            <span class="muted small">Listo para pegar en canal oficial o chat operativo</span>
+            <div class="row" style="gap:8px">
+              <button class="btn" id="socialDownload" type="button">Guardar imagen</button>
+              <button class="btn primary" id="socialCopyTextPreview" type="button">Copiar texto</button>
+              <button id="socialCopyText" type="button" hidden></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="page" id="page-inc35pisrep">
  <div class="section-title"><h2>PIS-REP · clasificación y tiempos de respuesta</h2></div>
  <div class="split"><div class="card"><h3>Nuevo registro PIS-REP</h3><div class="field"><label>Código / evento</label><select id="prEvent"></select></div><div class="grid g2"><div class="field"><label>Prioridad</label><input id="prPriority" readonly></div><div class="field"><label>Ubicación / referencia</label><input id="prLocation"></div><div class="field"><label>Inicio</label><input type="datetime-local" id="prStart"></div><div class="field"><label>Fin</label><input type="datetime-local" id="prEnd"></div></div><!-- NUEVO: calculadora independiente de tiempos PIS-REP, sin modificar los valores del registro. --><div class="card" id="ccttPisrepTimeCalculator" style="margin:12px 0;background:var(--cctt-theme-card,var(--card));color:var(--cctt-theme-text,var(--text));border-color:var(--cctt-theme-line,var(--line))"><h3>Calculadora de tiempo transcurrido</h3><div class="grid g2"><div class="field"><label for="ccttPisrepCalcStart">Hora de inicio</label><input type="time" id="ccttPisrepCalcStart" style="color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))"></div><div class="field"><label for="ccttPisrepCalcEnd">Hora de fin</label><input type="time" id="ccttPisrepCalcEnd" style="color:var(--cctt-theme-inputtext,var(--text));background:var(--cctt-theme-input,var(--card))"></div></div><div class="row" style="margin-top:10px"><button class="btn" type="button" id="ccttPisrepCalcButton">Calcular tiempo</button><!-- NUEVO: copiar solo el resultado calculado. --><button class="btn" type="button" id="ccttPisrepCalcCopy">Copiar tiempo</button><output id="ccttPisrepCalcResult" role="status" aria-live="polite" style="color:var(--cctt-theme-text,var(--text));font-weight:800"></output></div><p class="muted" style="margin:8px 0 0">Si la hora final es anterior a la inicial, se interpreta como el día siguiente.</p></div><div class="field"><label>Descripción / seguimiento</label><textarea id="prNotes"></textarea></div><div class="row"><button class="btn primary" id="prSave">Guardar</button><button class="btn" id="prCopy">Copiar ficha</button><button class="btn bad" id="prUndo">Deshacer último</button></div></div><div class="card"><h3>Resultado</h3><div id="prKpis" class="grid g3"></div><div id="prPreview" class="notice" style="white-space:pre-wrap;margin-top:12px;min-height:210px"></div></div></div>
@@ -4402,7 +4651,7 @@ function company35(v){let raw=String(v||'').trim();if(!raw)return'';let key=norm
 'CEMEX':'CEMEX S.A. de C.V.','CEMEX SA DE CV':'CEMEX S.A. de C.V.','SSA MEXICO':'SSA México','SSA':'SSA México','OCUPA':'OCUPA','TIMSA':'TIMSA','CONTECON':'Contecon Manzanillo','HAZESA':'Hazesa','MULTIMODAL':'Multimodal','LA JUNTA':'La Junta','FRIMAN':'Friman','ASIPONA':'ASIPONA','HOLCIM APASCO':'Holcim Apasco','GRANELERA':'Granelera'};if(known[key])return known[key];let x=proper35(raw);x=x.replace(/\bS\.?\s*A\.?\s+De\s+C\.?\s*V\.?$/i,'S.A. de C.V.').replace(/\bS\.?\s*De\s+R\.?\s*L\.?\s+De\s+C\.?\s*V\.?$/i,'S. de R.L. de C.V.').replace(/\bS\.?\s*R\.?\s*L\.?\s+De\s+C\.?\s*V\.?$/i,'S.R.L. de C.V.');return x}
 async function copyPlain(t){try{await navigator.clipboard.writeText(t);toast('Copiado al portapapeles.')}catch(e){let ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copiado al portapapeles.')}}
 function incident35TypeText(){const sel=document.getElementById('i35Type');return sel.value==='__custom__'?(document.getElementById('i35CustomType').value.trim()||'CCTT Reporta:'):sel.value}function incident35Text(){let fields=[['Ubicación:',proper35(document.getElementById('i35Location').value)],['Empresa:',company35(document.getElementById('i35Company').value)],['Placa:',document.getElementById('i35Plate').value.trim().toUpperCase()],['Operador:',proper35(document.getElementById('i35Operator').value)],['DEC:',document.getElementById('i35DEC').value.trim()],['DEA:',document.getElementById('i35DEA').value.trim()],['DEO:',document.getElementById('i35DEO').value.trim()],['DEI:',document.getElementById('i35DEI').value.trim()],['DEV:',document.getElementById('i35DEV').value.trim()],['DEP:',document.getElementById('i35DEP').value.trim()]];return [incident35TypeText(),...fields.filter(x=>x[1]).map(x=>x[0]+' '+x[1])].join('\n')}
-function renderI35(){let t=incident35Text();document.getElementById('i35Preview').textContent=t;document.getElementById('i35History').innerHTML=(state.inc35.incidents||[]).slice().reverse().map(x=>`<tr><td>${esc(x.at)}</td><td>${esc(x.type)}</td><td>${esc(x.location)}</td><td>${esc(x.company)}</td><td>${esc(x.plate)}</td></tr>`).join('')}
+function renderI35(){let t=incident35Text();const pv=document.getElementById('i35Preview');if(pv)pv.textContent=t;const hb=document.getElementById('i35History');if(hb)hb.innerHTML=(state.inc35.incidents||[]).slice().reverse().map(x=>`<tr><td>${esc(x.at)}</td><td>${esc(x.type)}</td><td>${esc(x.location)}</td><td>${esc(x.company)}</td><td>${esc(x.plate)}</td></tr>`).join('')}
 function toggleI35CustomType(){const custom=document.getElementById('i35Type').value==='__custom__';document.getElementById('i35CustomTypeWrap').style.display=custom?'block':'none';renderI35()}document.getElementById('i35Process').onclick=()=>{const ce=document.getElementById('i35Company');ce.value=company35(ce.value);let text=incident35Text(),o={at:new Date().toLocaleString(),type:incident35TypeText(),location:proper35(document.getElementById('i35Location').value),company:ce.value,plate:document.getElementById('i35Plate').value.trim().toUpperCase(),text};state.inc35.incidents.push(o);save();renderI35();toast('Reporte procesado y guardado.')};document.getElementById('i35Copy').onclick=()=>copyPlain(incident35Text());document.getElementById('i35Clear').onclick=()=>{['i35Location','i35Company','i35Plate','i35Operator','i35DEC','i35DEA','i35DEO','i35DEI','i35DEV','i35DEP','i35CustomType'].forEach(id=>document.getElementById(id).value='');renderI35()};document.getElementById('i35Type').addEventListener('change',toggleI35CustomType);['i35Location','i35Company','i35Plate','i35Operator','i35DEC','i35DEA','i35DEO','i35DEI','i35DEV','i35DEP','i35CustomType'].forEach(id=>document.getElementById(id).addEventListener('input',renderI35));toggleI35CustomType();
 let copTemplates=[],copTemplateIndex=-1;
 function copomaText(){let d=document.getElementById('copDate').value?new Date(document.getElementById('copDate').value+'T12:00:00'):new Date(),ds=d.toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}).toUpperCase(),tm=document.getElementById('copTime').value||timeNow();return `${ds}\n${document.getElementById('copHeader').value.trim()}\n${tm} HRS.\n\n${document.getElementById('copText').value.trim()}\n\n${document.getElementById('copFooter').value.trim()}`}
