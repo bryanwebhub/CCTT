@@ -12310,6 +12310,26 @@ html[data-cctt-scheme="dark"] #page-traficoTerrestre .tr-shared-toolbar,html[dat
 @media(max-width:600px){#page-traficoTerrestre .tr-pin-icons{grid-template-columns:repeat(3,minmax(0,1fr));}#page-traficoTerrestre .tr-pin-locate{grid-template-columns:1fr;}}
 
 </style>
+<!-- NUEVO: editor flotante y confirmaciones exclusivos del módulo Tráfico. -->
+<style id="trFloatingEditorStyles">
+#page-traficoTerrestre{--tr-float-bg:color-mix(in srgb,var(--cctt-theme-accent,#641b2f) 3%,white);--tr-float-fg:#211923;--tr-float-line:color-mix(in srgb,var(--cctt-theme-accent,#641b2f) 35%,white)}
+html[data-cctt-scheme=dark] #page-traficoTerrestre{--tr-float-bg:color-mix(in srgb,var(--cctt-theme-accent,#641b2f) 24%,#080314);--tr-float-fg:#fff4ff;--tr-float-line:color-mix(in srgb,var(--cctt-theme-accent,#641b2f) 65%,#b695cf)}
+#page-traficoTerrestre #trPinPanel{position:fixed;z-index:1200;right:18px;top:100px;width:min(430px,calc(100vw - 28px));max-height:calc(100dvh - 120px);overflow:auto;box-sizing:border-box;padding:14px;background:var(--tr-float-bg);color:var(--tr-float-fg);border:1px solid var(--tr-float-line);border-radius:16px;box-shadow:0 12px 40px #0005}
+#page-traficoTerrestre #trPinPanel[hidden]{display:none!important}
+#page-traficoTerrestre .tr-floating-head{display:flex;align-items:center;gap:6px;position:sticky;top:-14px;background:var(--tr-float-bg);padding:8px 0;z-index:2}
+#page-traficoTerrestre .tr-floating-head strong{flex:1}
+#page-traficoTerrestre .tr-floating-head .btn{padding:6px;font-size:12px}
+#page-traficoTerrestre #trPinPanel.tr-editor-compact>:not(.tr-floating-head){display:none!important}
+#page-traficoTerrestre #trPinPanel .tr-shared-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#page-traficoTerrestre #trPinPanel .tr-actions{display:flex;flex-wrap:wrap;gap:6px}
+#page-traficoTerrestre :is(#trPinPanel,.tr-confirm-dialog) :is(input,textarea,select,.btn){background:var(--tr-float-bg);color:var(--tr-float-fg);border-color:var(--tr-float-line);max-width:100%;box-sizing:border-box}
+#page-traficoTerrestre :is(#trPinPanel,.tr-confirm-dialog) :is(.btn:hover,:focus-visible){outline:2px solid var(--cctt-theme-accent,#641b2f);outline-offset:2px}
+#page-traficoTerrestre :is(#trSharedSave,#trConfirmYes){background:var(--cctt-theme-accent,#641b2f);color:white}
+#page-traficoTerrestre .tr-confirm-dialog{background:var(--tr-float-bg);color:var(--tr-float-fg);border:1px solid var(--tr-float-line);border-radius:16px;padding:22px;max-width:min(440px,calc(100vw - 40px));box-shadow:0 16px 60px #0007}
+#page-traficoTerrestre .tr-confirm-dialog::backdrop{background:#10062099}
+#page-traficoTerrestre .tr-swatch[data-flow=blocked]{background:repeating-linear-gradient(90deg,#c1272d 0 6px,#f2f2f2 6px 10px);border:1px solid #666}
+@media(max-width:600px){#page-traficoTerrestre #trPinPanel{top:auto;bottom:12px;right:12px;max-height:58dvh}#page-traficoTerrestre #trPinPanel .tr-shared-fields{grid-template-columns:1fr}}
+</style>
 <script id="ccttTrafficModule">
 /* NUEVO: datos reales del proveedor configurado; sin estimaciones ni registros sintéticos. */
 (() => {
@@ -12589,6 +12609,19 @@ const trShared = (() => {
  /* MODIFICADO: reutilizar el botón Capas sobre el mapa, sin duplicarlo. */
  const layerDock=el('div',undefined,'tr-map-layer-control');layerDock.append($('trLayers'));page.querySelector('.tr-view').prepend(layerDock);$('trLayers').title='Cambiar capas del mapa';$('trLayers').setAttribute('aria-label','Cambiar capas del mapa');$('trLayersPanel').hidden=true;$('trLayout').classList.add('tr-wide');$('trLayers').setAttribute('aria-expanded','false');
  const panel=$('trPinPanel');panel.classList.add('tr-shared-editor');
+ /* NUEVO: editor flotante no modal: el mapa sigue disponible para colocar y arrastrar. */
+ panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Editor de anotaciones del mapa');
+ const floatingHead=el('div',undefined,'tr-floating-head');
+ const compact=btn('trEditorCompact','Minimizar','shrink',()=>{const small=panel.classList.toggle('tr-editor-compact');compact.setAttribute('aria-expanded',String(!small));compact.querySelector('span').textContent=small?'Ampliar':'Minimizar';});compact.setAttribute('aria-expanded','true');
+ floatingHead.append(panel.querySelector(':scope>strong'),compact,btn('trEditorClose','Cerrar','cancel',()=>cancel.click()));panel.prepend(floatingHead);
+ /* NUEVO: confirmación propia, con foco y cancelación segura ante cambios de sesión/borrador. */
+ const question=el('dialog',undefined,'tr-confirm-dialog'),questionText=el('p'),questionActions=el('div',undefined,'tr-actions');
+ question.id='trConfirmDialog';questionText.id='trConfirmText';question.setAttribute('aria-labelledby',questionText.id);
+ question.append(questionText,questionActions);page.append(question);let confirming=false;
+ function ask(message){if(confirming)return Promise.resolve(false);confirming=true;const token=epoch,original=draft,previous=document.activeElement;questionText.textContent=message;
+ return new Promise(resolve=>{const settle=value=>{if(!confirming)return;confirming=false;question.close();questionActions.replaceChildren();if(previous?.isConnected)previous.focus();resolve(value&&token===epoch&&original===draft&&active()&&!busy);};
+ questionActions.replaceChildren(btn('trConfirmNo','Cancelar','cancel',()=>settle(false)),btn('trConfirmYes','Confirmar','finish',()=>settle(true)));question.oncancel=e=>{e.preventDefault();settle(false);};question.showModal();questionActions.firstChild.focus();});}
+
  const editor=el('div',undefined,'tr-shared-fields');
  function field(id,label,type,value){const wrap=el('label',label),n=el(type==='textarea'?'textarea':'input');n.id=id;if(type!=='textarea')n.type=type;n.value=value;wrap.append(n);editor.append(wrap);return n;}
  const titleInput=field('trSharedTitle','Nombre','text','');titleInput.maxLength=120;
@@ -12648,16 +12681,16 @@ const trShared = (() => {
  const at=decoded.match(/@([+-]?\d+(?:\.\d+)?),([+-]?\d+(?:\.\d+)?),/);if(at){const p=pair(at[1]+','+at[2]);if(p)return{point:p,center:true};}
  throw Error('No se encontraron coordenadas explícitas. Copia latitud y longitud del sitio e introdúcelas manualmente.');
  }
- function locate(fromLink){if(!draft||draft.kind!=='pin'||busy)return;sourceOpen.hidden=true;sourceOpen.removeAttribute('href');try{const result=fromLink?parseLocation(linkInput.value):{point:[numberValue(latInput.value,90),numberValue(lngInput.value,180)]};if(result.center&&!confirm('El enlace indica el centro de la vista, no necesariamente la ubicación del sitio. ¿Quieres usar ese centro?'))return;draft.points=[result.point];drawing=false;pinMode(false);latInput.value=String(result.point[0]);lngInput.value=String(result.point[1]);renderDraft();map.setView(result.point,Math.max(map.getZoom(),16));locationHelp.textContent=(result.center?'Centro del enlace ubicado.':'Coordenadas ubicadas.')+' Revisa el punto y pulsa Guardar y compartir.';}catch(e){locationHelp.textContent=e.message;}}
+ /* MODIFICADO: diálogo del sitio. */ async function locate(fromLink){if(!draft||draft.kind!=='pin'||busy)return;sourceOpen.hidden=true;sourceOpen.removeAttribute('href');try{const result=fromLink?parseLocation(linkInput.value):{point:[numberValue(latInput.value,90),numberValue(lngInput.value,180)]};if(result.center&&!(await ask('El enlace indica el centro de la vista, no necesariamente la ubicación del sitio. ¿Quieres usar ese centro?')))return;draft.points=[result.point];drawing=false;pinMode(false);latInput.value=String(result.point[0]);lngInput.value=String(result.point[1]);renderDraft();map.setView(result.point,Math.max(map.getZoom(),16));locationHelp.textContent=(result.center?'Centro del enlace ubicado.':'Coordenadas ubicadas.')+' Revisa el punto y pulsa Guardar y compartir.';}catch(e){locationHelp.textContent=e.message;}}
  for(const n of [latInput,lngInput,linkInput])n.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();locate(n===linkInput);}});
 
  const actions=el('div',undefined,'tr-actions');
- const save=btn('trSharedSave','Guardar y compartir','save',persist),cancel=btn('trSharedCancel','Cancelar','cancel',()=>reset()),finish=btn('trSharedFinish','Terminar trazado','finish',()=>{drawing=false;renderDraft();feedback('Ajusta los vértices y guarda para compartir.');}),undo=btn('trSharedUndo','Quitar último punto','undo',()=>{if(draft?.points.length){draft.points.pop();renderDraft();}}),remove=btn('trSharedDelete','Eliminar','remove',()=>erase());
+ const save=btn('trSharedSave','Guardar y compartir','save',persist),cancel=btn('trSharedCancel','Cancelar','cancel',async()=>{if(!draft||await ask('¿Descartar el borrador sin guardar?'))reset();}),finish=btn('trSharedFinish','Terminar trazado','finish',()=>{drawing=false;renderDraft();feedback('Ajusta los vértices y guarda para compartir.');}),undo=btn('trSharedUndo','Quitar último punto','undo',()=>{if(draft?.points.length){draft.points.pop();renderDraft();}}),remove=btn('trSharedDelete','Eliminar','remove',()=>erase());
  const grow=btn('trSharedGrow','Ampliar 10 %','expand',()=>scale(1.1)),shrink=btn('trSharedShrink','Reducir 10 %','shrink',()=>scale(1/1.1));
  const vertexLabel=el('label','Vértice'),vertex=el('select');vertex.id='trSharedVertex';vertexLabel.append(vertex);
  const deleteVertex=btn('trSharedDeleteVertex','Quitar vértice','vertex',()=>{if(draft){draft.points.splice(Number(vertex.value),1);renderDraft();}});
  actions.append(finish,undo,grow,shrink,vertexLabel,deleteVertex,save,cancel,remove);
- panel.querySelector(':scope>p').after(editor,actions);panel.querySelector(':scope>strong').textContent='Anotación compartida';panel.querySelector(':scope>p').textContent='Los cambios se comparten al guardar. Arrastra los puntos para ajustar la figura.';
+ panel.querySelector(':scope>p').after(editor,actions);panel.querySelector('.tr-floating-head strong').textContent='Anotación compartida';panel.querySelector(':scope>p').textContent='Los cambios se comparten al guardar. Arrastra los puntos para ajustar la figura.';
  let iconStorage=false;
  let rows=new Map(),layers=null,handles=null,preview=null,draft=null,drawing=false,busy=false,ready=false,me='',admin=false,channel=null,connected=false,epoch=0,loading=false,again=false,timer=null,poll=null,attached=null,loadSerial=0,selected=null,popupRef=null;
  function feedback(s){$('trPinStatus').textContent=s;}
@@ -12698,12 +12731,13 @@ const trShared = (() => {
  if(isPin&&draft.points.length)updatePinLink({lat:draft.points[0][0],lng:draft.points[0][1]});
  feedback((draft.id?'Editando':'Borrador')+' · '+(pending(draft)?'Pendiente · ':'')+(drawing?'Pulsa el mapa para añadir puntos. ':'Arrastra los puntos para ajustar. ')+'Sin guardar.');
  }
- function reset(){if(busy)return;selected=null;map?.closePopup();draft=null;drawing=false;preview?.clearLayers();handles?.clearLayers();pinMode(false);panel.hidden=true;feedback('');paint();}
- function begin(kind){if(!active()||!ready||busy){feedback('Espera a que se verifique el almacenamiento compartido. Si no está instalado, ejecuta el SQL adjunto.');return;}if(draft&&!confirm('¿Descartar el borrador sin guardar?'))return;reset();draft={kind,title:'',notes:'',priority:'low',color:colors.low,size:32,weight:4,opacity:25,points:[],icon_key:'pin'};drawing=true;pinMode(true);syncFields();feedback(kind==='pin'?'Pulsa el mapa para situar el pin.':'Pulsa el mapa para añadir vértices; después selecciona Terminar trazado.');}
+ /* MODIFICADO: próxima apertura muestra todos los campos. */
+ function reset(){if(busy)return;panel.classList.remove('tr-editor-compact');compact.setAttribute('aria-expanded','true');compact.querySelector('span').textContent='Minimizar';selected=null;map?.closePopup();draft=null;drawing=false;preview?.clearLayers();handles?.clearLayers();pinMode(false);panel.hidden=true;feedback('');paint();}
+ /* MODIFICADO: diálogo del sitio. */ async function begin(kind){if(!active()||!ready||busy){feedback('Espera a que se verifique el almacenamiento compartido. Si no está instalado, ejecuta el SQL adjunto.');return;}if(draft&&!(await ask('¿Descartar el borrador sin guardar?')))return;reset();draft={kind,title:'',notes:'',priority:'low',color:colors.low,size:32,weight:4,opacity:25,points:[],icon_key:'pin'};drawing=true;pinMode(true);syncFields();feedback(kind==='pin'?'Pulsa el mapa para situar el pin.':'Pulsa el mapa para añadir vértices; después selecciona Terminar trazado.');}
  function click(event){if(!draft||!drawing||busy||!active()||zoomSettling)return;const p=L.latLng(event.latlng).wrap(),v=[p.lat,p.lng];if(draft.kind==='pin'){draft.points=[v];latInput.value=p.lat;lngInput.value=p.lng;drawing=false;pinMode(false);}else{if(draft.points.length>=200){feedback('Máximo 200 vértices por figura.');return;}const last=draft.points.at(-1);if(!last||last[0]!==v[0]||last[1]!==v[1])draft.points.push(v);}renderDraft();}
  function scale(f){if(!draft?.points.length)return;const n=draft.points.length,center=draft.points.reduce((a,p)=>[a[0]+p[0]/n,a[1]+p[1]/n],[0,0]),next=draft.points.map(p=>p.map((v,i)=>center[i]+(v-center[i])*f));if(next.some(p=>Math.abs(p[0])>90||Math.abs(p[1])>180)){feedback('La figura excede los límites del mapa.');return;}draft.points=next;renderDraft();}
  async function copy(){const r=draft;if(!r||r.kind!=='pin'||!r.points.length)return;try{await navigator.clipboard.writeText($('trPinLink').value);feedback('Enlace de Google Maps copiado.');}catch{feedback('No se pudo copiar. Selecciona el enlace y cópialo manualmente.');}}
- function select(id,focus=false){const r=rows.get(id);if(!r||busy)return;if(draft&&!confirm('¿Descartar el borrador sin guardar?'))return;reset();selected=id;if(focus){if(r.kind==='pin')map.panTo(r.points[0]);else map.fitBounds(r.points,{padding:[30,30]});}
+ /* MODIFICADO: diálogo del sitio. */ async function select(id,focus=false){const r=rows.get(id);if(!r||busy)return;if(draft&&!(await ask('¿Descartar el borrador sin guardar?')))return;reset();selected=id;if(focus){if(r.kind==='pin')map.panTo(r.points[0]);else map.fitBounds(r.points,{padding:[30,30]});}
  const content=el('div',undefined,'tr-shared-popup');content.append(el('strong',r.title),el('p',r.notes||'Sin notas'),el('small',pending(r)?'Pendiente · emparejamiento por confirmar':r.kind==='pin'?'Importancia '+names[r.priority]:r.kind==='line'?'Línea compartida':'Polígono compartido'));
  if(editable(r))content.append(btn('trSharedEditSelected','Editar','edit',()=>{map.closePopup();draft=clone(r);drawing=false;syncFields();paint();}));
  /* NUEVO: eliminación desde el propio elemento, con los permisos vigentes. */
@@ -12715,12 +12749,13 @@ const trShared = (() => {
  function errorText(e){return /PGRST202|42P01|42883/.test(e.code||'')?'Falta instalar Instalar_Anotaciones_Trafico.sql en Supabase.':e.message||'No se pudo comunicar con el servidor.';}
  async function persist(){if(!draft||busy||!active()||!ready)return;if(!titleInput.value.trim()){titleInput.focus();feedback('Escribe un nombre para identificar el elemento.');return;}if(draft.kind==='pin'&&!iconStorage){feedback('Actualiza el SQL de anotaciones para guardar el símbolo del pin. Tu borrador se conserva.');return;}const item=clone(draft),token=epoch;busy=true;renderDraft();try{const result=await rpc('save',item);if(token!==epoch)return;loadSerial++;rows.set(result.id,result);schedule();busy=false;reset();feedback('Guardado en el servidor. '+(connected?'La actualización se envía a los usuarios conectados.':'La conexión en tiempo real está pendiente.'));}catch(e){if(token===epoch)feedback(errorText(e)+' El borrador se conserva.');}finally{if(token===epoch){busy=false;save.disabled=false;cancel.disabled=false;remove.disabled=false;for(const n of editor.querySelectorAll('input,textarea,select'))n.disabled=false;for(const n of [finish,undo,grow,shrink,vertex,deleteVertex,applyManual,applyLink])n.disabled=false;for(const b of iconPicker.querySelectorAll('button'))b.disabled=false;}}}
  /* MODIFICADO: confirmar antes de abrir una edición al eliminar desde el mapa. */
- async function erase(target=null){if(busy||!(target||draft)?.id||!confirm('¿Eliminar esta anotación compartida para todos los usuarios?'))return;const item=clone(target||draft),token=epoch;if(target){map.closePopup();draft=clone(item);drawing=false;syncFields();}busy=true;renderDraft();try{await rpc('remove',{id:item.id,version:item.version});if(token!==epoch)return;loadSerial++;rows.delete(item.id);schedule();busy=false;reset();feedback('Anotación eliminada en el servidor.');}catch(e){if(token===epoch)feedback(errorText(e)+' Tu edición se conserva.');}finally{if(token===epoch){busy=false;if(draft){const message=$('trPinStatus').textContent;renderDraft();feedback(message);}}}}
+ async function erase(target=null){if(busy||!(target||draft)?.id||!(await ask('¿Eliminar esta anotación compartida para todos los usuarios?')))return;const item=clone(target||draft),token=epoch;if(target){map.closePopup();draft=clone(item);drawing=false;syncFields();}busy=true;renderDraft();try{await rpc('remove',{id:item.id,version:item.version});if(token!==epoch)return;loadSerial++;rows.delete(item.id);schedule();busy=false;reset();feedback('Anotación eliminada en el servidor.');}catch(e){if(token===epoch)feedback(errorText(e)+' Tu edición se conserva.');}finally{if(token===epoch){busy=false;if(draft){const message=$('trPinStatus').textContent;renderDraft();feedback(message);}}}}
  for(const n of [titleInput,notes,priority,color,size,weight,opacity])n.addEventListener('input',()=>{if(!draft||busy)return;draft.title=titleInput.value;draft.notes=notes.value;draft.priority=priority.value;draft.color=draft.kind==='pin'?colors[priority.value]:color.value;draft.size=Number(size.value);draft.weight=Number(weight.value);draft.opacity=Number(opacity.value);/* MODIFICADO: escribir notas no reconstruye vértices ni marcadores. */if(n===titleInput||n===notes){feedback((draft.id?'Editando':'Borrador')+' · '+(pending(draft)?'Pendiente · ':'')+'Sin guardar.');return;}renderDraft();});
  async function load(){if(!active()||!attached)return;if(loading){again=true;return;}const token=epoch,serial=++loadSerial;loading=true;try{const data=await rpc('read');if(token!==epoch||serial!==loadSerial||!allowed())return;ready=true;iconStorage=data.icons_version===1;me=data.user_id;admin=data.admin;/* MODIFICADO: no cerrar/reabrir ventanas cuyos datos no cambiaron. */const selectedVersion=selected?rows.get(selected)?.version:null;rows=new Map(data.items.map(r=>[r.id,r]));paint();if(!draft&&selected&&popupRef?.isOpen()&&rows.get(selected)?.version!==selectedVersion){const id=selected;if(rows.has(id))select(id);else{map.closePopup();selected=null;}}live.textContent=connected?'Anotaciones · En tiempo real':'Anotaciones · Reconectando; revisión cada 30 s';if(draft?.id){const r=rows.get(draft.id);if(!r||r.version!==draft.version)feedback('Este elemento cambió o se eliminó en otro equipo. Tu borrador se conserva; cancela y vuelve a abrirlo antes de guardar.');}}catch(e){if(token===epoch){ready=false;live.textContent=errorText(e);if(e.code==='42501'){busy=false;reset();rows.clear();paint();}}}finally{if(token===epoch){loading=false;if(again){again=false;void load();}}}}
  function schedule(){clearTimeout(timer);timer=setTimeout(load,150);}
  function connect(){if(!active()||!map)return;if(attached===map){/* MODIFICADO: agrupar aperturas simultáneas; la suscripción mantiene su revalidación. */if(!loading)void load();return;}stop();attached=map;layers=L.layerGroup().addTo(map);preview=L.layerGroup().addTo(map);handles=L.layerGroup().addTo(map);const token=epoch;const sb=client();if(sb?.channel)channel=sb.channel('cctt-traffic-annotations-'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:'cctt_traffic_annotations_data'},schedule).subscribe(state=>{if(token!==epoch)return;connected=state==='SUBSCRIBED';if(connected)void load();else live.textContent='Anotaciones · Sin conexión en tiempo real; reintentando';});void load();poll=setInterval(load,30000);}
- function stop(){epoch++;loadSerial++;clearTimeout(timer);clearInterval(poll);if(channel)void client()?.removeChannel(channel);channel=null;connected=ready=loading=again=busy=false;draft=null;drawing=false;selected=null;popupRef=null;attached?.closePopup();me='';admin=false;rows.clear();/* NUEVO: liberar referencias al cerrar sesión/cambiar de mapa. */painted.clear();for(const g of [layers,preview,handles]){g?.clearLayers();if(attached&&g)attached.removeLayer(g);}layers=preview=handles=attached=null;panel.hidden=true;updateList();}
+ /* MODIFICADO: cerrar confirmaciones pendientes al terminar la sesión del editor. */
+ function stop(){if(confirming)question.dispatchEvent(new Event('cancel',{cancelable:true}));epoch++;loadSerial++;clearTimeout(timer);clearInterval(poll);if(channel)void client()?.removeChannel(channel);channel=null;connected=ready=loading=again=busy=false;draft=null;drawing=false;selected=null;popupRef=null;attached?.closePopup();me='';admin=false;rows.clear();/* NUEVO: liberar referencias al cerrar sesión/cambiar de mapa. */painted.clear();for(const g of [layers,preview,handles]){g?.clearLayers();if(attached&&g)attached.removeLayer(g);}layers=preview=handles=attached=null;panel.hidden=true;updateList();}
  window.addEventListener('cctt:access-updated',()=>{if(!allowed())stop();else if(active())connect();});
  window.addEventListener('cctt:logout',stop);window.addEventListener('cctt:session',e=>{if(me&&me!==e.detail?.session?.user?.id)stop();});
  return {connect,stop,click,copy,beginPin:()=>begin('pin'),canOpen:()=>!!draft&&draft.kind==='pin'&&draft.points.length>0};
@@ -12842,7 +12877,7 @@ const trShared = (() => {
    host.append(document.createTextNode('El proveedor representa circulación fluida, tráfico denso, filas y bloqueos con su propia escala de colores.'));
    return;
   }
-  for (const [color,text] of [['free','Flujo ≥75 %'],['slow','35–75 %'],['heavy','15–35 %'],['queue','Menos de 15 %'],['blocked','Cierre reportado']]) {
+  for (const [color,text] of [['free','Flujo ≥75 %'],['slow','35–75 %'],['heavy','15–35 %'],['queue','Menos de 15 %'],['blocked','Rojo/blanco: cierre reportado por TomTom']]) {
    const item = document.createElement('span'), swatch = document.createElement('i');
    swatch.className = 'tr-swatch';
    swatch.dataset.flow = color;
@@ -12892,14 +12927,16 @@ const trShared = (() => {
   const ticket=++resumeTicket,stamp=generation;
   requestAnimationFrame(()=>map?.invalidateSize());
   try {
-   if(!await loadConfig()||ticket!==resumeTicket||stamp!==generation||!active())return;
+   /* MODIFICADO: agrupar retornos y reutilizar configuración durante 60 s. */
+   if(((!config||Date.now()-trConfigAt>=60000)&&!await loadConfig())||ticket!==resumeTicket||stamp!==generation||!active())return;
    trafficSuspended=false;
    if(traffic&&traffic.trafficSource===$('trProvider').value&&$('trFlow').checked) {
     traffic.resumeView();
    } else {
     drawTraffic();
    }
-   if(!base||$('trBase').value==='auto')void setBase();
+   /* MODIFICADO: comprobar estilo local sin consultar CARTO si no cambió. */
+   void setBase(false);
   } catch(error) {
    if(ticket!==resumeTicket||stamp!==generation||!active())return;
    if([401,403].includes(error.httpStatus))pause();
@@ -12970,7 +13007,8 @@ const trShared = (() => {
     });
    }
   }
-  async function execute(job) {
+  /* MODIFICADO: las imágenes en memoria se dibujan sin esperar la cola de red. */
+  async function execute(job,cached=null) {
    const controller=new AbortController();
    job.controller=controller;
    let url='';
@@ -12978,7 +13016,7 @@ const trShared = (() => {
     if(!active()||trafficSuspended||stamp!==generation)return;
     /* MODIFICADO: el controlador del mosaico cancela su dibujo, no una descarga reutilizable por otro nivel. */
     const force=job.force;job.force=false;
-    const value=await trFetchTile(keyFor(job.coords),source,job.coords,force);
+    const value=cached||await trFetchTile(keyFor(job.coords),source,job.coords,force);
     if(job.cancelled||disposed||controller.signal.aborted||stamp!==generation||!active())return;
     if(!(value.blob instanceof Blob)||!value.blob.type.startsWith('image/png'))throw Error('La respuesta no contiene una imagen de tráfico válida.');
     const image=document.createElement('img');
@@ -13066,8 +13104,10 @@ const trShared = (() => {
     const job={tile,coords,done,controller:null,url:'',cancelled:false,finished:false,ready:false,queued:false,running:false,force:false,needsRefresh:true,receivedAt:0,lastError:''};
     jobs.add(job);
     tile.trJob=job;
-    enqueue(job);
-    pump();
+    /* NUEVO: reutilización inmediata de mosaicos vigentes al volver a un nivel. */
+    const cached=readTrafficTile(keyFor(coords));
+    if(cached&&active()&&!trafficSuspended){job.running=true;void execute(job,cached).finally(()=>{job.running=false;layer.reportView();if(job.needsRefresh&&!job.cancelled)enqueue(job);pump();});}
+    else {enqueue(job);pump();}
     return tile;
    },
    onRemove(target) {
@@ -13086,19 +13126,22 @@ const trShared = (() => {
   return layer;
  }
  /* NUEVO: agrupar peticiones CARTO simultáneas; no guardar credenciales ni permisos. */
- let baseConfigFlight=null;
+ /* NUEVO: configuración reciente solo en memoria; no sustituye permisos del servidor. */
+ let baseConfigFlight=null,trConfigAt=0,trConfigFlight=null,trBaseStyle='';
  function readBaseConfig(){
   if(baseConfigFlight)return baseConfigFlight;
   const request=client().functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
   const flight=Promise.resolve(request).finally(()=>{if(baseConfigFlight===flight)baseConfigFlight=null;});
   baseConfigFlight=flight;return flight;
  }
- async function setBase() {
+ /* MODIFICADO: la actualización manual conserva su verificación remota. */
+ async function setBase(recheck=true) {
   if (!map || !active()) return;
   const ticket = ++baseRequest;
   const dark = document.documentElement.dataset.ccttScheme === 'dark';
   const selected = $('trBase').value;
   const style = selected === 'auto' ? (dark?'dark_all':'voyager') : selected;
+  /* NUEVO */ if(!recheck&&base&&!baseError&&trBaseStyle===style)return;
   try {
    const sb = client();
    /* MODIFICADO: reutilizar únicamente una consulta que aún está en curso. */
@@ -13130,7 +13173,7 @@ const trShared = (() => {
    baseError = '';
    base = layer;
    /* NUEVO */
-   baseUrl=nextUrl;
+   baseUrl=nextUrl;/* NUEVO */trBaseStyle=style;
    base.addTo(map);
    if (traffic) traffic.bringToFront();
   } catch (error) {
@@ -13143,10 +13186,12 @@ const trShared = (() => {
  }
  async function loadConfig() {
   const stamp = generation;
-  const result = await call('traffic-config');
+  /* NUEVO: compartir únicamente una petición de configuración pendiente. */
+  if(!trConfigFlight){const request=call('traffic-config');const flight=request.finally(()=>{if(trConfigFlight===flight)trConfigFlight=null;});trConfigFlight=flight;}
+  const result = await trConfigFlight;
   if (stamp !== generation || !active()) return false;
   const selected = $('trProvider').value;
-  config = result;
+  config = result;/* NUEVO */trConfigAt=Date.now();
   const selector = $('trProvider');
   selector.replaceChildren(new Option('Selecciona una fuente',''));
   for (const source of ['tomtom','here']) {
@@ -13193,7 +13238,8 @@ const trShared = (() => {
    if ((recheck || !config) && !await loadConfig()) return;
    if (stamp !== generation || !active()) return;
    /* MODIFICADO: las actualizaciones también conservan la consulta mientras llega el detalle. */
-   drawTraffic(true);
+   /* MODIFICADO: el ciclo automático solo descarga mosaicos vencidos. */
+   drawTraffic(recheck);
    /* MODIFICADO: el mapa base ya se solicitó en paralelo al iniciar. */
   } catch (error) {
    if (stamp===generation&&active()) {
@@ -13251,7 +13297,8 @@ const trShared = (() => {
   if(!trGoogleObserver)trLoadGoogle();
   requestAnimationFrame(()=>map?.invalidateSize());
   /* MODIFICADO: eventos de apertura repetidos no encolan otro refresco completo. */
-  if(!starting)void refresh();
+  /* MODIFICADO: abrir/reabrir no fuerza la descarga de todos los mosaicos. */
+  if(!starting){if(config)void resumeTraffic();else void refresh();}
  }
  function syncCard() {
   const visible = allowed();
@@ -13322,7 +13369,7 @@ const trShared = (() => {
   }
  }).observe(page,{attributes:true,attributeFilter:['class']});
  new MutationObserver(()=>{
-  if(active()&&$('trBase').value==='auto')void setBase();
+  if(active()&&$('trBase').value==='auto')void setBase(false);
  }).observe(document.documentElement,{attributes:true,attributeFilter:['data-cctt-scheme']});
  /* MODIFICADO: pausar consultas en segundo plano conservando la capa, y revalidar al regresar. */
  document.addEventListener('visibilitychange',()=>{
@@ -13337,7 +13384,7 @@ const trShared = (() => {
   if(owner&&next!==owner){
    /* NUEVO: el pin no se transfiere entre cuentas. */
    clearPin();
-   /* NUEVO: no reutilizar una petición de la sesión anterior. */baseConfigFlight=null;
+   /* NUEVO: no reutilizar una petición de la sesión anterior. */baseConfigFlight=null;/* NUEVO */trConfigFlight=null;trConfigAt=0;trBaseStyle='';
    pause();config=null;baseRequest++;
    if(map){map.remove();map=null;base=null;locationMarker=null;}
   }
