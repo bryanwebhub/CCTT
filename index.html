@@ -4743,7 +4743,10 @@ ensureAssetModal();injectControlReview();injectTemplateTools();renderPdfHist();e
    const ft=document.createElement('div');ft.className='cop-layer cop-layer-footer';ft.dataset.base=footPx;ft.style.fontSize=footPx+'px';ft.textContent=document.getElementById('copFooter').value.trim();
    stage.append(d,h,b,ft);requestAnimationFrame(()=>[d,h,b,ft].forEach(x=>fitLayer(x,9)));
  }
- function copSavedStatus(){const st=document.getElementById('copUploadStatus');if(!st)return;const f=copTemplateIndex>=0?copTemplates[copTemplateIndex]:null;st.innerHTML=f?`Formato activo guardado: <b>${esc(f.name)}</b>. Puede cambiarlo o eliminarlo desde la lista.`:'No hay un formato base guardado.'}
+ /* MODIFICADO: el indicador local no invalida las plantillas oficiales visibles. */
+ function copSavedStatus(){const st=document.getElementById('copUploadStatus');if(!st)return;const official=document.querySelector('#copTemplateList .cctt-v35-option');st.hidden=!!official;if(official){st.textContent='';return;}const f=copTemplateIndex>=0?copTemplates[copTemplateIndex]:null;st.innerHTML=f?`Formato activo guardado: <b>${esc(f.name)}</b>. Puede cambiarlo o eliminarlo desde la lista.`:'No hay un formato base guardado.'}
+ /* NUEVO: sincronizar la leyenda cuando termina la carga o cambia la lista oficial. */
+ const copOfficialStatusHost=document.getElementById('copTemplateList');if(copOfficialStatusHost)new MutationObserver(copSavedStatus).observe(copOfficialStatusHost,{childList:true,subtree:true});
 
  renderCopTemplates=function(){const list=document.getElementById('copTemplateList');if(!list)return;list.innerHTML=copTemplates.length?copTemplates.map((f,i)=>`<div class="template-option ${i===copTemplateIndex?'active':''}"><input type="radio" name="copTemplateChoice" ${i===copTemplateIndex?'checked':''} onchange="chooseCopTemplate(${i})"><span><b>Plantilla ${i+1}</b><br><span class="mini-file">${esc(f.name)}</span></span><span class="pill ok" style="margin-left:auto">${/\.pdf$/i.test(f.name)?'PDF':'Imagen'}</span><span class="template-actions"><button type="button" onclick="replacePersistedTemplate('copoma',${i})">Cambiar</button><button type="button" onclick="removePersistedTemplate('copoma',${i})">Eliminar</button></span></div>`).join(''):'<div class="empty">No hay formatos guardados.</div>';copSavedStatus()};
 
@@ -16016,5 +16019,75 @@ html[data-cctt-scheme=dark] #page-inc35copoma.gc-design{--gc-bg:color-mix(in srg
 <script id="ccttVialReportMetrics">
 /* NUEVO: métricas del texto real mostrado, sin alterar el reporte ni su copia. */
 (()=>{function init(){const preview=document.getElementById('vialPreview');if(!preview||document.getElementById('vialReportMetrics'))return;const metrics=document.createElement('div');metrics.id='vialReportMetrics';metrics.className='vial-report-metrics';const chars=document.createElement('span'),lines=document.createElement('span');metrics.append(chars,lines);preview.after(metrics);function sync(){const text=preview.value===undefined?preview.textContent:preview.value;chars.textContent='Caracteres: '+text.length;lines.textContent='Líneas: '+(text?text.split(/\r?\n/).length:0);}preview.addEventListener('input',sync);new MutationObserver(sync).observe(preview,{childList:true,characterData:true,subtree:true});sync();}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>queueMicrotask(init));else init();})();
+</script>
+
+<!-- NUEVO: rediseño del procesamiento fotográfico según referencia adjunta. -->
+<style id="ccttPhotoReferenceDesign">
+/* NUEVO: estilos confinados al procesamiento fotográfico. */
+#page-inc35vial #vrpPanel.pf-design{--pf-bg:#fef8f4;--pf-card:#fff;--pf-line:#e5ded9;--pf-text:#241e1c;--pf-muted:#796b66;--pf-a:var(--cctt-theme-accent,#4a0e17);padding:0!important;border:1px solid var(--pf-line)!important;border-radius:12px!important;background:var(--pf-bg)!important;color:var(--pf-text)!important;overflow:hidden}
+html[data-cctt-scheme=dark] #page-inc35vial #vrpPanel.pf-design{--pf-bg:color-mix(in srgb,var(--pf-a) 18%,#0b0413);--pf-card:color-mix(in srgb,var(--pf-a) 24%,#100619);--pf-line:color-mix(in srgb,var(--pf-a) 55%,#705274);--pf-text:#fff5fc;--pf-muted:#e1cfdf}
+#page-inc35vial #vrpPanel.pf-design .vrp-heading{padding:16px 20px!important;margin:0!important;min-height:70px;background:var(--pf-card);border-bottom:1px solid var(--pf-line);gap:12px}
+#page-inc35vial #vrpPanel.pf-design .vrp-heading h3{font-size:18px!important;line-height:24px;margin:0 0 5px!important;color:var(--pf-text)}
+#page-inc35vial #vrpPanel.pf-design :is(p,.muted){color:var(--pf-muted)!important;font-size:12px!important;line-height:18px}
+#page-inc35vial #vrpPanel.pf-design .vrp-count{font-size:12px!important;background:var(--pf-bg)!important;color:var(--pf-a)!important;border:1px solid var(--pf-line);border-radius:20px;padding:5px 12px;white-space:nowrap}
+html[data-cctt-scheme=dark] #page-inc35vial #vrpPanel.pf-design .vrp-count{color:var(--pf-text)!important}
+#page-inc35vial #vrpPanel.pf-design .pf-layout{display:grid;grid-template-columns:minmax(300px,1fr) minmax(0,2.04fr);gap:16px;padding:20px}
+#page-inc35vial #vrpPanel.pf-design .pf-left{display:flex;flex-direction:column;gap:16px;min-width:0}
+#page-inc35vial #vrpPanel.pf-design .pf-box{background:var(--pf-card);border:1px solid var(--pf-line);border-radius:12px;padding:16px;box-shadow:0 1px 2px #0001;min-width:0}
+#page-inc35vial #vrpPanel.pf-design h4{font-size:14px;line-height:20px;font-weight:700;margin:0;color:var(--pf-text)}
+#page-inc35vial #vrpPanel.pf-design .pf-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#page-inc35vial #vrpPanel.pf-design .pf-title>span{font-size:12px;color:var(--pf-muted)}
+#page-inc35vial #vrpPanel.pf-design #vrpResetGlobalPreview{font-size:11px!important;text-decoration:underline;min-height:0!important;border:0!important;background:transparent!important;padding:0!important;color:var(--pf-muted)!important}
+#page-inc35vial #vrpPanel.pf-design .vrp-global{display:flex;flex-direction:column;align-items:stretch;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;gap:16px!important;margin:0!important}
+#page-inc35vial #vrpPanel.pf-design .vrp-global .field{flex:none!important;display:flex;flex-direction:column;gap:10px!important;margin:0!important;min-width:0}
+#page-inc35vial #vrpPanel.pf-design .vrp-global label{font-size:11px!important;color:var(--pf-text)!important;font-weight:400}
+#page-inc35vial #vrpPanel.pf-design .vrp-global output{font-weight:700;color:var(--pf-a);float:right}
+html[data-cctt-scheme=dark] #page-inc35vial #vrpPanel.pf-design .vrp-global output{color:var(--pf-text)}
+#page-inc35vial #vrpPanel.pf-design .pf-minor-crops{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#page-inc35vial #vrpPanel.pf-design input[type=range]{appearance:none!important;height:6px!important;min-height:6px!important;padding:0!important;border:0!important;background:var(--pf-line)!important;border-radius:20px;width:100%;margin:7px 0!important;cursor:pointer;accent-color:var(--pf-a)}
+#page-inc35vial #vrpPanel.pf-design input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:var(--pf-a);border:2px solid var(--pf-card);box-shadow:0 1px 3px #0004}
+#page-inc35vial #vrpPanel.pf-design input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--pf-a);border:2px solid var(--pf-card)}
+#page-inc35vial #vrpPanel.pf-design .vrp-ratio{border-top:1px solid var(--pf-line);padding-top:12px;flex:none!important;font-size:11px!important;line-height:16px}
+#page-inc35vial #vrpPanel.pf-design input[type=checkbox]{accent-color:var(--pf-a)}
+#page-inc35vial #vrpPanel.pf-design .pf-crop-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+#page-inc35vial #vrpPanel.pf-design :is(.btn,.vrp-file-btn){font-size:11px!important;min-height:30px!important;padding:6px 10px!important;border:1px solid var(--pf-line)!important;border-radius:8px!important;color:var(--pf-text)!important;background:var(--pf-card)!important;display:inline-flex;align-items:center;justify-content:center;gap:6px;line-height:16px;cursor:pointer}
+#page-inc35vial #vrpPanel.pf-design :is(.vrp-file-btn,#vrpPrepareWhatsApp){background:var(--pf-a)!important;color:var(--cctt-theme-onaccent,#fff)!important;border-color:var(--pf-a)!important}
+#page-inc35vial #vrpPanel.pf-design :is(button,label.vrp-file-btn):hover{filter:brightness(.96)}
+#page-inc35vial #vrpPanel.pf-design :focus-visible{outline:2px solid var(--pf-a)!important;outline-offset:3px}
+#page-inc35vial #vrpPanel.pf-design button:disabled{opacity:.6!important;color:var(--pf-muted)!important;cursor:not-allowed}
+#page-inc35vial #vrpPanel.pf-design .pf-mode{border:1px solid var(--pf-line);border-radius:8px;padding:12px;margin-top:16px}
+#page-inc35vial #vrpPanel.pf-design .pf-mode-auto{background:var(--pf-bg)}
+#page-inc35vial #vrpPanel.pf-design h5{font-size:12px;line-height:18px;margin:0 0 8px;color:var(--pf-text)}
+#page-inc35vial #vrpPanel.pf-design .pf-mode p{font-size:11px!important;line-height:18px;margin:0 0 10px}
+#page-inc35vial #vrpPanel.pf-design #vrpPrepareWhatsApp{width:100%;min-height:36px!important}
+#page-inc35vial #vrpPanel.pf-design .vrp-sequence-tools{display:flex;flex-wrap:wrap;gap:8px;background:transparent!important;border:0!important;padding:0!important;margin:0!important}
+#page-inc35vial #vrpPanel.pf-design #vrpCopyAll{flex:1}
+#page-inc35vial #vrpPanel.pf-design #vrpSequenceCount{font-size:11px;font-weight:500;flex-basis:100%;color:var(--pf-muted)}
+#page-inc35vial #vrpPanel.pf-design .vrp-tools{padding:0 0 12px!important;margin:0 0 12px!important;border-bottom:1px solid var(--pf-line);gap:8px}
+#page-inc35vial #vrpPanel.pf-design .pf-gallery-area{position:relative;min-height:790px;display:flex}
+#page-inc35vial #vrpPanel.pf-design #vrpGallery{flex:1;min-width:0;min-height:790px;align-content:start;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))!important;gap:12px;background:var(--pf-bg)!important;border:2px dashed var(--pf-line)!important;border-radius:12px;padding:12px!important;margin:0!important}
+#page-inc35vial #vrpPanel.pf-design .pf-empty{pointer-events:none;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;color:var(--pf-text);font-size:13px}
+#page-inc35vial #vrpPanel.pf-design .pf-empty svg{width:40px;height:40px;color:var(--pf-a)}
+#page-inc35vial #vrpPanel.pf-design .pf-empty p{margin:0;max-width:540px}
+#page-inc35vial #vrpPanel.pf-design .vrp-photo{background:var(--pf-card)!important;border-color:var(--pf-line)!important;color:var(--pf-text)!important}
+#page-inc35vial #vrpPanel.pf-design .pf-help{font-size:11px;margin-top:12px;color:var(--pf-muted)}
+#page-inc35vial #vrpPanel.pf-design #vrpMessage:empty{display:none}
+#page-inc35vial #vrpPanel.pf-design [hidden]{display:none!important}
+@media(max-width:850px){#page-inc35vial #vrpPanel.pf-design .pf-layout{grid-template-columns:minmax(0,1fr);padding:12px}#page-inc35vial #vrpPanel.pf-design :is(.pf-gallery-area,#vrpGallery){min-height:360px}#page-inc35vial #vrpPanel.pf-design .vrp-heading{flex-wrap:wrap}#page-inc35vial #vrpPanel.pf-design #vrpGallery{grid-template-columns:repeat(auto-fill,minmax(145px,1fr))!important}}
+
+</style>
+<script id="ccttPhotoReferenceLayout">
+/* NUEVO: composición fotográfica de referencia, reutilizando controles y eventos. */
+(()=>{function init(){const root=document.getElementById('vrpPanel');if(!root||root.dataset.pfReady)return;root.dataset.pfReady='1';const $=id=>document.getElementById(id),node=(tag,cls,text)=>{const n=document.createElement(tag);n.className=cls||'';if(text)n.textContent=text;return n;};
+root.classList.add('pf-design');const layout=node('div','pf-layout'),left=node('div','pf-left'),tray=node('section','pf-box pf-tray'),crop=node('section','pf-box pf-crop'),transfer=node('section','pf-box pf-transfer');layout.append(left,tray);left.append(crop,transfer);root.append(layout);
+const cropHead=node('div','pf-title'),reset=node('button','btn','Restablecer 0 %');reset.type='button';reset.id='vrpResetGlobalPreview';cropHead.append(node('h4','','Recorte general por lote'),reset);crop.append(cropHead,root.querySelector('.vrp-global'));
+const general=crop.querySelector('.vrp-global'),minor=node('div','pf-minor-crops');for(const id of ['vrpGlobaltop','vrpGloballeft','vrpGlobalright']){const range=$(id);if(range)minor.append(range.closest('.field'));}const bottom=$('vrpGlobalBottom').closest('.field');bottom.after(minor);const ratio=$('vrpKeepRatio')?.closest('label');if(ratio)general.append(ratio);const controls=node('div','pf-crop-actions');controls.append($('vrpApplyGlobal'));if($('vrpCancelPreview'))controls.append($('vrpCancelPreview'));general.append(controls);reset.onclick=()=>{for(const id of ['vrpGlobalBottom','vrpGlobaltop','vrpGloballeft','vrpGlobalright']){const r=$(id);if(r){r.value=0;r.dispatchEvent(new Event('input',{bubbles:true}));}}};
+transfer.append(node('h4','','Traslado a WhatsApp Web'));const auto=node('div','pf-mode pf-mode-auto'),manual=node('div','pf-mode');auto.append(node('h5','','Modalidad 1 · Preparar lote con extensión'),node('p','','Prepara todas las fotografías recortadas. Después abre la extensión en WhatsApp Web para adjuntarlas al chat.'));if($('vrpPrepareWhatsApp'))auto.append($('vrpPrepareWhatsApp'));manual.append(node('h5','','Modalidad 2 · Copia manual'),node('p','','Copia una fotografía, pégala con Ctrl+V en WhatsApp Web y continúa con la siguiente.'));const sequence=root.querySelector('.vrp-sequence-tools');manual.append(sequence);transfer.append(auto,manual,$('vrpMessage'));
+const trayHead=node('div','pf-title');trayHead.append(node('h4','','Bandeja de fotografías'),node('span','','Vista previa de recorte en tiempo real'));tray.append(trayHead,root.querySelector('.vrp-tools'));const area=node('div','pf-gallery-area'),empty=node('div','pf-empty');empty.innerHTML='<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17H5a4 4 0 0 1-1-8 7 7 0 0 1 13-2 5 5 0 0 1 2 10h-2M12 21V10m-4 4 4-4 4 4"/></svg>';empty.append(node('strong','','Arrastra fotografías aquí o pulsa «Añadir fotografías»'),node('p','','Ajusta el recorte en el panel izquierdo y comprueba el resultado antes de aplicarlo.'));area.append($('vrpGallery'),empty);tray.append(area);
+const syncEmpty=()=>{empty.hidden=!!$('vrpGallery').querySelector('.vrp-photo');};new MutationObserver(syncEmpty).observe($('vrpGallery'),{childList:true});syncEmpty();
+// La información existente permanece accesible sin duplicar instrucciones en el área de trabajo.
+const help=node('details','pf-help');help.append(node('summary','','Ayuda de preparación y copia'));for(const child of [...root.children])if(child!==layout&&!child.classList.contains('vrp-heading'))help.append(child);transfer.append(help);
+}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>queueMicrotask(init));else init();})();
+
 </script>
 </body></html>
