@@ -3208,6 +3208,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
           <button type="button" data-tool="line" class="ei-tool" title="Línea recta: arrastra"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M5 19 19 5"/></svg><span>Línea</span></button>
           <button type="button" data-tool="polyline" class="ei-tool" title="Polilínea: clic por punto, doble clic para terminar"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 17l5-8 4 6 5-9 4 5"/></svg><span>Polilínea</span></button>
           <button type="button" data-tool="spline" class="ei-tool" title="Curva suave: clic por punto, doble clic para terminar; sigue calles curvas"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 18c5-9 13 3 18-6"/><circle cx="3" cy="18" r="1.3"/><circle cx="21" cy="12" r="1.3"/></svg><span>Suave</span></button>
+          <button type="button" data-tool="train" class="ei-tool" title="Línea tipo tren: clic por punto, doble clic para terminar; traviesas como vía férrea"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M5 2h14v16H5zM5 6h14M12 6v6M5 12h14M7 18l-4 4M17 18l4 4M8 15h1M15 15h1"/></svg><span>Tren</span></button>
           <button type="button" data-tool="polygon" class="ei-tool" title="Polígono: clic por vértice, doble clic para cerrar"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M12 3l8 6-3 8H7l-3-8z"/></svg><span>Polígono</span></button>
           <button type="button" data-tool="rect" class="ei-tool" title="Rectángulo con esquinas redondeadas: arrastra"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x="4" y="6" width="16" height="12" rx="2"/></svg><span>Rectáng.</span></button>
           <button type="button" data-tool="ellipse" class="ei-tool" title="Elipse / círculo: arrastra (Mayús = círculo)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><ellipse cx="12" cy="12" rx="9" ry="6"/></svg><span>Elipse</span></button>
@@ -3315,6 +3316,11 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
                     <select id="eiPropArrowStart"><option value="none">Ninguna</option><option value="triangle">Triangular</option><option value="open">Abierta</option><option value="spear">De lanza</option><option value="circle">Circular</option><option value="diamond">Diamante</option></select>
                   </label>
                   <label>Tamaño punta <input id="eiPropArrowSize" type="number" min="4" max="80" value="26" step="1"></label>
+                </div>
+                <div class="ei-row">
+                  <label>Flechas consecutivas
+                    <select id="eiPropArrowSeq"><option value="none">Sin repetición</option><option value="repeat-forward">Consecutivas hacia adelante</option><option value="repeat-backward">Consecutivas hacia atrás</option><option value="repeat-both">Consecutivas en ambos sentidos</option></select>
+                  </label>
                 </div>
               </details>
               <details class="ei-panel">
@@ -3441,7 +3447,8 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
                 <tr><td>Ctrl+S</td><td>Guardar proyecto JSON</td></tr>
                 <tr><td>Rueda / pellizco</td><td>Zoom (Ctrl+rueda = zoom al cursor)</td></tr>
                 <tr><td>Doble clic en trazo</td><td>Añadir un punto al trazo</td></tr>
-                <tr><td>Esc</td><td>Cancelar trazo / quitar selección</td></tr>
+                <tr><td>Esc</td><td>Volver a «Seleccionar» (la herramienta sigue activa para colocar varios elementos seguidos)</td></tr>
+                <tr><td>Colocar varios</td><td>Tras crear un elemento, la herramienta sigue activa: dibuja el siguiente sin volver a elegirla</td></tr>
               </table>
               <p class="muted">En pantallas táctiles: un dedo dibuja o mueve, dos dedos hacen zoom y desplazan la vista.</p>
             </details>
@@ -10321,7 +10328,7 @@ $('ccttTramosThreshold')?.addEventListener('input',e=>{cfg.thresholdMeters=Math.
 $('ccttTramosExport')?.addEventListener('click',()=>{const {output,other}=classify();const rows=[['Tramo','Estado','Buque','MMSI','Velocidad_nudos','Destino','Ultimo_reporte']];TRAMOS.forEach(t=>{const a=output.get(t.name);if(!Array.isArray(ships))rows.push([t.name,'Sin datos AIS','','','','','']);else if(!a.length)rows.push([t.name,'Sin buque operante','','','','','']);else a.forEach(x=>rows.push([t.name,'Ocupado',x.name,x.mmsi,x.speedKnots,x.destination,x.reportedAt]))});other.forEach(x=>rows.push(['En fondeo o maniobra','Fuera de tramo',x.name,x.mmsi,x.speedKnots,x.destination,x.reportedAt]));const csv='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download='CCTT_tramos_manzanillo.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)});
 let loadingLeaflet=null;async function loadLeaflet(){if(window.L)return; if(loadingLeaflet)return loadingLeaflet;loadingLeaflet=new Promise((resolve,reject)=>{const link=document.createElement('link');link.rel='stylesheet';link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.append(link);const script=document.createElement('script');script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';script.onload=resolve;script.onerror=()=>reject(Error('Leaflet no disponible'));document.head.append(script)});return loadingLeaflet}
 function drawCalibration(){if(!leafletMap)return;leafletPoints.forEach(l=>leafletMap.removeLayer(l));leafletPoints=[];if(Array.isArray(ships))ships.forEach(b=>leafletPoints.push(L.circleMarker([b.lat,b.lon],{radius:5,color:'#ecb44e'}).addTo(leafletMap).bindPopup((()=>{const n=document.createElement('span');n.textContent=b.name||'Buque sin nombre';return n})())))}
-$('ccttTramosCalibration')?.addEventListener('change',async e=>{const mapDiv=$('ccttTramosMap');mapDiv.hidden=!e.target.checked;if(!e.target.checked)return;try{await loadLeaflet();if(!leafletMap){leafletMap=L.map(mapDiv).setView([19.069,-104.295],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19,keepBuffer:1}).addTo(leafletMap);TRAMOS.forEach(t=>{const p=L.polyline(t.points,{color:'#0e9dd8',weight:4}).addTo(leafletMap).bindTooltip(t.name);leafletLines.push(p)});leafletMap.fitBounds(L.featureGroup(leafletLines).getBounds(),{padding:[15,15]})}setTimeout(()=>leafletMap.invalidateSize(),100);drawCalibration()}catch(err){mapDiv.hidden=true;$('ccttTramosUpdated').textContent='Mapa de calibración no disponible: '+String(err?.message||err)}});
+$('ccttTramosCalibration')?.addEventListener('change',async e=>{const mapDiv=$('ccttTramosMap');mapDiv.hidden=!e.target.checked;if(!e.target.checked)return;try{await loadLeaflet();if(!leafletMap){leafletMap=L.map(mapDiv).setView([19.069,-104.295],13);const tramosBases={'OpenStreetMap':L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19,keepBuffer:1}),'CARTO Claro':L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap contributors · © CARTO',maxZoom:19,maxNativeZoom:19,keepBuffer:1}),'CARTO Oscuro':L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap contributors · © CARTO',maxZoom:19,maxNativeZoom:19,keepBuffer:1})};tramosBases['OpenStreetMap'].addTo(leafletMap);L.control.layers(tramosBases).addTo(leafletMap);TRAMOS.forEach(t=>{const p=L.polyline(t.points,{color:'#0e9dd8',weight:4}).addTo(leafletMap).bindTooltip(t.name);leafletLines.push(p)});leafletMap.fitBounds(L.featureGroup(leafletLines).getBounds(),{padding:[15,15]})}setTimeout(()=>leafletMap.invalidateSize(),100);drawCalibration()}catch(err){mapDiv.hidden=true;$('ccttTramosUpdated').textContent='Mapa de calibración no disponible: '+String(err?.message||err)}});
 // NUEVO: consulta AISStream mediante Supabase; mantiene intacto el iframe MarineTraffic.
 // El muestreo limitado no garantiza cobertura continua ni ausencia de buques.
 const aisInfo=document.createElement('p');aisInfo.id='ccttAISStreamStatus';aisInfo.className='muted';aisInfo.setAttribute('role','status');aisInfo.setAttribute('aria-live','polite');aisInfo.textContent='AISStream: pendiente de consulta. La ausencia de señales no confirma muelles libres.';
@@ -11769,7 +11776,7 @@ let recordingCanvas=null;
 function record(){if(recorder?.state==='recording'){recorder.stop();el('stRecord').textContent='Grabar video';return}if(!canvas.captureStream||!window.MediaRecorder){notify('Este navegador no permite grabar video. Usa PNG o JSON.');return}try{recordingCanvas=composite();recordingCanvas.toDataURL('image/png');const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>MediaRecorder.isTypeSupported(t));if(!mime)throw Error('No hay un formato de video compatible.');recordStream=recordingCanvas.captureStream(15);recordChunks=[];recorder=new MediaRecorder(recordStream,{mimeType:mime});recorder.ondataavailable=e=>{if(e.data.size)recordChunks.push(e.data)};recorder.onstop=()=>{exportFile('cctt_transito_simulacion.webm',new Blob(recordChunks,{type:mime}),mime);recordStream.getTracks().forEach(t=>t.stop());recorder=null;recordingCanvas=null;el('stRecord').textContent='Grabar video';notify('Grabación descargada.');};recorder.start();el('stRecord').textContent='Detener grabación';notify('Grabando mapa visible y agentes; pulsa Detener grabación para descargar.');}catch(e){notify('No se pudo grabar: '+e.message)}}
 setInterval(()=>{if(recorder?.state==='recording'&&recordingCanvas){try{const frame=composite(),cx=recordingCanvas.getContext('2d');cx.clearRect(0,0,recordingCanvas.width,recordingCanvas.height);cx.drawImage(frame,0,0,recordingCanvas.width,recordingCanvas.height)}catch(e){recorder.stop();notify('La capa base impidió continuar la captura por sus permisos de imagen.')}}},100);
 /* NUEVO: integración de Leaflet-Geoman y controles existentes del panel. */
-function init(){if(map)return true;if(!window.L?.map||!L.PM||!window.turf?.bezierSpline){notify('No se cargaron Leaflet, Leaflet-Geoman o Turf. Comprueba la conexión y permite los CDNs autorizados; vuelve a abrir este módulo.');return false}map=L.map(el('stLeafletMap'),{preferCanvas:true,zoomControl:true,maxZoom:21}).setView([19.08,-104.30],15);const bases={OpenStreetMap:L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxNativeZoom:19,maxZoom:21,crossOrigin:'anonymous',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'}),'Esri World Imagery':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:19,maxZoom:21,crossOrigin:'anonymous',attribution:'Tiles &copy; Esri &mdash; Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community'}),'Topográfico':L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxNativeZoom:17,maxZoom:21,crossOrigin:'anonymous',attribution:'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, SRTM | Map style &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)'})};bases.OpenStreetMap.addTo(map);layerControl=L.control.layers(bases,{}, {position:'bottomright'}).addTo(map);L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);networkLayer=L.featureGroup().addTo(map);draftLayer=L.featureGroup([], {pmIgnore:true}).addTo(map);areaLayer=L.featureGroup([], {pmIgnore:true}).addTo(map);map.pm.setLang('es');map.pm.setGlobalOptions({snappable:true,snapDistance:20,snapSegment:true,snapMiddle:true,layerGroup:networkLayer});
+function init(){if(map)return true;if(!window.L?.map||!L.PM||!window.turf?.bezierSpline){notify('No se cargaron Leaflet, Leaflet-Geoman o Turf. Comprueba la conexión y permite los CDNs autorizados; vuelve a abrir este módulo.');return false}map=L.map(el('stLeafletMap'),{preferCanvas:true,zoomControl:true,maxZoom:21}).setView([19.08,-104.30],15);const bases={OpenStreetMap:L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxNativeZoom:19,maxZoom:21,crossOrigin:'anonymous',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'}),'Esri World Imagery':L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxNativeZoom:19,maxZoom:21,crossOrigin:'anonymous',attribution:'Tiles &copy; Esri &mdash; Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community'}),'Topográfico':L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxNativeZoom:17,maxZoom:21,crossOrigin:'anonymous',attribution:'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, SRTM | Map style &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)'}),'CARTO Claro':L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxNativeZoom:20,maxZoom:21,crossOrigin:'anonymous',attribution:'© OpenStreetMap contributors · © CARTO'}),'CARTO Oscuro':L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxNativeZoom:20,maxZoom:21,crossOrigin:'anonymous',attribution:'© OpenStreetMap contributors · © CARTO'})};bases.OpenStreetMap.addTo(map);layerControl=L.control.layers(bases,{}, {position:'bottomright'}).addTo(map);L.control.scale({imperial:false,position:'bottomleft',maxWidth:120}).addTo(map);networkLayer=L.featureGroup().addTo(map);draftLayer=L.featureGroup([], {pmIgnore:true}).addTo(map);areaLayer=L.featureGroup([], {pmIgnore:true}).addTo(map);map.pm.setLang('es');map.pm.setGlobalOptions({snappable:true,snapDistance:20,snapSegment:true,snapMiddle:true,layerGroup:networkLayer});
 map.on('baselayerchange',e=>baseLayerName=e.name);map.on('overlayadd overlayremove',()=>{if(overlay)el('stOverlayVisible').checked=map.hasLayer(overlay)});map.on('mousemove',e=>el('coordsDisplay').textContent=e.latlng.lat.toFixed(6)+'°, '+e.latlng.lng.toFixed(6)+'°');map.on('move zoom moveend zoomend resize',render);let tileErrors=0;Object.values(bases).forEach(layer=>layer.on('tileerror',()=>{if(++tileErrors===4)notify('No se pudo cargar la cartografía. Comprueba la conexión o cambia de capa base; tu red dibujada se conserva.')}));
 map.on('pm:create',e=>{const layer=e.layer;networkLayer.removeLayer(layer);map.removeLayer(layer);const kind=tool;if(kind==='area'){const b=layer.getBounds();area=[[b.getSouth(),b.getWest()],[b.getNorth(),b.getEast()]];areaLayer.clearLayers();L.rectangle(b,{color:'#e879a5',weight:2,fillOpacity:.07,pmIgnore:true}).addTo(areaLayer);notify('Área seleccionada. Pulsa Importar OSM del área.');return}if(kind==='zone'){const name=safe('stZoneName');if(!name||zones.some(z=>z.properties.name===name)){notify('Escribe un nombre único en Nombre de zona y vuelve a dibujar el polígono.');return}pushHistory();zones.push({type:'Feature',id:uid('zone-'),properties:{name,capacity:Math.max(0,Math.floor(float('stZoneCapacity')))},geometry:layer.toGeoJSON().geometry});invalidate();redrawNetwork();notify('Zona guardada; disponible en origen y destino.');return}if(['signal','stop','yield','booth','crossing','pin'].includes(kind)){pushHistory();controls.push({type:'Feature',id:uid('control-'),properties:controlProperties(kind),geometry:{type:'Point',coordinates:coord(layer.getLatLng())}});invalidate();redrawNetwork();notify('Control registrado; sus tiempos se aplicarán al nodo más cercano de la red.');return}if(kind==='roundabout'){const center=coord(layer.getLatLng()),radius=layer.getRadius(),min={pedestrian:2,light:5,heavy:12,special:7}[mode];if(radius<min){notify('La glorieta requiere un radio mínimo de '+min+' m para el tipo seleccionado.');return}const coords=Array.from({length:49},(_,i)=>turf.destination(turf.point(center),radius/1000,i*360/48).geometry.coordinates);setDraft(coords);draft.radius=radius;el('stTurnRadius').value=radius.toFixed(1)}else{const geometry=layer.toGeoJSON().geometry;if(geometry.type==='LineString'){setDraft(geometry.coordinates);if(kind==='route')notify('Puntos intermedios marcados; la ruta se ajustará a la red al añadir el flujo.')}}});
 map.on('pm:cut',e=>{const originalId=[...layerById].find(([,layer])=>layer===e.originalLayer)?.[0],original=roads.find(r=>r.id===originalId);if(!original){notify('Selecciona un tramo registrado antes de cortarlo.');return}pushHistory();const collect=[];const take=l=>{const geo=l.toGeoJSON();if(geo.type==='FeatureCollection')geo.features.forEach(f=>{if(f.geometry.type==='LineString')collect.push(f.geometry.coordinates)});else if(geo.geometry.type==='LineString')collect.push(geo.geometry.coordinates);else if(geo.geometry.type==='MultiLineString')collect.push(...geo.geometry.coordinates)};take(e.layer);roads=roads.filter(r=>r.id!==originalId);collect.forEach((c,i)=>roads.push(featureFromCoords(c,{...original.properties,name:original.properties.name+' · '+(i+1)})));invalidate();redrawNetwork();notify('Corte aplicado y registrado en el historial.');});
@@ -14094,7 +14101,7 @@ html[data-cctt-scheme=dark] #page-traficoTerrestre{--tr-float-bg:color-mix(in sr
   <aside class="tr-panel" id="trLayersPanel" aria-label="Capas del mapa">
    <h3>Capas del mapa</h3>
    <label for="trBase">Mapa base CARTO
-    <select id="trBase"><option value="auto">Automático según el tema</option><option value="voyager">Voyager · calles</option><option value="light_all">Positron · claro</option><option value="dark_all">Dark Matter · oscuro</option></select>
+    <select id="trBase"><option value="auto">Automático según el tema</option><option value="voyager">Voyager · calles</option><option value="light_all">Positron · claro</option><option value="dark_all">Dark Matter · oscuro</option><option value="osm">OpenStreetMap · calles</option></select>
    </label>
    <p class="tr-help" id="trBaseNotice" role="status"></p>
    <label for="trProvider">Fuente de tráfico
@@ -14851,6 +14858,18 @@ const trShared = (() => {
   const selected = $('trBase').value;
   const style = selected === 'auto' ? (dark?'dark_all':'voyager') : selected;
   /* NUEVO */ if(!recheck&&base&&!baseError&&trBaseStyle===style)return;
+  /* NUEVO: OpenStreetMap como capa base, sin proxy (es pública). */
+  if(style==='osm'){
+   const nextUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+   if(base&&baseUrl===nextUrl&&!baseError)return;
+   const layer=L.tileLayer(nextUrl,{maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,attribution:'© OpenStreetMap contributors'});
+   layer.on('tileerror',()=>{if(base!==layer||!active())return;baseError='No se pudo cargar parte del mapa base.';$('trBaseNotice').textContent=baseError;status(baseError+' Puedes intentar actualizar.','error');if(!baseRetryTimer){baseRetryTimer=setTimeout(()=>{baseRetryTimer=null;if(base===layer&&active()&&!document.hidden)layer.redraw();},1500);}});
+   if(base)map.removeLayer(base);
+   baseError='';base=layer;baseUrl=nextUrl;trBaseStyle=style;base.addTo(map);
+   if(traffic)traffic.bringToFront();
+   $('trBaseNotice').textContent='OpenStreetMap · calles';
+   return;
+  }
   try {
    const sb = client();
    /* MODIFICADO: reutilizar únicamente una consulta que aún está en curso. */
@@ -14906,14 +14925,14 @@ const trShared = (() => {
   config = result;/* NUEVO */trConfigAt=Date.now();
   const selector = $('trProvider');
   selector.replaceChildren(new Option('Selecciona una fuente',''));
-  for (const source of ['tomtom','here']) {
+  for (const source of ['tomtom']) {
    const enabled = result?.providers?.[source] === true;
    const option = new Option(providerNames[source]+(enabled?'':' · sin configurar'),source);
    option.disabled = !enabled;
    selector.add(option);
   }
-  selector.value = result?.providers?.[selected] ? selected : ['tomtom','here'].find(source=>result?.providers?.[source]) || '';
-  $('trProviders').textContent = ['tomtom','here'].map(source=>providerNames[source]+(result?.providers?.[source]?' disponible':' sin configurar')).join(' · ');
+  selector.value = result?.providers?.[selected] ? selected : ['tomtom'].find(source=>result?.providers?.[source]) || '';
+  $('trProviders').textContent = ['tomtom'].map(source=>providerNames[source]+(result?.providers?.[source]?' disponible':' sin configurar')).join(' · ');
    /* MODIFICADO: la configuración consultada aquí solo se utiliza para el mapa. */
   legend();
   return true;
@@ -16912,7 +16931,7 @@ const pathLength = pts => pts.reduce((s, p, i) => i ? s + Math.hypot(p.x - pts[i
 const DEFAULT_STYLE = {
   stroke: '#22c55e', fill: '#e53935', strokeOpacity: 1, fillOpacity: .9,
   lineWidth: 8, dash: 'solid', dashGap: 10, lineCap: 'round', lineJoin: 'round',
-  arrowStart: 'none', arrowEnd: 'triangle', arrowStyle: 'triangle', arrowSize: 26,
+  arrowStart: 'none', arrowEnd: 'triangle', arrowStyle: 'triangle', arrowSize: 26, arrowSeq: 'none',
   halo: true, shadow: false, glow: false, parallel: false, parallelOffset: 28, parallelCount: 2,
   font: 'Arial', fontSize: 34, bold: true, italic: false, textAlign: 'center',
   textColor: '#ffffff', textOutline: true, textShadow: false,
@@ -17138,6 +17157,71 @@ function drawArrowheads(c, o) {
   if (startStyle && startStyle !== 'none') { o.arrowStyle = startStyle; drawArrowhead(c, s[0], startAngle, o, true); }
   o.arrowStyle = saved;
 }
+/* Flechas consecutivas (como Mapas y croquis): reparte las puntas a lo largo
+   del trazo, centradas en cada tramo; la secuencia va hacia adelante, hacia
+   atrás o en ambos sentidos según o.arrowSeq. */
+function repeatHeadPositions(o) {
+  const seq = o.arrowSeq || 'none';
+  if (!seq || seq === 'none' || !seq.startsWith('repeat-')) return [];
+  const s = samplePath(o);
+  if (s.length < 2) return [];
+  const cum = [0]; let total = 0;
+  for (let i = 1; i < s.length; i++) { total += Math.hypot(s[i].x - s[i - 1].x, s[i].y - s[i - 1].y); cum.push(total); }
+  if (total < 12) return [];
+  const step = Math.max(42, (o.lineWidth || 8) * 10);
+  const count = Math.max(1, Math.floor(total / step));
+  const out = [];
+  for (let j = 0; j < count; j++) {
+    const dist = (j + .5) * total / count;
+    let k = 1; while (k < cum.length - 1 && cum[k] < dist) k++;
+    const segLen = cum[k] - cum[k - 1] || 1, f = (dist - cum[k - 1]) / segLen;
+    out.push({ x: s[k - 1].x + (s[k].x - s[k - 1].x) * f, y: s[k - 1].y + (s[k].y - s[k - 1].y) * f, angle: Math.atan2(s[k].y - s[k - 1].y, s[k].x - s[k - 1].x) });
+  }
+  return out;
+}
+function drawRepeatArrowheads(c, o) {
+  const seq = o.arrowSeq || 'none';
+  if (!seq || seq === 'none' || !seq.startsWith('repeat-')) return;
+  const dir = seq.replace('repeat-', '');
+  const saved = o.arrowStyle;
+  o.arrowStyle = (o.arrowEnd && o.arrowEnd !== 'none') ? o.arrowEnd : 'triangle';
+  for (const h of repeatHeadPositions(o)) {
+    if (dir === 'forward' || dir === 'both') drawArrowhead(c, h, h.angle, o, false);
+    if (dir === 'backward' || dir === 'both') drawArrowhead(c, h, h.angle + Math.PI, o, false);
+  }
+  o.arrowStyle = saved;
+}
+/* Traviesas de la línea tipo tren (como Mapas y croquis): una marca
+   transversal cada 21 px a lo largo de todo el trazo, empezando a 10.5 px. */
+function trainTieSegments(o) {
+  const s = samplePath(o), out = [];
+  if (s.length < 2) return out;
+  const step = 21, half = Math.max(6, (o.lineWidth || 8) * 1.7);
+  let acc = 0, next = step / 2;
+  for (let i = 1; i < s.length; i++) {
+    const dx = s[i].x - s[i - 1].x, dy = s[i].y - s[i - 1].y, len = Math.hypot(dx, dy);
+    if (len < .01) continue;
+    const nx = -dy / len, ny = dx / len;
+    while (acc + len >= next) {
+      const d = next - acc;
+      const x = s[i - 1].x + dx * d / len, y = s[i - 1].y + dy * d / len;
+      out.push({ x1: x + nx * half, y1: y + ny * half, x2: x - nx * half, y2: y - ny * half });
+      next += step;
+    }
+    acc += len;
+  }
+  return out;
+}
+function drawTrainTies(c, o) {
+  const ties = trainTieSegments(o);
+  if (!ties.length) return;
+  c.save();
+  c.strokeStyle = hexToRgba(o.stroke, o.strokeOpacity ?? 1);
+  c.lineWidth = Math.max(2, (o.lineWidth || 8) * .65);
+  c.lineCap = 'round';
+  for (const t of ties) { c.beginPath(); c.moveTo(t.x1, t.y1); c.lineTo(t.x2, t.y2); c.stroke(); }
+  c.restore();
+}
 function roundRectPath(c, x, y, w, h, r) {
   r = clamp(r || 0, 0, Math.min(w, h) / 2);
   c.beginPath();
@@ -17206,10 +17290,12 @@ function drawObject(c, o, forExport) {
   if (o.shadow && o.type !== 'arrow' && o.type !== 'line' && o.type !== 'polyline' && o.type !== 'spline' && o.type !== 'curve' && o.type !== 'doubleArrow' && o.type !== 'freehand') {
     c.shadowColor = 'rgba(0,0,0,.4)'; c.shadowBlur = 10; c.shadowOffsetY = 4;
   }
-  const pathTypes = ['arrow', 'doubleArrow', 'curve', 'line', 'polyline', 'spline', 'freehand'];
+  const pathTypes = ['arrow', 'doubleArrow', 'curve', 'line', 'polyline', 'spline', 'freehand', 'train'];
   if (pathTypes.includes(o.type)) {
     strokePath(c, o, () => buildPath(c, o));
     if (o.type === 'arrow' || o.type === 'doubleArrow' || o.type === 'curve') drawArrowheads(c, o);
+    if (o.type === 'train') drawTrainTies(c, o);
+    drawRepeatArrowheads(c, o);
     if (o.text && o.pathText) drawTextOnPath(c, o);
     else if (o.text) { const mid = samplePath(o)[Math.floor(samplePath(o).length / 2)] || o.pts[0]; if (mid) drawTextLines(c, o.text.split('\n'), mid.x, mid.y, o); }
   } else if (o.type === 'polygon') {
@@ -17496,7 +17582,7 @@ function setTool(t) {
   const tn = $('eiToolName');
   if (tn) { const b = document.querySelector('#eiTools .ei-tool[data-tool="' + t + '"] span'); tn.textContent = b ? b.textContent : t; }
   if (t === 'icon') switchEiTab('adjust');
-  hint(t === 'polyline' || t === 'spline' || t === 'polygon' ? 'Haz clic por punto. Doble clic o Enter para terminar, Esc para cancelar.' :
+  hint(t === 'polyline' || t === 'spline' || t === 'polygon' || t === 'train' ? 'Haz clic por punto. Doble clic o Enter para terminar, Esc para cancelar.' :
     t === 'curve' ? 'Haz clic en el inicio, luego en el punto de control y por último en el final.' :
     t === 'crop' ? 'Arrastra sobre la imagen para definir el recorte.' :
     t === 'pathtext' ? 'Haz clic en una línea o curva para escribir su rótulo.' : '');
@@ -17588,11 +17674,14 @@ canvas.addEventListener('pointerdown', e => {
     else if (state.tool === 'icon') o = newObject('icon', { ...base, w: 90, h: 90, iconId: state.currentIcon || 'pin', fill: state.style.stroke });
     else if (state.tool === 'north') o = newObject('north', { ...base, w: 110, h: 110 });
     else o = newObject('scalebar', { ...base, w: 320, h: 70, text: '0 — 100 m' });
-    o.name = o.type === 'label' ? 'Etiqueta' : o.type === 'text' ? 'Texto' : o.type === 'icon' ? 'Icono' : o.type;
-    state.objects.push(o); select([o.id]); setTool('select');
+    o.name = o.type === 'label' ? 'Etiqueta' : o.type === 'text' ? 'Texto' : o.type === 'icon' ? 'Icono' : o.type === 'north' ? 'Norte' : o.type === 'scalebar' ? 'Escala' : o.type;
+    state.objects.push(o); select([o.id]);
+    /* La herramienta sigue activa para colocar el siguiente elemento sin
+       volver a elegirla; Esc o «Seleccionar» vuelven a mover/editar. */
+    setStatus(o.name + ' creado. Sigue colocando o pulsa Esc para seleccionar.');
     return;
   }
-  if (['polyline', 'spline', 'polygon', 'curve'].includes(state.tool)) {
+  if (['polyline', 'spline', 'polygon', 'curve', 'train'].includes(state.tool)) {
     const p = snapPoint(img);
     if (!drawing) drawing = { tool: state.tool, pts: [p], cur: p };
     else drawing.pts.push(p);
@@ -17667,7 +17756,8 @@ function finishPointer(e) {
     } else if (d.tool === 'freehand') o = newObject('freehand', { pts: d.pts });
     else o = newObject(d.tool, { pts: [d.start, d.cur] });
     o.name = { arrow: 'Flecha', doubleArrow: 'Flecha doble', line: 'Línea', rect: 'Rectángulo', ellipse: 'Elipse', freehand: 'Trazo libre' }[d.tool] || d.tool;
-    state.objects.push(o); select([o.id]); setTool('select');
+    state.objects.push(o); select([o.id]);
+    setStatus(o.name + ' creado. Sigue dibujando o pulsa Esc para seleccionar.');
   }
 }
 canvas.addEventListener('pointerup', finishPointer);
@@ -17691,13 +17781,20 @@ function finishDrawingPoints() {
     commitHistory('crear');
     const o = newObject('polygon', { pts: d.pts, name: 'Polígono' });
     state.objects.push(o); select([o.id]);
+  } else if (d.tool === 'train') {
+    if (d.pts.length < 2) { setStatus('La línea tipo tren necesita al menos 2 puntos.'); return; }
+    commitHistory('crear');
+    const o = newObject('train', { pts: d.pts, name: 'Línea tipo tren' });
+    state.objects.push(o); select([o.id]);
   } else {
     if (d.pts.length < 2) { setStatus('La ruta necesita al menos 2 puntos.'); return; }
     commitHistory('crear');
     const o = newObject(d.tool, { pts: d.pts, name: d.tool === 'spline' ? 'Curva suave' : 'Polilínea' });
     state.objects.push(o); select([o.id]);
   }
-  setTool('select');
+  /* La herramienta sigue activa para trazar el siguiente elemento sin
+     volver a elegirla; Esc o «Seleccionar» vuelven a mover/editar. */
+  setStatus('Elemento creado. Sigue dibujando o pulsa Esc para seleccionar.');
 }
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
@@ -17724,7 +17821,7 @@ function syncProps() {
   if (fo) fo.textContent = Math.round((o.fillOpacity ?? 1) * 100) + ' %';
   set('eiPropLineWidth', o.lineWidth); set('eiPropDash', o.dash); set('eiPropDashGap', o.dashGap);
   set('eiPropLineCap', o.lineCap); set('eiPropLineJoin', o.lineJoin);
-  set('eiPropArrowStart', o.arrowStart); set('eiPropArrowEnd', o.arrowEnd); set('eiPropArrowSize', o.arrowSize);
+  set('eiPropArrowStart', o.arrowStart); set('eiPropArrowEnd', o.arrowEnd); set('eiPropArrowSize', o.arrowSize); set('eiPropArrowSeq', o.arrowSeq || 'none');
   setChk('eiPropHalo', o.halo); setChk('eiPropShadow', o.shadow); setChk('eiPropGlow', o.glow);
   setChk('eiPropParallel', o.parallel); set('eiPropParallelOffset', o.parallelOffset); set('eiPropParallelCount', o.parallelCount);
   set('eiPropText', o.text || ''); setChk('eiPropPathText', o.pathText);
@@ -17774,6 +17871,7 @@ function initProps() {
     ['eiPropArrowStart', (o, el) => { o.arrowStart = el.value; }],
     ['eiPropArrowEnd', (o, el) => { o.arrowEnd = el.value; }],
     ['eiPropArrowSize', (o, el) => { o.arrowSize = clamp(+el.value || 26, 4, 80); }],
+    ['eiPropArrowSeq', (o, el) => { o.arrowSeq = el.value; }],
     ['eiPropHalo', (o, el) => { o.halo = el.checked; }],
     ['eiPropShadow', (o, el) => { o.shadow = el.checked; }],
     ['eiPropGlow', (o, el) => { o.glow = el.checked; }],
@@ -17801,6 +17899,8 @@ function initProps() {
   /* Si no hay selección, el color elegido se convierte en el estilo por defecto. */
   $('eiPropStroke')?.addEventListener('input', e => { if (!selectedObjects().length) state.style.stroke = e.target.value; });
   $('eiPropFill')?.addEventListener('input', e => { if (!selectedObjects().length) state.style.fill = e.target.value; });
+  /* Sin selección, la secuencia elegida se convierte en el estilo por defecto. */
+  $('eiPropArrowSeq')?.addEventListener('input', e => { if (!selectedObjects().length) state.style.arrowSeq = e.target.value; });
 }
 function renderLayers() {
   const host = $('eiLayers'); if (!host) return;
@@ -18091,6 +18191,20 @@ async function exportImage(kind) {
   setStatus(`Exportado ${name} (${c.width} × ${c.height} px).`);
   return { blob, canvas: c, name };
 }
+/* Una punta de flecha como elemento SVG (misma geometría que drawArrowhead:
+   la punta está en el origen y apunta hacia +x antes de rotarla). */
+function svgHead(tip, angle, o, style) {
+  const s = o.arrowSize || 26, cos = Math.cos(angle), sin = Math.sin(angle);
+  const P = (x, y) => [Math.round(tip.x + x * cos - y * sin), Math.round(tip.y + x * sin + y * cos)];
+  const col = esc(o.stroke), op = o.strokeOpacity ?? 1, lw = Math.max(2, (o.lineWidth || 8) * .5);
+  const pts = a => a.map(([x, y]) => P(x, y).join(',')).join(' ');
+  if (style === 'circle') { const [cx, cy] = P(-s * .35, 0); return `<circle cx="${cx}" cy="${cy}" r="${Math.round(s * .32)}" fill="${col}" fill-opacity="${op}"/>`; }
+  if (style === 'open') return `<path d="M${pts([[-s, -s * .55]])} L${P(0, 0).join(',')} L${pts([[-s, s * .55]])}" fill="none" stroke="${col}" stroke-opacity="${op}" stroke-width="${lw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const shape = style === 'spear' ? [[0, 0], [-s * 1.4, -s * .32], [-s * .8, 0], [-s * 1.4, s * .32]]
+    : style === 'diamond' ? [[0, 0], [-s * .5, -s * .4], [-s, 0], [-s * .5, s * .4]]
+    : [[0, 0], [-s, -s * .45], [-s, s * .45]];
+  return `<polygon points="${pts(shape)}" fill="${col}" fill-opacity="${op}"/>`;
+}
 function exportSvg() {
   if (!state.img) { setStatus('Carga primero una imagen.'); return; }
   const ds = displaySize();
@@ -18102,6 +18216,21 @@ function exportSvg() {
       const s = samplePath(o);
       const d = 'M' + s.map(p => `${Math.round(p.x)} ${Math.round(p.y)}`).join(' L');
       parts.push(`<path d="${d}" fill="none" stroke="${esc(o.stroke)}" stroke-opacity="${so}" stroke-width="${o.lineWidth}" stroke-linecap="${o.lineCap}" stroke-linejoin="${o.lineJoin}" stroke-dasharray="${dashFor(o).join(' ') || 'none'}"/>`);
+      /* Puntas de los extremos (lienzo: flecha, doble y curva), traviesas del
+         tren y flechas consecutivas (todos los trazos). */
+      if (['arrow', 'doubleArrow', 'curve'].includes(o.type) && s.length >= 2) {
+        const endAngle = Math.atan2(s[s.length - 1].y - s[s.length - 2].y, s[s.length - 1].x - s[s.length - 2].x);
+        const startAngle = Math.atan2(s[0].y - s[1].y, s[0].x - s[1].x);
+        if (o.arrowEnd && o.arrowEnd !== 'none') parts.push(svgHead(s[s.length - 1], endAngle, o, o.arrowEnd));
+        if (o.arrowStart && o.arrowStart !== 'none') parts.push(svgHead(s[0], startAngle, o, o.arrowStart));
+      }
+      if (o.type === 'train') for (const t of trainTieSegments(o)) parts.push(`<path d="M${Math.round(t.x1)} ${Math.round(t.y1)} L${Math.round(t.x2)} ${Math.round(t.y2)}" fill="none" stroke="${esc(o.stroke)}" stroke-opacity="${so}" stroke-width="${Math.max(2, (o.lineWidth || 8) * .65)}" stroke-linecap="round"/>`);
+      const seqDir = (o.arrowSeq || '').replace('repeat-', '');
+      for (const h of repeatHeadPositions(o)) {
+        const st = (o.arrowEnd && o.arrowEnd !== 'none') ? o.arrowEnd : 'triangle';
+        if (seqDir === 'forward' || seqDir === 'both') parts.push(svgHead(h, h.angle, o, st));
+        if (seqDir === 'backward' || seqDir === 'both') parts.push(svgHead(h, h.angle + Math.PI, o, st));
+      }
       if (o.text && o.pathText) { const rev = pathTextReverse(o); const dp = rev ? [...s].reverse() : s; const dd = 'M' + dp.map(p => `${Math.round(p.x)} ${Math.round(p.y)}`).join(' L'); const offPct = Math.round(((rev ? 1 - (o.pathTextOffset ?? .5) : (o.pathTextOffset ?? .5))) * 100); parts.push(`<path id="eiPath${i}" d="${dd}" fill="none"/><text font-family="${esc(o.font)}" font-size="${o.fontSize}" font-weight="${o.bold ? 'bold' : 'normal'}" fill="${esc(o.textColor)}"><textPath href="#eiPath${i}" startOffset="${offPct}%" text-anchor="middle">${esc(o.text)}</textPath></text>`); }
     } else if (o.type === 'rect') parts.push(`<rect x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}" rx="${o.labelRadius ?? 10}" fill="${esc(o.fill)}" fill-opacity="${fo}" stroke="${esc(o.stroke)}" stroke-opacity="${so}" stroke-width="${o.lineWidth}"/>`);
     else if (o.type === 'ellipse') parts.push(`<ellipse cx="${o.x + o.w / 2}" cy="${o.y + o.h / 2}" rx="${o.w / 2}" ry="${o.h / 2}" fill="${esc(o.fill)}" fill-opacity="${fo}" stroke="${esc(o.stroke)}" stroke-opacity="${so}" stroke-width="${o.lineWidth}"/>`);
@@ -18518,7 +18647,8 @@ function init() {
         purpose: 'Anotar fotografías con rutas, flechas, rótulos sobre trazo y cuadros de etiqueta; exportar PNG, JPEG, WebP, PDF y SVG.',
         steps: [
           { title: 'Cargar la foto', body: 'Pulsa «Cargar imagen», arrastra el archivo al lienzo o pégalo con Ctrl+V. También puedes traer una foto de Reporte de vialidades con «Desde Reporte de vialidades».' },
-          { title: 'Trazar una ruta', body: 'Elige «Curva suave» o «Flecha» en la barra lateral, haz clic por los puntos del recorrido y termina con doble clic o Enter. Los nodos se arrastran para ajustar el trazo.' },
+          { title: 'Trazar una ruta', body: 'Elige «Curva suave» o «Flecha» en la barra lateral, haz clic por los puntos del recorrido y termina con doble clic o Enter. Los nodos se arrastran para ajustar el trazo. La herramienta sigue activa para trazar la siguiente; pulsa Esc para volver a «Seleccionar».' },
+          { title: 'Flechas consecutivas y tren', body: 'En Propiedades, «Flechas consecutivas» repite la punta a lo largo del trazo hacia adelante, hacia atrás o en ambos sentidos, como en Mapas y croquis. La herramienta «Tren» dibuja una línea con traviesas como vía férrea.' },
           { title: 'Rotular', body: 'Activa «Texto siguiendo el trazo» en Propiedades para escribir el nombre de la calle sobre la ruta, o usa «Etiqueta» para un cuadro de color con texto blanco.' },
           { title: 'Exportar y enviar', body: 'Descarga PNG, JPEG, WebP, PDF o SVG desde la barra superior, o envía la imagen terminada a Reporte de vialidades o a WhatsApp con los botones «Enviar».' }
         ]
