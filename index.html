@@ -2593,6 +2593,9 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #page-generadorCorreos textarea{padding:6px!important;border:1px solid var(--cm-line);border-radius:2px;min-height:0;background:var(--cm-soft);color:var(--cm-text);font:inherit;line-height:18px;box-sizing:border-box;resize:vertical}
 #page-generadorCorreos #correoIdea{height:74px;min-height:66px}#page-generadorCorreos #correoContexto{height:56px;min-height:48px}
 #page-generadorCorreos #correoFichaPlantilla{padding:6px;margin-top:4px;background:var(--cm-soft);border:0;border-radius:2px}
+#page-generadorCorreos #correoGruasForm{padding:8px;margin-top:8px;background:var(--cm-soft);border:0;border-radius:2px}
+#page-generadorCorreos .cm-keys{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+#page-generadorCorreos .cm-keys .field{margin:0}
 #page-generadorCorreos #correoVistaPlantilla{font-style:italic;margin:4px 0;font-size:13px;line-height:18px;white-space:pre-wrap}
 #page-generadorCorreos #correoEditorPlantilla{padding:10px;background:var(--cm-soft)}#page-generadorCorreos #correoInicioPlantilla{min-height:100px}
 #page-generadorCorreos .correo-actions{gap:6px;margin:4px 0;flex-wrap:wrap}#page-generadorCorreos .correo-actions:empty{display:none}
@@ -3282,6 +3285,11 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
                   <select id="eiPropClickOrient" title="Dirección de la flecha o línea que se crea con un solo clic (240 px)"><option value="right">Hacia la derecha →</option><option value="down">Hacia abajo ↓</option><option value="left">Hacia la izquierda ←</option><option value="up">Hacia arriba ↑</option></select>
                 </label>
               </div>
+              <div class="ei-row">
+                <label>Rotación (°)
+                  <span class="ei-rot"><input id="eiPropRotation" type="number" min="-180" max="180" step="1" value="0" title="Ángulo del objeto seleccionado, en grados"><input id="eiPropRotationRange" type="range" min="-180" max="180" step="1" value="0" title="Girar el objeto seleccionado"><output id="eiPropRotationOut">0°</output></span>
+                </label>
+              </div>
               <div class="ei-fieldset"><span class="ei-fieldset-title">Texto / Etiqueta</span>
                 <label>Texto <textarea id="eiPropText" rows="2" placeholder="Texto del rótulo o de la etiqueta"></textarea></label>
                 <div class="ei-row">
@@ -3456,6 +3464,9 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
                 <tr><td>Arrastrar un nodo</td><td>Mover solo ese punto de la línea, flecha o polígono (los círculos blancos)</td></tr>
                 <tr><td>Clic con Flecha / Línea</td><td>Coloca una flecha o línea de 240 px en ese punto, en la dirección elegida en «Orientación al colocar por clic» (también vale mantener pulsado y arrastrar)</td></tr>
                 <tr><td>Orientación al colocar</td><td>En Propiedades, elige hacia dónde apunta la flecha o línea que se crea con un solo clic: derecha, abajo, izquierda o arriba</td></tr>
+                <tr><td>Tirador «↻» sobre la caja</td><td>Girar el objeto seleccionado (texto, etiqueta, rectángulo, elipse, icono). Con Mayús, gira en pasos de 15°</td></tr>
+                <tr><td>Tiradores de esquina y borde</td><td>Redimensionar el objeto seleccionado; en texto y etiqueta, el tamaño de letra crece con la caja</td></tr>
+                <tr><td>Rotación (°) en Propiedades</td><td>Escribir el ángulo exacto del objeto seleccionado (−180° a 180°)</td></tr>
                 <tr><td>Esc</td><td>Volver a «Seleccionar» (la herramienta sigue activa para colocar varios elementos seguidos)</td></tr>
                 <tr><td>Colocar varios</td><td>Tras crear un elemento, la herramienta sigue activa: dibuja el siguiente sin volver a elegirla</td></tr>
               </table>
@@ -6410,6 +6421,8 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
       if(chosen) chosen.textContent='Diseño boletín institucional';
       return typeof oldUpdateReportPreview==='function' ? oldUpdateReportPreview() : (typeof v10Compat==='function' ? v10Compat() : null);
     }
+    /* CORREGIDO (2026-11-26): mostrar el boletín institucional de inmediato mientras la plantilla se rasteriza; la plantilla lo sustituye al estar lista. */
+    try{ if(typeof oldUpdateReportPreview==='function') oldUpdateReportPreview(); }catch(e){}
     try{ return await renderReportPreviewV10(file); }
     catch(err){
       console.warn('V10: no se pudo aplicar la plantilla al reporte, se usa vista institucional.', err);
@@ -7852,7 +7865,7 @@ body{background:#f7f0e8!important}
 (()=>{
  'use strict';
  const q=id=>document.getElementById(id);
- let items=[],active=null,seq=0,refreshPending=null,lastPaintKey="",painting=false,paintRequested=false,lastStageWidth=0;
+ let items=[],active=null,seq=0,refreshPending=null,lastPaintKey="",painting=false,paintRequested=false,lastStageWidth=0,paintRetries=0,stageObserver=null;
  /* NUEVO: identidad de carga y vigencia de metadatos por sesión. */let loadEpoch=0,loadedAt=0,currentKey="",sessionId="";
  const visible=()=>q("page-inc35copoma")?.classList.contains("active")&&window.ccttCanAccess?.("inc35copoma")===true;
  const imageCache=new Map();const pendingImages=new Map();
@@ -7863,12 +7876,21 @@ body{background:#f7f0e8!important}
  else{url=URL.createObjectURL(blob)}const img=new Image();img.decoding='async';img.src=url;await img.decode();return {url,width:img.naturalWidth,height:img.naturalHeight,blob,img}})();pendingImages.set(key,task);try{const result=await task;if(epoch!==loadEpoch){if(result.url.startsWith("blob:"))URL.revokeObjectURL(result.url);throw Error("La sesión cambió");}imageCache.set(key,result);return result}finally{if(pendingImages.get(key)===task)pendingImages.delete(key)}}
  function detectLayout(source){try{const c=document.createElement('canvas');c.width=40;c.height=15;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(source.img,0,0,source.width,source.height*.22,0,0,40,15);const d=x.getImageData(0,0,40,15).data;let colored=0;for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2];if(Math.max(r,g,b)-Math.min(r,g,b)>32&&Math.min(r,g,b)<200)colored++}return colored>75?'photo':'plain'}catch(e){return 'plain'}}
  function fit(node,target){if(!node)return;const base=Math.max(8,Math.min(target,35));let size=base;node.style.fontSize=size+'px';while(size>7&&(node.scrollHeight>node.clientHeight+2||node.scrollWidth>node.clientWidth+2)){size-=.5;node.style.fontSize=size+'px'}}
- function paint(){const stage=q('copTemplatePreview')?.querySelector('.cctt-v35-stage');if(!stage||!stage.isConnected||!stage.clientWidth)return;const paintKey=[stage.dataset.templateId,Math.round(stage.clientWidth),...['copText','copHeader','copFooter','copDate','copTime','copFontSize'].map(id=>q(id)?.value||'')].join('\u241f');if(paintKey===lastPaintKey&&stage.querySelector('.cctt-v35-text'))return;lastPaintKey=paintKey;stage.querySelector('.cctt-v35-text')?.remove();const over=document.createElement('div');over.className='cctt-v35-text';over.dataset.layout=stage.dataset.layout;
+ function paint(){const stage=q('copTemplatePreview')?.querySelector('.cctt-v35-stage');if(!stage||!stage.isConnected||!stage.clientWidth)return;
+ /* CORREGIDO (2026-11-26): no pintar con el alto aún sin calcular (la plantilla acababa de montarse y las capas quedaban solapadas hasta que algo volvía a pintar). Si el alto no es válido, reintentar por rAF. */
+ if(!(stage.clientHeight>100)){if(paintRetries<30){paintRetries++;requestAnimationFrame(paint);}return;}
+ paintRetries=0;const paintKey=[stage.dataset.templateId,Math.round(stage.clientWidth),...['copText','copHeader','copFooter','copDate','copTime','copFontSize'].map(id=>q(id)?.value||'')].join('\u241f');if(paintKey===lastPaintKey&&stage.querySelector('.cctt-v35-text'))return;lastPaintKey=paintKey;stage.querySelector('.cctt-v35-text')?.remove();const over=document.createElement('div');over.className='cctt-v35-text';over.dataset.layout=stage.dataset.layout;
  const date=q('copDate')?.value||'';const time=q('copTime')?.value||'';const dt=date?new Date(date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'}).toUpperCase():'';
  const vals={head:q('copHeader')?.value||'',body:q('copText')?.value||'',foot:q('copFooter')?.value||''};const dateBlock=document.createElement('div');dateBlock.className='date';const line=document.createElement('span');line.className='cctt-date-line';line.textContent=dt;const clock=document.createElement('span');clock.className='cctt-time-line';clock.textContent=time?time+' horas':'';dateBlock.append(line,clock);over.append(dateBlock);for(const [k,value] of Object.entries(vals)){const n=document.createElement('div');n.className=k;n.textContent=value;over.append(n)}stage.append(over);const unit=stage.clientWidth/700;const chosen=Number(q('copFontSize')?.value||4);const bodyPx=(17+chosen*2.2)*unit;const sizes={date:18*unit,head:19*unit,body:bodyPx,foot:18*unit};for(const [k,size] of Object.entries(sizes))fit(over.querySelector('.'+k),size);const dl=over.querySelector('.cctt-date-line');if(dl){let n=19*unit;dl.style.fontSize=n+'px';while(n>9*unit&&dl.scrollWidth>dateBlock.clientWidth){n-=.5*unit;dl.style.fontSize=n+'px'}}}
  async function select(id){const item=items.find(x=>x.id===id);if(!item)return;/* NUEVO: la misma plantilla conserva su imagen y texto. */const key=item.id+'|'+item.url;if(active===id&&currentKey===key&&q('copTemplatePreview')?.querySelector('.cctt-v35-stage')){paint();return;}active=id;renderChoices();const ticket=++seq;const box=q('copTemplatePreview');if(!box)return;box.setAttribute('aria-busy','true');try{const source=await imageFor(item);if(ticket!==seq)return;const stage=document.createElement('div');stage.className='cctt-v35-stage';stage.dataset.templateId=id;stage.style.aspectRatio=source.width+'/'+source.height;
  // Template-specific layout uses the proportions of the header; published formats are distinct resources.
- stage.dataset.layout=detectLayout(source);/* MODIFICADO: posición exclusiva de COPOMA 1. */stage.dataset.copoma1=/\bCOPOMA[\s_-]*1\b/i.test(item.name||'')?'true':'false';const img=document.createElement('img');img.src=source.url;img.alt='Formato '+item.name;stage.append(img);box.replaceChildren(stage);currentKey=key;lastPaintKey='';requestAnimationFrame(paint)}catch(e){if(ticket===seq)status('No se pudo mostrar este formato. '+e.message)}finally{if(ticket===seq)box.removeAttribute('aria-busy')}}
+ stage.dataset.layout=detectLayout(source);/* MODIFICADO: posición exclusiva de COPOMA 1. */stage.dataset.copoma1=/\bCOPOMA[\s_-]*1\b/i.test(item.name||'')?'true':'false';const img=document.createElement('img');img.src=source.url;img.alt='Formato '+item.name;
+ /* CORREGIDO (2026-11-26): repintar cuando la imagen de la plantilla termina de cargar y cuando cambia el tamaño del escenario (ancho o alto), para que las capas no queden solapadas. */
+ img.addEventListener('load',()=>{lastPaintKey='';requestAnimationFrame(paint)});
+ img.addEventListener('error',()=>{lastPaintKey='';requestAnimationFrame(paint)});
+ stage.append(img);box.replaceChildren(stage);currentKey=key;lastPaintKey='';paintRetries=0;
+ if(window.ResizeObserver){try{stageObserver?.disconnect();let sw=0,sh=0;stageObserver=new ResizeObserver(es=>{const r=es[0]?.contentRect;const w=Math.round(r?.width||0),h=Math.round(r?.height||0);if((w||h)&&(w!==sw||h!==sh)){sw=w;sh=h;lastPaintKey='';requestAnimationFrame(paint);}});stageObserver.observe(stage);}catch(e){}}
+ requestAnimationFrame(paint)}catch(e){if(ticket===seq)status('No se pudo mostrar este formato. '+e.message)}finally{if(ticket===seq)box.removeAttribute('aria-busy')}}
  /* MODIFICADO: agrupar solicitudes, cargar al abrir y reutilizar la selección vigente. */
  async function load(provided){if(!visible())return;if(refreshPending)return refreshPending;const epoch=loadEpoch;const task=(async()=>{let all=provided;if(!Array.isArray(all)){if(items.length&&Date.now()-loadedAt<60000){await select(active||items[0].id);return;}const cli=window.ccttSupabaseClient;if(!cli)return;const {data,error}=await cli.functions.invoke('cctt-admin',{body:{action:'visible-templates'}});if(error||data?.error)throw error||Error(data.error);all=data?.templates||[];}if(epoch!==loadEpoch||!visible())return;items=all.filter(x=>x.module_id==='inc35copoma').slice(0,3);loadedAt=Date.now();if(!items.length){active=null;currentKey='';renderChoices();status('No hay formatos institucionales publicados.');return;}await select(items.some(x=>x.id===active)?active:items[0].id);})().catch(e=>{if(epoch===loadEpoch)status('No se pudieron consultar los formatos. '+(e.message||''));}).finally(()=>{if(refreshPending===task)refreshPending=null;});refreshPending=task;return task;}
  window.ccttComunicadosLoad=load;
@@ -7878,7 +7900,9 @@ body{background:#f7f0e8!important}
  // Capture phase isolates selection from older radio handlers and avoids duplicate renders.
  window.addEventListener('click',e=>{const btn=e.target.closest?.('#copTemplateList [data-id]');if(!btn)return;e.preventDefault();e.stopImmediatePropagation();select(btn.dataset.id)},true);
  const observer=new MutationObserver(()=>{const host=q('copTemplateList');if(host&&items.length&&!host.querySelector('.cctt-v35-option'))renderChoices()});
- function boot(){try{renderCopTemplateFinal=async()=>paint();renderCop=()=>paint()}catch(e){}const host=q('copTemplateList');if(host)observer.observe(host,{childList:true});for(const id of ['copText','copHeader','copFooter','copDate','copTime','copFontSize']){const e=q(id);if(e){e.addEventListener('input',paint,true);e.addEventListener('change',paint,true)}}const preview=q('copTemplatePreview');if(preview){new ResizeObserver(entries=>{const w=Math.round(entries[0]?.contentRect?.width||0);if(w&&w!==lastStageWidth){lastStageWidth=w;requestAnimationFrame(paint)}}).observe(preview)}const page=q('page-inc35copoma');if(page)new MutationObserver(()=>{if(visible())void load();}).observe(page,{attributes:true,attributeFilter:['class']});if(visible())void load()}
+ function boot(){try{renderCopTemplateFinal=async()=>paint();renderCop=()=>paint()}catch(e){}const host=q('copTemplateList');if(host)observer.observe(host,{childList:true});for(const id of ['copText','copHeader','copFooter','copDate','copTime','copFontSize']){const e=q(id);if(e){e.addEventListener('input',paint,true);e.addEventListener('change',paint,true)}}const preview=q('copTemplatePreview');if(preview){new ResizeObserver(entries=>{const w=Math.round(entries[0]?.contentRect?.width||0);if(w&&w!==lastStageWidth){lastStageWidth=w;requestAnimationFrame(paint)}}).observe(preview)}
+ /* CORREGIDO (2026-11-26): las fuentes web pueden cambiar el ancho del texto tras el primer pintado. */
+ if(document.fonts?.ready)document.fonts.ready.then(()=>{lastPaintKey='';requestAnimationFrame(paint);});const page=q('page-inc35copoma');if(page)new MutationObserver(()=>{if(visible())void load();}).observe(page,{attributes:true,attributeFilter:['class']});if(visible())void load()}
  /* MODIFICADO: la navegación de Consignas se inicializa en su propio módulo, no en COPOMA. */document.addEventListener('visibilitychange',()=>{if(!document.hidden){const host=q('copTemplateList');if(host&&items.length&&!host.querySelector('.cctt-v35-option'))renderChoices();const stage=q('copTemplatePreview')?.querySelector('.cctt-v35-stage');if(stage&&!stage.querySelector('.cctt-v35-text'))requestAnimationFrame(paint)}});
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
@@ -13586,6 +13610,27 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
           </div>
         </div>
         <p id="correoEstadoPlantilla" class="muted" role="status"></p>
+        <!-- NUEVO (2026-11-26): mensaje de grúas con campos y claves de despacho. -->
+        <div id="correoGruasForm" hidden>
+          <div class="field"><label for="correoGruasUnidad">Unidad</label><input id="correoGruasUnidad" maxlength="120" placeholder="Número o descripción de la unidad"></div>
+          <div class="field"><label for="correoGruasPlacas">Placas</label><input id="correoGruasPlacas" maxlength="40" placeholder="Placas de la unidad"></div>
+          <div class="field"><label for="correoGruasOperador">Operador</label><input id="correoGruasOperador" maxlength="120" placeholder="Nombre del operador"></div>
+          <div class="field"><label for="correoGruasUbicacion">Ubicación</label><input id="correoGruasUbicacion" maxlength="200" placeholder="Ubicación exacta de la obstrucción"></div>
+          <div class="field"><label>Claves de despacho y enlace CCTT</label>
+            <div class="cm-keys">
+              <div class="field"><label for="correoGruasDEC">DEC</label><input id="correoGruasDEC" maxlength="20" placeholder="DEC"></div>
+              <div class="field"><label for="correoGruasDEA">DEA</label><input id="correoGruasDEA" maxlength="20" placeholder="DEA"></div>
+              <div class="field"><label for="correoGruasDEO">DEO</label><input id="correoGruasDEO" maxlength="20" placeholder="DEO"></div>
+              <div class="field"><label for="correoGruasDEI">DEI</label><input id="correoGruasDEI" maxlength="20" placeholder="DEI"></div>
+              <div class="field"><label for="correoGruasDEV">DEV</label><input id="correoGruasDEV" maxlength="20" placeholder="DEV"></div>
+              <div class="field"><label for="correoGruasDEP">DEP</label><input id="correoGruasDEP" maxlength="20" placeholder="DEP"></div>
+            </div>
+          </div>
+          <div class="correo-actions">
+            <button class="btn primary" type="button" id="correoGruasComponer">Componer mensaje de grúa</button>
+          </div>
+          <p id="correoGruasEstado" class="muted" role="status"></p>
+        </div>
       </div>
       <div class="field"><label for="correoIdea">Solicitud</label><textarea id="correoIdea" maxlength="5000" placeholder="Escribe qué deseas solicitar"></textarea></div>
       <div class="field"><label for="correoContexto">Contexto para la versión larga (opcional)</label><textarea id="correoContexto" maxlength="5000" placeholder="Añade solo antecedentes o datos confirmados"></textarea></div>
@@ -13619,6 +13664,10 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   const newTemplate = get('correoNuevaPlantilla'), editTemplate = get('correoEditarPlantilla');
   const deleteTemplate = get('correoEliminarPlantilla'), cancelTemplate = get('correoCancelarPlantilla');
   let owner = '', templates = [], editingIndex = null, deleting = false, templateOwnerRevision = 0;
+  /* NUEVO (2026-11-26): mensaje de grúas. gruasManual=true cuando el borrador se edita a mano; entonces los campos ya no lo reescriben. */
+  let gruasComposed = false, gruasManual = false, gruasLastComposed = '';
+  const gruasVal = id => (get(id)?.value || '').trim();
+  const gruasKeys = ['DEC', 'DEA', 'DEO', 'DEI', 'DEV', 'DEP'];
   const storageKey = () => 'cctt-correo-intros-v1:' + owner;
   const selectedTemplate = () => selector.value === '' ? null : templates[Number(selector.value)];
   function showTemplate(template) {
@@ -13629,14 +13678,17 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   }
   function renderTemplates(selection = '') {
     selector.replaceChildren(new Option('Introducción institucional', ''));
+    /* NUEVO (2026-11-26): mensaje de grúas con campos y claves de despacho. */
+    selector.add(new Option('Activación de servicio de grúa y retiro de unidad', 'gruas'));
     templates.forEach((template, index) => selector.add(new Option(template.name, String(index))));
     selector.value = selection;
+    get('correoGruasForm').hidden = selector.value !== 'gruas';
     /* MODIFICADO: dejar la plantilla en vista de lectura. */
     editingIndex = null;
     showTemplate(null);
     const selected = selectedTemplate();
     /* MODIFICADO */
-    get('correoVistaPlantilla').textContent = selected?.intro || defaultIntro;
+    get('correoVistaPlantilla').textContent = selector.value === 'gruas' ? 'Mensaje de activación de servicio de grúa y retiro de unidad. Llena Unidad, Placas, Operador, Ubicación y las claves de despacho; el borrador se compone con esos datos.' : (selected?.intro || defaultIntro);
     const personalActions = get('correoAccionesPlantilla');
     personalActions.hidden = !owner || !selected;
     personalActions.style.display = personalActions.hidden ? 'none' : 'contents';
@@ -13677,6 +13729,8 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   get('correoUsarPlantilla').onclick = () => {
     if (!allowed()) return;
     renderTemplates(selector.value);
+    /* NUEVO (2026-11-26): con la opción de grúas, componer el mensaje. */
+    if (selector.value === 'gruas') { componerGruas(); return; }
     const selected = selectedTemplate();
     templateStatus.textContent = (selected?.name || 'Introducción institucional') + ' seleccionada. Escribe tu solicitud y genera el borrador.';
     idea.focus();
@@ -13792,6 +13846,47 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
     /* NUEVO */ updatePending();
     draft.focus();
   };
+  /* NUEVO (2026-11-26): componer el mensaje de grúas con los campos y las
+     claves de despacho; los campos vacíos conservan su marcador [ ... ]. */
+  function componerGruas(focus) {
+    if (!allowed()) return;
+    const unidad = gruasVal('correoGruasUnidad'), placas = gruasVal('correoGruasPlacas');
+    const operador = gruasVal('correoGruasOperador'), ubicacion = gruasVal('correoGruasUbicacion');
+    const asunto = 'Activación de servicio de grúa y retiro de unidad - ' + (placas || unidad || '[Placas / Unidad]');
+    const claves = gruasKeys.map(k => { const v = gruasVal('correoGruas' + k); return v ? k + ' ' + v : ''; }).filter(Boolean);
+    const lineas = [
+      'Estimados,', '',
+      'Por medio del presente, el Centro de Control de Tráfico Terrestre informa que, en apego a los protocolos operativos y contratos vigentes de la ASIPONA con los prestadores de servicios de grúa, se procederá a activar la solicitud de arrastre para el retiro de la siguiente unidad:', '',
+      '- Unidad: ' + (unidad || '[Número o descripción de la unidad]'),
+      '- Placas: ' + (placas || '[Placas de la unidad]'),
+      '- Operador: ' + (operador || '[Nombre del operador]'),
+      '- Ubicación: ' + (ubicacion || '[Ubicación exacta de la obstrucción]'),
+    ];
+    if (claves.length) lineas.push('- Claves de despacho CCTT: ' + claves.join(' · '));
+    lineas.push('', 'Lo anterior se determina debido a que ya se estableció contacto previo con la empresa transportista y se le otorgó el tiempo reglamentario necesario para solventar la incidencia sin que la unidad fuera movilizada.', '', 'Asimismo, se hace de su conocimiento que los prestadores del servicio de grúa disponen de las credenciales y permisos aprobados para el ingreso y egreso del recinto portuario. En este sentido, solicitamos de su amable colaboración para abstenerse de brindar o gestionar cualquier otro tipo de apoyo externo y facilitar el acceso necesario para que la unidad pueda ser retirada del área de manera ágil y segura, evitando mayores demoras u obstrucciones en la vialidad.', '', 'Agradecemos de antemano su atención y apoyo para mantener la fluidez operativa.', '', 'Atentamente,', 'Centro de Control de Tráfico Terrestre');
+    draft.value = asunto + '\n\n' + lineas.join('\n');
+    gruasLastComposed = draft.value; gruasComposed = true; gruasManual = false;
+    const ge = get('correoGruasEstado'); if (ge) ge.textContent = 'Mensaje de grúa compuesto en el borrador. Puedes editarlo directamente.';
+    status.textContent = 'Mensaje de grúa compuesto en el borrador.';
+    updatePending();
+    if (focus !== false) draft.focus();
+  }
+  get('correoGruasComponer').onclick = () => componerGruas();
+  /* Al escribir en un campo de grúas, el borrador se actualiza solo si aún
+     no se editó a mano. */
+  ['correoGruasUnidad', 'correoGruasPlacas', 'correoGruasOperador', 'correoGruasUbicacion', 'correoGruasDEC', 'correoGruasDEA', 'correoGruasDEO', 'correoGruasDEI', 'correoGruasDEV', 'correoGruasDEP'].forEach(id => {
+    const el = get(id);
+    if (el) el.addEventListener('input', () => { if (gruasComposed && !gruasManual) componerGruas(false); });
+  });
+  /* Si el borrador se edita a mano, esa edición manda: los campos ya no lo
+     reescriben hasta pulsar «Componer mensaje de grúa». */
+  draft.addEventListener('input', () => {
+    if (gruasComposed && draft.value !== gruasLastComposed) {
+      gruasManual = true;
+      const ge = get('correoGruasEstado');
+      if (ge) ge.textContent = 'Borrador editado a mano. Pulsa «Componer mensaje de grúa» para regenerarlo con los campos.';
+    }
+  });
   get('correoCorto').onclick = () => generate(false);
   get('correoLargo').onclick = () => generate(true);
   get('correoCopiar').onclick = async () => {
@@ -13809,6 +13904,10 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
   get('correoLimpiar').onclick = () => {
     if (!allowed()) return;
     idea.value = context.value = draft.value = '';
+    /* NUEVO (2026-11-26): limpiar también los campos de grúas. */
+    ['correoGruasUnidad', 'correoGruasPlacas', 'correoGruasOperador', 'correoGruasUbicacion', 'correoGruasDEC', 'correoGruasDEA', 'correoGruasDEO', 'correoGruasDEI', 'correoGruasDEV', 'correoGruasDEP'].forEach(id => { const el = get(id); if (el) el.value = ''; });
+    gruasComposed = false; gruasManual = false; gruasLastComposed = '';
+    const ge = get('correoGruasEstado'); if (ge) ge.textContent = '';
     status.textContent = 'Campos limpiados.';
     updatePending();
     idea.focus();
@@ -13881,6 +13980,7 @@ html[data-cctt-scheme="dark"] #ccttSessionExit{color:var(--cctt-theme-text,#f2f6
       /* NUEVO */
       {title:'Gestiona tus plantillas',body:'Selecciona una plantilla personal para ver su texto y sus acciones en la misma ficha. Usa Editar plantilla y guarda los cambios, o Cancelar para descartarlos. Eliminar plantilla pide confirmación. La introducción institucional se puede usar y permanece fija.'},
       {title:'Elige la extensión',body:'Elige la introducción institucional o una plantilla personal y pulsa Usar esta plantilla para ir a Solicitud. Genera una opción corta o larga con la selección actual. La opción larga añade el contexto confirmado que captures.',controlId:'correoLargo'},
+      {title:'Mensaje de grúas',body:'Elige «Activación de servicio de grúa y retiro de unidad», llena Unidad, Placas, Operador, Ubicación y las claves de despacho (DEC, DEA, DEO, DEI, DEV, DEP) y pulsa «Componer mensaje de grúa». El borrador se actualiza al escribir; si lo editas a mano, tus cambios se conservan y puedes regenerarlo con el botón.',controlId:'correoGruasComponer'},
       {title:'Revisa y copia',body:'Ajusta el borrador antes de copiarlo a tu correo. Si aparece un emparejamiento por confirmar, revisa el pendiente.',controlId:'correoCopiar'},
       /* NUEVO */
       {title:'Inicia otro borrador',body:'Limpiar vacía la solicitud, el contexto y el borrador actual.',controlId:'correoLimpiar'}
@@ -16735,6 +16835,10 @@ const help=node('details','pf-help');help.append(node('summary','','Ayuda de pre
 #page-editorImagenes .ei-colorfield input[type=text]{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
 #page-editorImagenes .ei-row{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
 #page-editorImagenes .ei-row>*{flex:1;min-width:70px}
+#page-editorImagenes .ei-rot{display:flex;align-items:center;gap:8px}
+#page-editorImagenes .ei-rot input[type="number"]{width:64px;flex:0 0 auto}
+#page-editorImagenes .ei-rot input[type="range"]{flex:1;min-width:80px}
+#page-editorImagenes .ei-rot output{flex:0 0 auto}
 #page-editorImagenes .ei-row .btn{flex:0 0 auto}
 #page-editorImagenes .ei-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 #page-editorImagenes .ei-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px}
@@ -16894,6 +16998,32 @@ function pathMidpoints(o) {
   for (let i = 1; i < o.pts.length; i++) out.push({ x: (o.pts[i - 1].x + o.pts[i].x) / 2, y: (o.pts[i - 1].y + o.pts[i].y) / 2, index: i });
   if (o.type === 'polygon' && o.pts.length > 2) out.push({ x: (o.pts[o.pts.length - 1].x + o.pts[0].x) / 2, y: (o.pts[o.pts.length - 1].y + o.pts[0].y) / 2, index: o.pts.length });
   return out;
+}
+/* Tiradores de caja: esquinas/bordes para redimensionar y el tirador de giro.
+   Los dibuja drawSelection() (cuadrados blancos + círculo «↻» sobre la caja).
+   Antes solo se dibujaban: no había detección de puntero y agarrarlos movía
+   el objeto entero o iniciaba una selección por marco. */
+const BOX_HANDLES = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+function boxHandlePos(o, handle) {
+  const b = objectBBox(o);
+  const map = {
+    nw: [b.x, b.y], n: [b.x + b.w / 2, b.y], ne: [b.x + b.w, b.y],
+    e: [b.x + b.w, b.y + b.h / 2], se: [b.x + b.w, b.y + b.h],
+    s: [b.x + b.w / 2, b.y + b.h], sw: [b.x, b.y + b.h], w: [b.x, b.y + b.h / 2],
+  };
+  const q = map[handle];
+  return { x: q[0], y: q[1] };
+}
+function rotateHandlePos(o) {
+  const b = objectBBox(o);
+  return { x: b.x + b.w / 2, y: b.y - 28 / state.view.scale };
+}
+/* Normaliza un ángulo a (-180, 180]. */
+function normAngle(deg) { const a = ((deg + 180) % 360 + 360) % 360 - 180; return a === -180 ? 180 : a; }
+/* Convierte un punto de imagen al marco local de un objeto (sin su rotación). */
+function toLocalFrame(img, cx, cy, rotDeg) {
+  const r = rotDeg * Math.PI / 180, dx = img.x - cx, dy = img.y - cy, c = Math.cos(r), s = Math.sin(r);
+  return { x: cx + dx * c + dy * s, y: cy - dx * s + dy * c };
 }
 /* Curva suave (Catmull-Rom) convertida en segmentos de Bézier cúbica. */
 function catmullRom(pts) {
@@ -17550,7 +17680,10 @@ function drawSelection() {
       const corners = [[b.x, b.y], [b.x + b.w / 2, b.y], [b.x + b.w, b.y], [b.x + b.w, b.y + b.h / 2], [b.x + b.w, b.y + b.h], [b.x + b.w / 2, b.y + b.h], [b.x, b.y + b.h], [b.x, b.y + b.h / 2]];
       for (const [x, y] of corners) { const s = total.apply({ x, y }); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 2; ctx.fillRect(s.x - 5, s.y - 5, 10, 10); ctx.strokeRect(s.x - 5, s.y - 5, 10, 10); }
       const c = total.apply({ x: b.x + b.w / 2, y: b.y - 28 / state.view.scale });
-      ctx.beginPath(); ctx.arc(c.x, c.y, 6, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#0284c7'; ctx.stroke();
+      const top = total.apply({ x: b.x + b.w / 2, y: b.y });
+      ctx.beginPath(); ctx.moveTo(top.x, top.y); ctx.lineTo(c.x, c.y); ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.beginPath(); ctx.arc(c.x, c.y, 7, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#0284c7'; ctx.font = 'bold 10px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('↻', c.x, c.y + 0.5);
     }
   }
   if (marquee) {
@@ -17707,6 +17840,33 @@ canvas.addEventListener('pointerdown', e => {
         }
       }
     }
+    /* Tirador de giro y tiradores de esquina/borde de un objeto de caja
+       seleccionado (texto, etiqueta, rectángulo, elipse, icono, norte,
+       escala). Antes se dibujaban pero no se detectaban: agarrarlos movía
+       el objeto entero o iniciaba una selección por marco. */
+    const handleTol = 10 / state.view.scale;
+    for (const o of selectedObjects()) {
+      if (o.locked || (o.pts && o.pts.length)) continue;
+      const b = objectBBox(o);
+      const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+      const rh = rotateHandlePos(o);
+      if (Math.hypot(img.x - rh.x, img.y - rh.y) <= handleTol) {
+        drag = { mode: 'rotate', obj: o, cx, cy, a0: Math.atan2(img.y - cy, img.x - cx) * 180 / Math.PI, r0: o.rotation || 0, moved: false, snapshot: JSON.stringify({ objects: state.objects, adjust: state.adjust }) };
+        setStatus('Girando. Con Mayús, gira en pasos de 15°.');
+        return;
+      }
+      for (const h of BOX_HANDLES) {
+        const hp = boxHandlePos(o, h);
+        if (Math.hypot(img.x - hp.x, img.y - hp.y) <= handleTol) {
+          const rot = o.rotation || 0;
+          const lp = toLocalFrame(img, cx, cy, rot);
+          const hpL = toLocalFrame(hp, cx, cy, rot);
+          drag = { mode: 'resize', obj: o, handle: h, cx, cy, rot, x0: o.x, y0: o.y, w0: o.w, h0: o.h, fs0: o.fontSize || 0, gx: lp.x - hpL.x, gy: lp.y - hpL.y, px0: img.x, py0: img.y, moved: false, snapshot: JSON.stringify({ objects: state.objects, adjust: state.adjust }) };
+          setStatus('Redimensionando. En texto y etiqueta, el tamaño de letra crece con la caja.');
+          return;
+        }
+      }
+    }
     if (hit) {
       if (!state.selected.includes(hit.id)) select([hit.id], e.shiftKey);
       else if (e.shiftKey) select(state.selected.filter(id => id !== hit.id), false);
@@ -17787,6 +17947,42 @@ canvas.addEventListener('pointermove', e => {
     }
     return;
   }
+  if (drag?.mode === 'rotate') {
+    const o = drag.obj;
+    const a = Math.atan2(img.y - drag.cy, img.x - drag.cx) * 180 / Math.PI;
+    let rot = normAngle(drag.r0 + normAngle(a - drag.a0));
+    /* Imán: con Mayús, pasos de 15°; si no, se pega a 0°/90°/180°/-90°. */
+    if (e.shiftKey) rot = normAngle(Math.round(rot / 15) * 15);
+    else for (const s of [0, 90, 180, -90]) if (Math.abs(normAngle(rot - s)) <= 3) { rot = s; break; }
+    if (Math.abs(normAngle(rot - drag.r0)) > 1) {
+      drag.moved = true; o.rotation = rot;
+      const ri = $('eiPropRotation'); if (ri) ri.value = Math.round(rot);
+      const rr = $('eiPropRotationRange'); if (rr) rr.value = Math.round(rot);
+      const ro = $('eiPropRotationOut'); if (ro) ro.textContent = Math.round(rot) + '°';
+      requestRender();
+    }
+    return;
+  }
+  if (drag?.mode === 'resize') {
+    const o = drag.obj;
+    if (Math.abs(img.x - drag.px0) + Math.abs(img.y - drag.py0) > 2 / state.view.scale) drag.moved = true;
+    if (!drag.moved) return;
+    const lp = toLocalFrame(img, drag.cx, drag.cy, drag.rot);
+    const lx = lp.x - drag.gx, ly = lp.y - drag.gy;
+    /* Esquinas fijas (opuestas al tirador) en el marco local del objeto. */
+    const fx = drag.handle.includes('w') ? drag.x0 + drag.w0 : drag.x0;
+    const fy = drag.handle.includes('n') ? drag.y0 + drag.h0 : drag.y0;
+    let nx = drag.x0, ny = drag.y0, nw = drag.w0, nh = drag.h0;
+    if (drag.handle.includes('w')) { nx = Math.min(lx, fx - 10); nw = fx - nx; }
+    if (drag.handle.includes('e')) { nw = Math.max(10, lx - drag.x0); }
+    if (drag.handle.includes('n')) { ny = Math.min(ly, fy - 10); nh = fy - ny; }
+    if (drag.handle.includes('s')) { nh = Math.max(10, ly - drag.y0); }
+    o.x = nx; o.y = ny; o.w = nw; o.h = nh;
+    /* En texto y etiqueta, el tamaño de letra crece con la caja. */
+    if ((o.type === 'text' || o.type === 'label') && drag.fs0 > 0 && drag.w0 > 0 && nw !== drag.w0) o.fontSize = clamp(drag.fs0 * (nw / drag.w0), 8, 220);
+    requestRender();
+    return;
+  }
   if (marquee) { marquee.x1 = pos.x; marquee.y1 = pos.y; requestRender(); return; }
   if (drawing) {
     const p = snapPoint(img);
@@ -17799,7 +17995,7 @@ canvas.addEventListener('pointermove', e => {
 function finishPointer(e) {
   pointers.delete(e.pointerId);
   if (pointers.size < 2) pinch = null;
-  if ((drag?.mode === 'move' || drag?.mode === 'node') && (drag.moved || drag.added)) { history.push(drag.snapshot); future = []; state.dirty = true; scheduleAutosave(); }
+  if ((drag?.mode === 'move' || drag?.mode === 'node' || drag?.mode === 'rotate' || drag?.mode === 'resize') && (drag.moved || drag.added)) { history.push(drag.snapshot); future = []; state.dirty = true; scheduleAutosave(); }
   drag = null;
   if (marquee) {
     const x0 = Math.min(marquee.x0, marquee.x1), y0 = Math.min(marquee.y0, marquee.y1), x1 = Math.max(marquee.x0, marquee.x1), y1 = Math.max(marquee.y0, marquee.y1);
@@ -17924,6 +18120,8 @@ function syncProps() {
   set('eiPropLineWidth', o.lineWidth); set('eiPropDash', o.dash); set('eiPropDashGap', o.dashGap);
   set('eiPropLineCap', o.lineCap); set('eiPropLineJoin', o.lineJoin);
   set('eiPropArrowStart', o.arrowStart); set('eiPropArrowEnd', o.arrowEnd); set('eiPropArrowSize', o.arrowSize); set('eiPropArrowSeq', o.arrowSeq || 'none'); set('eiPropClickOrient', o.clickOrient || 'right');
+  set('eiPropRotation', Math.round(o.rotation || 0)); set('eiPropRotationRange', Math.round(o.rotation || 0));
+  const ro = $('eiPropRotationOut'); if (ro) ro.textContent = Math.round(o.rotation || 0) + '°';
   setChk('eiPropHalo', o.halo); setChk('eiPropShadow', o.shadow); setChk('eiPropGlow', o.glow);
   setChk('eiPropParallel', o.parallel); set('eiPropParallelOffset', o.parallelOffset); set('eiPropParallelCount', o.parallelCount);
   set('eiPropText', o.text || ''); setChk('eiPropPathText', o.pathText);
@@ -17975,6 +18173,8 @@ function initProps() {
     ['eiPropArrowSize', (o, el) => { o.arrowSize = clamp(+el.value || 26, 4, 80); }],
     ['eiPropArrowSeq', (o, el) => { o.arrowSeq = el.value; }],
     ['eiPropClickOrient', (o, el) => { o.clickOrient = el.value; }],
+    ['eiPropRotation', (o, el) => { o.rotation = normAngle(+el.value || 0); const r = $('eiPropRotationRange'); if (r) r.value = Math.round(o.rotation); const out = $('eiPropRotationOut'); if (out) out.textContent = Math.round(o.rotation) + '°'; }],
+    ['eiPropRotationRange', (o, el) => { o.rotation = normAngle(+el.value || 0); const n = $('eiPropRotation'); if (n) n.value = Math.round(o.rotation); const out = $('eiPropRotationOut'); if (out) out.textContent = Math.round(o.rotation) + '°'; }],
     ['eiPropHalo', (o, el) => { o.halo = el.checked; }],
     ['eiPropShadow', (o, el) => { o.shadow = el.checked; }],
     ['eiPropGlow', (o, el) => { o.glow = el.checked; }],
@@ -18753,6 +18953,7 @@ function init() {
           { title: 'Cargar la foto', body: 'Pulsa «Cargar imagen», arrastra el archivo al lienzo o pégalo con Ctrl+V. También puedes traer una foto de Reporte de vialidades con «Desde Reporte de vialidades».' },
           { title: 'Trazar una ruta', body: 'Elige «Curva suave» o «Flecha» en la barra lateral, haz clic por los puntos del recorrido y termina con doble clic o Enter. Un solo clic con «Flecha» coloca una flecha de 240 px en la dirección elegida en «Orientación al colocar por clic» (Propiedades: derecha, abajo, izquierda o arriba); mantener pulsado y arrastrar la dibuja a medida. Para nivelar la ruta, arrastra los nodos (círculos blancos) o pulsa el tirador verde «+» del medio de un segmento para añadir un punto y moverlo. La herramienta sigue activa para trazar la siguiente; pulsa Esc para volver a «Seleccionar».' },
           { title: 'Flechas consecutivas y tren', body: 'En Propiedades, «Flechas consecutivas» repite la punta a lo largo del trazo hacia adelante, hacia atrás o en ambos sentidos, como en Mapas y croquis. La herramienta «Tren» dibuja una línea con traviesas como vía férrea.' },
+          { title: 'Girar y redimensionar', body: 'Selecciona un texto, etiqueta, rectángulo, elipse o icono y arrastra el tirador «↻» que aparece sobre la caja para girarlo (con Mayús, en pasos de 15°), o arrastra sus esquinas y bordes para cambiar su tamaño; en texto y etiqueta, el tamaño de letra crece con la caja. También puedes escribir el ángulo exacto en «Rotación (°)» en Propiedades.' },
           { title: 'Rotular', body: 'Activa «Texto siguiendo el trazo» en Propiedades para escribir el nombre de la calle sobre la ruta, o usa «Etiqueta» para un cuadro de color con texto blanco.' },
           { title: 'Exportar y enviar', body: 'Descarga PNG, JPEG, WebP, PDF o SVG desde la barra superior, o envía la imagen terminada a Reporte de vialidades o a WhatsApp con los botones «Enviar».' }
         ]
