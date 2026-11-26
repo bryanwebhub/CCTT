@@ -6157,11 +6157,22 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
     </div>`;document.body.appendChild(gate);
     document.getElementById('ccttLoginForm').onsubmit=async ev=>{ev.preventDefault();const msg=document.getElementById('ccttAuthMsg');msg.textContent='Validando acceso...';if(!sb){msg.textContent='El servicio de acceso no está disponible. Contacta a administración.';return}const email=document.getElementById('ccttLoginEmail').value.trim(),password=document.getElementById('ccttLoginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error){msg.textContent='No fue posible iniciar sesión. Verifica tus datos o contacta a administración.';return}currentSession=data.session;msg.textContent='';/* MODIFICADO: activar transición solo al autenticarse correctamente. */document.documentElement.classList.add('cctt-login-entering');showApp(data.session)};
   }
+/* NUEVO: adaptador opcional de sesión CCTT 0.5.0. Fuera de la extensión mantiene Auth original. */
+const ccttSharedAuth=(()=>{
+ let enabled=false,ticket=null;const pending=new Map();
+ document.addEventListener('cctt:auth-response',e=>{let r;try{r=JSON.parse(e.detail)}catch{return}const p=pending.get(r.id);if(!p)return;pending.delete(r.id);clearTimeout(p.timer);r.error?p.reject(Error(r.error)):p.resolve(r)});
+ function request(op,data={},timeout=15000){return new Promise((resolve,reject)=>{const id=crypto.randomUUID();const timer=setTimeout(()=>{pending.delete(id);reject(Error('No respondió el servicio de sesión. Recarga la pestaña.'))},timeout);pending.set(id,{resolve,reject,timer});document.dispatchEvent(new CustomEvent('cctt:auth-request',{detail:JSON.stringify({id,op,ticket,...data})}));});}
+ const storage={getItem:async key=>(await request('get',{key})).value,setItem:async(key,value)=>{await request('set',{key,value})},removeItem:async key=>{await request('remove',{key})}};
+ async function lock(name,timeout,fn){const grant=await request('lock');ticket=grant.value;try{return await fn()}finally{const old=ticket;ticket=null;await request('unlock',{ticket:old}).catch(()=>{})}}
+ return {activity:async(uid,touch=false)=>enabled?(await request('activity',{uid,touch})).value:0,get enabled(){return enabled},options(){const receive=e=>{enabled=e.detail===true};document.addEventListener('cctt:auth-available',receive);document.dispatchEvent(new Event('cctt:auth-probe'));document.removeEventListener('cctt:auth-available',receive);/* NUEVO: descartar el respaldo local antiguo para que no reaparezca tras cerrar sesión. */if(enabled){try{for(const suffix of ['', '-code-verifier','-user'])localStorage.removeItem('sb-iwmbkvwvwfxsiojweprf-auth-token'+suffix)}catch{}}return enabled?{storage,lock}:{};}};
+})();
+  /* NUEVO: solo actividad, sin credenciales, para el control de inactividad existente. */
+  window.ccttSharedActivity=(uid,touch)=>ccttSharedAuth.activity(uid,touch);
   function initSupabase(){
     const url=String(SUPABASE_URL||'').trim(),anon=String(SUPABASE_ANON_KEY||'').trim();
     const configured=url && anon && !url.includes('TU-PROYECTO') && !anon.includes('TU_ANON_O_PUBLISHABLE_KEY');
     if(window.supabase&&configured){
-      try{sb=window.supabase.createClient(url,anon,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}catch(e){console.error('Error al iniciar Supabase',e);sb=null}
+      try{sb=window.supabase.createClient(url,anon,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,...ccttSharedAuth.options()}})}catch(e){console.error('Error al iniciar Supabase',e);sb=null}
     }else sb=null;
     window.ccttSupabaseClient=sb;return sb;
   }
@@ -6197,6 +6208,17 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
     const {data}=await sb.auth.getSession();if(data?.session)showApp(data.session);else showGate();
     /* MODIFICADO: una renovación de token de la misma cuenta no vuelve a iniciar el panel. */sb.auth.onAuthStateChange((_event,session)=>{if(session){if(currentSession?.user?.id===session.user?.id){currentSession=session;return}showApp(session)}else{currentSession=null;showGate()}});
   }
+  /* NUEVO: avisos sin tokens; cada panel lee la sesión común mediante Auth. */
+  let sharedSessionQueue=Promise.resolve();
+  document.addEventListener('cctt:auth-changed',()=>{
+    if(!ccttSharedAuth.enabled||!sb)return;
+    sharedSessionQueue=sharedSessionQueue.catch(()=>{}).then(async()=>{
+      const {data,error}=await sb.auth.getSession();if(error)throw error;
+      const session=data?.session;
+      if(session){if(currentSession?.user?.id!==session.user.id)showApp(session);else currentSession=session;}
+      else{const hadSession=!!currentSession;currentSession=null;showGate();if(hadSession)window.dispatchEvent(new Event('cctt:logout'));}
+    }).catch(()=>{});
+  });
   bootAuth();
 })();
 </script>
@@ -7482,12 +7504,14 @@ body{background:#f7f0e8!important}
  const ONE_HOUR=180*60*1000;
  /* NUEVO: la exención se basa exclusivamente en metadatos de autenticación. */
  const inactivityAdmin=user=>String(user?.app_metadata?.role||'').trim().toLowerCase()==='admin';
- let active=false,admin=false,lastActivity=Date.now(),signingOut=false,activityUser='';
+ let active=false,admin=false,lastActivity=Date.now(),signingOut=false,activityUser='',sharedActivityAt=0; /* MODIFICADO: actividad conjunta de los paneles. */
  const activityKey=()=>activityUser?'cctt:last-activity:'+activityUser:'';
  const activity=()=>{
   /* MODIFICADO: registrar actividad mientras se valida un posible cierre. */
   if(!active||admin)return;
   lastActivity=Date.now();
+  /* NUEVO: limitar avisos de actividad a uno cada 10 segundos. */
+  if(Date.now()-sharedActivityAt>10000){sharedActivityAt=Date.now();window.ccttSharedActivity?.(activityUser,true).catch(()=>{});}
   try{const key=activityKey();if(key)sessionStorage.setItem(key,String(lastActivity))}catch(e){}
  };
  // NUEVO: eventos de toda la ventana en fase de captura; escritura, clics, navegación, desplazamiento y pantallas táctiles.
@@ -7504,6 +7528,8 @@ body{background:#f7f0e8!important}
   if(!active||admin||signingOut)return;
   let stamp=lastActivity;
   try{const stored=Number(sessionStorage.getItem(activityKey()));if(Number.isFinite(stored))stamp=Math.max(stamp,stored)}catch(e){}
+  /* NUEVO: una pestaña inactiva consulta la actividad del resto antes de cerrar. */
+  try{stamp=Math.max(stamp,await window.ccttSharedActivity?.(activityUser)||0);lastActivity=Math.max(lastActivity,stamp)}catch{return;}
   if(Date.now()-stamp<ONE_HOUR)return;
   /* MODIFICADO: confirmar cuenta, rol y actividad tras consultar la sesión vigente. */
   signingOut=true;
