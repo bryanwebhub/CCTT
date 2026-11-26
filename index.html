@@ -6155,7 +6155,23 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
       <div class="cctt-login-brand"><div class="cctt-login-mark">CCTT</div><div><div class="cctt-login-title">Centro de Control de Tráfico Terrestre</div><div class="cctt-login-sub">Acceso al panel operativo</div></div></div>
       <form id="ccttLoginForm" autocomplete="on"><div class="field"><label>Correo electrónico</label><input id="ccttLoginEmail" type="email" autocomplete="username" required></div><div class="field"><label>Contraseña</label><input id="ccttLoginPassword" type="password" autocomplete="current-password" required></div><!-- MODIFICADO: icono de ingreso mediante puerta y flecha, sin documento ni palomita. --><button class="btn primary cctt-login-btn" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"/><path d="m14 8 4 4-4 4M8 12h10"/></svg>Iniciar sesión</button><div id="ccttAuthMsg" class="cctt-auth-msg"></div></form>
     </div>`;document.body.appendChild(gate);
-    document.getElementById('ccttLoginForm').onsubmit=async ev=>{ev.preventDefault();const msg=document.getElementById('ccttAuthMsg');msg.textContent='Validando acceso...';if(!sb){msg.textContent='El servicio de acceso no está disponible. Contacta a administración.';return}const email=document.getElementById('ccttLoginEmail').value.trim(),password=document.getElementById('ccttLoginPassword').value;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error){msg.textContent='No fue posible iniciar sesión. Verifica tus datos o contacta a administración.';return}currentSession=data.session;msg.textContent='';/* MODIFICADO: activar transición solo al autenticarse correctamente. */document.documentElement.classList.add('cctt-login-entering');showApp(data.session)};
+    /* MODIFICADO 0.5.1: capturar errores de Auth/almacenamiento y evitar solicitudes duplicadas. */
+    document.getElementById('ccttLoginForm').onsubmit=async ev=>{
+      ev.preventDefault();const msg=document.getElementById('ccttAuthMsg'),button=ev.currentTarget.querySelector('button[type="submit"]');
+      if(button.disabled)return;
+      if(!sb){msg.textContent='El servicio de acceso no está disponible. Recarga la página.';return}
+      button.disabled=true;msg.textContent='Validando acceso...';
+      const slow=setTimeout(()=>{msg.textContent='La validación está tardando. Esperando respuesta del servicio…'},12000);
+      try{
+        const email=document.getElementById('ccttLoginEmail').value.trim(),password=document.getElementById('ccttLoginPassword').value;
+        const {data,error}=await sb.auth.signInWithPassword({email,password});
+        if(error)throw error;
+        if(!data?.session)throw Error('No se recibió una sesión válida.');
+        currentSession=data.session;msg.textContent='';document.documentElement.classList.add('cctt-login-entering');showApp(data.session);
+      }catch(error){
+        msg.textContent=/sesión|extensión|servicio|Clave de sesión/i.test(error?.message||'')?'No se pudo completar el acceso. Actualiza la extensión a 0.5.1 y recarga esta pestaña.':'No fue posible iniciar sesión. Verifica tus datos y la conexión e inténtalo de nuevo.';
+      }finally{clearTimeout(slow);button.disabled=false;}
+    };
   }
 /* NUEVO: adaptador opcional de sesión CCTT 0.5.0. Fuera de la extensión mantiene Auth original. */
 const ccttSharedAuth=(()=>{
@@ -6219,7 +6235,8 @@ const ccttSharedAuth=(()=>{
       else{const hadSession=!!currentSession;currentSession=null;showGate();if(hadSession)window.dispatchEvent(new Event('cctt:logout'));}
     }).catch(()=>{});
   });
-  bootAuth();
+  /* MODIFICADO 0.5.1: un fallo al recuperar la sesión también libera el formulario. */
+  bootAuth().catch(()=>{showGate();const msg=document.getElementById('ccttAuthMsg');if(msg)msg.textContent='No se pudo recuperar la sesión. Actualiza la extensión y recarga esta pestaña.';});
 })();
 </script>
 
