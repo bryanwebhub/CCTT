@@ -2643,7 +2643,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  <button class="navbtn" data-page="inc35copoma"><span class="ico"><span data-nav-icon="megaphone"></span></span><span class="lbl">Generador de Comunicados</span></button>
  <button class="navbtn" data-page="inc35vial"><span class="ico"><span data-nav-icon="truck"></span></span><span class="lbl">Reporte de vialidades</span></button>
 <!-- NUEVO: navegación Editor de imágenes. -->
-<button class="navbtn" data-page="editorImagenes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m4 18 5-5 4 3 3-4 4 5"/></svg></span><span class="lbl">Editor de imágenes</span></button>
+<button class="navbtn" data-page="editorImagenes"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M4 17c3-5 5-2 7-5s3-4 6-2"/><path d="M17 8l3 2-3 2"/></svg></span><span class="lbl">Editor de imágenes</span></button>
 <!-- NUEVO: enlace del reporte de atención por ambulancia, SVG de cruz de atención y pulso. -->
 <button class="navbtn" data-page="atencionAmbulancia"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/><path d="M6 12h3l2-2 2 4 2-2h3"/></svg></span><span class="lbl">Atención por ambulancia</span></button>
 <!-- NUEVO: navegación Sobrevuelo de dron con SVG independiente. -->
@@ -3146,79 +3146,86 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
 </div>
 </section>
 <!-- NUEVO: módulo Editor de imágenes (Anotador de imágenes) — CCTT 0.5.3.
-     Anota fotografías (aéreas, vialidades, accesos, instalaciones) con rutas,
-     flechas, rótulos sobre trazo y cuadros de etiqueta, sin modificar el archivo
-     original. Las anotaciones viven como objetos editables en una capa propia.
-     Se integra al permiso 'editorImagenes' (Administrar accesos) y al catálogo
-     de Aprendizaje de módulos. No toca la lógica de Reporte de vialidades:
-     solo lee sus fotos mediante window.ccttVrpPhotos (gancho de una línea en
-     vrpPhotoLogic) y le devuelve la imagen terminada con el evento 'change'
-     de su input vrpFiles, que es su interfaz pública. -->
+     Rediseño 2026-11-26 según la maqueta Stitch "Gestor interactivo de
+     ubicaciones": sub-barra compacta, herramientas en rejilla de 2 columnas,
+     lienzo oscuro con rejilla, panel derecho con pestañas
+     (Propiedades / Capas / Ajustes) y barra de estado inferior.
+     Se conservan TODOS los identificadores que usa ei-script.js, así que la
+     funcionalidad es la misma; solo cambia la presentación. -->
 <section class="page" id="page-editorImagenes">
   <div class="section-title"><h2>Editor de imágenes</h2><p class="muted">Anotador de imágenes · Rutas, flechas, rótulos y etiquetas sobre fotografía</p></div>
 
   <div class="ei-wrap" id="eiWrap">
-    <!-- Barra superior: archivo, historial, zoom y exportación -->
-    <div class="ei-topbar card" role="toolbar" aria-label="Acciones del editor de imágenes">
+    <!-- Sub-barra estilo Stitch: archivo, historial/zoom y exportación -->
+    <nav class="ei-topbar" role="toolbar" aria-label="Acciones del editor de imágenes">
       <div class="ei-group" role="group" aria-label="Archivo">
-        <button class="btn primary" id="eiLoadImage" type="button" title="Cargar una fotografía (archivo, arrastre o pegado)">Cargar imagen</button>
-        <button class="btn" id="eiFromVialidades" type="button" title="Usar una foto ya cargada en Reporte de vialidades">Desde Reporte de vialidades</button>
-        <button class="btn" id="eiSaveProject" type="button" title="Guardar el proyecto completo (imagen + anotaciones) como JSON">Guardar proyecto</button>
-        <button class="btn" id="eiLoadProjectBtn" type="button" title="Abrir un proyecto JSON guardado antes">Abrir proyecto</button>
-        <span class="ei-autosave muted" id="eiAutosave" role="status" aria-live="polite">Autoguardado: sin cambios</span>
+        <button class="btn primary" id="eiLoadImage" type="button" title="Cargar una fotografía (archivo, arrastre o pegado)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 16V4m-5 5 5-5 5 5M4 20h16'/></svg>Cargar imagen</button>
+        <button class="btn" id="eiFromVialidades" type="button" title="Usar una foto ya cargada en Reporte de vialidades"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M6 21 9 3h6l3 18M12 5v3m0 4v3m0 4v2'/></svg>Desde Reporte de vialidades</button>
+        <button class="btn" id="eiSaveProject" type="button" title="Guardar el proyecto completo (imagen + anotaciones) como JSON"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M5 3h11l3 3v15H5zM8 3v5h8V3M8 21v-7h8v7'/></svg>Guardar</button>
+        <button class="btn" id="eiLoadProjectBtn" type="button" title="Abrir un proyecto JSON guardado antes"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M2 5h8l2 3h10v11H2zM6 13h6m-6 4h8'/></svg>Abrir</button>
+        <span class="ei-autosave" role="status" aria-live="polite"><span class="ei-dot" aria-hidden="true"></span><span id="eiAutosave">Autoguardado</span></span>
       </div>
-      <div class="ei-group" role="group" aria-label="Historial">
-        <button class="btn" id="eiUndo" type="button" title="Deshacer (Ctrl+Z)">↩ Deshacer</button>
-        <button class="btn" id="eiRedo" type="button" title="Rehacer (Ctrl+Y)">↪ Rehacer</button>
+      <div class="ei-sep" aria-hidden="true"></div>
+      <div class="ei-group" role="group" aria-label="Historial y zoom">
+        <button class="btn" id="eiUndo" type="button" title="Deshacer (Ctrl+Z)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M8 5 3 10l5 5M3 10h11a6 6 0 0 1 0 12h-3'/></svg>Deshacer</button>
+        <button class="btn" id="eiRedo" type="button" title="Rehacer (Ctrl+Y)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='m16 5 5 5-5 5M21 10H10a6 6 0 0 0 0 12h3'/></svg>Rehacer</button>
+        <div class="ei-zoomseg" role="group" aria-label="Zoom">
+          <button class="btn" id="eiZoomOut" type="button" title="Alejar (-)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14'/></svg><span class="ei-sr">Alejar</span></button>
+          <button class="btn" id="eiZoomFit" type="button" data-iconized="1" title="Ajustar la imagen a la pantalla (0)">Ajustar</button>
+          <button class="btn" id="eiZoom100" type="button" data-iconized="1" title="Zoom 100 % (1)">100%</button>
+          <button class="btn" id="eiZoomIn" type="button" title="Acercar (+)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 5v14M5 12h14'/></svg><span class="ei-sr">Acercar</span></button>
+        </div>
+        <span class="ei-zoom-label" id="eiZoomLabel">100%</span>
       </div>
-      <div class="ei-group" role="group" aria-label="Zoom">
-        <button class="btn" id="eiZoomOut" type="button" title="Alejar (-)">−</button>
-        <button class="btn" id="eiZoomFit" type="button" title="Ajustar la imagen a la pantalla (0)">Ajustar</button>
-        <button class="btn" id="eiZoom100" type="button" title="Zoom 100 % (1)">100 %</button>
-        <button class="btn" id="eiZoomIn" type="button" title="Acercar (+)">+</button>
-        <span class="ei-zoom-label" id="eiZoomLabel">100 %</span>
+      <div class="ei-sep" aria-hidden="true"></div>
+      <div class="ei-group" role="group" aria-label="Exportación e integración">
+        <div class="ei-exportseg">
+          <button class="btn primary" id="eiExportMain" type="button" data-iconized="1" title="Exportar en el formato elegido">Exportar</button>
+          <select id="eiExportFormat" aria-label="Formato de exportación">
+            <option value="png">PNG (.png)</option>
+            <option value="jpeg">JPEG (.jpg)</option>
+            <option value="webp">WebP (.webp)</option>
+            <option value="pdf">PDF (.pdf)</option>
+            <option value="svg">SVG (.svg)</option>
+          </select>
+        </div>
+        <button class="btn" id="eiCopyClipboard" type="button" title="Copiar la imagen anotada al portapapeles"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='9' y='9' width='12' height='12' rx='2'/><path d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/></svg>Copiar imagen</button>
+        <button class="btn" id="eiSendReport" type="button" title="Enviar la imagen terminada a Reporte de vialidades"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M22 2 11 13M22 2l-4 9-9 4z'/></svg>Enviar a Reporte</button>
+        <button class="btn" id="eiSendWhatsapp" type="button" title="Preparar la imagen para la extensión CCTT de WhatsApp Web"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M21 12a9 9 0 0 1-13.5 7.8L3 21l1.3-4.3A9 9 0 1 1 21 12z'/><path d='m8.5 12 2.5 2.5 4.5-5'/></svg>Enviar a WhatsApp</button>
       </div>
-      <div class="ei-group" role="group" aria-label="Exportación">
-        <button class="btn primary" id="eiExportPng" type="button" title="Descargar PNG a resolución completa">PNG</button>
-        <button class="btn" id="eiExportJpg" type="button" title="Descargar JPEG con calidad ajustable">JPEG</button>
-        <button class="btn" id="eiExportWebp" type="button" title="Descargar WebP">WebP</button>
-        <button class="btn" id="eiExportPdf" type="button" title="Descargar PDF con título y leyenda opcionales">PDF</button>
-        <button class="btn" id="eiExportSvg" type="button" title="Descargar solo las anotaciones en SVG">SVG</button>
-        <button class="btn" id="eiCopyClipboard" type="button" title="Copiar la imagen anotada al portapapeles">Copiar</button>
-      </div>
-      <div class="ei-group" role="group" aria-label="Enviar">
-        <button class="btn" id="eiSendReport" type="button" title="Enviar la imagen terminada a Reporte de vialidades">Enviar a Reporte</button>
-        <button class="btn" id="eiSendWhatsapp" type="button" title="Preparar la imagen para la extensión CCTT de WhatsApp Web">Enviar a WhatsApp</button>
-      </div>
-    </div>
+    </nav>
 
+    <!-- Área de trabajo: herramientas + lienzo + panel con pestañas -->
     <div class="ei-main">
-      <!-- Barra lateral de herramientas -->
-      <div class="ei-tools card" role="toolbar" aria-label="Herramientas de dibujo" id="eiTools">
-        <button type="button" data-tool="select" class="ei-tool is-active" title="Seleccionar / mover (V)">➤<span>Seleccionar</span></button>
-        <button type="button" data-tool="pan" class="ei-tool" title="Mover la vista (H) — arrastra la imagen">✋<span>Mover vista</span></button>
-        <button type="button" data-tool="arrow" class="ei-tool" title="Flecha simple: arrastra del inicio al final">→<span>Flecha</span></button>
-        <button type="button" data-tool="doubleArrow" class="ei-tool" title="Flecha doble: punta en ambos extremos">↔<span>Flecha doble</span></button>
-        <button type="button" data-tool="curve" class="ei-tool" title="Flecha curva: haz clic en inicio, punto de control y final">↷<span>Flecha curva</span></button>
-        <button type="button" data-tool="line" class="ei-tool" title="Línea recta: arrastra">╱<span>Línea</span></button>
-        <button type="button" data-tool="polyline" class="ei-tool" title="Polilínea: clic por punto, doble clic para terminar">﹋<span>Polilínea</span></button>
-        <button type="button" data-tool="spline" class="ei-tool" title="Curva suave: clic por punto, doble clic para terminar; sigue calles curvas">〰<span>Curva suave</span></button>
-        <button type="button" data-tool="polygon" class="ei-tool" title="Polígono: clic por vértice, doble clic para cerrar">⬠<span>Polígono</span></button>
-        <button type="button" data-tool="rect" class="ei-tool" title="Rectángulo con esquinas redondeadas: arrastra">▭<span>Rectángulo</span></button>
-        <button type="button" data-tool="ellipse" class="ei-tool" title="Elipse / círculo: arrastra (Mayús = círculo)">◯<span>Elipse</span></button>
-        <button type="button" data-tool="freehand" class="ei-tool" title="Mano alzada con suavizado: arrastra">✎<span>Mano alzada</span></button>
-        <button type="button" data-tool="text" class="ei-tool" title="Texto libre: haz clic donde va el texto">T<span>Texto</span></button>
-        <button type="button" data-tool="pathtext" class="ei-tool" title="Texto sobre trazo: haz clic en una línea o curva para rotularla">↝T<span>Texto sobre trazo</span></button>
-        <button type="button" data-tool="label" class="ei-tool" title="Cuadro de etiqueta con fondo y texto: arrastra para dimensionarlo">▣<span>Etiqueta</span></button>
-        <button type="button" data-tool="icon" class="ei-tool" title="Icono / símbolo: haz clic para colocarlo (elige uno en el panel Iconos)">⚑<span>Icono</span></button>
-        <button type="button" data-tool="north" class="ei-tool" title="Rosa de los vientos / norte">N<span>Norte</span></button>
-        <button type="button" data-tool="scalebar" class="ei-tool" title="Barra de escala">▬<span>Escala</span></button>
-        <button type="button" data-tool="crop" class="ei-tool" title="Recortar la imagen (no destructivo): arrastra el recuadro">✂<span>Recortar</span></button>
-        <div class="ei-tool-sep"></div>
-        <label class="ei-check" title="Mostrar rejilla"><input type="checkbox" id="eiGridToggle"> Rejilla</label>
-        <label class="ei-check" title="Ajuste magnético a la rejilla y a otros objetos"><input type="checkbox" id="eiSnapToggle" checked> Imán</label>
-        <label class="ei-check" title="Mostrar leyenda y membrete sobre la imagen"><input type="checkbox" id="eiOverlayToggle" checked> Leyenda / membrete</label>
-      </div>
+      <aside class="ei-tools" aria-label="Herramientas de dibujo" id="eiTools">
+        <p class="ei-tools-title">Herramientas</p>
+        <div class="ei-tools-grid">
+          <button type="button" data-tool="select" class="ei-tool is-active" title="Seleccionar / mover (V)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M5 3l14 7-6 2-2 6z"/></svg><span>Seleccionar</span></button>
+          <button type="button" data-tool="pan" class="ei-tool" title="Mover la vista (H) — arrastra la imagen"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M12 3v18M3 12h18M12 3 9 6m3-3 3 3M12 21l-3-3m3 3 3-3M3 12l3-3m-3 3 3 3M21 12l-3-3m3 3-3 3"/></svg><span>Mover</span></button>
+          <button type="button" data-tool="arrow" class="ei-tool" title="Flecha simple: arrastra del inicio al final"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 12h17m-6-6 6 6-6 6"/></svg><span>Flecha</span></button>
+          <button type="button" data-tool="doubleArrow" class="ei-tool" title="Flecha doble: punta en ambos extremos"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M4 12h16M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg><span>Doble</span></button>
+          <button type="button" data-tool="curve" class="ei-tool" title="Flecha curva: haz clic en inicio, punto de control y final"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M5 19a9 9 0 0 1 14-7"/><path d="M19 6v6h-6"/></svg><span>Curva</span></button>
+          <button type="button" data-tool="line" class="ei-tool" title="Línea recta: arrastra"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M5 19 19 5"/></svg><span>Línea</span></button>
+          <button type="button" data-tool="polyline" class="ei-tool" title="Polilínea: clic por punto, doble clic para terminar"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 17l5-8 4 6 5-9 4 5"/></svg><span>Polilínea</span></button>
+          <button type="button" data-tool="spline" class="ei-tool" title="Curva suave: clic por punto, doble clic para terminar; sigue calles curvas"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 18c5-9 13 3 18-6"/><circle cx="3" cy="18" r="1.3"/><circle cx="21" cy="12" r="1.3"/></svg><span>Suave</span></button>
+          <button type="button" data-tool="polygon" class="ei-tool" title="Polígono: clic por vértice, doble clic para cerrar"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M12 3l8 6-3 8H7l-3-8z"/></svg><span>Polígono</span></button>
+          <button type="button" data-tool="rect" class="ei-tool" title="Rectángulo con esquinas redondeadas: arrastra"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x="4" y="6" width="16" height="12" rx="2"/></svg><span>Rectáng.</span></button>
+          <button type="button" data-tool="ellipse" class="ei-tool" title="Elipse / círculo: arrastra (Mayús = círculo)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><ellipse cx="12" cy="12" rx="9" ry="6"/></svg><span>Elipse</span></button>
+          <button type="button" data-tool="freehand" class="ei-tool" title="Mano alzada con suavizado: arrastra"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3"/></svg><span>Lápiz</span></button>
+          <button type="button" data-tool="text" class="ei-tool" title="Texto libre: haz clic donde va el texto"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M5 6h14M12 6v13"/></svg><span>Texto</span></button>
+          <button type="button" data-tool="pathtext" class="ei-tool" title="Texto sobre trazo: haz clic en una línea o curva para rotularla"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 17c5-8 13-8 18-2"/><path d="M8 8h6M11 8v5"/></svg><span>T. Trazo</span></button>
+          <button type="button" data-tool="label" class="ei-tool" title="Cuadro de etiqueta con fondo y texto: arrastra para dimensionarlo"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="8" cy="8" r="1.5"/></svg><span>Etiqueta</span></button>
+          <button type="button" data-tool="icon" class="ei-tool" title="Icono / símbolo: haz clic para colocarlo (elige uno en la pestaña Ajustes)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M5 21V4m0 1h13l-3 4 3 4H5"/></svg><span>Icono</span></button>
+          <button type="button" data-tool="north" class="ei-tool" title="Rosa de los vientos / norte"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx="12" cy="12" r="9"/><path d="M12 7l2.5 6L12 11.5 9.5 13z"/></svg><span>Norte</span></button>
+          <button type="button" data-tool="scalebar" class="ei-tool" title="Barra de escala"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M3 17h18M3 17v-4m6 4v-4m6 4v-4m6 4v-4"/></svg><span>Escala</span></button>
+          <button type="button" data-tool="crop" class="ei-tool ei-tool-wide" title="Recortar la imagen (no destructivo): arrastra el recuadro"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d="M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14"/></svg><span>Recortar lienzo</span></button>
+        </div>
+        <div class="ei-toggles">
+          <label class="ei-check" title="Mostrar rejilla"><input type="checkbox" id="eiGridToggle"> Rejilla</label>
+          <label class="ei-check" title="Ajuste magnético a la rejilla y a otros objetos"><input type="checkbox" id="eiSnapToggle" checked> Imán</label>
+          <label class="ei-check" title="Mostrar leyenda y membrete sobre la imagen"><input type="checkbox" id="eiOverlayToggle" checked> Leyenda / membrete</label>
+        </div>
+      </aside>
 
       <!-- Lienzo -->
       <div class="ei-stage-wrap">
@@ -3231,222 +3238,263 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
           </div>
           <div class="ei-hint" id="eiHint" role="status" aria-live="polite"></div>
         </div>
-        <div class="ei-statusbar">
-          <span id="eiCoords">X — · Y —</span>
-          <span id="eiImgInfo">Sin imagen</span>
-          <span id="eiObjCount">0 objetos</span>
-          <span id="eiStatus" role="status" aria-live="polite">Listo.</span>
+      </div>
+
+      <!-- Panel derecho con pestañas -->
+      <aside class="ei-side" aria-label="Propiedades, capas y ajustes">
+        <div class="ei-tabs" role="tablist" aria-label="Paneles del editor">
+          <button class="ei-tab is-active" data-ei-tab="props" type="button" role="tab" aria-selected="true">Propiedades</button>
+          <button class="ei-tab" data-ei-tab="layers" type="button" role="tab" aria-selected="false">Capas</button>
+          <button class="ei-tab" data-ei-tab="adjust" type="button" role="tab" aria-selected="false">Ajustes</button>
+        </div>
+        <div class="ei-tabpanels">
+          <!-- Pestaña Propiedades -->
+          <div class="ei-tabpanel is-active" id="eiTabProps" role="tabpanel">
+            <div class="ei-props">
+              <label>Nombre del objeto <input id="eiPropName" type="text" placeholder="Ej. Ruta de ingreso"></label>
+              <div class="ei-row">
+                <label>Trazo <span class="ei-colorfield"><input id="eiPropStroke" type="color" value="#22c55e"><input id="eiPropStrokeHex" type="text" value="#22c55e" maxlength="7" spellcheck="false"></span></label>
+                <label>Relleno <span class="ei-colorfield"><input id="eiPropFill" type="color" value="#e53935"><input id="eiPropFillHex" type="text" value="#e53935" maxlength="7" spellcheck="false"></span></label>
+              </div>
+              <div class="ei-row">
+                <label>Opacidad trazo <input id="eiPropStrokeOpacity" type="range" min="0" max="100" value="100"><output id="eiPropStrokeOpacityOut">100 %</output></label>
+                <label>Opacidad relleno <input id="eiPropFillOpacity" type="range" min="0" max="100" value="90"><output id="eiPropFillOpacityOut">90 %</output></label>
+              </div>
+              <div class="ei-row">
+                <label>Grosor <input id="eiPropLineWidth" type="number" min="1" max="60" value="8" step="1"></label>
+                <label>Tipo de línea
+                  <select id="eiPropDash">
+                    <option value="solid">Continua</option>
+                    <option value="dashed">Guiones</option>
+                    <option value="dotted">Punteada</option>
+                    <option value="dashdot">Guion-punto</option>
+                    <option value="longdash">Guiones largos</option>
+                    <option value="double">Doble línea</option>
+                  </select>
+                </label>
+                <label>Punta final
+                  <select id="eiPropArrowEnd"><option value="triangle">Triangular</option><option value="open">Abierta</option><option value="spear">De lanza</option><option value="circle">Circular</option><option value="diamond">Diamante</option><option value="none">Ninguna</option></select>
+                </label>
+              </div>
+              <div class="ei-fieldset"><span class="ei-fieldset-title">Texto / Etiqueta</span>
+                <label>Texto <textarea id="eiPropText" rows="2" placeholder="Texto del rótulo o de la etiqueta"></textarea></label>
+                <div class="ei-row">
+                  <label>Fuente <select id="eiPropFont"><option value="Arial">Arial</option><option value="Noto Sans">Noto Sans</option><option value="Public Sans">Public Sans</option><option value="Verdana">Verdana</option><option value="Georgia">Georgia</option><option value="Tahoma">Tahoma</option><option value="Trebuchet MS">Trebuchet MS</option><option value="Courier New">Courier New</option></select></label>
+                  <label>Tamaño <input id="eiPropFontSize" type="number" min="8" max="220" value="34" step="1"></label>
+                  <label>Fondo etiq. <input id="eiPropLabelFill" type="color" value="#f57c00"></label>
+                </div>
+              </div>
+              <div class="ei-fieldset"><span class="ei-fieldset-title">Orden y Alineación</span>
+                <div class="ei-grid2">
+                  <button class="btn" id="eiBringFront" type="button" title="Traer al frente"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 19V5M6 11l6-6 6 6M4 21h16'/></svg>Al frente</button>
+                  <button class="btn" id="eiSendBack" type="button" title="Enviar atrás"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 5v14M6 13l6 6 6-6M4 3h16'/></svg>Atrás</button>
+                  <button class="btn" id="eiDuplicate" type="button" title="Duplicar (Ctrl+D)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M8 8h12v12H8zM4 16V4h12'/></svg>Duplicar</button>
+                  <button class="btn" id="eiLockToggle" type="button" title="Bloquear / desbloquear"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M6 11V8a6 6 0 0 1 12 0v3M4 11h16v10H4zM12 15v3'/></svg>Bloquear</button>
+                  <button class="btn ei-btn-danger" id="eiDelete" type="button" title="Eliminar (Supr)"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7h16M9 7V4h6v3m-6 0 1 14h8l1-14M10 11v6m4-6v6'/></svg>Eliminar objeto</button>
+                </div>
+                <div class="ei-grid3">
+                  <button class="btn" id="eiAlignLeft" type="button" title="Alinear a la izquierda"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 4v16M8 6h11M8 12h8M8 18h11'/></svg>Izq.</button>
+                  <button class="btn" id="eiAlignCenter" type="button" title="Centrar horizontalmente"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4v16M7 6h10M5 12h14M7 18h10'/></svg>Centro</button>
+                  <button class="btn" id="eiAlignRight" type="button" title="Alinear a la derecha"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M20 4v16M5 6h11M8 12h8M5 18h11'/></svg>Der.</button>
+                  <button class="btn" id="eiAlignTop" type="button" title="Alinear arriba"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 4h16M6 8v11M12 8v8M18 8v11'/></svg>Arriba</button>
+                  <button class="btn" id="eiAlignMiddle" type="button" title="Centrar verticalmente"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 12h16M6 5v14M12 7v10M18 5v14'/></svg>Medio</button>
+                  <button class="btn" id="eiAlignBottom" type="button" title="Alinear abajo"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 20h16M6 5v11M12 8v8M18 5v11'/></svg>Abajo</button>
+                  <button class="btn" id="eiDistH" type="button" title="Distribuir horizontalmente"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6v12M20 6v12M8 9h8M8 15h8'/></svg>Distr. H</button>
+                  <button class="btn" id="eiDistV" type="button" title="Distribuir verticalmente"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M6 4h12M6 20h12M9 8v8M15 8v8'/></svg>Distr. V</button>
+                </div>
+              </div>
+              <details class="ei-panel">
+                <summary>Estilo de línea</summary>
+                <div class="ei-row">
+                  <label>Espaciado guiones <input id="eiPropDashGap" type="number" min="1" max="40" value="10" step="1"></label>
+                  <label>Extremo <select id="eiPropLineCap"><option value="round">Redondeado</option><option value="butt">Plano</option><option value="square">Cuadrado</option></select></label>
+                  <label>Unión <select id="eiPropLineJoin"><option value="round">Redondeada</option><option value="miter">Inglete</option><option value="bevel">Bisel</option></select></label>
+                </div>
+                <div class="ei-row">
+                  <label>Punta inicio
+                    <select id="eiPropArrowStart"><option value="none">Ninguna</option><option value="triangle">Triangular</option><option value="open">Abierta</option><option value="spear">De lanza</option><option value="circle">Circular</option><option value="diamond">Diamante</option></select>
+                  </label>
+                  <label>Tamaño punta <input id="eiPropArrowSize" type="number" min="4" max="80" value="26" step="1"></label>
+                </div>
+              </details>
+              <details class="ei-panel">
+                <summary>Efectos</summary>
+                <div class="ei-row">
+                  <label class="ei-check"><input type="checkbox" id="eiPropHalo" checked> Borde blanco (halo)</label>
+                  <label class="ei-check"><input type="checkbox" id="eiPropShadow"> Sombra</label>
+                  <label class="ei-check"><input type="checkbox" id="eiPropGlow"> Resplandor</label>
+                </div>
+                <div class="ei-row">
+                  <label class="ei-check"><input type="checkbox" id="eiPropParallel"> Líneas paralelas</label>
+                  <label>Separación (px) <input id="eiPropParallelOffset" type="number" min="4" max="120" value="28" step="1"></label>
+                  <label>N.º de líneas <input id="eiPropParallelCount" type="number" min="2" max="4" value="2" step="1"></label>
+                </div>
+              </details>
+              <details class="ei-panel">
+                <summary>Texto siguiendo el trazo</summary>
+                <label class="ei-check"><input type="checkbox" id="eiPropPathText"> Texto siguiendo el trazo</label>
+                <label>Posición del texto sobre el trazo <span class="ei-out" id="eiPropPathOffsetOut">50 %</span><input type="range" id="eiPropPathOffset" min="0" max="100" step="1" value="50"></label>
+                <div class="ei-row">
+                  <label class="ei-check"><input type="checkbox" id="eiPropBold" checked> Negrita</label>
+                  <label class="ei-check"><input type="checkbox" id="eiPropItalic"> Cursiva</label>
+                  <label>Alineación <select id="eiPropTextAlign"><option value="center">Centrada</option><option value="left">Izquierda</option><option value="right">Derecha</option></select></label>
+                  <label>Color texto <input id="eiPropTextColor" type="color" value="#ffffff"></label>
+                  <label class="ei-check"><input type="checkbox" id="eiPropTextOutline" checked> Contorno oscuro</label>
+                  <label class="ei-check"><input type="checkbox" id="eiPropTextShadow"> Sombra texto</label>
+                </div>
+              </details>
+              <details class="ei-panel">
+                <summary>Cuadro de etiqueta</summary>
+                <div class="ei-row">
+                  <label>Borde <input id="eiPropLabelBorder" type="color" value="#ffffff"></label>
+                  <label>Radio <input id="eiPropLabelRadius" type="number" min="0" max="40" value="8" step="1"></label>
+                  <label>Relleno interno <input id="eiPropLabelPadding" type="number" min="4" max="60" value="18" step="1"></label>
+                </div>
+                <label class="ei-check"><input type="checkbox" id="eiPropCallout" checked> Punta / conector hacia el punto señalado</label>
+              </details>
+              <p class="muted">Selecciona un objeto para editarlo. Con Mayús haz clic en varios objetos para seleccionarlos juntos. Doble clic en una línea o curva añade un punto; arrastra los nodos para ajustar el trazo.</p>
+            </div>
+          </div>
+          <!-- Pestaña Capas -->
+          <div class="ei-tabpanel" id="eiTabLayers" role="tabpanel">
+            <div id="eiLayers" class="ei-layers" aria-label="Lista de capas"></div>
+            <p class="muted">La primera capa de la lista está al frente. Pulsa el ojo para ocultar, el candado para bloquear y el nombre para renombrar.</p>
+          </div>
+          <!-- Pestaña Ajustes -->
+          <div class="ei-tabpanel" id="eiTabAdjust" role="tabpanel">
+            <details class="ei-panel" open>
+              <summary>Paleta y estilos rápidos</summary>
+              <div class="ei-palette" id="eiPalette" aria-label="Paleta de colores predefinidos"></div>
+              <div class="ei-row"><button class="btn" id="eiSaveColor" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z'/></svg>Guardar color actual</button><button class="btn" id="eiClearColors" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M6 6l12 12M18 6 6 18'/></svg>Limpiar guardados</button></div>
+              <div class="ei-templates" id="eiTemplates" aria-label="Plantillas y estilos predefinidos"></div>
+              <div class="ei-row"><button class="btn" id="eiSaveStyle" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M6 3h12v18l-6-4-6 4z'/></svg>Guardar estilo del objeto seleccionado</button></div>
+              <div id="eiCustomStyles" class="ei-templates"></div>
+            </details>
+            <details class="ei-panel">
+              <summary>Iconos y símbolos</summary>
+              <input id="eiIconSearch" type="search" placeholder="Buscar icono: camión, grúa, pin…" aria-label="Buscar icono">
+              <select id="eiIconCategory" aria-label="Categoría de iconos"><option value="">Todas las categorías</option></select>
+              <div class="ei-icons" id="eiIcons" role="listbox" aria-label="Biblioteca de iconos"></div>
+              <div class="ei-row"><button class="btn" id="eiUploadIcon" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='16' rx='2'/><path d='M12 13V8m-2.5 2.5L12 8l2.5 2.5M7 17l3-3 2 2 3-3'/></svg>Subir icono propio (SVG o PNG)</button></div>
+              <p class="muted">Los iconos son vectoriales, se recolorean con el color de relleno y no pierden calidad al ampliarlos.</p>
+            </details>
+            <details class="ei-panel">
+              <summary>Leyenda, membrete y logotipo</summary>
+              <label>Título <input id="eiTitle" type="text" placeholder="Ej. Rutas de acceso — Manzanillo"></label>
+              <label>Fecha <input id="eiDate" type="date"></label>
+              <label>Marca de agua <input id="eiWatermark" type="text" placeholder="Ej. CCTT · Uso interno"></label>
+              <label>Posición de la leyenda
+                <select id="eiLegendPos"><option value="bl">Abajo a la izquierda</option><option value="br">Abajo a la derecha</option><option value="tl">Arriba a la izquierda</option><option value="tr">Arriba a la derecha</option><option value="none">Sin leyenda</option></select>
+              </label>
+              <div class="ei-row"><button class="btn" id="eiInsertLegend" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M8 6h13M8 12h13M8 18h13'/><path d='M3.5 6h.01M3.5 12h.01M3.5 18h.01'/></svg>Insertar leyenda como objeto</button><button class="btn" id="eiUploadLogo" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z'/></svg>Subir logotipo</button></div>
+              <div id="eiLegendPreview" class="ei-legend-preview muted">La leyenda se genera con los nombres y colores de tus rutas.</div>
+            </details>
+            <details class="ei-panel">
+              <summary>Ajustes de la imagen</summary>
+              <label>Brillo <input id="eiBrightness" type="range" min="50" max="150" value="100"><output id="eiBrightnessOut">100 %</output></label>
+              <label>Contraste <input id="eiContrast" type="range" min="50" max="150" value="100"><output id="eiContrastOut">100 %</output></label>
+              <label>Saturación <input id="eiSaturation" type="range" min="0" max="200" value="100"><output id="eiSaturationOut">100 %</output></label>
+              <label>Nitidez <input id="eiSharpness" type="range" min="0" max="100" value="0"><output id="eiSharpnessOut">0 %</output></label>
+              <div class="ei-row">
+                <button class="btn" id="eiRotateLeft" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 10a8 8 0 1 1 2 6M4 4v6h6'/></svg>Girar 90°</button>
+                <button class="btn" id="eiRotateRight" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M20 10a8 8 0 1 0-2 6M20 4v6h-6'/></svg>Girar 90°</button>
+                <button class="btn" id="eiFlipH" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v18M8 6 3 12l5 6M16 6l5 6-5 6'/></svg>Voltear H</button>
+                <button class="btn" id="eiFlipV" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M3 12h18M6 8l6-5 6 5M6 16l6 5 6-5'/></svg>Voltear V</button>
+                <button class="btn" id="eiResetAdjust" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3'/></svg>Restablecer</button>
+              </div>
+              <p class="muted">Los ajustes no tocan el archivo original; solo afectan a la vista y a la exportación.</p>
+            </details>
+            <details class="ei-panel">
+              <summary>Exportación y lote</summary>
+              <div class="ei-row">
+                <label>Tamaño de salida
+                  <select id="eiExportSize"><option value="1">Original (100 %)</option><option value="0.75">75 %</option><option value="0.5">50 %</option><option value="custom">Ancho personalizado</option></select>
+                </label>
+                <label>Ancho (px) <input id="eiExportWidth" type="number" min="200" max="8000" value="1600" step="10" disabled></label>
+                <label>Escala <select id="eiExportScale"><option value="1">1×</option><option value="2">2× (más nítido)</option><option value="3">3×</option></select></label>
+              </div>
+              <div class="ei-row">
+                <label>Calidad JPEG <input id="eiJpegQuality" type="range" min="50" max="100" value="92"><output id="eiJpegQualityOut">92 %</output></label>
+                <label class="ei-check"><input type="checkbox" id="eiPngTransparent"> PNG solo anotaciones (fondo transparente)</label>
+              </div>
+              <div class="ei-row">
+                <label>Página PDF <select id="eiPdfPage"><option value="a4">A4</option><option value="letter">Carta</option><option value="a3">A3</option></select></label>
+                <label>Orientación <select id="eiPdfOrient"><option value="landscape">Horizontal</option><option value="portrait">Vertical</option></select></label>
+                <label class="ei-check"><input type="checkbox" id="eiPdfLegend" checked> Incluir título y leyenda en el PDF</label>
+              </div>
+              <div class="ei-row">
+                <button class="btn" id="eiAddBatch" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='m12 3 9 5-9 5-9-5z'/><path d='m3 13 9 5 9-5M12 17v4M10 19h4'/></svg>Añadir imagen actual al lote</button>
+                <button class="btn" id="eiExportBatchPdf" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2h9l5 5v15H6zM15 2v5h5M12 11v6m-3-3 3 3 3-3'/></svg>Exportar lote a PDF</button>
+                <button class="btn" id="eiClearBatch" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7h16M9 7V4h6v3m-6 0 1 14h8l1-14M10 11v6m4-6v6'/></svg>Vaciar lote</button>
+              </div>
+              <div id="eiBatchList" class="ei-batch muted">Lote vacío.</div>
+            </details>
+            <details class="ei-panel">
+              <summary>Ayuda y atajos</summary>
+              <table class="ei-help">
+                <tr><td>Ctrl+Z / Ctrl+Y</td><td>Deshacer / rehacer</td></tr>
+                <tr><td>Ctrl+D</td><td>Duplicar selección</td></tr>
+                <tr><td>Ctrl+C / Ctrl+V</td><td>Copiar / pegar objetos</td></tr>
+                <tr><td>Ctrl+A</td><td>Seleccionar todo</td></tr>
+                <tr><td>Supr</td><td>Eliminar selección</td></tr>
+                <tr><td>Flechas (Mayús = ×10)</td><td>Mover selección</td></tr>
+                <tr><td>Ctrl+S</td><td>Guardar proyecto JSON</td></tr>
+                <tr><td>Rueda / pellizco</td><td>Zoom (Ctrl+rueda = zoom al cursor)</td></tr>
+                <tr><td>Doble clic en trazo</td><td>Añadir un punto al trazo</td></tr>
+                <tr><td>Esc</td><td>Cancelar trazo / quitar selección</td></tr>
+              </table>
+              <p class="muted">En pantallas táctiles: un dedo dibuja o mueve, dos dedos hacen zoom y desplazan la vista.</p>
+            </details>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Barra de estado estilo Stitch -->
+    <footer class="ei-statusbar">
+      <div class="ei-status-left">
+        <span id="eiCoords">X — · Y —</span>
+        <span id="eiImgInfo">Sin imagen</span>
+        <span id="eiObjCount">0 objetos</span>
+      </div>
+      <div class="ei-status-right">
+        <span>Herramienta: <strong id="eiToolName">Seleccionar</strong></span>
+        <span id="eiStatus" role="status" aria-live="polite">Listo.</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal "Desde Reporte de vialidades" (estilo Stitch) -->
+  <div class="ei-modal" id="eiVrpModal" hidden>
+    <div class="ei-modal-card" role="dialog" aria-modal="true" aria-labelledby="eiVrpModalTitle">
+      <div class="ei-modal-head">
+        <div>
+          <h3 id="eiVrpModalTitle">Desde Reporte de vialidades</h3>
+          <p class="muted">Elige una fotografía cargada en ese módulo y cárgala aquí con su recorte.</p>
+        </div>
+        <button type="button" id="eiVrpClose" aria-label="Cerrar">×</button>
+      </div>
+      <div class="ei-modal-body">
+        <select id="eiVrpPhotoSelect" aria-label="Fotografías de Reporte de vialidades"><option value="">— Sin fotografías disponibles —</option></select>
+        <p class="muted" id="eiVrpStatus" role="status" aria-live="polite"></p>
+        <div class="ei-modal-foot">
+          <button class="btn" id="eiVrpGo" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6M20 4l-9 9M9 5H5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-4'/></svg>Ir a Reporte de vialidades</button>
+          <button class="btn" id="eiVrpRefresh" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M20 11a8 8 0 1 0-2 6M20 5v6h-6'/></svg>Actualizar lista</button>
+          <button class="btn primary" id="eiVrpLoad" type="button"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v12m-5-5 5 5 5-5M4 19h16'/></svg>Cargar seleccionada</button>
         </div>
       </div>
-
-      <!-- Panel derecho -->
-      <div class="ei-side">
-        <details class="card ei-panel" open>
-          <summary>Propiedades del objeto</summary>
-          <div class="ei-props">
-            <label>Nombre <input id="eiPropName" type="text" placeholder="Ej. Ruta de ingreso"></label>
-            <div class="ei-row">
-              <label>Trazo <input id="eiPropStroke" type="color" value="#22c55e"></label>
-              <label>Hex <input id="eiPropStrokeHex" type="text" value="#22c55e" maxlength="7" spellcheck="false"></label>
-              <label>Relleno <input id="eiPropFill" type="color" value="#e53935"></label>
-              <label>Hex <input id="eiPropFillHex" type="text" value="#e53935" maxlength="7" spellcheck="false"></label>
-            </div>
-            <div class="ei-row">
-              <label>Opacidad trazo <input id="eiPropStrokeOpacity" type="range" min="0" max="100" value="100"><output id="eiPropStrokeOpacityOut">100 %</output></label>
-              <label>Opacidad relleno <input id="eiPropFillOpacity" type="range" min="0" max="100" value="90"><output id="eiPropFillOpacityOut">90 %</output></label>
-            </div>
-            <div class="ei-row">
-              <label>Grosor <input id="eiPropLineWidth" type="number" min="1" max="60" value="8" step="1"></label>
-              <label>Tipo de línea
-                <select id="eiPropDash">
-                  <option value="solid">Continua</option>
-                  <option value="dashed">Guiones</option>
-                  <option value="dotted">Punteada</option>
-                  <option value="dashdot">Guion-punto</option>
-                  <option value="longdash">Guiones largos</option>
-                  <option value="double">Doble línea</option>
-                </select>
-              </label>
-              <label>Espaciado guiones <input id="eiPropDashGap" type="number" min="1" max="40" value="10" step="1"></label>
-            </div>
-            <div class="ei-row">
-              <label>Extremo <select id="eiPropLineCap"><option value="round">Redondeado</option><option value="butt">Plano</option><option value="square">Cuadrado</option></select></label>
-              <label>Unión <select id="eiPropLineJoin"><option value="round">Redondeada</option><option value="miter">Inglete</option><option value="bevel">Bisel</option></select></label>
-            </div>
-            <div class="ei-row">
-              <label>Punta inicio
-                <select id="eiPropArrowStart"><option value="none">Ninguna</option><option value="triangle">Triangular</option><option value="open">Abierta</option><option value="spear">De lanza</option><option value="circle">Circular</option><option value="diamond">Diamante</option></select>
-              </label>
-              <label>Punta final
-                <select id="eiPropArrowEnd"><option value="triangle">Triangular</option><option value="open">Abierta</option><option value="spear">De lanza</option><option value="circle">Circular</option><option value="diamond">Diamante</option><option value="none">Ninguna</option></select>
-              </label>
-              <label>Tamaño punta <input id="eiPropArrowSize" type="number" min="4" max="80" value="26" step="1"></label>
-            </div>
-            <div class="ei-row">
-              <label class="ei-check"><input type="checkbox" id="eiPropHalo" checked> Borde blanco (halo)</label>
-              <label class="ei-check"><input type="checkbox" id="eiPropShadow"> Sombra</label>
-              <label class="ei-check"><input type="checkbox" id="eiPropGlow"> Resplandor</label>
-            </div>
-            <div class="ei-row">
-              <label class="ei-check"><input type="checkbox" id="eiPropParallel"> Líneas paralelas</label>
-              <label>Separación (px) <input id="eiPropParallelOffset" type="number" min="4" max="120" value="28" step="1"></label>
-              <label>N.º de líneas <input id="eiPropParallelCount" type="number" min="2" max="4" value="2" step="1"></label>
-            </div>
-            <fieldset class="ei-fieldset"><legend>Texto</legend>
-              <label>Texto <textarea id="eiPropText" rows="2" placeholder="Texto del rótulo o de la etiqueta"></textarea></label>
-              <label class="ei-check"><input type="checkbox" id="eiPropPathText"> Texto siguiendo el trazo</label>
-              <label class="ei-field">Posición del texto sobre el trazo <span class="ei-out" id="eiPropPathOffsetOut">50 %</span><input type="range" id="eiPropPathOffset" min="0" max="100" step="1" value="50"></label>
-              <div class="ei-row">
-                <label>Fuente <select id="eiPropFont"><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Georgia">Georgia</option><option value="Tahoma">Tahoma</option><option value="Trebuchet MS">Trebuchet MS</option><option value="Courier New">Courier New</option></select></label>
-                <label>Tamaño <input id="eiPropFontSize" type="number" min="8" max="220" value="34" step="1"></label>
-                <label class="ei-check"><input type="checkbox" id="eiPropBold" checked> Negrita</label>
-                <label class="ei-check"><input type="checkbox" id="eiPropItalic"> Cursiva</label>
-              </div>
-              <div class="ei-row">
-                <label>Alineación <select id="eiPropTextAlign"><option value="center">Centrada</option><option value="left">Izquierda</option><option value="right">Derecha</option></select></label>
-                <label>Color texto <input id="eiPropTextColor" type="color" value="#ffffff"></label>
-                <label class="ei-check"><input type="checkbox" id="eiPropTextOutline" checked> Contorno oscuro</label>
-                <label class="ei-check"><input type="checkbox" id="eiPropTextShadow"> Sombra texto</label>
-              </div>
-            </fieldset>
-            <fieldset class="ei-fieldset"><legend>Cuadro de etiqueta</legend>
-              <div class="ei-row">
-                <label>Fondo <input id="eiPropLabelFill" type="color" value="#f57c00"></label>
-                <label>Borde <input id="eiPropLabelBorder" type="color" value="#ffffff"></label>
-                <label>Radio <input id="eiPropLabelRadius" type="number" min="0" max="40" value="8" step="1"></label>
-                <label>Relleno interno <input id="eiPropLabelPadding" type="number" min="4" max="60" value="18" step="1"></label>
-              </div>
-              <label class="ei-check"><input type="checkbox" id="eiPropCallout" checked> Punta / conector hacia el punto señalado</label>
-            </fieldset>
-            <div class="ei-row ei-actions">
-              <button class="btn" id="eiBringFront" type="button" title="Traer al frente">Al frente</button>
-              <button class="btn" id="eiSendBack" type="button" title="Enviar atrás">Atrás</button>
-              <button class="btn" id="eiDuplicate" type="button" title="Duplicar (Ctrl+D)">Duplicar</button>
-              <button class="btn" id="eiLockToggle" type="button" title="Bloquear / desbloquear">Bloquear</button>
-              <button class="btn bad" id="eiDelete" type="button" title="Eliminar (Supr)">Eliminar</button>
-            </div>
-            <div class="ei-row ei-actions">
-              <button class="btn" id="eiAlignLeft" type="button" title="Alinear a la izquierda">⇤ Izq.</button>
-              <button class="btn" id="eiAlignCenter" type="button" title="Centrar horizontalmente">↔ Centro</button>
-              <button class="btn" id="eiAlignRight" type="button" title="Alinear a la derecha">⇥ Der.</button>
-              <button class="btn" id="eiAlignTop" type="button" title="Alinear arriba">⇧ Arriba</button>
-              <button class="btn" id="eiAlignMiddle" type="button" title="Centrar verticalmente">↕ Medio</button>
-              <button class="btn" id="eiAlignBottom" type="button" title="Alinear abajo">⇩ Abajo</button>
-              <button class="btn" id="eiDistH" type="button" title="Distribuir horizontalmente">Distr. H</button>
-              <button class="btn" id="eiDistV" type="button" title="Distribuir verticalmente">Distr. V</button>
-            </div>
-            <p class="muted">Selecciona un objeto para editarlo. Con Mayús haz clic en varios objetos para seleccionarlos juntos. Doble clic en una línea o curva añade un punto; arrastra los nodos para ajustar el trazo.</p>
-          </div>
-        </details>
-
-        <details class="card ei-panel" open>
-          <summary>Capas</summary>
-          <div id="eiLayers" class="ei-layers" aria-label="Lista de capas"></div>
-          <p class="muted">La primera capa de la lista está al frente. Pulsa el ojo para ocultar, el candado para bloquear y el nombre para renombrar.</p>
-        </details>
-
-        <details class="card ei-panel">
-          <summary>Paleta y estilos</summary>
-          <div class="ei-palette" id="eiPalette" aria-label="Paleta de colores predefinidos"></div>
-          <div class="ei-row"><button class="btn" id="eiSaveColor" type="button">Guardar color actual</button><button class="btn" id="eiClearColors" type="button">Limpiar guardados</button></div>
-          <div class="ei-templates" id="eiTemplates" aria-label="Plantillas y estilos predefinidos"></div>
-          <div class="ei-row"><button class="btn" id="eiSaveStyle" type="button">Guardar estilo del objeto seleccionado</button></div>
-          <div id="eiCustomStyles" class="ei-templates"></div>
-        </details>
-
-        <details class="card ei-panel">
-          <summary>Iconos y símbolos</summary>
-          <input id="eiIconSearch" type="search" placeholder="Buscar icono: camión, grúa, pin…" aria-label="Buscar icono">
-          <select id="eiIconCategory" aria-label="Categoría de iconos"><option value="">Todas las categorías</option></select>
-          <div class="ei-icons" id="eiIcons" role="listbox" aria-label="Biblioteca de iconos"></div>
-          <div class="ei-row"><button class="btn" id="eiUploadIcon" type="button">Subir icono propio (SVG o PNG)</button></div>
-          <p class="muted">Los iconos son vectoriales, se recolorean con el color de relleno y no pierden calidad al ampliarlos.</p>
-        </details>
-
-        <details class="card ei-panel">
-          <summary>Leyenda, membrete y logotipo</summary>
-          <label>Título <input id="eiTitle" type="text" placeholder="Ej. Rutas de acceso — Manzanillo"></label>
-          <label>Fecha <input id="eiDate" type="date"></label>
-          <label>Marca de agua <input id="eiWatermark" type="text" placeholder="Ej. CCTT · Uso interno"></label>
-          <label>Posición de la leyenda
-            <select id="eiLegendPos"><option value="bl">Abajo a la izquierda</option><option value="br">Abajo a la derecha</option><option value="tl">Arriba a la izquierda</option><option value="tr">Arriba a la derecha</option><option value="none">Sin leyenda</option></select>
-          </label>
-          <div class="ei-row"><button class="btn" id="eiInsertLegend" type="button">Insertar leyenda como objeto</button><button class="btn" id="eiUploadLogo" type="button">Subir logotipo</button></div>
-          <div id="eiLegendPreview" class="ei-legend-preview muted">La leyenda se genera con los nombres y colores de tus rutas.</div>
-        </details>
-
-        <details class="card ei-panel">
-          <summary>Ajustes de la imagen</summary>
-          <label>Brillo <input id="eiBrightness" type="range" min="50" max="150" value="100"><output id="eiBrightnessOut">100 %</output></label>
-          <label>Contraste <input id="eiContrast" type="range" min="50" max="150" value="100"><output id="eiContrastOut">100 %</output></label>
-          <label>Saturación <input id="eiSaturation" type="range" min="0" max="200" value="100"><output id="eiSaturationOut">100 %</output></label>
-          <label>Nitidez <input id="eiSharpness" type="range" min="0" max="100" value="0"><output id="eiSharpnessOut">0 %</output></label>
-          <div class="ei-row">
-            <button class="btn" id="eiRotateLeft" type="button">⟲ Girar 90°</button>
-            <button class="btn" id="eiRotateRight" type="button">Girar 90° ⟳</button>
-            <button class="btn" id="eiFlipH" type="button">Voltear ↔</button>
-            <button class="btn" id="eiFlipV" type="button">Voltear ↕</button>
-            <button class="btn" id="eiResetAdjust" type="button">Restablecer</button>
-          </div>
-          <p class="muted">Los ajustes no tocan el archivo original; solo afectan a la vista y a la exportación.</p>
-        </details>
-
-        <details class="card ei-panel">
-          <summary>Exportación y lote</summary>
-          <div class="ei-row">
-            <label>Tamaño de salida
-              <select id="eiExportSize"><option value="1">Original (100 %)</option><option value="0.75">75 %</option><option value="0.5">50 %</option><option value="custom">Ancho personalizado</option></select>
-            </label>
-            <label>Ancho (px) <input id="eiExportWidth" type="number" min="200" max="8000" value="1600" step="10" disabled></label>
-            <label>Escala <select id="eiExportScale"><option value="1">1×</option><option value="2">2× (más nítido)</option><option value="3">3×</option></select></label>
-          </div>
-          <div class="ei-row">
-            <label>Calidad JPEG <input id="eiJpegQuality" type="range" min="50" max="100" value="92"><output id="eiJpegQualityOut">92 %</output></label>
-            <label class="ei-check"><input type="checkbox" id="eiPngTransparent"> PNG solo anotaciones (fondo transparente)</label>
-          </div>
-          <div class="ei-row">
-            <label>Página PDF <select id="eiPdfPage"><option value="a4">A4</option><option value="letter">Carta</option><option value="a3">A3</option></select></label>
-            <label>Orientación <select id="eiPdfOrient"><option value="landscape">Horizontal</option><option value="portrait">Vertical</option></select></label>
-            <label class="ei-check"><input type="checkbox" id="eiPdfLegend" checked> Incluir título y leyenda en el PDF</label>
-          </div>
-          <div class="ei-row">
-            <button class="btn" id="eiAddBatch" type="button">Añadir imagen actual al lote</button>
-            <button class="btn" id="eiExportBatchPdf" type="button">Exportar lote a PDF</button>
-            <button class="btn" id="eiClearBatch" type="button">Vaciar lote</button>
-          </div>
-          <div id="eiBatchList" class="ei-batch muted">Lote vacío.</div>
-        </details>
-
-        <details class="card ei-panel">
-          <summary>Ayuda y atajos</summary>
-          <table class="ei-help">
-            <tr><td>Ctrl+Z / Ctrl+Y</td><td>Deshacer / rehacer</td></tr>
-            <tr><td>Ctrl+D</td><td>Duplicar selección</td></tr>
-            <tr><td>Ctrl+C / Ctrl+V</td><td>Copiar / pegar objetos</td></tr>
-            <tr><td>Ctrl+A</td><td>Seleccionar todo</td></tr>
-            <tr><td>Supr</td><td>Eliminar selección</td></tr>
-            <tr><td>Flechas (Mayús = ×10)</td><td>Mover selección</td></tr>
-            <tr><td>Ctrl+S</td><td>Guardar proyecto JSON</td></tr>
-            <tr><td>Rueda / pellizco</td><td>Zoom (Ctrl+rueda = zoom al cursor)</td></tr>
-            <tr><td>Doble clic en trazo</td><td>Añadir un punto al trazo</td></tr>
-            <tr><td>Esc</td><td>Cancelar trazo / quitar selección</td></tr>
-          </table>
-          <p class="muted">En pantallas táctiles: un dedo dibuja o mueve, dos dedos hacen zoom y desplazan la vista.</p>
-        </details>
-      </div>
     </div>
+  </div>
 
-    <div class="card ei-vrp" id="eiVrpBox">
-      <strong>Desde Reporte de vialidades</strong>
-      <span class="muted">Elige una foto ya cargada en ese módulo y cárgala aquí con su recorte.</span>
-      <div class="ei-row">
-        <select id="eiVrpPhotoSelect" aria-label="Fotografías de Reporte de vialidades"><option value="">— Sin fotografías disponibles —</option></select>
-        <button class="btn" id="eiVrpRefresh" type="button">Actualizar lista</button>
-        <button class="btn primary" id="eiVrpLoad" type="button">Cargar seleccionada</button>
-        <button class="btn" id="eiVrpGo" type="button">Ir a Reporte de vialidades</button>
-      </div>
-      <p class="muted" id="eiVrpStatus" role="status" aria-live="polite"></p>
-    </div>
+  <!-- Botones de exportación originales (ocultos): la sub-barra usa un solo
+       botón "Exportar" + selector de formato que los acciona. Se conservan
+       para no tocar el cableado de ei-script.js. -->
+  <div class="ei-hidden" aria-hidden="true">
+    <button class="btn primary" id="eiExportPng" type="button" tabindex="-1"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='16' rx='2'/><circle cx='9' cy='10' r='1.5'/><path d='m4 18 5-5 3 3 3-3 4 4'/></svg>PNG</button>
+    <button class="btn" id="eiExportJpg" type="button" tabindex="-1"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M3 8h4l2-3h6l2 3h4v12H3z'/><circle cx='12' cy='13' r='3.5'/></svg>JPEG</button>
+    <button class="btn" id="eiExportWebp" type="button" tabindex="-1"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18'/></svg>WebP</button>
+    <button class="btn" id="eiExportPdf" type="button" tabindex="-1"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M6 2h9l5 5v15H6zM15 2v5h4M9 12h6M9 16h6'/></svg>PDF</button>
+    <button class="btn" id="eiExportSvg" type="button" tabindex="-1"><svg class="ei-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='m8 7-5 5 5 5M16 7l5 5-5 5'/></svg>SVG</button>
   </div>
 
   <input type="file" id="eiFileImage" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
@@ -4325,7 +4373,7 @@ function ccttRestorePhoto(session){const uid=session?.user?.id||'';if(window.__c
 function ccttCompletePhoto(){window.__ccttPhotoPending=false;const av=document.getElementById('miniAvatar');if(av)delete av.dataset.ccttPhotoPending;renderProfile()}
 function renderProfile(){let p=state.profile||baseState.profile;for(const [id,v] of [['profName',p.name],['profRole',p.role],['profEntity',p.entity]])document.getElementById(id).value=v||'';document.getElementById('miniName').textContent=p.name||'Operador CCTT';document.getElementById('miniRole').textContent=p.role||'Control operativo';let av=document.getElementById('miniAvatar');/* MODIFICADO: no sustituir una foto válida por el avatar temporal. */let photo=p.photo||(window.__ccttPhotoPending?window.__ccttPhotoCached:'');if(p.photo&&window.__ccttPhotoUser){window.__ccttPhotoCached=p.photo;try{sessionStorage.setItem('cctt_profile_photo_'+window.__ccttPhotoUser,p.photo)}catch(_e){}}if(!window.__ccttPhotoPending&&window.__ccttPhotoUser&&!p.photo){window.__ccttPhotoCached='';try{sessionStorage.removeItem('cctt_profile_photo_'+window.__ccttPhotoUser)}catch(_e){}}if(photo){const img=av.querySelector('img');if(!img||img.getAttribute('src')!==photo){av.replaceChildren();const next=document.createElement('img');next.src=photo;next.alt='Fotografía de perfil';next.onload=()=>{if(window.__ccttPhotoCached===photo)delete av.dataset.ccttPhotoPending};av.appendChild(next)}if(!window.__ccttPhotoPending)delete av.dataset.ccttPhotoPending;}else if(window.__ccttPhotoPending){av.dataset.ccttPhotoPending='true';av.replaceChildren()}else{delete av.dataset.ccttPhotoPending;av.textContent=esc((p.name||'CC').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase())}let pp=document.getElementById('profilePreview');pp.src=p.photo||'data:image/svg+xml;charset=utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" rx="50" fill="#dce8f5"/><text x="50" y="58" text-anchor="middle" font-size="28">CCTT</text></svg>');let lp=document.getElementById('logoPreview');lp.src=window.CCTT_SHARED_LOGO||'data:image/svg+xml;charset=utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="16" fill="#10233f"/><text x="60" y="70" fill="white" text-anchor="middle" font-size="26" font-family="Arial" font-weight="700">CCTT</text></svg>');let sl=document.getElementById('sideLogo');sl.innerHTML=window.CCTT_SHARED_LOGO?`<img src="${window.CCTT_SHARED_LOGO}" alt="Logo CCTT">`:'<span data-brand-icon="traffic"></span>';decorateNavIcons()}
 function readImg(input,cb){let f=input.files[0];if(!f)return;let r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f)}
-function renderHome(){const pisTotal=Object.values(state.pis).reduce((a,b)=>a+b.length,0);const cmp=state.cmp?.length||0;const msgs=state.messages?.length||0;document.getElementById('homeKpis').innerHTML=kpi('Registros PIS',pisTotal)+kpi('Accidentes',state.accidents?.length||0)+kpi('Citas procesadas',cmp)+kpi('Comunicados',msgs+(state.pdfHistory?.length||0));const mods=[/* NUEVO: tarjeta del Recordatorio de cumpleaños. */['recordatorioCumpleanos','Recordatorio de cumpleaños','Calendario mensual y anual con cumpleaños y edades calculadas.'],/* NUEVO: tarjeta de Ruleta de decisiones. */['ruletaDecisiones','Ruleta de decisiones','Sorteo aleatorio de nombres, números y opciones mediante ruleta animada.'],/* NUEVO: tarjeta exclusiva del Simulador de tránsito. */['simuladorTransito','Simulador de tránsito','Movimientos ilustrativos de peatones, ligeros y pesados sobre croquis y mapas.'],/* NUEVO: tarjeta de Verificación de citas. */['verificacionCitas','Verificación de citas','Lectura DEC, revisión visual y consulta del sitio PIS.'],/* NUEVO: tarjeta Conteos */['conteos','Conteos','Captura diaria, gráficas, cierres de carriles y consolidado histórico.'],['bibliotecaOperativa','Biblioteca operativa','Catálogos institucionales, claves y referencias operativas.'],['mapaUbicaciones','Mapa de ubicaciones','Consulta de trazos, polígonos, puntos y grupos geográficos.'],/* NUEVO: tarjeta de croquis. */['mapasCroquis','Mapas y croquis','Editor profesional de rutas, flechas, símbolos, polígonos y leyendas.'],/* NUEVO: tarjeta de acceso marítimo. */['buquesManzanillo','Buques activos · Manzanillo','Visualizar el mapa AIS del puerto de Manzanillo en MarineTraffic.'],/* NUEVO: tarjeta climatológica */['climaManzanillo','Clima y alertas · Manzanillo','Avisos oficiales y pronóstico meteorológico para Manzanillo.'],['pis','Bitácoras PIS','Carga DEI/DEV/DEC/DEO/DEA/DEP, consolidación y exportación.'],['accidentes','Accidentes CCTT','Registro con ID y turno automáticos; estadísticas mensual/anual.'],['comparador','Comparación terminales','Procesamiento de consultas Impo/Expo y estadísticas diaria/horaria.'],['reporte','Reporte cesionarios','Estado operativo por zona, leyenda y reporte imprimible/PDF.'],['balance','Balance de citas','Comparación antes/después del incremento por terminal y día.'],/* NUEVO */['cumplimientoCitas','Cumplimiento de citas','Programación semanal y seguimiento horario por terminal.'],['comunicadosPdf','Registro comunicados','Registro de PDF o múltiples imágenes y generación de PDF.'],['mensajes','Mensajes comunicados','Guardar, buscar por palabra/ID/etiqueta y deshacer.'],/* MODIFICADO: tarjeta Expedientes retirada. *//* NUEVO: permiso Diccionario */['diccionarioProcesos','Diccionario de procesos'],/* NUEVO: tarjeta del diccionario */['diccionarioProcesos','Diccionario de procesos','Folios operativos y procedimientos autorizados paso a paso.'],['consignas','Consignas','Seguimiento de consignas relacionadas y vencimientos.'],['turnos','Turnos','Calendario de grupos A–D con exportación anual.'],['controlCitas','Control citas portuarias','Resumen, No Show, cumplidas/no cumplidas y tipo de operación.'],['inc35macro','Generador de incidentes','Replica la hoja MACRO: plantillas, normalización de datos y salida lista para comunicación.'],['inc35copoma','Generador de Comunicados','Editor de comunicados con fecha/hora y formato institucional.'],['inc35vial','Reporte de vialidades','Estatus de vialidades internas/externas y texto listo para WhatsApp.'],/* NUEVO: tarjeta de módulo */['editorImagenes','Editor de imágenes','Anota fotografías con rutas, flechas, rótulos y etiquetas; exporta PNG, JPEG, WebP y PDF.'],/* NUEVO: tarjeta de módulo */['sobrevueloDron','Sobrevuelo de dron','Captura y copia de información de sobrevuelos.'],/* NUEVO: tarjeta Atención por ambulancia */['atencionAmbulancia','Atención por ambulancia','Reporte para solicitar atención médica y copiar a WhatsApp.'],['inc35bolet','Boletinados','Registro de conductas e incidencias con formato automático.'],['inc35redes','Reporte de redes sociales','Composición de imágenes, logo, texto y exportación PNG.'],['inc35pisrep','PIS-REP','Catálogo de códigos, prioridad, tiempo de respuesta e historial.']];document.getElementById('moduleCards').innerHTML=mods.map(([id,t,d])=>`<!-- MODIFICADO: tarjeta identificable para aplicar permisos. --><div class="card" data-page="${id}"><h3>${t}</h3><p class="muted">${d}</p><!-- MODIFICADO: el acceso conserva su chevrón y no repite el documento genérico. --><button class="btn" data-iconized="1" onclick="go('${id}')">Abrir módulo</button></div>`).join('');if(window.ccttRenderIconHome)window.ccttRenderIconHome()}
+function renderHome(){const pisTotal=Object.values(state.pis).reduce((a,b)=>a+b.length,0);const cmp=state.cmp?.length||0;const msgs=state.messages?.length||0;document.getElementById('homeKpis').innerHTML=kpi('Registros PIS',pisTotal)+kpi('Accidentes',state.accidents?.length||0)+kpi('Citas procesadas',cmp)+kpi('Comunicados',msgs+(state.pdfHistory?.length||0));const mods=[/* NUEVO: tarjeta del Recordatorio de cumpleaños. */['recordatorioCumpleanos','Recordatorio de cumpleaños','Calendario mensual y anual con cumpleaños y edades calculadas.'],/* NUEVO: tarjeta de Ruleta de decisiones. */['ruletaDecisiones','Ruleta de decisiones','Sorteo aleatorio de nombres, números y opciones mediante ruleta animada.'],/* NUEVO: tarjeta exclusiva del Simulador de tránsito. */['simuladorTransito','Simulador de tránsito','Movimientos ilustrativos de peatones, ligeros y pesados sobre croquis y mapas.'],/* NUEVO: tarjeta de Verificación de citas. */['verificacionCitas','Verificación de citas','Lectura DEC, revisión visual y consulta del sitio PIS.'],/* NUEVO: tarjeta Conteos */['conteos','Conteos','Captura diaria, gráficas, cierres de carriles y consolidado histórico.'],['bibliotecaOperativa','Biblioteca operativa','Catálogos institucionales, claves y referencias operativas.'],['mapaUbicaciones','Mapa de ubicaciones','Consulta de trazos, polígonos, puntos y grupos geográficos.'],/* NUEVO: tarjeta de croquis. */['mapasCroquis','Mapas y croquis','Editor profesional de rutas, flechas, símbolos, polígonos y leyendas.'],/* NUEVO: tarjeta de acceso marítimo. */['buquesManzanillo','Buques activos · Manzanillo','Visualizar el mapa AIS del puerto de Manzanillo en MarineTraffic.'],/* NUEVO: tarjeta climatológica */['climaManzanillo','Clima y alertas · Manzanillo','Avisos oficiales y pronóstico meteorológico para Manzanillo.'],['pis','Bitácoras PIS','Carga DEI/DEV/DEC/DEO/DEA/DEP, consolidación y exportación.'],['accidentes','Accidentes CCTT','Registro con ID y turno automáticos; estadísticas mensual/anual.'],['comparador','Comparación terminales','Procesamiento de consultas Impo/Expo y estadísticas diaria/horaria.'],['reporte','Reporte cesionarios','Estado operativo por zona, leyenda y reporte imprimible/PDF.'],['balance','Balance de citas','Comparación antes/después del incremento por terminal y día.'],/* NUEVO */['cumplimientoCitas','Cumplimiento de citas','Programación semanal y seguimiento horario por terminal.'],['comunicadosPdf','Registro comunicados','Registro de PDF o múltiples imágenes y generación de PDF.'],['mensajes','Mensajes comunicados','Guardar, buscar por palabra/ID/etiqueta y deshacer.'],/* MODIFICADO: tarjeta Expedientes retirada. *//* NUEVO: tarjeta del diccionario */['diccionarioProcesos','Diccionario de procesos','Folios operativos y procedimientos autorizados paso a paso.'],['consignas','Consignas','Seguimiento de consignas relacionadas y vencimientos.'],['turnos','Turnos','Calendario de grupos A–D con exportación anual.'],['controlCitas','Control citas portuarias','Resumen, No Show, cumplidas/no cumplidas y tipo de operación.'],['inc35macro','Generador de incidentes','Replica la hoja MACRO: plantillas, normalización de datos y salida lista para comunicación.'],['inc35copoma','Generador de Comunicados','Editor de comunicados con fecha/hora y formato institucional.'],['inc35vial','Reporte de vialidades','Estatus de vialidades internas/externas y texto listo para WhatsApp.'],/* NUEVO: tarjeta de módulo */['editorImagenes','Editor de imágenes','Anota fotografías con rutas, flechas, rótulos y etiquetas; exporta PNG, JPEG, WebP y PDF.'],/* NUEVO: tarjeta de módulo */['sobrevueloDron','Sobrevuelo de dron','Captura y copia de información de sobrevuelos.'],/* NUEVO: tarjeta Atención por ambulancia */['atencionAmbulancia','Atención por ambulancia','Reporte para solicitar atención médica y copiar a WhatsApp.'],['inc35bolet','Boletinados','Registro de conductas e incidencias con formato automático.'],['inc35redes','Reporte de redes sociales','Composición de imágenes, logo, texto y exportación PNG.'],['inc35pisrep','PIS-REP','Catálogo de códigos, prioridad, tiempo de respuesta e historial.']];document.getElementById('moduleCards').innerHTML=mods.map(([id,t,d])=>`<!-- MODIFICADO: tarjeta identificable para aplicar permisos. --><div class="card" data-page="${id}"><h3>${t}</h3><p class="muted">${d}</p><!-- MODIFICADO: el acceso conserva su chevrón y no repite el documento genérico. --><button class="btn" data-iconized="1" onclick="go('${id}')">Abrir módulo</button></div>`).join('');if(window.ccttRenderIconHome)window.ccttRenderIconHome()}
 /* MODIFICADO: acceso a páginas limitado al rol verificado. */function go(id){if(window.ccttCanAccess&&!window.ccttCanAccess(id))return;document.querySelectorAll('.page').forEach(x=>{x.classList.remove('active');if(x.id==='page-adminUsuarios')x.style.removeProperty('display')});document.getElementById('page-'+id).classList.add('active');/* NUEVO: recordar únicamente la navegación de la cuenta verificada. */if(window.ccttCurrentNavUser){try{sessionStorage.setItem('cctt_last_page_'+window.ccttCurrentNavUser,id)}catch(_e){}}document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.page===id));const n=document.querySelector(`.navbtn[data-page="${id}"] .lbl`)?.textContent||'Centro de Control de Tráfico Terrestre';document.getElementById('pageTitle').textContent=n;/* MODIFICADO: la verificación DEC se abre en la cabecera, sin conservar desplazamiento anterior. */window.scrollTo({top:0,behavior:id==='verificacionCitas'?'instant':'smooth'});/* MODIFICADO: mantener la navegación del submódulo de seguridad dentro de Administrar accesos. */window.ccttAccessLayout?.route(id);renderAll()}
 document.querySelectorAll('.navbtn').forEach(b=>b.onclick=()=>go(b.dataset.page));
 // PIS
@@ -7305,7 +7353,7 @@ inc35redes:'<circle cx="5" cy="12" r="3"/><circle cx="19" cy="5" r="3"/><circle 
 inc35pisrep:'<path d="M3 4h18v16H3zM6 8h5m-5 4h3m5-4h4v8h-4zM6 16h4"/>',
 recuerdo:'<path d="M3 4h18v16H3zM3 17l5-5 4 4 3-3 6 6"/><circle cx="15" cy="9" r="2"/>',
 avisosRecurrentes:'<path d="M5 16V9a7 7 0 0 1 14 0v7l2 3H3zM9 22h6M2 5l2-3m16 0 2 3"/>'
-/* NUEVO: icono propio del módulo de aprendizaje. */};/* NUEVO: icono propio de tráfico en Inicio y la vista de iconos. *//* NUEVO: icono propio del directorio en Inicio y navegación. */icons.directorioSitios='<path d="M3 21V3h12v18M15 9h6v12M6 6h2m3 0h1M6 10h2m3 0h1M6 14h2m3 0h1M8 21v-4h3v4m7-9h1m-1 4h1"/>';icons.traficoTerrestre='<path d="M2 4l7-2 6 3 7-2v17l-7 2-6-3-7 2zM9 2v17m6-14v17M5 8v5m14-5v5"/><path d="m4 11 1 2 1-2m12-1 1-2 1 2"/>';icons.aprendizajeModulos='<path d="m2 8 10-5 10 5-10 5zM6 11v6c4 3 8 3 12 0v-6M22 8v8"/>';/* NUEVO */icons.editorImagenes='<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m4 18 5-5 4 3 3-4 4 5"/>';/* NUEVO */icons.mensajesPersonajes='<path d="M3 4h14v11H9l-5 4v-4H3zM17 8h4v13l-4-3h-5"/>';window.ccttHomeModuleSvg=id=>{const glyph=icons[id];if(!glyph)return null;return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+glyph+'</svg>'};})();
+/* NUEVO: icono propio del módulo de aprendizaje. */};/* NUEVO: icono propio de tráfico en Inicio y la vista de iconos. *//* NUEVO: icono propio del directorio en Inicio y navegación. */icons.directorioSitios='<path d="M3 21V3h12v18M15 9h6v12M6 6h2m3 0h1M6 10h2m3 0h1M6 14h2m3 0h1M8 21v-4h3v4m7-9h1m-1 4h1"/>';icons.traficoTerrestre='<path d="M2 4l7-2 6 3 7-2v17l-7 2-6-3-7 2zM9 2v17m6-14v17M5 8v5m14-5v5"/><path d="m4 11 1 2 1-2m12-1 1-2 1 2"/>';icons.aprendizajeModulos='<path d="m2 8 10-5 10 5-10 5zM6 11v6c4 3 8 3 12 0v-6M22 8v8"/>';/* NUEVO */icons.editorImagenes='<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M4 17c3-5 5-2 7-5s3-4 6-2"/><path d="M17 8l3 2-3 2"/>';/* NUEVO */icons.mensajesPersonajes='<path d="M3 4h14v11H9l-5 4v-4H3zM17 8h4v13l-4-3h-5"/>';/* NUEVO: icono propio del Generador de correos. */icons.generadorCorreos='<path d="M3 5h18v14H3zM3 7l9 6 9-6M15 13l4 4-1 2-3-1 1-2z"/>';window.ccttHomeModuleSvg=id=>{const glyph=icons[id];if(!glyph)return null;return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+glyph+'</svg>'};})();
 
 </script>
 <script id="cctt-v23-script">
@@ -8562,7 +8610,7 @@ async function recSetAlbum(path,albumId){if(!session||!admin())return false;let 
 function renderAlbums(){const host=$('recAlbumList');host.replaceChildren();if(!recAlbums.length){host.textContent='No hay álbumes creados.';return}for(const a of recAlbums){const row=document.createElement('div');row.className='rec-album-row';const count=Object.values(recAlbumMap).filter(v=>v===String(a.id)).length;const label=document.createElement('strong');label.textContent=a.anio+' · '+a.nombre+' ('+count+' fotos)';const rename=document.createElement('button');rename.type='button';rename.className='btn';rename.textContent='Renombrar';rename.onclick=()=>{const edit=document.createElement('input');edit.value=a.nombre;edit.maxLength=100;edit.setAttribute('aria-label','Nuevo nombre del álbum');label.replaceWith(edit);const save=document.createElement('button');save.type='button';save.className='btn primary';save.textContent='Guardar nombre';rename.replaceWith(save);save.onclick=async()=>{const name=edit.value.trim();if(!name)return;const r=await client().from('cctt_recuerdo_albumes').update({nombre:name}).eq('id',a.id);if(r.error){recAlbumError(r.error);return}await refreshAlbums()}};const del=document.createElement('button');del.type='button';del.className='btn bad';del.textContent='Eliminar álbum';del.onclick=async()=>{if(!await confirmSite('¿Eliminar el álbum '+a.anio+' · '+a.nombre+'? Las fotografías se conservarán.'))return;const r=await client().from('cctt_recuerdo_albumes').delete().eq('id',a.id);if(r.error){recAlbumError(r.error);return}await refreshAlbums()};row.append(label,rename,del);host.append(row)}}
 $('recAlbumCreate').onclick=async()=>{if(!admin())return;const anio=Number($('recAlbumYear').value),nombre=$('recAlbumName').value.trim();if(!Number.isInteger(anio)||anio<1900||anio>2200||!nombre){$('recAlbumStatus').textContent='Escribe un año válido y el nombre del álbum.';return}const r=await client().from('cctt_recuerdo_albumes').insert({anio,nombre});if(r.error){recAlbumError(r.error);return}$('recAlbumName').value='';$('recAlbumStatus').textContent='Álbum creado.';await refreshAlbums()};
 // NUEVO: módulo disponible en ambos catálogos; la preferencia se conserva por cuenta.
-function addCatalog(){const cards=$('moduleCards');if(cards&&!cards.querySelector('[data-page="recuerdo"]')){const card=document.createElement('div');card.className='card';card.dataset.page='recuerdo';card.innerHTML='<h3>El Recuerdo</h3><p class="muted">Galería compartida de fotografías.</p><button type="button" class="btn">Abrir módulo</button>';card.querySelector('button').onclick=()=>go('recuerdo');cards.append(card)}const icons=$('ccttHomeIconGrid');if(icons&&!icons.querySelector('[data-page="recuerdo"]')){const b=document.createElement('button');b.type='button';b.className='cctt-home-icon-tile';b.dataset.page='recuerdo';b.innerHTML='<span class="cctt-home-icon-symbol">▣</span><span class="cctt-home-tile-label">El Recuerdo</span>';b.onclick=()=>go('recuerdo');icons.append(b)}}
+function addCatalog(){const cards=$('moduleCards');if(cards&&!cards.querySelector('[data-page="recuerdo"]')){const card=document.createElement('div');card.className='card';card.dataset.page='recuerdo';card.innerHTML='<h3>El Recuerdo</h3><p class="muted">Galería compartida de fotografías.</p><button type="button" class="btn" data-iconized="1">Abrir módulo</button>';card.querySelector('button').onclick=()=>go('recuerdo');cards.append(card)}const icons=$('ccttHomeIconGrid');if(icons&&!icons.querySelector('[data-page="recuerdo"]')){const b=document.createElement('button');b.type='button';b.className='cctt-home-icon-tile';b.dataset.page='recuerdo';b.innerHTML='<span class="cctt-home-icon-symbol">▣</span><span class="cctt-home-tile-label">El Recuerdo</span>';b.onclick=()=>go('recuerdo');icons.append(b)}}
 const base=window.ccttRenderIconHome;window.ccttRenderIconHome=function(){base?.();addCatalog()};addCatalog();
 window.addEventListener('cctt:session',e=>{session=e.detail?.session||null;userId=session?.user?.id||'guest';updateRecuerdoAdminButtons();syncAdminFont();setTimeout(()=>{menuLink();addCatalog();applyPref();load()},80)});
 window.addEventListener('cctt:logout',()=>{session=null;photos=[];lb.hidden=true;closeAdminPanel();updateRecuerdoAdminButtons();syncAdminFont();document.documentElement.classList.remove('cctt-icons-only')});
@@ -13295,7 +13343,7 @@ function draw(){if(!allowed(current)){current='';$('learnBoardTitle').textConten
 function select(id){if(!allowed(id))return;current=id;const guide=lesson(id),saved=progress[id];position=saved?.version===guide.version?Number(saved.position)||0:0;signature=guide.version;draw();renderList()}
 function refresh(){scheduled=0;const access=allowed(ID);const nav=document.querySelector('.sidebar [data-page="'+ID+'"]');if(nav){nav.hidden=!access;nav.style.display=access?'':'none'}const card=$('learnHomeCard');if(card){card.hidden=!access;card.style.display=access?'':'none'}if(!access){current='';position=0;$('learnModules')?.replaceChildren();$('learnCurrent').textContent='';draw();return}if(current&&!allowed(current)){current='';position=0}if(!current)current=catalog()[0]?.[0]||'';if(current&&signature!==lesson(current).version){position=0;draw()}renderList();draw()}
 function schedule(){if(!scheduled)scheduled=setTimeout(refresh,100)}
-function home(){const host=$('moduleCards');if(!host||$('learnHomeCard'))return;const card=el('div',null,'card');card.id='learnHomeCard';card.dataset.page=ID;card.append(el('h3','Aprendizaje de módulos'),el('p','Recorridos paso a paso según los módulos y controles habilitados de tu cuenta.','muted'));const b=el('button','Abrir módulo','btn');b.type='button';b.onclick=()=>{if(allowed(ID))go(ID)};card.append(b);card.hidden=!allowed(ID);host.append(card)}
+function home(){const host=$('moduleCards');if(!host||$('learnHomeCard'))return;const card=el('div',null,'card');card.id='learnHomeCard';card.dataset.page=ID;card.append(el('h3','Aprendizaje de módulos'),el('p','Recorridos paso a paso según los módulos y controles habilitados de tu cuenta.','muted'));const b=el('button','Abrir módulo','btn');b.type='button';b.dataset.iconized='1';b.onclick=()=>{if(allowed(ID))go(ID)};card.append(b);card.hidden=!allowed(ID);host.append(card)}
 // NUEVO: API explícita para documentar funciones nuevas sin inventar instrucciones. Solo IDs de controles autorizados.
 window.ccttLearning={register(id,spec){if(!/^[\w-]+$/.test(id)||!spec||typeof spec.purpose!=='string'||!Array.isArray(spec.steps))throw Error('Guía inválida');guides.set(id,{purpose:spec.purpose.slice(0,1000),version:String(spec.version||''),steps:spec.steps.filter(s=>s&&typeof s.title==='string'&&typeof s.body==='string').map(s=>({title:s.title.slice(0,130),body:s.body.slice(0,1800),controlId:typeof s.controlId==='string'?s.controlId:undefined}))});schedule()},refresh:schedule};
 // NUEVO: interacción local de personajes; no modifica registros ni permisos.
@@ -13384,7 +13432,7 @@ function edit(m){editing=m.id;actor=m.character;Q('cmTitle').value=m.title;Q('cm
 function reset(){editing='';actor=0;Q('cmForm').reset();selectAll('cmTargets',false);schedule();preview();status('Nuevo mensaje.')}
 async function submit(e){e.preventDefault();if(busy||!allowed())return;busy=true;Q('cmSend').disabled=true;status('Guardando…');try{const data={id:editing,/* MODIFICADO: el mensaje no requiere título. */body:Q('cmBody').value,character:actor,recipients:checked('cmTargets'),recurrence:Q('cmRecurrence').value,startLocal:Q('cmStart').value,endLocal:Q('cmEnd').value,days:checked('cmDays').map(Number),intervalMinutes:Number(Q('cmInterval').value)};await call('save',data);reset();await refresh();status('Mensaje guardado. Se entregará al consultar avisos desde el sitio abierto.');tab('sent')}catch(e){status(e.message,true)}finally{busy=false;Q('cmSend').disabled=!allowed()}}
 function access(){/* MODIFICADO: el rol mostrado no concede permisos; el servidor valida la lista. */const isAdmin=current?.user?.app_metadata?.role==='admin';Q('cmTargetsLabel').textContent=isAdmin?'Usuarios':'Destinatarios autorizados';Q('cmRecipientHelp').textContent=(isAdmin?'Puedes enviar a cualquier usuario registrado, a uno o a varios. Actualizar incorpora los nuevos usuarios.':'Puedes enviar a los destinatarios autorizados para tu cuenta.')+' Horarios de Manzanillo. Los avisos llegan mientras el sitio esté abierto.';homeCard();const nav=document.querySelector('[data-page="'+ID+'"]');if(nav){nav.hidden=!allowed();nav.style.display=allowed()?'':'none'}Q('cmSend').disabled=!allowed();if(!allowed()){targets=[];sent=[];inbox=[];Q('cmTargets').replaceChildren();Q('cmInbox').replaceChildren();Q('cmSent').replaceChildren()}}
-function homeCard(){const host=Q('moduleCards');if(!host)return;const existing=host.querySelector('[data-page="'+ID+'"]');if(!allowed()){existing?.remove();return}if(existing)return;const b=document.createElement('button');b.type='button';b.className='card';b.dataset.page=ID;b.innerHTML=svg('module')+'<strong>Mensajes con personajes</strong>';b.onclick=()=>document.querySelector('.sidebar [data-page="'+ID+'"]').click();host.append(b)}
+function homeCard(){const host=Q('moduleCards');if(!host)return;const existing=host.querySelector('[data-page="'+ID+'"]');if(!allowed()){existing?.remove();return}if(existing)return;const b=document.createElement('div');b.className='card';b.dataset.page=ID;b.innerHTML='<h3>Mensajes con personajes</h3><p class="muted">Mensajes con personajes y guías para comunicados institucionales.</p><button type="button" class="btn" data-iconized="1">Abrir módulo</button>';b.querySelector('button').onclick=()=>document.querySelector('.sidebar [data-page="'+ID+'"]').click();host.append(b)}
 function scope(){const panel=Q('ccttAdminPanel');if(!panel||Q('cmScope'))return;const s=document.createElement('section');s.id='cmScope';s.className='card';s.innerHTML='<h3>Destinatarios de Mensajes con personajes</h3><p class="muted">Selecciona el UUID del remitente. Su módulo se habilita en la lista de permisos; aquí defines a quién puede enviar mensajes. El administrador puede enviar a todos los usuarios configurados.</p><div class="cm-actions"><button type="button" class="btn" id="cmScopeLoad">'+svg('load')+'Consultar destinatarios</button><button type="button" class="btn" id="cmScopeAll">'+svg('all')+'Seleccionar todos</button><button type="button" class="btn" id="cmScopeNone">'+svg('none')+'Desmarcar todos</button></div><div id="cmScopeTargets" class="cm-targets"></div><div class="cm-actions"><button type="button" class="btn" id="cmScopeSave" disabled>'+svg('scope')+'Guardar destinatarios</button></div><p id="cmScopeStatus" role="status"></p>';(Q('ccttAccessEditor')||panel).append(s);let loaded='',scopeGeneration=0;const target=()=>Q('ccttTargetUser')?.value.trim()||'',invalidate=()=>{scopeGeneration++;loaded='';Q('cmScopeTargets').replaceChildren();Q('cmScopeSave').disabled=true;Q('cmScopeStatus').textContent='Consulta los destinatarios del usuario seleccionado.'};Q('ccttTargetUser').addEventListener('input',invalidate);Q('ccttTargetUser').addEventListener('change',invalidate);Q('cmScopeAll').onclick=()=>selectAll('cmScopeTargets',true);Q('cmScopeNone').onclick=()=>selectAll('cmScopeTargets',false);Q('cmScopeLoad').onclick=async()=>{const id=target(),stamp=++scopeGeneration;loaded='';Q('cmScopeSave').disabled=true;try{const r=await window.ccttCharacterScopeInvoke('character-scope-get',{userId:id});if(target()!==id||stamp!==scopeGeneration)return;checkList(Q('cmScopeTargets'),r.users||[],r.targets||[]);loaded=id;Q('cmScopeSave').disabled=false;Q('cmScopeStatus').textContent='Destinatarios consultados.'}catch(e){Q('cmScopeStatus').textContent=e.message}};Q('cmScopeSave').onclick=async()=>{const id=target();if(!loaded||loaded!==id){invalidate();return}const selected=checked('cmScopeTargets');Q('cmScopeSave').disabled=true;try{const r=await window.ccttCharacterScopeInvoke('character-scope-save',{userId:id,targets:selected});if(target()===id){checkList(Q('cmScopeTargets'),r.users||[],r.targets||[]);Q('cmScopeStatus').textContent='Destinatarios guardados y confirmados.'}}catch(e){Q('cmScopeStatus').textContent='No se confirmó el guardado: '+e.message}finally{Q('cmScopeSave').disabled=target()!==loaded}}}
 function boot(){const nav=document.createElement('button');nav.type='button';nav.className='navbtn';nav.dataset.page=ID;nav.innerHTML='<span class="ico">'+svg('module')+'</span><span class="lbl">Mensajes con personajes</span>';nav.onclick=()=>{if(typeof window.go==='function')window.go(ID);else{document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+ID));}};document.querySelector('.sidebar')?.append(nav);const page=document.createElement('section');page.className='page';page.id='page-'+ID;page.innerHTML=`<div class="section-title"><h2>Mensajes con personajes</h2></div><!-- MODIFICADO --><p class="muted" id="cmRecipientHelp">Horarios de Manzanillo. Los avisos llegan mientras el sitio esté abierto.</p><div class="cm-tabs" role="tablist" aria-label="Mensajería"><button type="button" class="btn" role="tab" data-cm-tab="compose">${svg('compose')}Redactar</button><button type="button" class="btn" role="tab" data-cm-tab="inbox">${svg('inbox')}Recibidos</button><button type="button" class="btn" role="tab" data-cm-tab="sent">${svg('sent')}Enviados y programados</button><button type="button" class="btn" id="cmRefresh">${svg('refresh')}Actualizar</button></div><p id="cmStatus" class="cm-status" role="status"></p><div class="cm-panel" data-cm-panel="compose"><div class="cm-grid"><form id="cmForm" class="card cm-form"><!-- MODIFICADO: sin campo de título; ID conservado para compatibilidad. --><input id="cmTitle" type="hidden" value="Mensaje"><label>Mensaje<textarea id="cmBody" maxlength="4000" required></textarea></label><div><span>Personaje</span><div class="cm-actor-options"><!-- MODIFICADO: SVG propio de cada guía. --><button class="btn" type="button" data-cm-actor="0">${svg('guideOne')}Guía 1</button><button class="btn" type="button" data-cm-actor="1">${svg('guideTwo')}Guía 2</button></div></div><div><!-- MODIFICADO: etiqueta según rol. --><strong id="cmTargetsLabel">Destinatarios autorizados</strong><div class="cm-actions"><button type="button" class="btn" id="cmAll">${svg('all')}Todos</button><button type="button" class="btn" id="cmNone">${svg('none')}Ninguno</button></div><div class="cm-targets" id="cmTargets"></div></div><details id="cmSchedule"><summary>Programación y recurrencia</summary><label>Frecuencia<select id="cmRecurrence"><option value="once">Una sola vez</option><option value="daily">Diaria</option><option value="weekly">Semanal</option><option value="interval">Por intervalo</option></select></label><label>Inicio · Manzanillo<input id="cmStart" type="datetime-local"></label><small>Vacío: ahora, para un envío único.</small><label>Fin opcional · Manzanillo<input id="cmEnd" type="datetime-local"></label><div id="cmDaysBox"><label><input type="checkbox" id="cmWeek" checked>Toda la semana</label><div class="cm-days" id="cmDays">${['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'].map((d,i)=>'<label><input type="checkbox" value="'+i+'" checked>'+d+'</label>').join('')}</div></div><label id="cmIntervalBox">Intervalo en minutos<input id="cmInterval" type="number" min="5" max="525600" value="60"></label><p class="muted">Al regresar al sitio se entrega la última ocurrencia vencida, sin acumular los periodos ausentes. Una pausa detiene futuros avisos; el historial se conserva.</p></details><div class="cm-actions"><button type="submit" class="btn primary" id="cmSend">${svg('save')}Guardar mensaje</button><button type="button" class="btn" id="cmNew">${svg('new')}Nuevo</button></div></form><aside class="card cm-preview"><h3>Vista previa del aviso</h3><div class="cm-message-visual"><div id="cmPreviewCharacter"></div><div><h3 id="cmPreviewTitle"></h3><p id="cmPreviewBody"></p><span>${svg('open')}Abrir &nbsp; ${svg('close')}Cerrar</span></div></div><p class="muted">El aviso aparece abajo a la derecha. Abrir confirma lectura; cerrar oculta esa ocurrencia.</p></aside></div></div><div class="cm-panel card" data-cm-panel="inbox" hidden><h3>Recibidos</h3><div id="cmInbox"></div></div><div class="cm-panel card" data-cm-panel="sent" hidden><h3>Enviados y programados</h3><p class="muted">Hasta 100 mensajes recientes. Una entrega pendiente no equivale a una lectura.</p><div id="cmSent"></div></div>`;document.querySelector('.content')?.append(page);const dialog=document.createElement('dialog');dialog.id='cmMessageDialog';dialog.innerHTML='<div id="cmDialogCharacter"></div><h2 id="cmDialogTitle"></h2><p id="cmDialogBody"></p><button type="button" class="btn" id="cmDialogClose">'+svg('close')+'Cerrar</button>';document.body.append(dialog);Q('cmDialogClose').onclick=()=>dialog.close();document.querySelectorAll('[data-cm-tab]').forEach(b=>b.onclick=()=>tab(b.dataset.cmTab));document.querySelectorAll('[data-cm-actor]').forEach(b=>b.onclick=()=>{actor=Number(b.dataset.cmActor);preview()});Q('cmTitle').oninput=preview;Q('cmBody').oninput=preview;Q('cmRecurrence').onchange=schedule;Q('cmWeek').onchange=e=>selectAll('cmDays',e.target.checked);Q('cmDays').onchange=()=>{const n=checked('cmDays').length;Q('cmWeek').checked=n===7;Q('cmWeek').indeterminate=n>0&&n<7};Q('cmAll').onclick=()=>selectAll('cmTargets',true);Q('cmNone').onclick=()=>selectAll('cmTargets',false);Q('cmNew').onclick=reset;Q('cmRefresh').onclick=refresh;Q('cmForm').onsubmit=submit;schedule();preview();tab('compose');scope();access();/* NUEVO: cargar al abrir por cualquier ruta, incluida la guía. */new MutationObserver(()=>{if(allowed()&&page.classList.contains('active'))void refresh()}).observe(page,{attributes:true,attributeFilter:['class']});const cards=Q('moduleCards');if(cards)new MutationObserver(homeCard).observe(cards,{childList:true});/* MODIFICADO: guía actualizada según las opciones habilitadas. */window.ccttLearning?.register(ID,{version:'3',purpose:'Enviar mensajes con los guías a destinatarios autorizados, consultar entregas y programar recurrencias.',steps:[{title:'Destinatarios',body:'El administrador puede seleccionar cualquier usuario registrado, aunque aún no tenga módulos asignados. Actualizar incorpora los usuarios nuevos. Puede marcar uno específico o usar Todos. Los demás usuarios solo ven sus destinatarios autorizados. Todos marca los disponibles y Ninguno los desmarca.',controlId:'cmTargets'},{title:'Redactar y elegir guía',body:'Escribe el mensaje sin título y elige al guía; la vista previa cambia al instante.',controlId:'cmBody'},{title:'Programar',body:'Selecciona un envío único o recurrente, sus días y horarios de Manzanillo.',controlId:'cmSchedule'},{title:'Guardar',body:'El servidor confirma el mensaje y verifica tus destinatarios. No se envía desde la vista previa.',controlId:'cmSend'},{title:'Avisos y lectura',body:'Los avisos aparecen abajo a la derecha mientras el sitio está abierto. Abrir confirma lectura; cerrar oculta esa ocurrencia.'},{title:'Controlar los envíos',body:'En Enviados y programados puedes editar, pausar y cancelar futuros envíos sin borrar el historial.'}]});window.ccttLearning?.refresh();}
 function session(s){const old=current?.user?.id;current=s||null;if(old!==current?.user?.id){generation++;editing='';targets=[];sent=[];inbox=[];if(Q('cmForm'))reset();if(Q('cmMessageDialog')?.open)Q('cmMessageDialog').close();Q('cmScopeTargets')?.replaceChildren();if(Q('cmScopeSave'))Q('cmScopeSave').disabled=true;}if(Q('cmSend'))access()}
@@ -15246,7 +15294,7 @@ const ID='directorioSitios',title='Directorio de sitios y áreas',$=id=>document
 const glyphs={nav:'M3 21V3h12v18M15 9h6v12M6 6h2m3 0h1M6 10h2m3 0h1M6 14h2m3 0h1M8 21v-4h3v4m7-9h1m-1 4h1',home:'M2 5h8l2 3h10v13H2zM6 12h4m-4 4h6m5-5v7m-3-4h6',refresh:'M19 4v5h-5M5 20v-5h5M5 9a7 7 0 0 1 12-5l2 5M5 15l2 5a7 7 0 0 0 12-5',pin:'M12 22S4 14 4 9a8 8 0 0 1 16 0c0 5-8 13-8 13M9 9h6m-3-3v6',save:'M4 3h13l4 4v14H3V3h1m3 0v6h9V3M7 21v-8h10v8',cancel:'M7 7l10 10M17 7 7 17M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20',area:'M3 4h10v16H3zM6 8h4m-4 4h4m-4 4h4m8-8v8m-4-4h8',remove:'M5 12h14',edit:'m4 16 11-11 4 4L8 20H4zM13 7l4 4',delete:'M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7',focus:'M3 9V3h6m6 0h6v6m0 6v6h-6M9 21H3v-6M8 12h8m-4-4v8',loadUsers:'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M2 21v-4a7 7 0 0 1 14 0v4M19 9v8m-3-4h6',all:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',none:'M3 3h18v18H3zM7 12h10',grant:'M12 2l9 4v6c0 5-9 10-9 10S3 17 3 12V6zM8 12h8m-4-4v8'};
 /* NUEVO: SVG específicos del rediseño, sin fuentes de iconos externas. */
 Object.assign(glyphs,{search:'M21 21l-6-6M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14',list:'M4 4h16v4H4zM4 11h16v4H4zM4 18h16v3H4z',form:'M5 3h10l4 4v14H5zM14 3v5h5M8 12h8m-8 4h5',info:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20M12 10v7m0-11v1',building:'M5 21V3h14v18M2 21h20M8 7h2m4 0h2M8 11h2m4 0h2M10 21v-6h4v6',close:'M6 6l12 12M18 6 6 18'});
-const icon=k=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+glyphs[k]+'"/></svg>';
+const icon=k=>'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+glyphs[k]+'"/></svg>';
 const btn=(id,label,key)=>'<button type="button" class="btn" id="'+id+'" data-iconized="1" data-cctt-icon-fixed="true">'+icon(key)+'<span>'+label+'</span></button>';
 const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 const emptyRights=()=>({read:false,create:false,edit:false,delete:false});
@@ -16571,24 +16619,66 @@ const help=node('details','pf-help');help.append(node('summary','','Ayuda de pre
 
 </script>
 <style id="ccttEditorImagenesStyles">
-/* NUEVO: estilos aislados del Editor de imágenes; reutiliza las variables de
-   tema del sitio (--cctt-theme-*) y no modifica reglas de otros módulos. */
-#page-editorImagenes .ei-wrap{display:flex;flex-direction:column;gap:12px}
-#page-editorImagenes .ei-topbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-#page-editorImagenes .ei-group{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-right:10px;border-right:1px solid var(--cctt-theme-line,var(--line,#dce4ef))}
-#page-editorImagenes .ei-group:last-child{border-right:0}
-#page-editorImagenes .ei-autosave{font-size:12px}
-#page-editorImagenes .ei-zoom-label{min-width:52px;text-align:center;font-weight:700}
-#page-editorImagenes .ei-main{display:grid;grid-template-columns:172px minmax(0,1fr) 340px;gap:12px;align-items:start}
-#page-editorImagenes .ei-tools{display:flex;flex-direction:column;gap:6px;position:sticky;top:10px}
-#page-editorImagenes .ei-tool{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--cctt-theme-line,var(--line,#dce4ef));border-radius:10px;background:var(--cctt-theme-card,var(--card,#fff));color:var(--cctt-theme-text,var(--text,#152238));font:inherit;font-size:13px;cursor:pointer;text-align:left}
-#page-editorImagenes .ei-tool:hover{border-color:var(--cctt-theme-accent,var(--accent,#720a30))}
-#page-editorImagenes .ei-tool.is-active{background:var(--cctt-theme-accent,var(--accent,#720a30));color:var(--cctt-theme-onaccent,#fff);border-color:var(--cctt-theme-accent,var(--accent,#720a30))}
-#page-editorImagenes .ei-tool-sep{height:1px;background:var(--cctt-theme-line,var(--line,#dce4ef));margin:4px 0}
-#page-editorImagenes .ei-check{display:flex;gap:6px;align-items:center;font-size:13px;font-weight:400}
-#page-editorImagenes .ei-stage-wrap{display:flex;flex-direction:column;gap:6px;min-width:0}
-#page-editorImagenes .ei-stage{position:relative;height:min(72vh,760px);min-height:420px;border:1px solid var(--cctt-theme-line,var(--line,#dce4ef));border-radius:14px;overflow:hidden;background:#101826;touch-action:none;outline:none}
-#page-editorImagenes .ei-stage:focus-visible{outline:3px solid var(--cctt-theme-accent,var(--accent,#720a30));outline-offset:2px}
+/* Rediseño 2026-11-26 según la maqueta Stitch "Gestor interactivo de
+   ubicaciones". Paleta institucional CCTT de la maqueta; CSS propio aislado
+   bajo #page-editorImagenes (sin Tailwind, para no tocar el resto del sitio
+   ni añadir dependencias). La cabecera propia de la maqueta no se replica:
+   el sitio ya muestra su barra superior con el título del módulo. */
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap');
+#page-editorImagenes{
+  --ei-primary:#4a0e17; --ei-primary-hover:#631420; --ei-bg:#f8f2ee; --ei-bg-light:#fef8f4;
+  --ei-border:#e5dcd5; --ei-text:#2d2424; --ei-muted:#7a6c68; --ei-canvas:#0f172a;
+  --ei-emerald:#047857; --ei-danger:#b91c1c; --ei-danger-bg:#fef2f2; --ei-danger-border:#fecaca;
+  font-family:"Public Sans","Noto Sans",Arial,sans-serif;
+}
+#page-editorImagenes .ei-wrap{display:flex;flex-direction:column;background:var(--ei-bg);border:1px solid var(--ei-border);border-radius:12px;overflow:hidden;color:var(--ei-text)}
+#page-editorImagenes .ei-hidden{display:none!important}
+#page-editorImagenes .ei-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---- Sub-barra (h-11 de la maqueta) ---- */
+#page-editorImagenes .ei-topbar{display:flex;align-items:center;gap:8px;min-height:44px;background:var(--ei-bg-light);border-bottom:1px solid var(--ei-border);padding:4px 12px;overflow-x:auto;flex-shrink:0}
+#page-editorImagenes .ei-group{display:flex;align-items:center;gap:6px;flex-shrink:0}
+#page-editorImagenes .ei-sep{width:1px;height:20px;background:var(--ei-border);flex-shrink:0}
+#page-editorImagenes .ei-topbar .btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--ei-border);color:var(--ei-text);font-size:12px;font-weight:500;line-height:1.2;padding:6px 10px;border-radius:6px;white-space:nowrap;cursor:pointer}
+#page-editorImagenes .ei-topbar .btn:hover{background:#faf6f3}
+#page-editorImagenes .ei-topbar .btn.primary{background:var(--ei-primary);border-color:var(--ei-primary);color:#fff;font-weight:600}
+#page-editorImagenes .ei-topbar .btn.primary:hover{background:var(--ei-primary-hover)}
+#page-editorImagenes .ei-topbar .btn:disabled{opacity:.45;cursor:default}
+#page-editorImagenes .ei-ico{width:16px;height:16px;flex:0 0 16px;display:block}
+#page-editorImagenes .ei-autosave{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--ei-muted);margin-left:4px;white-space:nowrap}
+#page-editorImagenes .ei-dot{width:6px;height:6px;border-radius:50%;background:#10b981;flex:0 0 6px}
+#page-editorImagenes .ei-zoom-label{min-width:40px;text-align:center;font-size:12px;font-weight:600}
+#page-editorImagenes .ei-zoomseg{display:flex;align-items:stretch;background:#fff;border:1px solid var(--ei-border);border-radius:6px;overflow:hidden;margin-left:4px}
+#page-editorImagenes .ei-zoomseg .btn{border:0;border-radius:0;background:transparent;padding:5px 8px}
+#page-editorImagenes .ei-zoomseg .btn + .btn{border-left:1px solid var(--ei-border)}
+#page-editorImagenes .ei-zoomseg .btn:hover{background:#faf6f3}
+#page-editorImagenes .ei-exportseg{display:flex;align-items:stretch;background:#fff;border:1px solid var(--ei-border);border-radius:6px;overflow:hidden}
+#page-editorImagenes .ei-exportseg .btn{border:0;border-radius:0}
+#page-editorImagenes .ei-exportseg select{border:0;border-left:1px solid var(--ei-border);background:transparent;font-size:12px;font-weight:500;color:var(--ei-text);padding:6px 4px;cursor:pointer;font-family:inherit}
+#page-editorImagenes .ei-exportseg select:focus{outline:2px solid var(--ei-primary);outline-offset:-2px}
+
+/* ---- Área de trabajo ---- */
+#page-editorImagenes .ei-main{display:flex;height:min(76vh,780px);min-height:540px;overflow:hidden}
+
+/* Barra de herramientas: rejilla de 2 columnas */
+#page-editorImagenes .ei-tools{width:160px;flex:0 0 160px;background:#fff;border-right:1px solid var(--ei-border);padding:8px;display:flex;flex-direction:column;overflow-y:auto}
+#page-editorImagenes .ei-tools-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ei-muted);padding:0 4px;margin:0 0 6px}
+#page-editorImagenes .ei-tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+#page-editorImagenes .ei-tool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;background:var(--ei-bg-light);border:1px solid var(--ei-border);border-radius:6px;color:var(--ei-text);font-family:inherit;font-size:10px;font-weight:500;cursor:pointer;text-align:center;min-height:44px}
+#page-editorImagenes .ei-tool:hover{background:#f3ece7}
+#page-editorImagenes .ei-tool span{width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#page-editorImagenes .ei-tool .ei-ico{width:16px;height:16px}
+#page-editorImagenes .ei-tool.is-active{background:var(--ei-primary);border-color:var(--ei-primary);color:#fff}
+#page-editorImagenes .ei-tool.ei-tool-wide{grid-column:1/-1;flex-direction:row;gap:6px;min-height:32px}
+#page-editorImagenes .ei-tool.ei-tool-wide span{width:auto}
+#page-editorImagenes .ei-toggles{margin-top:auto;padding-top:8px;margin-top:8px;border-top:1px solid var(--ei-border);display:flex;flex-direction:column;gap:6px}
+#page-editorImagenes .ei-check{display:flex;gap:8px;align-items:center;font-size:11px;font-weight:400;cursor:pointer}
+#page-editorImagenes .ei-check input{accent-color:var(--ei-primary);width:14px;height:14px;flex:0 0 14px}
+
+/* Lienzo oscuro con rejilla */
+#page-editorImagenes .ei-stage-wrap{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--ei-canvas);position:relative;overflow:hidden}
+#page-editorImagenes .ei-stage{position:relative;flex:1;min-height:0;overflow:hidden;background-color:var(--ei-canvas);background-image:linear-gradient(to right,rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.05) 1px,transparent 1px);background-size:24px 24px;touch-action:none;outline:none}
+#page-editorImagenes .ei-stage:focus-visible{outline:3px solid var(--ei-primary);outline-offset:-3px}
 #page-editorImagenes .ei-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #page-editorImagenes .ei-drop{position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;text-align:center;color:#e8eef7;padding:20px;pointer-events:none}
 #page-editorImagenes .ei-drop strong{font-size:18px}
@@ -16597,42 +16687,112 @@ const help=node('details','pf-help');help.append(node('summary','','Ayuda de pre
 #page-editorImagenes .ei-stage.drag-over{outline:3px dashed #fff;outline-offset:-6px}
 #page-editorImagenes .ei-hint{position:absolute;left:10px;bottom:10px;max-width:80%;background:#0b1220d9;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;display:none}
 #page-editorImagenes .ei-hint.show{display:block}
-#page-editorImagenes .ei-statusbar{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--cctt-theme-muted,var(--muted,#5b6b82))}
-#page-editorImagenes .ei-side{display:flex;flex-direction:column;gap:12px;min-width:0}
-#page-editorImagenes .ei-panel summary{cursor:pointer;font-weight:800;padding:2px 0}
-#page-editorImagenes .ei-props,#page-editorImagenes .ei-panel label{display:flex;flex-direction:column;gap:4px;font-size:13px}
-#page-editorImagenes .ei-panel input[type=text],#page-editorImagenes .ei-panel input[type=number],#page-editorImagenes .ei-panel input[type=search],#page-editorImagenes .ei-panel select,#page-editorImagenes .ei-panel textarea{width:100%;box-sizing:border-box;padding:7px 8px;border:1px solid var(--cctt-theme-line,var(--line,#dce4ef));border-radius:8px;background:var(--cctt-theme-input,var(--card,#fff));color:var(--cctt-theme-inputtext,var(--text,#152238));font:inherit}
-#page-editorImagenes .ei-panel input[type=color]{width:100%;height:34px;padding:2px;border:1px solid var(--cctt-theme-line,var(--line,#dce4ef));border-radius:8px;background:var(--cctt-theme-input,var(--card,#fff))}
-#page-editorImagenes .ei-panel input[type=range]{width:100%}
+
+/* Panel derecho con pestañas */
+#page-editorImagenes .ei-side{width:320px;flex:0 0 320px;background:#fff;border-left:1px solid var(--ei-border);display:flex;flex-direction:column;min-width:0}
+#page-editorImagenes .ei-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--ei-border);background:var(--ei-bg-light);flex-shrink:0}
+#page-editorImagenes .ei-tab{padding:10px 4px;font-family:inherit;font-size:12px;font-weight:500;color:var(--ei-muted);background:transparent;border:0;border-bottom:2px solid transparent;cursor:pointer}
+#page-editorImagenes .ei-tab:hover{color:var(--ei-text)}
+#page-editorImagenes .ei-tab.is-active{font-weight:700;color:var(--ei-primary);border-bottom-color:var(--ei-primary);background:#fff}
+#page-editorImagenes .ei-tabpanels{flex:1;overflow-y:auto;padding:12px;min-height:0}
+#page-editorImagenes .ei-tabpanel{display:none}
+#page-editorImagenes .ei-tabpanel.is-active{display:block}
+#page-editorImagenes .ei-props,#page-editorImagenes .ei-tabpanel label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600}
+#page-editorImagenes .ei-tabpanel label{margin-bottom:8px}
+#page-editorImagenes .ei-props{gap:0}
+#page-editorImagenes .ei-tabpanel input[type=text],#page-editorImagenes .ei-tabpanel input[type=number],#page-editorImagenes .ei-tabpanel input[type=search],#page-editorImagenes .ei-tabpanel input[type=date],#page-editorImagenes .ei-tabpanel select,#page-editorImagenes .ei-tabpanel textarea{width:100%;box-sizing:border-box;padding:6px 8px;border:1px solid var(--ei-border);border-radius:6px;background:#fff;color:var(--ei-text);font-family:inherit;font-size:12px;font-weight:400}
+#page-editorImagenes .ei-tabpanel input[type=text]:focus,#page-editorImagenes .ei-tabpanel input[type=number]:focus,#page-editorImagenes .ei-tabpanel select:focus,#page-editorImagenes .ei-tabpanel textarea:focus{outline:2px solid var(--ei-primary);outline-offset:-1px;border-color:var(--ei-primary)}
+#page-editorImagenes .ei-tabpanel input[type=color]{width:36px;height:28px;padding:2px;border:1px solid var(--ei-border);border-radius:6px;background:#fff;cursor:pointer}
+#page-editorImagenes .ei-tabpanel input[type=range]{width:100%;accent-color:var(--ei-primary);height:6px}
+#page-editorImagenes .ei-tabpanel output{font-size:11px;font-weight:600;text-align:right}
+#page-editorImagenes .ei-colorfield{display:flex;align-items:center;gap:6px}
+#page-editorImagenes .ei-colorfield input[type=text]{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
 #page-editorImagenes .ei-row{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
 #page-editorImagenes .ei-row>*{flex:1;min-width:70px}
 #page-editorImagenes .ei-row .btn{flex:0 0 auto}
-#page-editorImagenes .ei-actions{margin-top:8px}
-#page-editorImagenes .ei-fieldset{border:1px solid var(--cctt-theme-line,var(--line,#dce4ef));border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;margin:4px 0}
-#page-editorImagenes .ei-fieldset legend{font-weight:700;font-size:13px;padding:0 6px}
-#page-editorImagenes .ei-layers{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
-#page-editorImagenes .ei-layer{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;padding:7px 9px;border:1px solid var(--cctt-theme-line,var(--line,#dce4ef));border-radius:9px;font-size:13px;cursor:pointer;background:var(--cctt-theme-card,var(--card,#fff))}
-#page-editorImagenes .ei-layer.is-selected{border-color:var(--cctt-theme-accent,var(--accent,#720a30));box-shadow:0 0 0 1px var(--cctt-theme-accent,var(--accent,#720a30))}
+#page-editorImagenes .ei-grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#page-editorImagenes .ei-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px}
+#page-editorImagenes .ei-side .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--ei-bg-light);border:1px solid var(--ei-border);color:var(--ei-text);font-family:inherit;font-size:11px;font-weight:500;padding:6px 8px;border-radius:6px;cursor:pointer}
+#page-editorImagenes .ei-side .btn:hover{background:#f3ece7}
+#page-editorImagenes .ei-side .btn.primary{background:var(--ei-primary);border-color:var(--ei-primary);color:#fff;font-weight:600}
+#page-editorImagenes .ei-side .btn.primary:hover{background:var(--ei-primary-hover)}
+#page-editorImagenes .ei-side .btn:disabled{opacity:.45;cursor:default}
+#page-editorImagenes .ei-btn-danger{grid-column:1/-1;background:var(--ei-danger-bg)!important;border-color:var(--ei-danger-border)!important;color:var(--ei-danger)!important;font-weight:600!important}
+#page-editorImagenes .ei-btn-danger:hover{background:#fee2e2!important}
+#page-editorImagenes .ei-fieldset{border:0;border-top:1px solid var(--ei-border);padding:10px 0 0;margin:10px 0 0;display:flex;flex-direction:column;gap:4px}
+#page-editorImagenes .ei-fieldset-title{font-size:11px;font-weight:700;margin-bottom:4px}
+#page-editorImagenes .ei-panel{border:1px solid var(--ei-border);border-radius:6px;background:var(--ei-bg-light);margin-bottom:8px;padding:0}
+#page-editorImagenes .ei-panel summary{cursor:pointer;font-weight:600;font-size:12px;padding:8px 10px;list-style:none}
+#page-editorImagenes .ei-panel summary::-webkit-details-marker{display:none}
+#page-editorImagenes .ei-panel > *:not(summary){margin:0 10px 10px}
+#page-editorImagenes .ei-panel .ei-row{margin-bottom:8px}
+#page-editorImagenes .ei-layers{display:flex;flex-direction:column;gap:6px}
+#page-editorImagenes .ei-layer{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;padding:7px 9px;border:1px solid var(--ei-border);border-radius:6px;font-size:12px;cursor:pointer;background:#fff}
+#page-editorImagenes .ei-layer.is-selected{border-color:var(--ei-primary);box-shadow:0 0 0 1px var(--ei-primary)}
 #page-editorImagenes .ei-layer .ei-layer-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #page-editorImagenes .ei-layer button{border:0;background:none;cursor:pointer;font-size:15px;padding:2px 4px;color:inherit}
 #page-editorImagenes .ei-layer.is-hidden-layer{opacity:.55}
 #page-editorImagenes .ei-palette{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
 #page-editorImagenes .ei-swatch{width:28px;height:28px;border-radius:8px;border:2px solid #ffffff55;cursor:pointer;padding:0}
-#page-editorImagenes .ei-swatch.is-active{outline:2px solid var(--cctt-theme-accent,var(--accent,#720a30));outline-offset:1px}
+#page-editorImagenes .ei-swatch.is-active{outline:2px solid var(--ei-primary);outline-offset:1px}
 #page-editorImagenes .ei-templates{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
 #page-editorImagenes .ei-icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;max-height:260px;overflow:auto;margin:8px 0}
-#page-editorImagenes .ei-icon{border:1px solid var(--cctt-theme-line,var(--line,#dce4ef));border-radius:9px;background:var(--cctt-theme-card,var(--card,#fff));color:var(--cctt-theme-text,var(--text,#152238));cursor:pointer;padding:6px;min-height:44px}
+#page-editorImagenes .ei-icon{border:1px solid var(--ei-border);border-radius:6px;background:#fff;color:var(--ei-text);cursor:pointer;padding:6px;min-height:44px}
 #page-editorImagenes .ei-icon svg{width:100%;height:28px;display:block}
-#page-editorImagenes .ei-icon.is-active{border-color:var(--cctt-theme-accent,var(--accent,#720a30));box-shadow:0 0 0 1px var(--cctt-theme-accent,var(--accent,#720a30))}
+#page-editorImagenes .ei-icon.is-active{border-color:var(--ei-primary);box-shadow:0 0 0 1px var(--ei-primary)}
 #page-editorImagenes .ei-icon small{display:block;font-size:10px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#page-editorImagenes .ei-legend-preview{border:1px dashed var(--cctt-theme-line,var(--line,#dce4ef));border-radius:9px;padding:8px;font-size:12px}
-#page-editorImagenes .ei-batch{display:flex;flex-direction:column;gap:4px;font-size:13px}
-#page-editorImagenes .ei-help{width:100%;border-collapse:collapse;font-size:13px}
-#page-editorImagenes .ei-help td{padding:4px 6px;border-bottom:1px solid var(--cctt-theme-line,var(--line,#dce4ef))}
+#page-editorImagenes .ei-legend-preview{border:1px dashed var(--ei-border);border-radius:6px;padding:8px;font-size:12px}
+#page-editorImagenes .ei-batch{display:flex;flex-direction:column;gap:4px;font-size:12px}
+#page-editorImagenes .ei-help{width:100%;border-collapse:collapse;font-size:12px}
+#page-editorImagenes .ei-help td{padding:4px 6px;border-bottom:1px solid var(--ei-border)}
 #page-editorImagenes .ei-help td:first-child{font-weight:700;white-space:nowrap}
-#page-editorImagenes .ei-vrp{display:flex;flex-direction:column;gap:8px}
-@media(max-width:1200px){#page-editorImagenes .ei-main{grid-template-columns:150px minmax(0,1fr)}#page-editorImagenes .ei-side{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));align-items:start}}
-@media(max-width:760px){#page-editorImagenes .ei-main{grid-template-columns:1fr}#page-editorImagenes .ei-tools{position:static;flex-direction:row;flex-wrap:wrap}#page-editorImagenes .ei-tool span{display:none}#page-editorImagenes .ei-stage{height:60vh;min-height:340px}}
+#page-editorImagenes .ei-tabpanel .muted{font-size:11px;color:var(--ei-muted);font-weight:400}
+#page-editorImagenes .ei-tabpanels::-webkit-scrollbar,#page-editorImagenes .ei-tools::-webkit-scrollbar{width:6px}
+#page-editorImagenes .ei-tabpanels::-webkit-scrollbar-track,#page-editorImagenes .ei-tools::-webkit-scrollbar-track{background:var(--ei-bg)}
+#page-editorImagenes .ei-tabpanels::-webkit-scrollbar-thumb,#page-editorImagenes .ei-tools::-webkit-scrollbar-thumb{background:#d5c8c0;border-radius:3px}
+
+/* ---- Barra de estado ---- */
+#page-editorImagenes .ei-statusbar{min-height:28px;background:#fff;border-top:1px solid var(--ei-border);padding:4px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px;color:var(--ei-muted);flex-shrink:0}
+#page-editorImagenes .ei-status-left,#page-editorImagenes .ei-status-right{display:flex;align-items:center;gap:16px;min-width:0}
+#page-editorImagenes .ei-status-right{gap:12px}
+#page-editorImagenes #eiCoords{font-family:ui-monospace,Menlo,Consolas,monospace}
+#page-editorImagenes #eiToolName{color:var(--ei-primary)}
+#page-editorImagenes #eiStatus{color:var(--ei-emerald);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---- Modal Desde Reporte de vialidades ---- */
+#page-editorImagenes .ei-modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.5)}
+#page-editorImagenes .ei-modal[hidden]{display:none}
+#page-editorImagenes .ei-modal-card{background:#fff;border:1px solid var(--ei-border);border-radius:8px;box-shadow:0 25px 80px rgba(0,0,0,.35);width:100%;max-width:512px;overflow:hidden}
+#page-editorImagenes .ei-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--ei-border);background:var(--ei-bg-light)}
+#page-editorImagenes .ei-modal-head h3{margin:0;font-size:14px;font-weight:700}
+#page-editorImagenes .ei-modal-head p{margin:2px 0 0;font-size:11px}
+#page-editorImagenes .ei-modal-head .muted{color:var(--ei-muted)}
+#page-editorImagenes #eiVrpClose{border:0;background:none;font-size:20px;line-height:1;color:var(--ei-muted);cursor:pointer;padding:2px 6px}
+#page-editorImagenes #eiVrpClose:hover{color:var(--ei-text)}
+#page-editorImagenes .ei-modal-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+#page-editorImagenes .ei-modal-body select{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid var(--ei-border);border-radius:6px;background:#fff;color:var(--ei-text);font-family:inherit;font-size:12px}
+#page-editorImagenes .ei-modal-body .muted{font-size:11px;color:var(--ei-muted)}
+#page-editorImagenes .ei-modal-foot{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:4px}
+#page-editorImagenes .ei-modal-foot .btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--ei-border);color:var(--ei-text);font-family:inherit;font-size:12px;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer}
+#page-editorImagenes .ei-modal-foot .btn:hover{background:#faf6f3}
+#page-editorImagenes .ei-modal-foot .btn.primary{background:var(--ei-primary);border-color:var(--ei-primary);color:#fff;font-weight:600}
+#page-editorImagenes .ei-modal-foot .btn.primary:hover{background:var(--ei-primary-hover)}
+
+@media(max-width:1200px){
+  #page-editorImagenes .ei-main{flex-direction:column;height:auto;min-height:0}
+  #page-editorImagenes .ei-stage-wrap{order:1;flex:none;height:60vh;min-height:420px}
+  #page-editorImagenes .ei-tools{order:2;width:100%;flex:none;border-right:0;border-top:1px solid var(--ei-border)}
+  #page-editorImagenes .ei-tools-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+  #page-editorImagenes .ei-toggles{flex-direction:row;flex-wrap:wrap;gap:12px}
+  #page-editorImagenes .ei-side{order:3;width:100%;flex:none;border-left:0;border-top:1px solid var(--ei-border)}
+  #page-editorImagenes .ei-tabpanels{overflow:visible}
+}
+@media(max-width:760px){
+  #page-editorImagenes .ei-tool span{display:none}
+  #page-editorImagenes .ei-tool{min-height:40px}
+  #page-editorImagenes .ei-tool.ei-tool-wide span{display:inline}
+  #page-editorImagenes .ei-stage-wrap{height:55vh;min-height:340px}
+}
 
 </style>
 <script id="ccttEditorImagenesModule">
@@ -16865,6 +17025,10 @@ function screenToImage(px, py) {
 function fitView() {
   if (!state.img) return;
   const r = stage.getBoundingClientRect(), ds = displaySize();
+  /* Si el módulo está oculto (otra página activa), el lienzo mide 0×0 y el
+     ajuste calculaba escala 0.01 (zoom 1 %): la foto quedaba invisible.
+     En ese caso no se toca la vista; al hacerse visible se reajusta sola. */
+  if (r.width < 50 || r.height < 50) return;
   const s = Math.min((r.width - 24) / ds.w, (r.height - 24) / ds.h);
   state.view.scale = clamp(s, 0.01, 8);
   state.view.tx = (r.width - ds.w * state.view.scale) / 2;
@@ -16876,6 +17040,9 @@ function resizeCanvas() {
   canvas.width = Math.max(1, Math.round(r.width * dpr));
   canvas.height = Math.max(1, Math.round(r.height * dpr));
   canvas._dpr = dpr;
+  /* Si la vista quedó en el mínimo 0.01 (ajuste corrupto de cuando el
+     módulo estaba oculto) y el lienzo ya tiene tamaño real, reajustar. */
+  if (state.img && state.view.scale <= 0.011 && r.width > 50 && r.height > 50) { fitView(); return; }
   render();
 }
 
@@ -17316,6 +17483,11 @@ function setTool(t) {
   state.tool = t;
   document.querySelectorAll('#eiTools .ei-tool').forEach(b => b.classList.toggle('is-active', b.dataset.tool === t));
   stage.style.cursor = t === 'pan' ? 'grab' : t === 'select' ? 'default' : 'crosshair';
+  /* Rediseño Stitch: nombre de la herramienta en la barra de estado y, al
+     elegir Icono, abrir la pestaña Ajustes donde vive la biblioteca. */
+  const tn = $('eiToolName');
+  if (tn) { const b = document.querySelector('#eiTools .ei-tool[data-tool="' + t + '"] span'); tn.textContent = b ? b.textContent : t; }
+  if (t === 'icon') switchEiTab('adjust');
   hint(t === 'polyline' || t === 'spline' || t === 'polygon' ? 'Haz clic por punto. Doble clic o Enter para terminar, Esc para cancelar.' :
     t === 'curve' ? 'Haz clic en el inicio, luego en el punto de control y por último en el final.' :
     t === 'crop' ? 'Arrastra sobre la imagen para definir el recorte.' :
@@ -18044,6 +18216,18 @@ function refreshVrpList() {
     ? photos.length + ' fotografía(s) en Reporte de vialidades. Se cargará el archivo original con su recorte.'
     : 'Aún no hay fotografías en Reporte de vialidades. Carga ahí una foto y pulsa «Actualizar lista».';
 }
+/* ---------- Pestañas del panel derecho (rediseño Stitch) ---------- */
+function switchEiTab(name) {
+  document.querySelectorAll('#page-editorImagenes [data-ei-tab]').forEach(b => {
+    const on = b.dataset.eiTab === name;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  document.querySelectorAll('#page-editorImagenes .ei-tabpanel').forEach(p => {
+    p.classList.toggle('is-active', p.id === 'eiTab' + name[0].toUpperCase() + name.slice(1));
+  });
+}
+
 async function loadFromVrp() {
   const photos = typeof window.ccttVrpPhotos === 'function' ? window.ccttVrpPhotos() : [];
   const sel = $('eiVrpPhotoSelect');
@@ -18051,6 +18235,8 @@ async function loadFromVrp() {
   const p = photos[clamp(+sel.value || 0, 0, photos.length - 1)];
   const ok = await loadImageFile(p.file);
   if (ok && p.crop) { state.adjust.crop = applyCropFromVrp(p.crop, p.img); fitView(); setStatus('Foto cargada desde Reporte de vialidades con su recorte.'); }
+  /* Rediseño Stitch: al cargar, cerrar el modal "Desde Reporte". */
+  if (ok) { const m = $('eiVrpModal'); if (m) m.hidden = true; }
 }
 
 /* ---------- Ejemplo de aceptación: rutas CCTT ---------- */
@@ -18174,7 +18360,11 @@ function init() {
   document.querySelectorAll('#eiTools .ei-tool').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
   $('eiLoadImage').onclick = () => $('eiFileImage').click();
   $('eiFileImage').onchange = e => { const f = e.target.files[0]; if (f) loadImageFile(f); e.target.value = ''; };
-  $('eiFromVialidades').onclick = () => { document.getElementById('eiVrpBox')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); refreshVrpList(); };
+  $('eiFromVialidades').onclick = () => { const m = $('eiVrpModal'); if (m) m.hidden = false; refreshVrpList(); };
+  $('eiVrpClose').onclick = () => { const m = $('eiVrpModal'); if (m) m.hidden = true; };
+  $('eiVrpModal').addEventListener('click', e => { if (e.target === $('eiVrpModal')) $('eiVrpModal').hidden = true; });
+  /* Rediseño Stitch: pestañas Propiedades / Capas / Ajustes. */
+  document.querySelectorAll('#page-editorImagenes [data-ei-tab]').forEach(b => b.addEventListener('click', () => switchEiTab(b.dataset.eiTab)));
   $('eiSaveProject').onclick = saveProject;
   $('eiLoadProjectBtn').onclick = () => $('eiFileProject').click();
   $('eiFileProject').onchange = e => { const f = e.target.files[0]; if (f) loadProjectFile(f); e.target.value = ''; };
@@ -18188,6 +18378,10 @@ function init() {
   $('eiExportWebp').onclick = () => exportImage('webp');
   $('eiExportPdf').onclick = () => exportPdf();
   $('eiExportSvg').onclick = exportSvg;
+  /* Rediseño Stitch: un solo botón "Exportar" + selector de formato que
+     acciona el botón original (oculto) del formato elegido. */
+  const eiFmt = { png: 'eiExportPng', jpeg: 'eiExportJpg', webp: 'eiExportWebp', pdf: 'eiExportPdf', svg: 'eiExportSvg' };
+  $('eiExportMain').onclick = () => { const b = $(eiFmt[$('eiExportFormat').value] || 'eiExportPng'); if (b) b.click(); };
   $('eiCopyClipboard').onclick = copyToClipboard;
   $('eiSendReport').onclick = sendToReport;
   $('eiSendWhatsapp').onclick = sendToWhatsapp;
@@ -18332,4 +18526,10 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 
 </script>
-</body></html></body></html>
+<style id="ccttHomeIconsFix">
+/* NUEVO (0.5.3): iconos de Inicio con tamaño fijo. */
+#page-inicio #moduleCards .card button svg{width:16px!important;height:16px!important;flex:0 0 16px}
+#page-inicio #moduleCards button.card{text-align:left}
+#page-inicio #moduleCards button.card>svg{width:28px!important;height:28px!important}
+</style>
+</body></html>
