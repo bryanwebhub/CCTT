@@ -9432,7 +9432,7 @@ panel.querySelector('#muCartoTest').onclick=async()=>{if(!unlocked())return;cons
 panel.querySelector('#muCartoSave').onclick=async()=>{if(!unlocked()){status.textContent='Desbloquea la administración.';return}const tile_url=url.value.trim();if(!valid(tile_url)){status.textContent='URL HTTPS XYZ inválida.';return}status.textContent='Guardando configuración…';try{await request('save',{tile_url});status.textContent='Configuración guardada y compartida. La clave permanece en Supabase.';await muLoadCartoSettings()}catch(e){status.textContent='No se pudo guardar: '+e.message}};
 const unlock=document.getElementById('ccttUnlockAdmin');unlock?.addEventListener('click',()=>setTimeout(load,400));document.querySelector('.cctt-admin-nav')?.addEventListener('click',()=>setTimeout(load,300));if(unlocked())load();}
 const muCartoObserver=new MutationObserver(muInstallCartoAdmin);muCartoObserver.observe(document.querySelector('.content')||document.body,{childList:true});muInstallCartoAdmin();
-const muBasemaps={default:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',options:{maxZoom:19,attribution:'© OpenStreetMap contributors'}},/* MODIFICADO: modo oscuro sin API key mediante mosaicos OSM y filtro exclusivo de la capa. */dark:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',options:{maxZoom:19,attribution:'© OpenStreetMap contributors',className:'mu-dark-tiles'}},satellite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',options:{maxZoom:19,attribution:'Tiles © Esri, Maxar, Earthstar Geographics and contributors'}}};
+const muBasemaps={default:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',options:{maxZoom:19,keepBuffer:1,attribution:'© OpenStreetMap contributors'}},/* MODIFICADO: modo oscuro sin API key mediante mosaicos OSM y filtro exclusivo de la capa. */dark:{url:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',options:{maxZoom:19,keepBuffer:1,attribution:'© OpenStreetMap contributors',className:'mu-dark-tiles'}},satellite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',options:{maxZoom:19,keepBuffer:1,attribution:'Tiles © Esri, Maxar, Earthstar Geographics and contributors'}}};
 /* NUEVO: sustituye exclusivamente la capa base; conserva geometrías, controles y posición del mapa. */
 /* MODIFICADO: reutiliza las capas en memoria, conserva la anterior hasta recibir mosaicos y comunica el estado a usuarios no administradores. */
 const muLayerCache=new Map();let muSwitchToken=0;
@@ -9442,7 +9442,7 @@ function setMuBasemap(choice){
  muBaseChoice=choice;
  if(map){
   const url=choice==='dark'&&muCartoUrl()?muCartoUrl():muBasemaps[choice].url;
-  const cfg=choice==='dark'&&muCartoUrl()?{maxZoom:19,attribution:'© CARTO',crossOrigin:true,updateWhenIdle:true,keepBuffer:2}:muBasemaps[choice].options;
+  const cfg=choice==='dark'&&muCartoUrl()?{maxZoom:19,attribution:'© CARTO',crossOrigin:true,updateWhenIdle:true,keepBuffer:1}:muBasemaps[choice].options;
   const cacheKey=choice+'|'+url;
   let layer=muLayerCache.get(cacheKey);
   if(!layer){layer=L.tileLayer(url,cfg);muLayerCache.set(cacheKey,layer)}
@@ -9455,7 +9455,7 @@ function setMuBasemap(choice){
    layer.on('load',onLoad);layer.on('tileerror',onError);
    layer.addTo(map);layer.bringToBack();muBaseLayer=layer;
    /* NUEVO: evita un indicador indefinido cuando el servidor cartográfico tarda o no responde. */
-   setTimeout(()=>{if(token===muSwitchToken&&!finished){finish(true)}},12000);
+   setTimeout(()=>{if(token===muSwitchToken&&!finished){finish(true)}},30000);
   }
  }
  document.querySelectorAll('#muBaseMapToolbar [data-mu-basemap]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.muBasemap===choice)));
@@ -10321,7 +10321,7 @@ $('ccttTramosThreshold')?.addEventListener('input',e=>{cfg.thresholdMeters=Math.
 $('ccttTramosExport')?.addEventListener('click',()=>{const {output,other}=classify();const rows=[['Tramo','Estado','Buque','MMSI','Velocidad_nudos','Destino','Ultimo_reporte']];TRAMOS.forEach(t=>{const a=output.get(t.name);if(!Array.isArray(ships))rows.push([t.name,'Sin datos AIS','','','','','']);else if(!a.length)rows.push([t.name,'Sin buque operante','','','','','']);else a.forEach(x=>rows.push([t.name,'Ocupado',x.name,x.mmsi,x.speedKnots,x.destination,x.reportedAt]))});other.forEach(x=>rows.push(['En fondeo o maniobra','Fuera de tramo',x.name,x.mmsi,x.speedKnots,x.destination,x.reportedAt]));const csv='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download='CCTT_tramos_manzanillo.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),30000)});
 let loadingLeaflet=null;async function loadLeaflet(){if(window.L)return; if(loadingLeaflet)return loadingLeaflet;loadingLeaflet=new Promise((resolve,reject)=>{const link=document.createElement('link');link.rel='stylesheet';link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.append(link);const script=document.createElement('script');script.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';script.onload=resolve;script.onerror=()=>reject(Error('Leaflet no disponible'));document.head.append(script)});return loadingLeaflet}
 function drawCalibration(){if(!leafletMap)return;leafletPoints.forEach(l=>leafletMap.removeLayer(l));leafletPoints=[];if(Array.isArray(ships))ships.forEach(b=>leafletPoints.push(L.circleMarker([b.lat,b.lon],{radius:5,color:'#ecb44e'}).addTo(leafletMap).bindPopup((()=>{const n=document.createElement('span');n.textContent=b.name||'Buque sin nombre';return n})())))}
-$('ccttTramosCalibration')?.addEventListener('change',async e=>{const mapDiv=$('ccttTramosMap');mapDiv.hidden=!e.target.checked;if(!e.target.checked)return;try{await loadLeaflet();if(!leafletMap){leafletMap=L.map(mapDiv).setView([19.069,-104.295],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(leafletMap);TRAMOS.forEach(t=>{const p=L.polyline(t.points,{color:'#0e9dd8',weight:4}).addTo(leafletMap).bindTooltip(t.name);leafletLines.push(p)});leafletMap.fitBounds(L.featureGroup(leafletLines).getBounds(),{padding:[15,15]})}setTimeout(()=>leafletMap.invalidateSize(),100);drawCalibration()}catch(err){mapDiv.hidden=true;$('ccttTramosUpdated').textContent='Mapa de calibración no disponible: '+String(err?.message||err)}});
+$('ccttTramosCalibration')?.addEventListener('change',async e=>{const mapDiv=$('ccttTramosMap');mapDiv.hidden=!e.target.checked;if(!e.target.checked)return;try{await loadLeaflet();if(!leafletMap){leafletMap=L.map(mapDiv).setView([19.069,-104.295],13);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19,keepBuffer:1}).addTo(leafletMap);TRAMOS.forEach(t=>{const p=L.polyline(t.points,{color:'#0e9dd8',weight:4}).addTo(leafletMap).bindTooltip(t.name);leafletLines.push(p)});leafletMap.fitBounds(L.featureGroup(leafletLines).getBounds(),{padding:[15,15]})}setTimeout(()=>leafletMap.invalidateSize(),100);drawCalibration()}catch(err){mapDiv.hidden=true;$('ccttTramosUpdated').textContent='Mapa de calibración no disponible: '+String(err?.message||err)}});
 // NUEVO: consulta AISStream mediante Supabase; mantiene intacto el iframe MarineTraffic.
 // El muestreo limitado no garantiza cobertura continua ni ausencia de buques.
 const aisInfo=document.createElement('p');aisInfo.id='ccttAISStreamStatus';aisInfo.className='muted';aisInfo.setAttribute('role','status');aisInfo.setAttribute('aria-live','polite');aisInfo.textContent='AISStream: pendiente de consulta. La ausencia de señales no confirma muelles libres.';
@@ -10757,7 +10757,7 @@ async function setBase(){
  if(ticket!==mcCartoRequest)return;
  const previous=base,key=url+'|'+(opts.className||'');
  let entry=mcBaseLayerCache.get(key);
- if(!entry){opts.updateWhenZooming=false;opts.keepBuffer=3;entry={layer:L.tileLayer(url,opts),paused:false,events:null};mcBaseLayerCache.set(key,entry)}
+ if(!entry){opts.updateWhenZooming=false;opts.keepBuffer=1;entry={layer:L.tileLayer(url,opts),paused:false,events:null};mcBaseLayerCache.set(key,entry)}
  const candidate=entry.layer;
  if(candidate===base&&map.hasLayer(candidate)){if(notice)say(notice);return}
  let settled=false;
@@ -10765,13 +10765,18 @@ async function setBase(){
  const cancel=()=>{if(settled)return;settled=true;cleanup();if(candidate!==base)mcPauseBase(candidate)};
  const loaded=()=>{
   if(settled)return;if(ticket!==mcCartoRequest){cancel();return}
+  entry.errors=0;
   settled=true;cleanup();if(previous&&previous!==candidate)mcPauseBase(previous);
   base=candidate;candidate.setOpacity(1);candidate.setZIndex(2);
   for(const [cachedKey,cached] of mcBaseLayerCache){if(mcBaseLayerCache.size<=6)break;if(cached.layer!==base&&cached.layer!==previous){mcDisposeBase(cached);mcBaseLayerCache.delete(cachedKey)}}
   if(notice)say(notice);
  };
  const failed=(event)=>{
-  if(settled||ticket!==mcCartoRequest)return;settled=true;cleanup();
+  if(settled||ticket!==mcCartoRequest)return;
+  /* NUEVO: un mosaico aislado no descarta toda la capa. */
+  entry.errors=(entry.errors||0)+1;
+  if(entry.errors<3)return;
+  settled=true;cleanup();
   if(map.hasLayer(candidate))map.removeLayer(candidate);mcBaseLayerCache.delete(key);
   const imageUrl=event?.tile?.src||'';console.warn('Mapas y croquis · mosaico no disponible',imageUrl.replace(/([?&]key=)[^&]+/gi,'$1[oculta]'));
   if(previous&&map.hasLayer(previous)){base=previous;const old=[...mcBaseLayerCache.values()].find(e=>e.layer===previous);if(old)mcResumeBase(old);previous.setOpacity(1);previous.setZIndex(2)}
@@ -14689,7 +14694,7 @@ const trShared = (() => {
    const zoom=Math.round(map.getZoom()),bounds=map.getPixelBounds(),limit=2**zoom;
    const centerX=((bounds.min.x+bounds.max.x)/512)%limit;
    const centerY=(bounds.min.y+bounds.max.y)/512;
-   while(running<6) {
+   while(running<4) {
     let selected=-1,distance=Infinity;
     for(let index=0;index<queue.length;index++) {
      const job=queue[index];
@@ -14823,7 +14828,7 @@ const trShared = (() => {
     L.GridLayer.prototype.onRemove.call(this,target);
    }
   });
-  const layer=new TrafficLayer({minZoom:10,maxZoom:19,tileSize:256,opacity:Number($('trOpacity').value)/100,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:3,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]});
+  const layer=new TrafficLayer({minZoom:10,maxZoom:19,tileSize:256,opacity:Number($('trOpacity').value)/100,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,attribution:'Tráfico © '+new Date().getFullYear()+' '+providerNames[source]});
   layer.trafficSource=source;
   layer.on('tileunload',event=>{if(event.tile.trJob)release(event.tile.trJob);});
   layer.on('load',()=>layer.reportView());
@@ -14831,7 +14836,7 @@ const trShared = (() => {
  }
  /* NUEVO: agrupar peticiones CARTO simultáneas; no guardar credenciales ni permisos. */
  /* NUEVO: configuración reciente solo en memoria; no sustituye permisos del servidor. */
- let baseConfigFlight=null,trConfigAt=0,trConfigFlight=null,trBaseStyle='';
+ let baseConfigFlight=null,trConfigAt=0,trConfigFlight=null,trBaseStyle='',baseRetryTimer=null;
  function readBaseConfig(){
   if(baseConfigFlight)return baseConfigFlight;
   const request=client().functions.invoke('cctt-carto-tiles',{body:{action:'config'}});
@@ -14865,13 +14870,16 @@ const trShared = (() => {
    const nextUrl=sb.supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/'+path;
    if(base&&baseUrl===nextUrl&&!baseError)return;
    const layer = L.tileLayer(nextUrl,{
-    maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:3,attribution:'© OpenStreetMap contributors · © CARTO'
+    maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,attribution:'© OpenStreetMap contributors · © CARTO'
    });
    layer.on('tileerror',()=>{
     if(base!==layer||!active())return;
     baseError='No se pudo cargar parte del mapa CARTO.';
     $('trBaseNotice').textContent=baseError;
     status(baseError+' Puedes intentar actualizar.','error');
+    /* NUEVO: reintento acotado de los mosaicos fallidos; el proxy a veces
+       tarda o falla de forma transitoria al acercar mucho. */
+    if(!baseRetryTimer){baseRetryTimer=setTimeout(()=>{baseRetryTimer=null;if(base===layer&&active()&&!document.hidden)layer.redraw();},1500);}
    });
    if (base) map.removeLayer(base);
    baseError = '';
@@ -15298,7 +15306,7 @@ const icon=k=>'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" strok
 const btn=(id,label,key)=>'<button type="button" class="btn" id="'+id+'" data-iconized="1" data-cctt-icon-fixed="true">'+icon(key)+'<span>'+label+'</span></button>';
 const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 const emptyRights=()=>({read:false,create:false,edit:false,delete:false});
-let rights=emptyRights(),sites=[],map=null,base=null,markers=null,draft=null,editing=null,placing=false,busy=false,epoch=0,baseEpoch=0,owner='',users=[],selected=new Set(),adminBusy=false;
+let rights=emptyRights(),sites=[],map=null,base=null,markers=null,draft=null,editing=null,placing=false,busy=false,epoch=0,baseEpoch=0,owner='',users=[],selected=new Set(),adminBusy=false,dsBaseRetry=null;
 const allowed=()=>window.ccttCanAccess?.(ID)===true;
 const page=el('section');page.id='page-'+ID;page.className='page';
 /* MODIFICADO: distribución autorizada; mismos IDs y campos funcionales. */
@@ -15444,7 +15452,7 @@ async function setBase(){
   if(choice==='osm'){url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';attribution='© OpenStreetMap contributors';}
   else if(choice==='satellite'){url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';attribution='Tiles © Esri, Maxar, Earthstar Geographics and contributors';}
   else{const style=choice==='auto'?(document.documentElement.dataset.ccttScheme==='dark'?'dark_all':'voyager'):choice;const r=await sb().functions.invoke('cctt-carto-tiles',{body:{action:'config'}});if(r.error||r.data?.error)throw Error(r.data?.error||r.error.message);const path=r.data?.styles?.[style]?style+'/{z}/{x}/{y}.png':r.data?.ready?'{z}/{x}/{y}.png':null;if(!path)throw Error('CARTO no está configurado. Selecciona otra capa o consulta al administrador.');url=sb().supabaseUrl.replace(/\/$/,'')+'/functions/v1/cctt-carto-tiles/tiles/'+path;attribution='© OpenStreetMap contributors · © CARTO';}
-  if(ticket!==baseEpoch||!map)return;const next=L.tileLayer(url,{maxZoom:19,attribution,keepBuffer:3,updateWhenIdle:true});next.on('tileerror',()=>{if(base===next)$('dsMapStatus').textContent='No se pudieron cargar algunos mosaicos. Comprueba la conexión o selecciona otra capa.';});if(base)map.removeLayer(base);base=next;next.addTo(map);$('dsMapStatus').textContent='Capa: '+$('dsBase').selectedOptions[0].textContent;
+  if(ticket!==baseEpoch||!map)return;const next=L.tileLayer(url,{maxZoom:19,attribution,keepBuffer:1,updateWhenIdle:true});next.on('tileerror',()=>{if(base!==next)return;$('dsMapStatus').textContent='No se pudieron cargar algunos mosaicos. Comprueba la conexión o selecciona otra capa.';/* NUEVO: reintento acotado de los mosaicos fallidos. */if(!dsBaseRetry){dsBaseRetry=setTimeout(()=>{dsBaseRetry=null;if(base===next&&!document.hidden)next.redraw();},1500);}});if(base)map.removeLayer(base);base=next;next.addTo(map);$('dsMapStatus').textContent='Capa: '+$('dsBase').selectedOptions[0].textContent;
  }catch(e){if(ticket===baseEpoch)$('dsMapStatus').textContent=e.message;}
 }
 function initialize(){if(!allowed())return;if(!window.L){$('dsMapStatus').textContent='No se cargó Leaflet. Revisa la conexión y vuelve a abrir el módulo.';return;}if(!map){map=L.map('dsMap').setView([19.065,-104.31],12);/* NUEVO: controles reales del mapa en la posición de referencia. */map.zoomControl?.setPosition('bottomright');markers=L.layerGroup().addTo(map);map.on('click',e=>{if(placing&&!busy&&(editing?rights.edit:rights.create))place(e.latlng.lat,e.latlng.lng);});void setBase();}else if($('dsBase').value==='auto')void setBase();requestAnimationFrame(()=>map?.invalidateSize());void reload();}
