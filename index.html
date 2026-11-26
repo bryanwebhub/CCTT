@@ -6169,18 +6169,74 @@ window.addEventListener('DOMContentLoaded',()=>{initGlobalEnhancements();ccttEna
         if(!data?.session)throw Error('No se recibió una sesión válida.');
         currentSession=data.session;msg.textContent='';document.documentElement.classList.add('cctt-login-entering');showApp(data.session);
       }catch(error){
-        msg.textContent=/sesión|extensión|servicio|Clave de sesión/i.test(error?.message||'')?'No se pudo completar el acceso. Actualiza la extensión a 0.5.1 y recarga esta pestaña.':'No fue posible iniciar sesión. Verifica tus datos y la conexión e inténtalo de nuevo.';
+        msg.textContent=/sesión|extensión|servicio|Clave de sesión/i.test(error?.message||'')?'No se pudo completar el acceso. Comprueba la conexión y recarga esta pestaña.':'No fue posible iniciar sesión. Verifica tus datos y la conexión e inténtalo de nuevo.';
       }finally{clearTimeout(slow);button.disabled=false;}
     };
   }
-/* NUEVO: adaptador opcional de sesión CCTT 0.5.0. Fuera de la extensión mantiene Auth original. */
+/* MODIFICADO 0.5.2: el sitio principal usa Auth nativo. Solo los marcos de
+   extensión usan el almacén compartido; publicar una sesión nunca bloquea el ingreso. */
 const ccttSharedAuth=(()=>{
+ const embedded=window.parent!==window&&String(location.ancestorOrigins?.[0]||'').startsWith('chrome-extension://');
  let enabled=false,ticket=null;const pending=new Map();
  document.addEventListener('cctt:auth-response',e=>{let r;try{r=JSON.parse(e.detail)}catch{return}const p=pending.get(r.id);if(!p)return;pending.delete(r.id);clearTimeout(p.timer);r.error?p.reject(Error(r.error)):p.resolve(r)});
  function request(op,data={},timeout=15000){return new Promise((resolve,reject)=>{const id=crypto.randomUUID();const timer=setTimeout(()=>{pending.delete(id);reject(Error('No respondió el servicio de sesión. Recarga la pestaña.'))},timeout);pending.set(id,{resolve,reject,timer});document.dispatchEvent(new CustomEvent('cctt:auth-request',{detail:JSON.stringify({id,op,ticket,...data})}));});}
+ function available(){let found=false;const receive=e=>{found=e.detail===true};document.addEventListener('cctt:auth-available',receive);document.dispatchEvent(new Event('cctt:auth-probe'));document.removeEventListener('cctt:auth-available',receive);return found;}
  const storage={getItem:async key=>(await request('get',{key})).value,setItem:async(key,value)=>{await request('set',{key,value})},removeItem:async key=>{await request('remove',{key})}};
  async function lock(name,timeout,fn){const grant=await request('lock');ticket=grant.value;try{return await fn()}finally{const old=ticket;ticket=null;await request('unlock',{ticket:old}).catch(()=>{})}}
- return {activity:async(uid,touch=false)=>enabled?(await request('activity',{uid,touch})).value:0,get enabled(){return enabled},options(){const receive=e=>{enabled=e.detail===true};document.addEventListener('cctt:auth-available',receive);document.dispatchEvent(new Event('cctt:auth-probe'));document.removeEventListener('cctt:auth-available',receive);/* NUEVO: descartar el respaldo local antiguo para que no reaparezca tras cerrar sesión. */if(enabled){try{for(const suffix of ['', '-code-verifier','-user'])localStorage.removeItem('sb-iwmbkvwvwfxsiojweprf-auth-token'+suffix)}catch{}}return enabled?{storage,lock}:{};}};
+ const sid=s=>{try{const p=s.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');const c=JSON.parse(atob(p));return c.sub+':'+c.session_id}catch{return s?.user?.id||''}};
+ function bind(client){
+  if(embedded||!client?.auth)return;
+  let latest=null,published=null,applying=false,revision=0,timer=0,queue=Promise.resolve(),remote=Promise.resolve();
+  const ready=()=>document.documentElement.classList.contains('cctt-access-ready')&&window.ccttCurrentNavUser===latest?.user?.id&&window.ccttIpGateVerified?.()===true;
+  function schedule(){clearTimeout(timer);timer=setTimeout(publish,0);}
+  function publish(){
+   if(applying||!latest||!ready()||!available())return;
+   enabled=true;const session=latest,stamp=revision;
+   queue=queue.catch(()=>{}).then(async()=>{
+    if(stamp!==revision||!ready()||applying||published?.access_token===session.access_token)return;
+    await request('publish',{value:JSON.stringify(session)});
+    if(stamp===revision)published=session;
+   }).catch(()=>{});
+  }
+  function clear(){
+   const previous=published||latest;latest=null;published=null;revision++;clearTimeout(timer);
+   if(!enabled||!previous)return;
+   queue=queue.catch(()=>{}).then(()=>request('clear-source',{sessionId:sid(previous)})).catch(()=>{});
+  }
+  client.auth.onAuthStateChange((event,session)=>{
+   if(applying){latest=session;return;}
+   if(!session){if(event==='SIGNED_OUT')clear();return;}
+   latest=session;revision++;schedule();
+  });
+  window.addEventListener('cctt:session',schedule);
+  window.addEventListener('cctt:access-updated',schedule);
+  window.addEventListener('cctt:logout',()=>{if(!applying)clear();});
+  new MutationObserver(schedule).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+  /* NUEVO: recibir renovaciones/cierre tras la publicación, nunca importar una sesión antes del ingreso. */
+  document.addEventListener('cctt:auth-changed',()=>{
+   if(!enabled||!latest||!published)return;
+   remote=remote.catch(()=>{}).then(async()=>{
+    const stamp=revision,r=await request('snapshot');if(stamp!==revision||!latest)return;
+    const session=r.value?JSON.parse(r.value):null;
+    if(session?.access_token===latest.access_token)return;
+    if(session&&sid(session)===sid(latest)&&Number(session.expires_at)<Number(latest.expires_at))return;
+    applying=true;
+    try{
+     if(!session||sid(session)!==sid(latest)){
+      const {error}=await client.auth.signOut({scope:'local'});if(error)throw error;
+      latest=null;published=null;revision++;window.dispatchEvent(new Event('cctt:logout'));showGate();
+     }else{
+      const {data,error}=await client.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});if(error)throw error;
+      latest=data.session;published=data.session;revision++;
+     }
+    }finally{applying=false;}
+   }).catch(()=>{});
+  });
+ }
+ return {bind,embedded,activity:async(uid,touch=false)=>enabled?(await request('activity',{uid,touch})).value:0,get enabled(){return enabled},options(){
+  if(!embedded)return {}; // Sin llamadas ni esperas de extensión en el acceso del sitio.
+  enabled=available();return enabled?{storage,lock}:{};
+ }};
 })();
   /* NUEVO: solo actividad, sin credenciales, para el control de inactividad existente. */
   window.ccttSharedActivity=(uid,touch)=>ccttSharedAuth.activity(uid,touch);
@@ -6227,7 +6283,7 @@ const ccttSharedAuth=(()=>{
   /* NUEVO: avisos sin tokens; cada panel lee la sesión común mediante Auth. */
   let sharedSessionQueue=Promise.resolve();
   document.addEventListener('cctt:auth-changed',()=>{
-    if(!ccttSharedAuth.enabled||!sb)return;
+    if(!ccttSharedAuth.embedded||!ccttSharedAuth.enabled||!sb)return;
     sharedSessionQueue=sharedSessionQueue.catch(()=>{}).then(async()=>{
       const {data,error}=await sb.auth.getSession();if(error)throw error;
       const session=data?.session;
@@ -6237,6 +6293,8 @@ const ccttSharedAuth=(()=>{
   });
   /* MODIFICADO 0.5.1: un fallo al recuperar la sesión también libera el formulario. */
   bootAuth().catch(()=>{showGate();const msg=document.getElementById('ccttAuthMsg');if(msg)msg.textContent='No se pudo recuperar la sesión. Actualiza la extensión y recarga esta pestaña.';});
+  /* NUEVO: sincronización posterior al acceso, sin esperar su respuesta. */
+  ccttSharedAuth.bind(sb);
 })();
 </script>
 
