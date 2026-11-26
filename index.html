@@ -3362,13 +3362,12 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
                 <div class="ei-row">
                   <label>Flechas consecutivas
                     <select id="eiPropArrowSeq"><option value="none">Sin repetición</option><option value="repeat-forward">Consecutivas hacia adelante</option><option value="repeat-backward">Consecutivas hacia atrás</option><option value="repeat-both">Consecutivas en ambos sentidos</option></select>
+                  </label>
                 </div>
                 <!-- NUEVO: tipo de trazo del objeto seleccionado (línea/flecha/tren). -->
                 <div class="ei-row" id="eiPropLineTypeRow">
                   <label>Tipo de trazo
                     <select id="eiPropLineType" title="Cambia el tipo de la línea o flecha seleccionada sin mover sus puntos"><option value="line">Línea</option><option value="arrow">Flecha</option><option value="doubleArrow">Flecha doble</option><option value="train">Línea tipo tren</option><option value="polyline">Polilínea</option><option value="spline">Curva suave</option><option value="freehand">Trazo libre</option><option value="curve">Flecha curva</option></select>
-                  </label>
-                </div>
                   </label>
                 </div>
               </details>
@@ -16806,7 +16805,8 @@ const help=node('details','pf-help');help.append(node('summary','','Ayuda de pre
   font-family:"Public Sans","Noto Sans",Arial,sans-serif;
 }
 #page-editorImagenes .ei-wrap{display:flex;flex-direction:column;background:var(--ei-bg);border:1px solid var(--ei-border);border-radius:12px;overflow:hidden;color:var(--ei-text)}
-#page-editorImagenes .ei-hidden{display:none!important}
+/* NUEVO (§19): ocultar siempre los botones de exportación originales, sin depender de que el div esté dentro de la sección. */
+.ei-hidden{display:none!important}
 #page-editorImagenes .ei-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ---- Sub-barra (h-11 de la maqueta) ---- */
