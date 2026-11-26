@@ -3358,7 +3358,7 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
                 </div>
                 <label class="ei-check"><input type="checkbox" id="eiPropCallout" checked> Punta / conector hacia el punto señalado</label>
               </details>
-              <p class="muted">Selecciona un objeto para editarlo. Con Mayús haz clic en varios objetos para seleccionarlos juntos. Doble clic en una línea o curva añade un punto; arrastra los nodos para ajustar el trazo.</p>
+              <p class="muted">Selecciona un objeto para editarlo. Con Mayús haz clic en varios objetos para seleccionarlos juntos. Arrastra los nodos (círculos blancos) para mover un punto del trazo, o pulsa el tirador verde «+» del medio de un segmento para añadir un punto y nivelarlo. Doble clic en una línea añade un punto sobre el trazo.</p>
             </div>
           </div>
           <!-- Pestaña Capas -->
@@ -3446,7 +3446,10 @@ A continuación se anexa el estado de los cesionarios:</textarea></div><div clas
                 <tr><td>Flechas (Mayús = ×10)</td><td>Mover selección</td></tr>
                 <tr><td>Ctrl+S</td><td>Guardar proyecto JSON</td></tr>
                 <tr><td>Rueda / pellizco</td><td>Zoom (Ctrl+rueda = zoom al cursor)</td></tr>
-                <tr><td>Doble clic en trazo</td><td>Añadir un punto al trazo</td></tr>
+                <tr><td>Doble clic en trazo</td><td>Añadir un punto al trazo (cae sobre la línea)</td></tr>
+                <tr><td>Tirador verde «+»</td><td>Añadir un punto en el medio de un segmento y arrastrarlo para nivelar el trazo</td></tr>
+                <tr><td>Arrastrar un nodo</td><td>Mover solo ese punto de la línea, flecha o polígono (los círculos blancos)</td></tr>
+                <tr><td>Clic con Flecha / Línea</td><td>Coloca una flecha o línea de 240 px en ese punto (también vale mantener pulsado y arrastrar)</td></tr>
                 <tr><td>Esc</td><td>Volver a «Seleccionar» (la herramienta sigue activa para colocar varios elementos seguidos)</td></tr>
                 <tr><td>Colocar varios</td><td>Tras crear un elemento, la herramienta sigue activa: dibuja el siguiente sin volver a elegirla</td></tr>
               </table>
@@ -14101,7 +14104,7 @@ html[data-cctt-scheme=dark] #page-traficoTerrestre{--tr-float-bg:color-mix(in sr
   <aside class="tr-panel" id="trLayersPanel" aria-label="Capas del mapa">
    <h3>Capas del mapa</h3>
    <label for="trBase">Mapa base CARTO
-    <select id="trBase"><option value="auto">Automático según el tema</option><option value="voyager">Voyager · calles</option><option value="light_all">Positron · claro</option><option value="dark_all">Dark Matter · oscuro</option><option value="osm">OpenStreetMap · calles</option></select>
+    <select id="trBase"><option value="auto">Automático según el tema</option><option value="voyager">Voyager · calles</option><option value="light_all">Positron · claro</option><option value="dark_all">Dark Matter · oscuro</option></select>
    </label>
    <p class="tr-help" id="trBaseNotice" role="status"></p>
    <label for="trProvider">Fuente de tráfico
@@ -14858,18 +14861,6 @@ const trShared = (() => {
   const selected = $('trBase').value;
   const style = selected === 'auto' ? (dark?'dark_all':'voyager') : selected;
   /* NUEVO */ if(!recheck&&base&&!baseError&&trBaseStyle===style)return;
-  /* NUEVO: OpenStreetMap como capa base, sin proxy (es pública). */
-  if(style==='osm'){
-   const nextUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-   if(base&&baseUrl===nextUrl&&!baseError)return;
-   const layer=L.tileLayer(nextUrl,{maxZoom:19,updateWhenIdle:true,updateWhenZooming:false,keepBuffer:1,attribution:'© OpenStreetMap contributors'});
-   layer.on('tileerror',()=>{if(base!==layer||!active())return;baseError='No se pudo cargar parte del mapa base.';$('trBaseNotice').textContent=baseError;status(baseError+' Puedes intentar actualizar.','error');if(!baseRetryTimer){baseRetryTimer=setTimeout(()=>{baseRetryTimer=null;if(base===layer&&active()&&!document.hidden)layer.redraw();},1500);}});
-   if(base)map.removeLayer(base);
-   baseError='';base=layer;baseUrl=nextUrl;trBaseStyle=style;base.addTo(map);
-   if(traffic)traffic.bringToFront();
-   $('trBaseNotice').textContent='OpenStreetMap · calles';
-   return;
-  }
   try {
    const sb = client();
    /* MODIFICADO: reutilizar únicamente una consulta que aún está en curso. */
@@ -14925,14 +14916,14 @@ const trShared = (() => {
   config = result;/* NUEVO */trConfigAt=Date.now();
   const selector = $('trProvider');
   selector.replaceChildren(new Option('Selecciona una fuente',''));
-  for (const source of ['tomtom']) {
+  for (const source of ['tomtom','here']) {
    const enabled = result?.providers?.[source] === true;
    const option = new Option(providerNames[source]+(enabled?'':' · sin configurar'),source);
    option.disabled = !enabled;
    selector.add(option);
   }
-  selector.value = result?.providers?.[selected] ? selected : ['tomtom'].find(source=>result?.providers?.[source]) || '';
-  $('trProviders').textContent = ['tomtom'].map(source=>providerNames[source]+(result?.providers?.[source]?' disponible':' sin configurar')).join(' · ');
+  selector.value = result?.providers?.[selected] ? selected : ['tomtom','here'].find(source=>result?.providers?.[source]) || '';
+  $('trProviders').textContent = ['tomtom','here'].map(source=>providerNames[source]+(result?.providers?.[source]?' disponible':' sin configurar')).join(' · ');
    /* MODIFICADO: la configuración consultada aquí solo se utiliza para el mapa. */
   legend();
   return true;
@@ -16877,6 +16868,25 @@ const distPtSeg = (p, a, b) => {
   const x = a.x + t * dx, y = a.y + t * dy;
   return Math.hypot(p.x - x, p.y - y);
 };
+/* Punto más cercano de p sobre el segmento ab (proyección). */
+const closestPtSeg = (p, a, b) => {
+  const dx = b.x - a.x, dy = b.y - a.y, l2 = dx * dx + dy * dy;
+  let t = l2 ? ((p.x - a.x) * dx + (p.y - a.y) * dy) / l2 : 0; t = clamp(t, 0, 1);
+  return { x: a.x + t * dx, y: a.y + t * dy };
+};
+/* Trazos a los que se les pueden añadir puntos intermedios. La flecha curva
+   queda fuera: sus puntos son inicio, control y final, y se ajusta
+   arrastrando sus nodos. */
+const ADDABLE_PATH = ['arrow', 'doubleArrow', 'line', 'polyline', 'spline', 'freehand', 'train', 'polygon'];
+/* Puntos medios de los segmentos de un trazo (para el tirador «+» que añade
+   un punto). En el polígono se incluye el borde de cierre. */
+function pathMidpoints(o) {
+  if (!ADDABLE_PATH.includes(o.type) || !o.pts || o.pts.length < 2 || o.pts.length > 64) return [];
+  const out = [];
+  for (let i = 1; i < o.pts.length; i++) out.push({ x: (o.pts[i - 1].x + o.pts[i].x) / 2, y: (o.pts[i - 1].y + o.pts[i].y) / 2, index: i });
+  if (o.type === 'polygon' && o.pts.length > 2) out.push({ x: (o.pts[o.pts.length - 1].x + o.pts[0].x) / 2, y: (o.pts[o.pts.length - 1].y + o.pts[0].y) / 2, index: o.pts.length });
+  return out;
+}
 /* Curva suave (Catmull-Rom) convertida en segmentos de Bézier cúbica. */
 function catmullRom(pts) {
   if (pts.length < 3) return pts.map(p => ({ ...p }));
@@ -17514,6 +17524,12 @@ function drawSelection() {
         const s = total.apply(p);
         ctx.beginPath(); ctx.arc(s.x, s.y, 5, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#0284c7'; ctx.lineWidth = 2; ctx.stroke();
       }
+      /* Tiradores «+» en el medio de cada segmento: añaden un punto. */
+      for (const m of pathMidpoints(o)) {
+        const s = total.apply(m);
+        ctx.beginPath(); ctx.arc(s.x, s.y, 4.5, 0, Math.PI * 2); ctx.fillStyle = '#22c55e'; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(s.x - 2.5, s.y); ctx.lineTo(s.x + 2.5, s.y); ctx.moveTo(s.x, s.y - 2.5); ctx.lineTo(s.x, s.y + 2.5); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+      }
       if (o.type === 'curve' && o.pts.length >= 3) {
         const s0 = total.apply(o.pts[0]), s1 = total.apply(o.pts[1]);
         ctx.setLineDash([4, 4]); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
@@ -17537,7 +17553,7 @@ function drawSelection() {
 }
 function hitObject(p, o) {
   if (o.hidden) return false;
-  const tol = 10 / state.view.scale;
+  const tol = 12 / state.view.scale;
   if (o.pts && o.pts.length) {
     if (o.type === 'polygon' && o.pts.length > 2) {
       /* Dentro del polígono o cerca de su borde. */
@@ -17641,12 +17657,43 @@ canvas.addEventListener('pointerdown', e => {
   if (state.tool === 'pan' || e.button === 1) { drag = { mode: 'pan', x0: pos.x, y0: pos.y, tx: state.view.tx, ty: state.view.ty }; return; }
   if (state.tool === 'select') {
     const hit = hitAt(img);
-    if (e.detail === 2 && hit && hit.pts && hit.pts.length > 1) { /* Doble clic: añadir punto al trazo. */
+    if (e.detail === 2 && hit && hit.pts && hit.pts.length > 1 && ADDABLE_PATH.includes(hit.type)) { /* Doble clic: añadir punto al trazo, sobre la línea. */
       commitHistory('añadir punto');
       let best = 0, bestD = Infinity;
       for (let i = 1; i < hit.pts.length; i++) { const d = distPtSeg(img, hit.pts[i - 1], hit.pts[i]); if (d < bestD) { bestD = d; best = i; } }
-      hit.pts.splice(best, 0, { ...img });
+      /* El punto nuevo cae exactamente sobre el trazo (proyección), no donde
+         cayó el clic, para que la línea no se deforme al añadirlo. */
+      hit.pts.splice(best, 0, closestPtSeg(img, hit.pts[best - 1], hit.pts[best]));
       requestRender(); return;
+    }
+    /* Nodos de un trazo seleccionado: arrastrar el punto, no todo el objeto.
+       Antes no había distinción y cualquier arrastre movía la flecha entera. */
+    const nodeTol = 8 / state.view.scale;
+    for (const o of selectedObjects()) {
+      if (o.locked || !o.pts) continue;
+      for (let i = 0; i < o.pts.length; i++) {
+        if (Math.hypot(img.x - o.pts[i].x, img.y - o.pts[i].y) <= nodeTol) {
+          drag = { mode: 'node', obj: o, index: i, x0: img.x, y0: img.y, moved: false, snapshot: JSON.stringify({ objects: state.objects, adjust: state.adjust }) };
+          return;
+        }
+      }
+    }
+    /* Tirador «+» de un trazo seleccionado: añade un punto en el trazo y lo
+       deja agarrado para arrastrarlo (nivelar la flecha con la imagen). */
+    for (const o of selectedObjects()) {
+      if (o.locked || !o.pts) continue;
+      for (const m of pathMidpoints(o)) {
+        if (Math.hypot(img.x - m.x, img.y - m.y) <= nodeTol) {
+          const snapshot = JSON.stringify({ objects: state.objects, adjust: state.adjust });
+          const a = o.pts[m.index - 1] || o.pts[0], b = o.pts[m.index % o.pts.length];
+          o.pts.splice(m.index, 0, closestPtSeg(img, a, b));
+          select([o.id]);
+          /* Un solo paso de Deshacer para «añadir + arrastrar»: el estado
+             previo se guarda aquí y se confirma al soltar el puntero. */
+          drag = { mode: 'node', obj: o, index: m.index, x0: img.x, y0: img.y, moved: false, added: true, snapshot };
+          requestRender(); return;
+        }
+      }
     }
     if (hit) {
       if (!state.selected.includes(hit.id)) select([hit.id], e.shiftKey);
@@ -17711,8 +17758,21 @@ canvas.addEventListener('pointermove', e => {
   if (drag?.mode === 'pan') { state.view.tx = drag.tx + (pos.x - drag.x0); state.view.ty = drag.ty + (pos.y - drag.y0); requestRender(); return; }
   if (drag?.mode === 'move') {
     const dx = img.x - drag.x0, dy = img.y - drag.y0;
-    if (Math.abs(dx) + Math.abs(dy) > 0.5) drag.moved = true;
+    /* Umbral en pantalla (~2 px): un doble clic o un temblor no mueven el
+       objeto por accidente. */
+    if (Math.abs(dx) + Math.abs(dy) > 2 / state.view.scale) drag.moved = true;
     if (drag.moved) { moveSelected(dx, dy); drag.x0 = img.x; drag.y0 = img.y; }
+    return;
+  }
+  if (drag?.mode === 'node') {
+    const dx = img.x - drag.x0, dy = img.y - drag.y0;
+    if (Math.abs(dx) + Math.abs(dy) > 2 / state.view.scale) drag.moved = true;
+    if (drag.moved) {
+      /* Sin imán: el punto sigue al puntero 1:1 para nivelarlo con precisión. */
+      drag.obj.pts[drag.index] = { x: img.x, y: img.y };
+      drag.x0 = img.x; drag.y0 = img.y;
+      requestRender();
+    }
     return;
   }
   if (marquee) { marquee.x1 = pos.x; marquee.y1 = pos.y; requestRender(); return; }
@@ -17727,7 +17787,7 @@ canvas.addEventListener('pointermove', e => {
 function finishPointer(e) {
   pointers.delete(e.pointerId);
   if (pointers.size < 2) pinch = null;
-  if (drag?.mode === 'move' && drag.moved) { history.push(drag.snapshot); future = []; state.dirty = true; scheduleAutosave(); }
+  if ((drag?.mode === 'move' || drag?.mode === 'node') && (drag.moved || drag.added)) { history.push(drag.snapshot); future = []; state.dirty = true; scheduleAutosave(); }
   drag = null;
   if (marquee) {
     const x0 = Math.min(marquee.x0, marquee.x1), y0 = Math.min(marquee.y0, marquee.y1), x1 = Math.max(marquee.x0, marquee.x1), y1 = Math.max(marquee.y0, marquee.y1);
@@ -17747,7 +17807,28 @@ function finishPointer(e) {
       setTool('select'); return;
     }
     if (d.tool === 'freehand' && d.pts.length < 3) { setStatus('Trazo demasiado corto.'); return; }
-    if (d.tool !== 'freehand' && Math.hypot(d.cur.x - d.start.x, d.cur.y - d.start.y) < 6) { setStatus('Trazo demasiado corto.'); return; }
+    if (d.tool !== 'freehand' && Math.hypot(d.cur.x - d.start.x, d.cur.y - d.start.y) < 6) {
+      /* Clic o toque sin arrastre: coloca el elemento con un tamaño por
+         defecto en ese punto, en vez de descartarlo. Después se ajusta
+         arrastrando sus extremos (o con «Seleccionar» para moverlo). */
+      if (d.tool === 'arrow' || d.tool === 'line' || d.tool === 'doubleArrow') {
+        commitHistory('crear');
+        const o = newObject(d.tool, { pts: [{ x: d.start.x, y: d.start.y }, { x: d.start.x + 240, y: d.start.y }] });
+        o.name = { arrow: 'Flecha', doubleArrow: 'Flecha doble', line: 'Línea' }[d.tool];
+        state.objects.push(o); select([o.id]);
+        setStatus(o.name + ' creada (240 px). Arrastra sus extremos para ajustarla o pulsa Esc para seleccionar.');
+        return;
+      }
+      if (d.tool === 'rect' || d.tool === 'ellipse') {
+        commitHistory('crear');
+        const o = newObject(d.tool, { x: d.start.x - 120, y: d.start.y - 80, w: 240, h: 160, text: '' });
+        o.name = d.tool === 'rect' ? 'Rectángulo' : 'Elipse';
+        state.objects.push(o); select([o.id]);
+        setStatus(o.name + ' creado (240 × 160). Arrástralo para moverlo o pulsa Esc para seleccionar.');
+        return;
+      }
+      setStatus('Trazo demasiado corto.'); return;
+    }
     commitHistory('crear');
     let o;
     if (d.tool === 'rect' || d.tool === 'ellipse') {
@@ -18647,7 +18728,7 @@ function init() {
         purpose: 'Anotar fotografías con rutas, flechas, rótulos sobre trazo y cuadros de etiqueta; exportar PNG, JPEG, WebP, PDF y SVG.',
         steps: [
           { title: 'Cargar la foto', body: 'Pulsa «Cargar imagen», arrastra el archivo al lienzo o pégalo con Ctrl+V. También puedes traer una foto de Reporte de vialidades con «Desde Reporte de vialidades».' },
-          { title: 'Trazar una ruta', body: 'Elige «Curva suave» o «Flecha» en la barra lateral, haz clic por los puntos del recorrido y termina con doble clic o Enter. Los nodos se arrastran para ajustar el trazo. La herramienta sigue activa para trazar la siguiente; pulsa Esc para volver a «Seleccionar».' },
+          { title: 'Trazar una ruta', body: 'Elige «Curva suave» o «Flecha» en la barra lateral, haz clic por los puntos del recorrido y termina con doble clic o Enter. Un solo clic con «Flecha» coloca una flecha de 240 px; mantener pulsado y arrastrar la dibuja a medida. Para nivelar la ruta, arrastra los nodos (círculos blancos) o pulsa el tirador verde «+» del medio de un segmento para añadir un punto y moverlo. La herramienta sigue activa para trazar la siguiente; pulsa Esc para volver a «Seleccionar».' },
           { title: 'Flechas consecutivas y tren', body: 'En Propiedades, «Flechas consecutivas» repite la punta a lo largo del trazo hacia adelante, hacia atrás o en ambos sentidos, como en Mapas y croquis. La herramienta «Tren» dibuja una línea con traviesas como vía férrea.' },
           { title: 'Rotular', body: 'Activa «Texto siguiendo el trazo» en Propiedades para escribir el nombre de la calle sobre la ruta, o usa «Etiqueta» para un cuadro de color con texto blanco.' },
           { title: 'Exportar y enviar', body: 'Descarga PNG, JPEG, WebP, PDF o SVG desde la barra superior, o envía la imagen terminada a Reporte de vialidades o a WhatsApp con los botones «Enviar».' }
